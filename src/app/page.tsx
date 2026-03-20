@@ -1,11 +1,15 @@
-import Link from 'next/link'
-import { Play, Headphones, ArrowRight, Music, Star, Users, DollarSign } from 'lucide-react'
-import { TRACKS, ARTISTS, PRODUCTS } from '@/lib/data'
+'use client';
+
+import Link from 'next/link';
+import { Play, Headphones, ArrowRight, Music, Star, Users, DollarSign, Upload } from 'lucide-react';
+import { useSupabase } from '@/app/providers';
+import { TRACKS, ARTISTS, PRODUCTS } from '@/lib/data';
 
 export default function Home() {
-  const featuredTracks = TRACKS.slice(0, 3)
-  const featuredProducts = PRODUCTS.filter(p => p.category === 'merch' || p.category === 'music').slice(0, 3)
-  const artist = ARTISTS[0]
+  const { user } = useSupabase();
+  const featuredTracks = TRACKS.slice(0, 3);
+  const featuredProducts = PRODUCTS.filter(p => p.category === 'merch' || p.category === 'music').slice(0, 3);
+  const artist = ARTISTS[0];
 
   return (
     <div className="min-h-screen">
@@ -35,19 +39,34 @@ export default function Home() {
                 <span className="text-white">80% goes to you.</span>
               </p>
 
-              {/* CTAs */}
+              {/* CTAs - Show different buttons based on login state */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Link href="/marketplace" className="pf-btn pf-btn-primary text-lg px-8 py-4">
-                  <Headphones className="inline mr-2" size={20} />
-                  Browse Shop
-                </Link>
-                <Link href="/digital" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
-                  <Music className="inline mr-2" size={20} />
-                  Listen Now
-                </Link>
+                {user ? (
+                  // Logged in - show Upload Music and Dashboard
+                  <>
+                    <Link href="/dashboard/upload" className="pf-btn pf-btn-primary text-lg px-8 py-4">
+                      <Upload className="inline mr-2" size={20} />
+                      Upload Music
+                    </Link>
+                    <Link href="/marketplace" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
+                      <Headphones className="inline mr-2" size={20} />
+                      Browse Shop
+                    </Link>
+                  </>
+                ) : (
+                  // Not logged in - show Browse and Listen
+                  <>
+                    <Link href="/marketplace" className="pf-btn pf-btn-primary text-lg px-8 py-4">
+                      <Headphones className="inline mr-2" size={20} />
+                      Browse Shop
+                    </Link>
+                    <Link href="/digital" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
+                      <Music className="inline mr-2" size={20} />
+                      Listen Now
+                    </Link>
+                  </>
+                )}
               </div>
-
-              {/* Stats */}
               <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
                 <div>
                   <div className="text-3xl md:text-4xl font-bold text-[var(--pf-orange)]">847</div>
@@ -203,15 +222,25 @@ export default function Home() {
         <div className="pf-container">
           <div className="pf-card p-12 text-center bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Own Your Music?
+              {user ? 'Ready to Upload?' : 'Ready to Own Your Music?'}
             </h2>
             <p className="text-xl text-[var(--pf-text-secondary)] mb-8 max-w-xl mx-auto">
-              Upload today. Start earning tomorrow. No label required.
+              {user 
+                ? 'Upload your tracks and start earning from your music today.'
+                : 'Upload today. Start earning tomorrow. No label required.'
+              }
             </p>
-            <Link href="/signup?role=artist" className="pf-btn pf-btn-primary text-lg px-10 py-4">
-              Get Started Free
-              <ArrowRight className="inline ml-2" size={20} />
-            </Link>
+            {user ? (
+              <Link href="/dashboard/upload" className="pf-btn pf-btn-primary text-lg px-10 py-4">
+                <Upload className="inline mr-2" size={20} />
+                Upload Your First Track
+              </Link>
+            ) : (
+              <Link href="/signup?role=artist" className="pf-btn pf-btn-primary text-lg px-10 py-4">
+                Get Started Free
+                <ArrowRight className="inline ml-2" size={20} />
+              </Link>
+            )}
           </div>
         </div>
       </section>

@@ -1,130 +1,178 @@
 'use client'
 
 import { useState } from 'react'
-import { Suspense } from 'react'
 import { useSupabase } from '@/app/providers'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Music, Store, Building2, Star, ArrowRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Music, Store, Building2, Star } from 'lucide-react'
 
-const ROLES = [
-  { value: 'supporter', icon: Star, title: 'Supporter', description: 'Shop, listen, support artists', color: 'text-[var(--pf-orange)]', bgColor: 'bg-[var(--pf-orange)]/10' },
-  { value: 'artist', icon: Music, title: 'Artist', description: 'Upload music, sell merch, earn from everything', color: 'text-purple-400', bgColor: 'bg-purple-500/10' },
-  { value: 'business', icon: Store, title: 'Small Business', description: 'Sell products, reach music fans', color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
-  { value: 'brand', icon: Building2, title: 'Brand', description: 'Sponsor artists, run campaigns', color: 'text-green-400', bgColor: 'bg-green-500/10' },
-]
-
-function SignupContent() {
+export default function SignupPage() {
   const { supabase } = useSupabase()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const preselectedRole = searchParams.get('role')
   
-  const [step, setStep] = useState(preselectedRole ? 2 : 1)
-  const [selectedRole, setSelectedRole] = useState(preselectedRole || '')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [role, setRole] = useState('supporter')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ email: '', password: '', name: '', referral_code: '' })
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
+    setError('')
+
     try {
       if (!supabase) {
-        router.push('/dashboard')
+        setError('Database not configured. Please run the SQL setup first.')
+        setLoading(false)
         return
       }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: { data: { name: formData.name, role: selectedRole } },
-      })
-      if (signUpError) throw signUpError
-      if (data.user) {
-        await supabase.from('profiles').update({ role: selectedRole, name: formData.name }).eq('id', data.user.id)
-        if (formData.referral_code) {
-          const { data: referrer } = await supabase.from('profiles').select('id').eq('referral_code', formData.referral_code).single()
-          if (referrer) {
-            await supabase.from('referrals').insert({ referrer_id: referrer.id, referred_id: data.user.id, referral_code: formData.referral_code })
-          }
+        email,
+        password,
+        options: {
+          data: { name, role },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
+      })
+
+      if (signUpError) {
+        setError(signUpError.message)
+        return
       }
-      router.push(selectedRole === 'artist' ? '/dashboard/artist' : '/dashboard')
+
+      if (data.user) {
+        // Create profile
+        await supabase.from('profiles').insert({
+          id: data.user.id,
+          email: email,
+          full_name: name,
+          role: role,
+          referral_code: 'PF-' + Math.random().toString(36).substr(2, 8).toUpperCase()
+        })
+        
+        setSuccess(true)
+      }
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'An error occurred')
     } finally {
       setLoading(false)
     }
   }
 
+  if (success) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
+        <div className="pf-card p-8 max-w-md mx-auto text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+            <span className="text-3xl">✓</span>
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Check Your Email</h1>
+          <p className="text-[var(--pf-text-secondary)] mb-6">
+            We sent a confirmation link to <strong>{email}</strong>
+          </p>
+          <p className="text-sm text-[var(--pf-text-muted)]">
+            Click the link to verify your account, then you can log in.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen pt-24 pb-12">
-      <div className="pf-container max-w-lg">
+      <div className="pf-container max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Join the Economy</h1>
-          <p className="text-[var(--pf-text-secondary)]">{step === 1 ? 'What describes you?' : 'Create your account'}</p>
+          <h1 className="text-3xl font-bold mb-2">Create Account</h1>
+          <p className="text-[var(--pf-text-secondary)]">Join the artist economy</p>
         </div>
-        {error && <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400">{error}</div>}
-        {step === 1 && (
-          <div className="space-y-4">
-            {ROLES.map((role) => (
-              <button key={role.value} onClick={() => { setSelectedRole(role.value); setStep(2) }} className={'w-full p-4 rounded-xl border text-left transition-all ' + (selectedRole === role.value ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/10' : 'border-[var(--pf-border)] hover:border-[var(--pf-border-hover)]')}>
-                <div className="flex items-center gap-4">
-                  <div className={'w-12 h-12 rounded-xl flex items-center justify-center ' + role.bgColor}>
-                    <role.icon className={role.color} size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">{role.title}</h3>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">{role.description}</p>
-                  </div>
-                </div>
-              </button>
-            ))}
-            <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-purple-500/10 to-transparent border border-purple-500/20">
-              <div className="flex items-center gap-3 mb-3">
-                <Star className="text-purple-400" size={24} />
-                <h3 className="font-semibold text-purple-400">Become a Superfan</h3>
-              </div>
-              <p className="text-sm text-[var(--pf-text-secondary)] mb-4">Promote artists you love and earn from every sale.</p>
-              <button onClick={() => { setSelectedRole('supporter'); setStep(2) }} className="pf-btn bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400">Learn More <ArrowRight className="inline ml-1" size={16} /></button>
-            </div>
+
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400">
+            {error}
           </div>
         )}
-        {step === 2 && (
-          <form onSubmit={handleSignup} className="pf-card p-6 space-y-4">
-            <div className="flex items-center justify-between mb-2">
-              <button type="button" onClick={() => setStep(1)} className="text-sm text-[var(--pf-text-secondary)] hover:text-white">← Choose different role</button>
-              <span className="text-sm text-[var(--pf-orange)] capitalize">{ROLES.find(r => r.value === selectedRole)?.title}</span>
+
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)]"
+              placeholder="Your name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)]"
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)]"
+              placeholder="At least 6 characters"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">I am a...</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: 'supporter', icon: Star, label: 'Fan' },
+                { value: 'artist', icon: Music, label: 'Artist' },
+                { value: 'business', icon: Store, label: 'Business' },
+                { value: 'brand', icon: Building2, label: 'Brand' },
+              ].map((r) => (
+                <button
+                  key={r.value}
+                  type="button"
+                  onClick={() => setRole(r.value)}
+                  className={`p-3 rounded-lg border text-center transition-all ${
+                    role === r.value
+                      ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/10'
+                      : 'border-[var(--pf-border)] hover:border-[var(--pf-border-hover)]'
+                  }`}
+                >
+                  <r.icon className="mx-auto mb-1" size={20} />
+                  <span className="text-sm">{r.label}</span>
+                </button>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Name</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))} placeholder="Your name" className="pf-input" required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input type="email" value={formData.email} onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))} placeholder="you@example.com" className="pf-input" required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
-              <input type="password" value={formData.password} onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))} placeholder="Create a password" className="pf-input" required minLength={8} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Referral Code (optional)</label>
-              <input type="text" value={formData.referral_code} onChange={(e) => setFormData(prev => ({ ...prev, referral_code: e.target.value.toUpperCase() }))} placeholder="PF-XXXXXXXX" className="pf-input" />
-            </div>
-            <button type="submit" disabled={loading} className="pf-btn pf-btn-primary w-full">{loading ? 'Creating account...' : 'Create Account'}</button>
-            <p className="text-center text-sm text-[var(--pf-text-muted)]">Already have an account? <a href="/login" className="text-[var(--pf-orange)] hover:underline">Sign in</a></p>
-          </form>
-        )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full pf-btn pf-btn-primary py-4"
+          >
+            {loading ? 'Creating account...' : 'Create Account'}
+          </button>
+
+          <p className="text-center text-sm text-[var(--pf-text-muted)]">
+            Already have an account?{' '}
+            <a href="/login" className="text-[var(--pf-orange)] hover:underline">Sign in</a>
+          </p>
+        </form>
       </div>
     </div>
-  )
-}
-
-export default function SignupPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-[var(--pf-text-muted)]">Loading...</div></div>}>
-      <SignupContent />
-    </Suspense>
   )
 }

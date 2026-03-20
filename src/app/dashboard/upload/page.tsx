@@ -89,10 +89,33 @@ export default function UploadMusicPage() {
       );
 
       if (supabase && user) {
-        // In production, upload files to Supabase Storage
-        // For now, save metadata to database
-        const { error } = await supabase.from('tracks').insert(
-          tracksWithDuration.map(track => ({
+        // Upload each track to Supabase Storage
+        for (const track of tracksWithDuration) {
+          if (!track.file) continue;
+          
+          // Create unique filename with user ID
+          const fileName = `${user.id}/${Date.now()}-${track.file.name}`;
+          
+          // Upload to Supabase Storage
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('music')
+            .upload(fileName, track.file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+          
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            continue;
+          }
+          
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('music')
+            .getPublicUrl(fileName);
+          
+          // Save track metadata to database
+          const { error: insertError } = await supabase.from('tracks').insert({
             artist_id: user.id,
             title: track.title,
             artist: track.artist,
@@ -100,18 +123,26 @@ export default function UploadMusicPage() {
             duration: track.duration,
             price: track.price,
             proud_to_pay_min: track.price,
+            file_url: publicUrl,
+            file_path: fileName,
             created_at: new Date().toISOString(),
-          }))
-        );
-
-        if (error) throw error;
+          });
+          
+          if (insertError) {
+            console.error('Insert error:', insertError);
+          }
+        }
+        
+        alert(`Successfully uploaded ${tracks.length} track(s)!`);
+        setTracks([]);
+      } else {
+        // Not logged in - show demo message
+        alert(`Upload saved locally. In production with Supabase connected, this would persist to cloud storage.`);
+        setTracks([]);
       }
-
-      alert(`Uploaded ${tracks.length} track(s)! In production, these would be saved to Supabase Storage.`);
-      setTracks([]);
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload saved locally. In production with Supabase connected, this would persist.');
+      alert('Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }

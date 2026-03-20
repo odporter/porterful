@@ -2,191 +2,244 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-
-// Placeholder artist data - will come from database
-const placeholderArtist = {
-  id: 'artist-placeholder',
-  name: 'O D Porter',
-  bio: 'New Orleans-born artist blending hip-hop, R&B, and soul. Creating music that speaks to the human experience.',
-  location: 'New Orleans, LA',
-  genre: 'Hip-Hop / R&B',
-  followers: 2847,
-  products: 12,
-  image: '/placeholder-artist.jpg',
-  banner: '/placeholder-banner.jpg',
-  verified: true,
-  social: {
-    instagram: 'odporter',
-    twitter: 'odporter',
-    spotify: 'odporter',
-  }
-};
-
-const placeholderProducts = [
-  { id: 1, name: 'Essential Tee', price: 35, image: '/placeholder-product.jpg', type: 'merch' },
-  { id: 2, name: 'Limited Hoodie', price: 75, image: '/placeholder-product.jpg', type: 'merch' },
-  { id: 3, name: 'Cap - Black', price: 30, image: '/placeholder-product.jpg', type: 'merch' },
-];
-
-const placeholderTracks = [
-  { id: 1, name: 'Late Night', duration: '3:42', plays: '125K' },
-  { id: 2, name: 'Vibes', duration: '4:15', plays: '89K' },
-  { id: 3, name: 'Movement', duration: '3:58', plays: '67K' },
-];
+import { Play, Heart, Share2, Music, Package, Users, DollarSign } from 'lucide-react';
+import { TRACKS, ARTISTS, PRODUCTS } from '@/lib/data';
 
 export default function ArtistProfilePage({ params }: { params: { id: string } }) {
-  const [activeTab, setActiveTab] = useState<'products' | 'music' | 'about'>('products');
+  const [activeTab, setActiveTab] = useState<'music' | 'merch' | 'about'>('music');
+  const [following, setFollowing] = useState(false);
+
+  const artist = ARTISTS[0];
+  const tracks = TRACKS;
+  const merchProducts = PRODUCTS.filter(p => p.artist === artist.name);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Banner */}
-      <div className="relative h-64 md:h-80 bg-gradient-to-b from-[#ff6b00]/30 to-[#0a0a0a]">
-        <div className="absolute inset-0 bg-[url('/placeholder-banner.jpg')] bg-cover bg-center opacity-30" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
-      </div>
-
-      {/* Artist Info */}
-      <div className="max-w-6xl mx-auto px-6 -mt-20 relative">
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          {/* Avatar */}
-          <div className="w-40 h-40 rounded-full bg-[#1a1a1a] border-4 border-[#0a0a0a] overflow-hidden relative">
-            <div className="absolute inset-0 bg-[#ff6b00]/20 flex items-center justify-center text-6xl">
-              {placeholderArtist.name.charAt(0)}
-            </div>
+    <div className="min-h-screen pt-24 pb-12">
+      <div className="pf-container">
+        {/* Hero */}
+        <div className="relative mb-8">
+          <div className="h-48 md:h-64 rounded-2xl overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1493225457124-a3eb1614b109?w=1200"
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--pf-bg)] via-transparent to-transparent" />
           </div>
+        </div>
 
-          {/* Info */}
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl md:text-4xl font-bold">{placeholderArtist.name}</h1>
-              {placeholderArtist.verified && (
-                <span className="bg-[#ff6b00]/20 text-[#ff6b00] px-2 py-1 rounded-full text-xs font-semibold">
-                  ✓ Verified
-                </span>
-              )}
+        {/* Artist Info */}
+        <div className="relative -mt-24 mb-8">
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            {/* Avatar */}
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-[var(--pf-bg)] shadow-xl">
+              <img 
+                src={artist.image}
+                alt={artist.name}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <p className="text-gray-400 mb-4">{placeholderArtist.location} • {placeholderArtist.genre}</p>
-            <p className="text-gray-300 mb-6 max-w-2xl">{placeholderArtist.bio}</p>
 
-            <div className="flex flex-wrap gap-4">
-              <button className="bg-[#ff6b00] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#ff8533] transition-colors">
-                Follow
-              </button>
-              <button className="bg-transparent border border-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:border-gray-400 transition-colors">
-                ♪ Share Referral Code
-              </button>
-            </div>
-          </div>
+            {/* Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">{artist.name}</h1>
+                {artist.verified && (
+                  <span className="bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] px-2 py-0.5 rounded text-sm font-medium">
+                    ✓ Verified
+                  </span>
+                )}
+              </div>
+              <p className="text-[var(--pf-text-secondary)] mb-4">
+                {artist.genre} • {artist.location}
+              </p>
+              <p className="text-[var(--pf-text-muted)] max-w-xl">
+                {artist.bio}
+              </p>
 
-          {/* Stats */}
-          <div className="flex gap-6 md:gap-8 text-center">
-            <div>
-              <div className="text-2xl font-bold">{placeholderArtist.followers.toLocaleString()}</div>
-              <div className="text-gray-500 text-sm">Followers</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{placeholderArtist.products}</div>
-              <div className="text-gray-500 text-sm">Products</div>
+              {/* Stats */}
+              <div className="flex items-center gap-6 mt-4">
+                <div>
+                  <p className="text-2xl font-bold text-[var(--pf-orange)]">${artist.earnings.toLocaleString()}</p>
+                  <p className="text-sm text-[var(--pf-text-muted)]">Earned</p>
+                </div>
+                <div className="w-px h-8 bg-[var(--pf-border)]" />
+                <div>
+                  <p className="text-2xl font-bold">{artist.supporters.toLocaleString()}</p>
+                  <p className="text-sm text-[var(--pf-text-muted)]">Supporters</p>
+                </div>
+                <div className="w-px h-8 bg-[var(--pf-border)]" />
+                <div>
+                  <p className="text-2xl font-bold">{artist.tracks}</p>
+                  <p className="text-sm text-[var(--pf-text-muted)]">Tracks</p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-wrap gap-3 mt-6">
+                <button 
+                  onClick={() => setFollowing(!following)}
+                  className={`pf-btn ${following ? 'pf-btn-primary' : 'pf-btn-secondary'}`}
+                >
+                  <Heart 
+                    size={18} 
+                    className={`inline mr-2 ${following ? 'fill-white' : ''}`}
+                  />
+                  {following ? 'Following' : 'Follow'}
+                </button>
+                <Link href="/digital" className="pf-btn pf-btn-primary">
+                  <Play size={18} className="inline mr-2" />
+                  Play All
+                </Link>
+                <button className="pf-btn pf-btn-secondary">
+                  <Share2 size={18} className="inline mr-2" />
+                  Share
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="mt-8 border-b border-gray-800">
+        <div className="border-b border-[var(--pf-border)] mb-8">
           <div className="flex gap-8">
-            {(['products', 'music', 'about'] as const).map((tab) => (
+            {(['music', 'merch', 'about'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-4 font-semibold transition-colors ${
+                className={`pb-4 font-semibold transition-colors capitalize ${
                   activeTab === tab
-                    ? 'text-[#ff6b00] border-b-2 border-[#ff6b00]'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? 'text-[var(--pf-orange)] border-b-2 border-[var(--pf-orange)]'
+                    : 'text-[var(--pf-text-muted)] hover:text-white'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab}
               </button>
             ))}
           </div>
         </div>
 
         {/* Tab Content */}
-        <div className="py-8">
-          {activeTab === 'products' && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {placeholderProducts.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/product/${product.id}`}
-                  className="group bg-[#1a1a1a] rounded-xl overflow-hidden border border-gray-800 hover:border-[#ff6b00]/50 transition-colors"
-                >
-                  <div className="aspect-square bg-[#ff6b00]/10 flex items-center justify-center text-4xl">
-                    👕
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold mb-1 group-hover:text-[#ff6b00] transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-[#ff6b00] font-semibold">${product.price}</p>
-                  </div>
-                </Link>
-              ))}
+        {activeTab === 'music' && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold">Music ({tracks.length})</h2>
+              <Link href="/digital" className="text-[var(--pf-orange)] hover:underline">
+                View all releases
+              </Link>
             </div>
-          )}
-
-          {activeTab === 'music' && (
-            <div className="bg-[#1a1a1a] rounded-xl border border-gray-800">
-              <div className="p-4 border-b border-gray-800">
-                <h3 className="font-semibold">Latest Releases</h3>
-              </div>
-              <div className="divide-y divide-gray-800">
-                {placeholderTracks.map((track) => (
-                  <div
-                    key={track.id}
-                    className="flex items-center gap-4 p-4 hover:bg-[#222] cursor-pointer transition-colors"
-                  >
-                    <div className="w-12 h-12 bg-[#ff6b00]/20 rounded flex items-center justify-center">
-                      🎵
+            <div className="pf-card overflow-hidden">
+              <div className="divide-y divide-[var(--pf-border)]">
+                {tracks.map((track, i) => (
+                  <div key={track.id} className="flex items-center gap-4 p-4 hover:bg-[var(--pf-surface-hover)] transition-colors group">
+                    <span className="w-8 text-center text-[var(--pf-text-muted)] font-bold">{i + 1}</span>
+                    <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
+                      <img src={track.image} alt={track.title} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{track.name}</h4>
-                      <p className="text-gray-500 text-sm">{track.plays} plays</p>
+                    <button className="w-10 h-10 rounded-full bg-[var(--pf-surface)] flex items-center justify-center group-hover:bg-[var(--pf-orange)] transition-colors shrink-0">
+                      <Play size={16} className="text-white ml-0.5" />
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold truncate">{track.title}</p>
+                      <p className="text-sm text-[var(--pf-text-muted)]">{track.album}</p>
                     </div>
-                    <span className="text-gray-500">{track.duration}</span>
-                    <button className="text-[#ff6b00] hover:text-[#ff8533]">▶</button>
+                    <span className="text-sm text-[var(--pf-text-muted)] hidden sm:block">
+                      {(track.plays / 1000).toFixed(0)}K plays
+                    </span>
+                    <span className="text-sm text-[var(--pf-text-muted)]">{track.duration}</span>
+                    <span className="font-bold">${track.price}+</span>
                   </div>
                 ))}
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {activeTab === 'about' && (
-            <div className="max-w-2xl">
-              <h3 className="text-xl font-bold mb-4">About {placeholderArtist.name}</h3>
-              <p className="text-gray-300 mb-6">{placeholderArtist.bio}</p>
+        {activeTab === 'merch' && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold">Merch ({merchProducts.length})</h2>
+              <Link href="/marketplace" className="text-[var(--pf-orange)] hover:underline">
+                View all products
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {merchProducts.map((product) => (
+                <Link key={product.id} href={`/product/${product.id}`} className="pf-card group overflow-hidden">
+                  <div className="aspect-square bg-[var(--pf-surface)] overflow-hidden">
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold group-hover:text-[var(--pf-orange)] transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-[var(--pf-text-muted)]">{product.type}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-lg font-bold">${product.price}</span>
+                      <span className="text-xs text-green-400">${(product.artistCut).toFixed(2)} to artist</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'about' && (
+          <div className="max-w-2xl">
+            <div className="pf-card p-8">
+              <h2 className="text-xl font-bold mb-4">About {artist.name}</h2>
+              <p className="text-[var(--pf-text-secondary)] mb-6">
+                {artist.bio}
+              </p>
               
-              <h4 className="font-semibold mb-3">Location</h4>
-              <p className="text-gray-400 mb-6">{placeholderArtist.location}</p>
-              
-              <h4 className="font-semibold mb-3">Genre</h4>
-              <p className="text-gray-400 mb-6">{placeholderArtist.genre}</p>
-              
-              <h4 className="font-semibold mb-3">Social</h4>
-              <div className="flex gap-4">
-                <a href="#" className="text-gray-400 hover:text-[#ff6b00] transition-colors">
-                  Instagram
-                </a>
-                <a href="#" className="text-gray-400 hover:text-[#ff6b00] transition-colors">
-                  Twitter
-                </a>
-                <a href="#" className="text-gray-400 hover:text-[#ff6b00] transition-colors">
-                  Spotify
-                </a>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <h3 className="font-semibold mb-2">Location</h3>
+                  <p className="text-[var(--pf-text-muted)]">{artist.location}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Genre</h3>
+                  <p className="text-[var(--pf-text-muted)]">{artist.genre}</p>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-[var(--pf-border)]">
+                <h3 className="font-semibold mb-4">Stats</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="flex items-center gap-3">
+                    <Music className="text-purple-400" size={24} />
+                    <div>
+                      <p className="text-xl font-bold">{artist.tracks}</p>
+                      <p className="text-sm text-[var(--pf-text-muted)]">Tracks</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users className="text-blue-400" size={24} />
+                    <div>
+                      <p className="text-xl font-bold">{artist.supporters.toLocaleString()}</p>
+                      <p className="text-sm text-[var(--pf-text-muted)]">Supporters</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <DollarSign className="text-green-400" size={24} />
+                    <div>
+                      <p className="text-xl font-bold">${artist.earnings.toLocaleString()}</p>
+                      <p className="text-sm text-[var(--pf-text-muted)]">Earned</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Package className="text-[var(--pf-orange)]" size={24} />
+                    <div>
+                      <p className="text-xl font-bold">{artist.products}</p>
+                      <p className="text-sm text-[var(--pf-text-muted)]">Products</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,7 +10,9 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Logo className="h-8 w-auto mb-4" />
+            <div className="mb-4">
+              <Logo className="h-8 w-auto" />
+            </div>
             <p className="text-gray-400 text-sm mb-4">
               The Artist Economy.<br />
               Where creators own everything.

@@ -241,6 +241,13 @@ export default function Home() {
           <p className="text-center text-[var(--pf-text-muted)] italic mt-8">
             "The best platforms aren't free. They're funded by people who believe." — Porterful
           </p>
+          
+          <div className="text-center mt-8">
+            <Link href="/support" className="pf-btn pf-btn-primary">
+              <Star className="inline mr-2" size={18} />
+              Find Artists to Support
+            </Link>
+          </div>
         </div>
       </section>
 

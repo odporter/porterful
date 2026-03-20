@@ -1,11 +1,31 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 // GET /api/orders - List user's orders
 export async function GET(request: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {}
+          },
+        },
+      }
+    )
+
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -48,7 +68,27 @@ export async function GET(request: Request) {
 // POST /api/orders - Create order (checkout)
 export async function POST(request: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {}
+          },
+        },
+      }
+    )
+
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -134,7 +174,7 @@ export async function POST(request: Request) {
     // Create order items
     const { error: itemsError } = await supabase
       .from('order_items')
-      .insert(orderItems.map(item => ({
+      .insert(orderItems.map((item: any) => ({
         ...item,
         order_id: order.id,
       })))

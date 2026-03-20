@@ -49,7 +49,7 @@ export default function DashboardPage() {
       const { data: productsData } = await supabase
         .from('products')
         .select('*')
-        .eq('seller_id', user.id)
+        .eq('seller_id', user!.id)
 
       if (productsData) {
         setProducts(productsData)

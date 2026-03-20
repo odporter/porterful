@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 // Demo tracks
@@ -16,7 +16,6 @@ export function Player() {
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const track = DEMO_TRACKS[currentTrack];
 
@@ -30,17 +29,10 @@ export function Player() {
     setProgress(0);
   };
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
-
   // Simulate progress
   useEffect(() => {
     if (!isPlaying) return;
+    
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -50,8 +42,12 @@ export function Player() {
         return prev + 0.5;
       });
     }, 1000);
+    
     return () => clearInterval(interval);
   }, [isPlaying]);
+
+  const togglePlay = () => setIsPlaying(!isPlaying);
+  const toggleMute = () => setIsMuted(!isMuted);
 
   if (!track) return null;
 
@@ -74,18 +70,21 @@ export function Player() {
           <button
             onClick={playPrev}
             className="p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors"
+            aria-label="Previous track"
           >
             <SkipBack size={18} />
           </button>
           <button
             onClick={togglePlay}
             className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange-light)] transition-colors"
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? <Pause size={18} className="text-white" /> : <Play size={18} className="text-white ml-0.5" />}
           </button>
           <button
             onClick={playNext}
             className="p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors"
+            aria-label="Next track"
           >
             <SkipForward size={18} />
           </button>
@@ -106,6 +105,7 @@ export function Player() {
           <button
             onClick={toggleMute}
             className="p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors"
+            aria-label={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
@@ -116,6 +116,7 @@ export function Player() {
             value={isMuted ? 0 : volume}
             onChange={(e) => setVolume(parseInt(e.target.value))}
             className="w-20 h-1 bg-[var(--pf-surface)] rounded-full appearance-none cursor-pointer"
+            aria-label="Volume"
           />
         </div>
       </div>

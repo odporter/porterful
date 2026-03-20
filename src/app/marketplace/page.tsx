@@ -1,31 +1,11 @@
 import Link from 'next/link'
-import { ShoppingBag, Music, Tshirt, Headphones, Sparkles } from 'lucide-react'
-
-const CATEGORIES = [
-  { id: 'all', name: 'All', icon: Sparkles },
-  { id: 'music', name: 'Music', icon: Music },
-  { id: 'merch', name: 'Merch', icon: Tshirt },
-  { id: 'essentials', name: 'Essentials', icon: ShoppingBag },
-  { id: 'electronics', name: 'Electronics', icon: Headphones },
-]
-
-const PRODUCTS = [
-  // Artist Merch
-  { id: '1', name: 'Ambiguous Tour Tee', artist: 'O D Porter', price: 25, category: 'merch', image: '👕', type: 'Artist Merch' },
-  { id: '2', name: 'Ambiguous EP (Digital)', artist: 'O D Porter', price: 5, category: 'music', image: '💿', type: 'Digital Album' },
-  { id: '3', name: 'Ambiguous Vinyl', artist: 'O D Porter', price: 50, category: 'merch', image: '📀', type: 'Vinyl' },
-  
-  // Essentials (everyday items - part of the marketplace vision)
-  { id: '4', name: 'Premium Toothpaste', brand: 'CleanSmile', price: 8.99, category: 'essentials', image: '🦷', type: 'Essential', discount: '20% supports artists' },
-  { id: '5', name: 'Organic Shampoo', brand: 'Naturals', price: 14.99, category: 'essentials', image: '🧴', type: 'Essential', discount: '20% supports artists' },
-  { id: '6', name: 'Bamboo Toothbrush Set', brand: 'EcoBrush', price: 12.99, category: 'essentials', image: '🌿', type: 'Essential', discount: '20% supports artists' },
-  
-  // Electronics
-  { id: '7', name: 'Wireless Earbuds', brand: 'SoundMax', price: 49.99, category: 'electronics', image: '🎧', type: 'Electronics', discount: '20% supports artists' },
-  { id: '8', name: 'Portable Charger', brand: 'PowerUp', price: 29.99, category: 'electronics', image: '🔋', type: 'Electronics', discount: '20% supports artists' },
-]
+import { ShoppingBag, Music, Headphones, Star } from 'lucide-react'
+import { PRODUCTS, TRACKS, ARTISTS } from '@/lib/data'
 
 export default function MarketplacePage() {
+  const merchProducts = PRODUCTS.filter(p => p.category === 'merch' || p.category === 'music')
+  const essentials = PRODUCTS.filter(p => p.category === 'essentials' || p.category === 'electronics')
+
   return (
     <div className="min-h-screen bg-[var(--pf-bg)]">
       {/* Hero */}
@@ -36,73 +16,124 @@ export default function MarketplacePage() {
               Shop, Stream, Support
             </h1>
             <p className="text-xl text-[var(--pf-text-secondary)] mb-8">
-              Every purchase puts money in artists' pockets. From merch to toothpaste.
+              Every purchase puts money in artists' pockets. From merch to everyday essentials.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <div className="flex items-center gap-2 bg-[var(--pf-surface)] px-4 py-2 rounded-full">
                 <span className="text-[var(--pf-orange)] font-bold">80%</span>
-                <span class="text-[var(--pf-text-secondary)]">to artists on merch</span>
+                <span className="text-[var(--pf-text-secondary)]">to artists on merch</span>
               </div>
               <div className="flex items-center gap-2 bg-[var(--pf-surface)] px-4 py-2 rounded-full">
                 <span className="text-purple-400 font-bold">20%</span>
-                <span class="text-[var(--pf-text-secondary)]">to artists from marketplace</span>
+                <span className="text-[var(--pf-text-secondary)]">to artists from marketplace</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-8 border-b border-[var(--pf-border)]">
+      {/* Featured Artist */}
+      <section className="py-12">
         <div className="pf-container">
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-colors bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] text-[var(--pf-text-secondary)] hover:text-white"
-              >
-                <cat.icon size={16} />
-                {cat.name}
-              </button>
-            ))}
-          </div>
+          {ARTISTS.map((artist) => (
+            <div key={artist.id} className="pf-card p-8 bg-gradient-to-r from-[var(--pf-orange)]/5 to-purple-500/5">
+              <div className="grid md:grid-cols-[200px_1fr] gap-8 items-center">
+                <div className="aspect-square rounded-2xl overflow-hidden">
+                  <img 
+                    src={artist.image} 
+                    alt={artist.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-3xl font-bold">{artist.name}</h2>
+                    {artist.verified && (
+                      <span className="bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] px-2 py-0.5 rounded text-sm font-medium">
+                        ✓ Verified
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[var(--pf-text-secondary)] mb-2">{artist.genre} • {artist.location}</p>
+                  <p className="text-[var(--pf-text-muted)] mb-4">{artist.bio}</p>
+                  <div className="flex items-center gap-6 text-sm">
+                    <div>
+                      <span className="text-2xl font-bold text-[var(--pf-orange)]">${artist.earnings.toLocaleString()}</span>
+                      <span className="text-[var(--pf-text-muted)] ml-1">earned</span>
+                    </div>
+                    <div>
+                      <span className="text-2xl font-bold">{artist.supporters.toLocaleString()}</span>
+                      <span className="text-[var(--pf-text-muted)] ml-1">supporters</span>
+                    </div>
+                    <div>
+                      <span className="text-2xl font-bold">{artist.tracks}</span>
+                      <span className="text-[var(--pf-text-muted)] ml-1">tracks</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-6">
+                    <Link href="/artist/od-porter" className="pf-btn pf-btn-primary">
+                      View Artist
+                    </Link>
+                    <Link href="/digital" className="pf-btn pf-btn-secondary">
+                      Listen Now
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Artist Merch */}
       <section className="py-12">
         <div className="pf-container">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl font-bold">Artist Merch</h2>
-              <p className="text-[var(--pf-text-secondary)]">Direct from the artists you love</p>
+              <p className="text-[var(--pf-text-secondary)]">Direct from O D Porter. 80% goes to the artist.</p>
             </div>
             <Link href="/store" className="text-[var(--pf-orange)] hover:underline">
               View all →
             </Link>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PRODUCTS.filter(p => p.category === 'merch' || p.category === 'music').map((product) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {merchProducts.map((product) => (
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
                 className="pf-card group overflow-hidden"
               >
-                <div className="aspect-square bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-500/10 flex items-center justify-center text-6xl group-hover:scale-105 transition-transform">
-                  {product.image}
+                <div className="aspect-square bg-[var(--pf-surface)] overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <div className="p-4">
-                  <p className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">
-                    {product.type}
-                  </p>
+                  <div className="flex items-center gap-1 mb-1">
+                    <span className="text-xs text-[var(--pf-orange)] font-medium">{product.type}</span>
+                    {product.limited && (
+                      <span className="text-xs text-purple-400 font-medium">• Limited</span>
+                    )}
+                  </div>
                   <h3 className="font-semibold group-hover:text-[var(--pf-orange)] transition-colors">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">{product.artist}</p>
+                  <p className="text-sm text-[var(--pf-text-muted)]">
+                    {product.artist || product.brand}
+                  </p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-lg font-bold">${product.price}</span>
-                    <span className="text-sm text-[var(--pf-orange)]">80% to artist</span>
+                    <div className="flex items-center gap-1 text-sm text-[var(--pf-text-muted)]">
+                      <Star size={14} className="text-yellow-400 fill-yellow-400" />
+                      {product.rating}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 mt-1 text-xs text-green-400">
+                    <span>${(product.artistCut).toFixed(2)} to artist</span>
                   </div>
                 </div>
               </Link>
@@ -111,30 +142,77 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* Marketplace - Everyday Items */}
+      {/* Top Tracks */}
       <section className="py-12 bg-[var(--pf-bg-secondary)]">
+        <div className="pf-container">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold">Top Tracks</h2>
+              <p className="text-[var(--pf-text-secondary)]">Pay what you want. Artists keep 80%.</p>
+            </div>
+            <Link href="/digital" className="pf-btn pf-btn-secondary">
+              <Headphones className="inline mr-2" size={16} />
+              Open Player
+            </Link>
+          </div>
+
+          <div className="pf-card overflow-hidden">
+            <div className="divide-y divide-[var(--pf-border)]">
+              {TRACKS.map((track, i) => (
+                <div key={track.id} className="flex items-center gap-4 p-4 hover:bg-[var(--pf-surface-hover)] transition-colors group">
+                  <span className="w-8 text-center text-[var(--pf-text-muted)] font-bold">{i + 1}</span>
+                  <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
+                    <img src={track.image} alt={track.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate">{track.title}</p>
+                    <p className="text-sm text-[var(--pf-text-muted)]">{track.artist}</p>
+                  </div>
+                  <span className="text-sm text-[var(--pf-text-muted)] hidden sm:block">
+                    {(track.plays / 1000).toFixed(0)}K plays
+                  </span>
+                  <span className="text-sm text-[var(--pf-text-muted)] hidden md:block">
+                    {track.duration}
+                  </span>
+                  <span className="font-bold">${track.price}+</span>
+                  <button className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white ml-0.5">▶</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Everyday Essentials */}
+      <section className="py-12">
         <div className="pf-container">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Everyday Essentials</h2>
             <p className="text-[var(--pf-text-secondary)]">
-              Buy what you need. 20% goes to artists. Same price as Amazon.
+              Buy what you need. 20% goes to artists. Same prices as anywhere else.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {PRODUCTS.filter(p => p.category === 'essentials' || p.category === 'electronics').map((product) => (
+            {essentials.map((product) => (
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
                 className="pf-card group"
               >
-                <div className="aspect-square bg-gradient-to-br from-blue-500/10 to-green-500/10 flex items-center justify-center text-5xl group-hover:scale-105 transition-transform rounded-t-xl">
-                  {product.image}
+                <div className="aspect-square bg-[var(--pf-surface)] overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <div className="p-3">
                   <p className="text-xs text-[var(--pf-text-muted)]">{product.type}</p>
                   <h3 className="font-medium text-sm truncate">{product.name}</h3>
-                  <p className="text-xs text-[var(--pf-text-secondary)]">{product.brand}</p>
+                  <p className="text-xs text-[var(--pf-text-muted)]">{product.brand}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="font-bold">${product.price}</span>
                     <span className="text-xs text-purple-400">20% to artists</span>

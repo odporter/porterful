@@ -181,7 +181,7 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <button className="w-full pf-btn pf-btn-primary mb-4">
+                <button className="w-full pf-btn pf-btn-primary whitespace-nowrap" onClick={() => window.location.href = '/checkout'}>
                   Proceed to Checkout
                 </button>
 

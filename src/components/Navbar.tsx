@@ -94,6 +94,10 @@ export function Navbar() {
                         <ShoppingBag size={16} />
                         Cart
                       </Link>
+                      <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-[var(--pf-text-secondary)] hover:bg-[var(--pf-bg)] hover:text-white transition-colors">
+                        <User size={16} />
+                        Settings
+                      </Link>
                     </div>
                     <div className="border-t border-[var(--pf-border)] py-2">
                       <button 

@@ -14,9 +14,11 @@ const DEMO_ARTISTS = [
   { id: 'artist-6', name: 'Blue Notes', genre: 'Blues', location: 'Chicago, IL', supporters: 423, verified: false },
 ];
 
+type Artist = typeof DEMO_ARTISTS[number];
+
 export default function ProudToPayPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedArtist, setSelectedArtist] = useState<typeof DEMO_ARTISTS[0] | null>(null);
+  const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [customAmount, setCustomAmount] = useState('');
 
@@ -75,13 +77,11 @@ export default function ProudToPayPage() {
         {/* Artist Selection */}
         {!selectedArtist && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-            {filteredArtists.map((artist) => (
+            {filteredArtists.map((artist: Artist) => (
               <button
                 key={artist.id}
                 onClick={() => setSelectedArtist(artist)}
-                className={`pf-card p-6 text-left hover:border-[var(--pf-orange)]/50 transition-all ${
-                  selectedArtist?.id === artist.id ? 'border-[var(--pf-orange)]' : ''
-                }`}
+                className="pf-card p-6 text-left hover:border-[var(--pf-orange)]/50 transition-all"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-2xl shrink-0">

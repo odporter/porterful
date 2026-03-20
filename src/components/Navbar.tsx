@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useSupabase } from '@/app/providers'
-import { Menu, X, User, LogOut, Music, ShoppingBag, TrendingUp, Store, Building2 } from 'lucide-react'
+import { Menu, X, User, LogOut, Music, ShoppingBag, TrendingUp, Store, Building2, Heart } from 'lucide-react'
 
 export function Navbar() {
   const { user, supabase } = useSupabase()
@@ -57,9 +57,9 @@ export function Navbar() {
               <Music size={18} />
               <span>Radio</span>
             </Link>
-            <Link href="/trending" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] transition-all">
-              <TrendingUp size={18} />
-              <span>Trending</span>
+            <Link href="/support" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] transition-all">
+              <Heart size={18} />
+              <span>Proud to Pay</span>
             </Link>
           </div>
 

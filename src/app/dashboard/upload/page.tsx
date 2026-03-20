@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 import { useSupabase } from '@/app/providers';
 import { Upload, Music, Play, Trash2, DollarSign, Clock, Disc } from 'lucide-react';
 

@@ -6,7 +6,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Sliders, X, Clock
 import Link from 'next/link';
 
 export function GlobalPlayer() {
-  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, volume, setVolume, progress, duration, isPreview, previewTimeRemaining, isSupporter, seek } = useAudio();
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, volume, setVolume, progress, duration, isPreview, previewTimeRemaining, isSupporter, seek, isCountingDown, countdownSeconds, nextTrack, skipCountdown } = useAudio();
   const [showEQ, setShowEQ] = useState(false);
   const [showVolume, setShowVolume] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -53,24 +53,42 @@ export function GlobalPlayer() {
   const previewEnding = isPreview && !isSupporter && previewTimeRemaining <= 30 && previewTimeRemaining > 0;
   const previewEnded = isPreview && !isSupporter && previewTimeRemaining <= 0;
 
+  // Show countdown message
+  const showCountdownMessage = isCountingDown && !isSupporter;
+
   return (
     <>
-      {/* Preview Warning Bar - shows when < 30 seconds left */}
-      {previewEnding && !showUpgrade && (
-        <div className="fixed bottom-[88px] md:bottom-[72px] left-0 right-0 bg-yellow-500/20 border-t border-yellow-500/50 py-2 px-4 z-40">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
-              <Clock size={16} className="text-yellow-400" />
-              <span className="text-yellow-400">
-                Preview ending in {Math.floor(previewTimeRemaining)}s
-              </span>
+      {/* Countdown Between Tracks - Radio Style */}
+      {showCountdownMessage && nextTrack && (
+        <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[60] p-4">
+          <div className="text-center max-w-md">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center animate-pulse">
+              <Crown className="text-[var(--pf-orange)]" size={40} />
             </div>
-            <button
-              onClick={() => setShowUpgrade(true)}
-              className="text-sm font-medium text-white bg-[var(--pf-orange)] px-3 py-1 rounded-full hover:bg-[var(--pf-orange)]/80"
-            >
-              Keep Playing →
-            </button>
+            
+            <h2 className="text-2xl font-bold mb-2">Up Next</h2>
+            <p className="text-lg text-[var(--pf-text-secondary)] mb-2">{nextTrack.title}</p>
+            <p className="text-sm text-[var(--pf-text-muted)] mb-6">by {nextTrack.artist}</p>
+            
+            <div className="text-6xl font-bold text-[var(--pf-orange)] mb-6">
+              {countdownSeconds}
+            </div>
+            
+            <p className="text-sm text-[var(--pf-text-muted)] mb-6">
+              Playing in {countdownSeconds} second{countdownSeconds !== 1 ? 's' : ''}...
+            </p>
+
+            <div className="space-y-3">
+              <button
+                onClick={skipCountdown}
+                className="w-full py-3 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors font-medium"
+              >
+                Play Now
+              </button>
+              <p className="text-xs text-[var(--pf-text-muted)]">
+                Get <strong className="text-white">Full Access for $5.99</strong> — every song, no waiting
+              </p>
+            </div>
           </div>
         </div>
       )}

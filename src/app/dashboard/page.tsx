@@ -50,7 +50,7 @@ export default function DashboardPage() {
       const { data: productsData } = await supabase
         .from('products')
         .select('*')
-        .eq('seller_id', user!.id)
+        .eq('creator_id', user!.id)
 
       if (productsData) {
         setProducts(productsData)
@@ -81,7 +81,7 @@ export default function DashboardPage() {
         <div className="pf-container">
           <div className="pf-card p-12 text-center">
             <Store size={48} className="mx-auto mb-4 text-[var(--pf-orange)]" />
-            <h1 className="text-2xl font-bold mb-4">Seller Dashboard</h1>
+            <h1 className="text-2xl font-bold mb-4">Creator Dashboard</h1>
             <p className="text-[var(--pf-text-secondary)] mb-6">
               Sign in to manage your products, view sales, and track earnings.
             </p>
@@ -100,7 +100,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Seller Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
             <p className="text-[var(--pf-text-secondary)]">
               Manage your products and track your earnings
             </p>

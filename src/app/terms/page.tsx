@@ -93,7 +93,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-bold mb-4">8. Cancellations & Refunds</h2>
             <p className="text-gray-300">
-              Refund policies are set by individual sellers. For disputes, contact the seller first, then Porterful support if unresolved. We mediate disputes in good faith.
+              Refund policies are set by individual creators. For disputes, contact the creator first, then Porterful support if unresolved. We mediate disputes in good faith.
             </p>
           </section>
 

@@ -312,7 +312,7 @@ export default function AddProductPage() {
                 </p>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[var(--pf-text-muted)]">You (seller)</span>
+                    <span className="text-[var(--pf-text-muted)]">You (creator)</span>
                     <span className="font-medium">67%</span>
                   </div>
                   <div className="flex justify-between text-sm">

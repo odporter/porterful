@@ -56,7 +56,7 @@ export default function PrivacyPage() {
               We do NOT sell your personal data. We share only:
             </p>
             <ul className="list-disc list-inside text-gray-300 mt-2 space-y-1">
-              <li>With sellers: transaction details needed to fulfill orders</li>
+              <li>With creators: transaction details needed to fulfill orders</li>
               <li>With Stripe: payment processing data</li>
               <li>With analytics providers: anonymized usage data</li>
               <li>When required by law: legal compliance</li>

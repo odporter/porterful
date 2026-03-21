@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
-import { Player } from '@/components/Player'
+import { GlobalPlayer } from '@/components/GlobalPlayer'
 import { Footer } from '@/components/Footer'
 
 export const metadata: Metadata = {
@@ -75,7 +75,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
-          <Player />
+          <GlobalPlayer />
         </Providers>
       </body>
     </html>

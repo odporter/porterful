@@ -64,11 +64,10 @@ export default function OnboardingPage() {
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-[var(--pf-orange)]' : 'bg-[var(--pf-border)]'}`} />
-          <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-[var(--pf-orange)]' : 'bg-[var(--pf-border)]'}`} />
-          <div className={`w-3 h-3 rounded-full ${step >= 3 ? 'bg-[var(--pf-orange)]' : 'bg-[var(--pf-border)]'}`} />
-        </div>
           <div className="w-16 h-0.5 bg-[var(--pf-border)]" />
           <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-[var(--pf-orange)]' : 'bg-[var(--pf-border)]'}`} />
+          <div className="w-16 h-0.5 bg-[var(--pf-border)]" />
+          <div className={`w-3 h-3 rounded-full ${step >= 3 ? 'bg-[var(--pf-orange)]' : 'bg-[var(--pf-border)]'}`} />
         </div>
 
         {step === 1 && (

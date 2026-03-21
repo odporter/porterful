@@ -18,6 +18,9 @@ interface AudioContext {
   volume: number;
   progress: number;
   duration: number;
+  isPreview: boolean;
+  previewTimeRemaining: number;
+  isSupporter: boolean;
   playTrack: (track: Track) => void;
   togglePlay: () => void;
   pause: () => void;
@@ -28,7 +31,11 @@ interface AudioContext {
   queue: Track[];
   setQueue: (tracks: Track[]) => void;
   currentIndex: number;
+  upgradeToFull: () => void;
 }
+
+// Preview duration in seconds (1 minute)
+const PREVIEW_DURATION = 60;
 
 const AudioCtx = createContext<AudioContext | null>(null);
 
@@ -40,7 +47,11 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [queue, setQueue] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [isPreview, setIsPreview] = useState(true);
+  const [previewTimeRemaining, setPreviewTimeRemaining] = useState(PREVIEW_DURATION);
+  const [isSupporter, setIsSupporter] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Create audio element on mount
   useEffect(() => {
@@ -52,12 +63,26 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         if (audioRef.current) {
           const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
           setProgress(isNaN(pct) ? 0 : pct);
+
+          // Track preview time remaining
+          if (isPreview && !isSupporter) {
+            const timeRemaining = PREVIEW_DURATION - audioRef.current.currentTime;
+            setPreviewTimeRemaining(Math.max(0, timeRemaining));
+            
+            // Stop playback after preview duration
+            if (audioRef.current.currentTime >= PREVIEW_DURATION) {
+              audioRef.current.pause();
+              setIsPlaying(false);
+              setIsPreview(false);
+            }
+          }
         }
       });
 
       audioRef.current.addEventListener('loadedmetadata', () => {
         if (audioRef.current) {
           setDuration(audioRef.current.duration);
+          setPreviewTimeRemaining(Math.min(PREVIEW_DURATION, audioRef.current.duration));
         }
       });
 
@@ -79,6 +104,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if (previewTimerRef.current) {
+        clearInterval(previewTimerRef.current);
+      }
     };
   }, []);
 
@@ -87,6 +115,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     const idx = queue.findIndex(t => t.id === track.id);
     if (idx >= 0) setCurrentIndex(idx);
     setProgress(0);
+    setIsPreview(!isSupporter);
+    setPreviewTimeRemaining(PREVIEW_DURATION);
 
     if (audioRef.current && track.audio_url) {
       audioRef.current.src = track.audio_url;
@@ -124,6 +154,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     const nextTrack = queue[nextIdx];
     setCurrentTrack(nextTrack);
     setProgress(0);
+    setIsPreview(!isSupporter);
+    setPreviewTimeRemaining(PREVIEW_DURATION);
     
     if (audioRef.current && nextTrack.audio_url) {
       audioRef.current.src = nextTrack.audio_url;
@@ -140,6 +172,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     const prevTrack = queue[prevIdx];
     setCurrentTrack(prevTrack);
     setProgress(0);
+    setIsPreview(!isSupporter);
+    setPreviewTimeRemaining(PREVIEW_DURATION);
     
     if (audioRef.current && prevTrack.audio_url) {
       audioRef.current.src = prevTrack.audio_url;
@@ -157,10 +191,26 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   };
 
   const seek = (p: number) => {
-    if (audioRef.current && duration) {
-      audioRef.current.currentTime = (p / 100) * duration;
-      setProgress(p);
+    // Non-supporters can only seek within preview range
+    if (isPreview && !isSupporter) {
+      const previewProgress = (PREVIEW_DURATION / (duration || PREVIEW_DURATION)) * 100;
+      const maxSeek = Math.min(p, previewProgress);
+      if (audioRef.current && duration) {
+        audioRef.current.currentTime = (maxSeek / 100) * duration;
+        setProgress(maxSeek);
+        setPreviewTimeRemaining(PREVIEW_DURATION - audioRef.current.currentTime);
+      }
+    } else {
+      if (audioRef.current && duration) {
+        audioRef.current.currentTime = (p / 100) * duration;
+        setProgress(p);
+      }
     }
+  };
+
+  const upgradeToFull = () => {
+    setIsSupporter(true);
+    setIsPreview(false);
   };
 
   // Initialize queue
@@ -178,6 +228,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       volume,
       progress,
       duration,
+      isPreview,
+      previewTimeRemaining,
+      isSupporter,
       playTrack,
       togglePlay,
       pause,
@@ -188,6 +241,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       queue,
       setQueue,
       currentIndex,
+      upgradeToFull,
     }}>
       {children}
     </AudioCtx.Provider>

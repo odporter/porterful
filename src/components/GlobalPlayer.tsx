@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useAudio } from '@/lib/audio-context';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Sliders, X } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Sliders, X, Clock, Crown } from 'lucide-react';
+import Link from 'next/link';
 
 export function GlobalPlayer() {
-  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, volume, setVolume, progress, duration } = useAudio();
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, volume, setVolume, progress, duration, isPreview, previewTimeRemaining, isSupporter } = useAudio();
   const [showEQ, setShowEQ] = useState(false);
   const [eqSettings, setEqSettings] = useState({
     bass: 50,
@@ -71,6 +72,19 @@ export function GlobalPlayer() {
               <span>{formatCurrentTime()}</span>
               <span>{formatDuration(duration)}</span>
             </div>
+            {/* Preview Mode Indicator */}
+            {isPreview && !isSupporter && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="flex items-center gap-1 text-yellow-400">
+                  <Clock size={12} />
+                  Preview: {Math.floor(previewTimeRemaining / 60)}:{Math.floor(previewTimeRemaining % 60).toString().padStart(2, '0')}
+                </span>
+                <Link href="/support" className="flex items-center gap-1 text-[var(--pf-orange)] hover:underline">
+                  <Crown size={12} />
+                  Unlock Full Track
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* EQ Button */}

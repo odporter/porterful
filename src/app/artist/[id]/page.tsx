@@ -185,7 +185,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                           <h3 className="font-bold text-lg">{albumName}</h3>
                           <p className="text-sm text-[var(--pf-text-muted)]">{albumTracks.length} tracks • {albumTracks[0]?.artist || 'O D Porter'}</p>
                         </div>
-                        <button onClick={(e) => { e.stopPropagation(); albumTracks[0] && playTrack(albumTracks[0]); }} className="p-2 rounded-full bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange)]/80 transition-colors shrink-0"><Play size={18} className="ml-0.5" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); if (albumTracks[0]) playTrack(albumTracks[0]); }} className="p-2 rounded-full bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange)]/80 transition-colors shrink-0"><Play size={18} className="ml-0.5" /></button>
                         <div className="text-[var(--pf-text-muted)] shrink-0">{isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
                       </button>
                       {isExpanded && (

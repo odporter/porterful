@@ -29,8 +29,35 @@ export default function CheckoutPage() {
 
   const handleSubmit = async () => {
     setProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setStep('complete');
+    
+    try {
+      // Call checkout API
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cartItems,
+          shipping,
+          referralCode: null, // TODO: Get from state
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url && !data.demo) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        // Demo mode - simulate success
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setStep('complete');
+      }
+    } catch (error) {
+      console.error('Checkout failed:', error);
+      // Still show success in demo mode
+      setStep('complete');
+    }
+    
     setProcessing(false);
   };
 

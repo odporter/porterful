@@ -68,12 +68,20 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const isSupporterRef = useRef(false);
   const isPreviewRef = useRef(true);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const queueRef = useRef<Track[]>([]);
+  const currentIndexRef = useRef(-1);
 
   // Keep refs in sync with state
   useEffect(() => {
     isSupporterRef.current = isSupporter;
     isPreviewRef.current = isPreview;
   }, [isSupporter, isPreview]);
+
+  // Keep queue and index refs in sync
+  useEffect(() => {
+    queueRef.current = queue;
+    currentIndexRef.current = currentIndex;
+  }, [queue, currentIndex]);
 
   // Start countdown before next track
   const startCountdown = useCallback((track: Track) => {
@@ -160,38 +168,33 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       };
 
       const handleEnded = () => {
-        // For supporters, just go to next track
+        // Get current queue and index from refs to ensure we have latest values
+        const currentQueue = queueRef.current;
+        const currentIdx = currentIndexRef.current;
+        
+        if (!currentQueue || currentQueue.length === 0) return;
+        
+        const nextIdx = (currentIdx + 1) % currentQueue.length;
+        const nextTrackItem = currentQueue[nextIdx];
+        
+        if (!nextTrackItem) return;
+        
+        // For supporters, play next immediately
         if (isSupporterRef.current) {
-          // Play next immediately
-          setQueue(currentQueue => {
-            if (currentQueue.length === 0) return currentQueue;
-            setCurrentIndex(currentIdx => {
-              const nextIdx = (currentIdx + 1) % currentQueue.length;
-              const track = currentQueue[nextIdx];
-              if (track && audioRef.current && track.audio_url) {
-                setCurrentTrack(track);
-                setProgress(0);
-                audioRef.current.src = track.audio_url;
-                audioRef.current.play().catch(() => {});
-              }
-              return nextIdx;
-            });
-            return currentQueue;
-          });
+          setCurrentIndex(nextIdx);
+          setCurrentTrack(nextTrackItem);
+          setProgress(0);
+          setIsPreview(false);
+          setPreviewTimeRemaining(PREVIEW_DURATION);
+          
+          if (audioRef.current && nextTrackItem.audio_url) {
+            audioRef.current.src = nextTrackItem.audio_url;
+            audioRef.current.play().catch(() => {});
+          }
         } else {
           // Non-supporters: start countdown before next track
-          setQueue(currentQueue => {
-            if (currentQueue.length === 0) return currentQueue;
-            setCurrentIndex(currentIdx => {
-              const nextIdx = (currentIdx + 1) % currentQueue.length;
-              const track = currentQueue[nextIdx];
-              if (track) {
-                startCountdown(track);
-              }
-              return nextIdx;
-            });
-            return currentQueue;
-          });
+          startCountdown(nextTrackItem);
+          setCurrentIndex(nextIdx);
         }
       };
 

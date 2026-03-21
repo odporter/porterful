@@ -1,18 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAudio } from '@/lib/audio-context';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Sliders, X, Clock, Crown } from 'lucide-react';
 import Link from 'next/link';
 
 export function GlobalPlayer() {
-  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, volume, setVolume, progress, duration, isPreview, previewTimeRemaining, isSupporter } = useAudio();
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, volume, setVolume, progress, duration, isPreview, previewTimeRemaining, isSupporter, seek } = useAudio();
   const [showEQ, setShowEQ] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [eqSettings, setEqSettings] = useState({
     bass: 50,
     mid: 50,
     treble: 50,
   });
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   if (!currentTrack) return null;
 
@@ -31,79 +41,151 @@ export function GlobalPlayer() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+    seek(percentage);
+  };
+
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 bg-[var(--pf-bg)] border-t border-[var(--pf-border)] py-3 px-4 z-50">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-[var(--pf-bg)] border-t border-[var(--pf-border)] z-50 safe-area-bottom">
+        {/* Mobile Progress Bar (always visible on mobile) */}
+        {isMobile && (
+          <div 
+            className="h-1 bg-[var(--pf-surface)] cursor-pointer"
+            onClick={handleSeek}
+          >
+            <div className="h-full bg-[var(--pf-orange)] transition-all duration-300" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+
+        <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-4 p-2 sm:p-3 sm:px-4">
           {/* Track Info */}
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden shrink-0 bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center">
               {currentTrack.cover_url ? (
                 <img src={currentTrack.cover_url} alt={currentTrack.title} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-xl">🎵</span>
+                <span className="text-lg sm:text-xl">🎵</span>
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-medium truncate">{currentTrack.title}</p>
-              <p className="text-sm text-[var(--pf-text-muted)] truncate">{currentTrack.artist}</p>
+              <p className="font-medium truncate text-sm sm:text-base">{currentTrack.title}</p>
+              <p className="text-xs sm:text-sm text-[var(--pf-text-muted)] truncate">{currentTrack.artist}</p>
             </div>
           </div>
+
+          {/* Mobile Preview Badge */}
+          {isMobile && isPreview && !isSupporter && (
+            <div className="flex items-center gap-1 text-xs text-yellow-400 shrink-0">
+              <Clock size={12} />
+              <span>{Math.floor(previewTimeRemaining / 60)}:{Math.floor(previewTimeRemaining % 60).toString().padStart(2, '0')}</span>
+            </div>
+          )}
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
-            <button onClick={playPrev} className="p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors" aria-label="Previous">
-              <SkipBack size={18} />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button 
+              onClick={playPrev} 
+              className="p-1.5 sm:p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors touch-manipulation" 
+              aria-label="Previous"
+            >
+              <SkipBack size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
-            <button onClick={togglePlay} className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange)]/80 transition-colors" aria-label={isPlaying ? 'Pause' : 'Play'}>
+            <button 
+              onClick={togglePlay} 
+              className="w-10 h-10 sm:w-10 sm:h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange)]/80 transition-colors touch-manipulation" 
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+            >
               {isPlaying ? <Pause size={18} className="text-white" /> : <Play size={18} className="text-white ml-0.5" />}
             </button>
-            <button onClick={playNext} className="p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors" aria-label="Next">
-              <SkipForward size={18} />
+            <button 
+              onClick={playNext} 
+              className="p-1.5 sm:p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors touch-manipulation" 
+              aria-label="Next"
+            >
+              <SkipForward size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
           </div>
 
-          {/* Progress */}
-          <div className="flex-1 hidden md:flex flex-col gap-1">
-            <div className="h-1 bg-[var(--pf-surface)] rounded-full overflow-hidden cursor-pointer">
-              <div className="h-full bg-[var(--pf-orange)] transition-all duration-300" style={{ width: `${progress}%` }} />
-            </div>
-            <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
-              <span>{formatCurrentTime()}</span>
-              <span>{formatDuration(duration)}</span>
-            </div>
-            {/* Preview Mode Indicator */}
-            {isPreview && !isSupporter && (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="flex items-center gap-1 text-yellow-400">
-                  <Clock size={12} />
-                  Preview: {Math.floor(previewTimeRemaining / 60)}:{Math.floor(previewTimeRemaining % 60).toString().padStart(2, '0')}
-                </span>
-                <Link href="/support" className="flex items-center gap-1 text-[var(--pf-orange)] hover:underline">
-                  <Crown size={12} />
-                  Unlock Full Track
-                </Link>
+          {/* Desktop Progress */}
+          {!isMobile && (
+            <div className="flex-1 flex flex-col gap-1 max-w-md">
+              <div className="h-1 bg-[var(--pf-surface)] rounded-full overflow-hidden cursor-pointer">
+                <div className="h-full bg-[var(--pf-orange)] transition-all duration-300" style={{ width: `${progress}%` }} />
               </div>
-            )}
-          </div>
+              <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
+                <span>{formatCurrentTime()}</span>
+                <span>{formatDuration(duration)}</span>
+              </div>
+              {/* Preview Mode Indicator */}
+              {isPreview && !isSupporter && (
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="flex items-center gap-1 text-yellow-400">
+                    <Clock size={12} />
+                    Preview: {Math.floor(previewTimeRemaining / 60)}:{Math.floor(previewTimeRemaining % 60).toString().padStart(2, '0')}
+                  </span>
+                  <Link href="/support" className="flex items-center gap-1 text-[var(--pf-orange)] hover:underline">
+                    <Crown size={12} />
+                    Unlock Full Track
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* EQ Button */}
-          <button onClick={() => setShowEQ(!showEQ)} className={`p-2 rounded-full transition-colors ${showEQ ? 'bg-[var(--pf-orange)] text-white' : 'hover:bg-[var(--pf-surface)]'}`} aria-label="Equalizer">
-            <Sliders size={18} />
-          </button>
+          {!isMobile && (
+            <button 
+              onClick={() => setShowEQ(!showEQ)} 
+              className={`p-2 rounded-full transition-colors ${showEQ ? 'bg-[var(--pf-orange)] text-white' : 'hover:bg-[var(--pf-surface)]'}`} 
+              aria-label="Equalizer"
+            >
+              <Sliders size={18} />
+            </button>
+          )}
 
           {/* Volume */}
-          <div className="flex items-center gap-2">
-            <button onClick={() => setVolume(volume === 0 ? 80 : 0)} className="p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors" aria-label={volume === 0 ? 'Unmute' : 'Mute'}>
-              {volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          <div className="flex items-center">
+            <button 
+              onClick={() => {
+                if (isMobile) {
+                  setShowVolume(!showVolume);
+                }
+                setVolume(volume === 0 ? 80 : 0);
+              }} 
+              className="p-1.5 sm:p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors touch-manipulation" 
+              aria-label={volume === 0 ? 'Unmute' : 'Mute'}
+            >
+              {volume === 0 ? <VolumeX size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Volume2 size={16} className="sm:w-[18px] sm:h-[18px]" />}
             </button>
-            <input type="range" min="0" max="100" value={volume} onChange={(e) => setVolume(parseInt(e.target.value))} className="w-20 h-1 bg-[var(--pf-surface)] rounded-full appearance-none cursor-pointer" aria-label="Volume" />
+            {!isMobile && (
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={volume} 
+                onChange={(e) => setVolume(parseInt(e.target.value))} 
+                className="w-20 h-1 bg-[var(--pf-surface)] rounded-full appearance-none cursor-pointer" 
+                aria-label="Volume" 
+              />
+            )}
           </div>
         </div>
+
+        {/* Mobile Preview Full Track Link */}
+        {isMobile && isPreview && !isSupporter && (
+          <Link href="/support" className="block text-center py-2 text-xs text-[var(--pf-orange)] bg-[var(--pf-surface)] border-t border-[var(--pf-border)]">
+            <Crown size={12} className="inline mr-1" />
+            Unlock Full Track
+          </Link>
+        )}
       </div>
 
-      {/* EQ Panel */}
-      {showEQ && (
+      {/* EQ Panel - Desktop only */}
+      {showEQ && !isMobile && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl p-6 z-50 w-80 shadow-2xl">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Equalizer</h3>
@@ -128,10 +210,6 @@ export function GlobalPlayer() {
                 className="w-full h-2 bg-[var(--pf-bg)] rounded-full appearance-none cursor-pointer"
                 style={{ accentColor: 'var(--pf-orange)' }}
               />
-              <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
-                <span>Low</span>
-                <span>High</span>
-              </div>
             </div>
 
             {/* Mid */}
@@ -149,10 +227,6 @@ export function GlobalPlayer() {
                 className="w-full h-2 bg-[var(--pf-bg)] rounded-full appearance-none cursor-pointer"
                 style={{ accentColor: 'var(--pf-orange)' }}
               />
-              <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
-                <span>Low</span>
-                <span>High</span>
-              </div>
             </div>
 
             {/* Treble */}
@@ -170,16 +244,12 @@ export function GlobalPlayer() {
                 className="w-full h-2 bg-[var(--pf-bg)] rounded-full appearance-none cursor-pointer"
                 style={{ accentColor: 'var(--pf-orange)' }}
               />
-              <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
-                <span>Low</span>
-                <span>High</span>
-              </div>
             </div>
 
             {/* Presets */}
             <div className="pt-4 border-t border-[var(--pf-border)]">
               <p className="text-sm text-[var(--pf-text-muted)] mb-2">Presets</p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <button onClick={() => setEqSettings({ bass: 70, mid: 50, treble: 30 })} className="px-3 py-1.5 text-sm rounded-lg bg-[var(--pf-bg)] hover:bg-[var(--pf-orange)]/20 transition-colors">Bass Boost</button>
                 <button onClick={() => setEqSettings({ bass: 30, mid: 50, treble: 70 })} className="px-3 py-1.5 text-sm rounded-lg bg-[var(--pf-bg)] hover:bg-[var(--pf-orange)]/20 transition-colors">Vocals</button>
                 <button onClick={() => setEqSettings({ bass: 50, mid: 50, treble: 50 })} className="px-3 py-1.5 text-sm rounded-lg bg-[var(--pf-bg)] hover:bg-[var(--pf-orange)]/20 transition-colors">Flat</button>

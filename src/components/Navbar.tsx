@@ -139,28 +139,43 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden py-4 border-t border-[var(--pf-border)]" ref={mobileMenuRef}>
-            <div className="flex flex-col gap-1">
-              <Link href="/marketplace" className="px-4 py-2 text-[var(--pf-text-secondary)] hover:text-white" onClick={() => setMobileOpen(false)}>
-                Shop
-              </Link>
-              <Link href="/digital" className="px-4 py-2 text-[var(--pf-text-secondary)] hover:text-white" onClick={() => setMobileOpen(false)}>
-                Music
-              </Link>
-              <Link href="/radio" className="px-4 py-2 text-[var(--pf-text-secondary)] hover:text-white" onClick={() => setMobileOpen(false)}>
-                Radio
-              </Link>
-              {user && (
-                <>
-                  <div className="border-t border-[var(--pf-border)] my-2" />
-                  <Link href="/dashboard/artist" className="px-4 py-2 text-[var(--pf-text-secondary)] hover:text-white" onClick={() => setMobileOpen(false)}>
-                    Dashboard
-                  </Link>
-                  <Link href="/dashboard/upload" className="px-4 py-2 text-[var(--pf-orange)] font-medium" onClick={() => setMobileOpen(false)}>
-                    Upload Music
-                  </Link>
-                </>
-              )}
+          <div className="md:hidden absolute top-full left-0 right-0 bg-[var(--pf-bg)] border-b border-[var(--pf-border)] shadow-xl z-50" ref={mobileMenuRef}>
+            <div className="pf-container py-4">
+              <div className="flex flex-col gap-1">
+                <Link href="/marketplace" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                  Shop
+                </Link>
+                <Link href="/digital" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                  Music
+                </Link>
+                <Link href="/radio" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                  Radio
+                </Link>
+                <Link href="/support" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                  Proud to Pay
+                </Link>
+                {user ? (
+                  <>
+                    <div className="border-t border-[var(--pf-border)] my-2" />
+                    <Link href="/dashboard/artist" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                      Dashboard
+                    </Link>
+                    <Link href="/dashboard/upload" className="px-4 py-3 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                      Upload Music
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <div className="border-t border-[var(--pf-border)] my-2" />
+                    <Link href="/login" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                      Sign In
+                    </Link>
+                    <Link href="/signup" className="mx-4 mt-2 pf-btn pf-btn-primary text-center" onClick={() => setMobileOpen(false)}>
+                      Get Started
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}

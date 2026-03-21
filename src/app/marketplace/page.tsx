@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ShoppingBag, Music, Headphones, Star } from 'lucide-react'
+import { ShoppingBag, Music, Headphones, Star, Shield } from 'lucide-react'
 import { PRODUCTS, TRACKS, ARTISTS } from '@/lib/data'
 
 export default function MarketplacePage() {
@@ -27,6 +27,41 @@ export default function MarketplacePage() {
                 <span className="text-purple-400 font-bold">20%</span>
                 <span className="text-[var(--pf-text-secondary)]">to artists from marketplace</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Veteran & Community Support */}
+      <section className="py-8">
+        <div className="pf-container">
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="pf-card p-6 bg-blue-600/5 border border-blue-600/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🎖️</span>
+                <h3 className="font-semibold">Veteran-Owned</h3>
+              </div>
+              <p className="text-sm text-[var(--pf-text-secondary)]">
+                Support veteran artists and businesses. 1% goes to veteran causes.
+              </p>
+            </div>
+            <div className="pf-card p-6 bg-green-600/5 border border-green-600/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">✊</span>
+                <h3 className="font-semibold">Black-Owned</h3>
+              </div>
+              <p className="text-sm text-[var(--pf-text-secondary)]">
+                Discover and support Black-owned businesses on Porterful.
+              </p>
+            </div>
+            <div className="pf-card p-6 bg-purple-600/5 border border-purple-600/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🌍</span>
+                <h3 className="font-semibold">Minority-Owned</h3>
+              </div>
+              <p className="text-sm text-[var(--pf-text-secondary)]">
+                Support diverse creators and businesses on the platform.
+              </p>
             </div>
           </div>
         </div>

@@ -15,7 +15,7 @@ interface Track {
   price: number;
   audio_url: string;
   cover_url?: string;
-  plays: number;
+  play_count: number;
   created_at: string;
 }
 

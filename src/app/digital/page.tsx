@@ -14,16 +14,16 @@ interface Track {
   price: number;
   audio_url: string;
   cover_url?: string;
-  plays: number;
+  play_count: number;
 }
 
 // Demo tracks as fallback
 const DEMO_TRACKS: Track[] = [
-  { id: '1', title: 'Oddysee', artist: 'O D Porter', album: 'Ambiguous EP', duration: '3:42', price: 5, audio_url: '', plays: 12400 },
-  { id: '2', title: 'Midnight Drive', artist: 'O D Porter', album: 'Ambiguous EP', duration: '4:15', price: 5, audio_url: '', plays: 8900 },
-  { id: '3', title: 'Movement', artist: 'O D Porter', album: 'Ambiguous EP', duration: '3:58', price: 5, audio_url: '', plays: 15600 },
-  { id: '4', title: 'Lost in Transit', artist: 'O D Porter', album: 'Ambiguous EP', duration: '3:21', price: 5, audio_url: '', plays: 6200 },
-  { id: '5', title: 'Ambiguous', artist: 'O D Porter', album: 'Ambiguous EP', duration: '4:02', price: 5, audio_url: '', plays: 9800 },
+  { id: '1', title: 'Oddysee', artist: 'O D Porter', album: 'Ambiguous EP', duration: '3:42', price: 5, audio_url: '', play_count: 12400 },
+  { id: '2', title: 'Midnight Drive', artist: 'O D Porter', album: 'Ambiguous EP', duration: '4:15', price: 5, audio_url: '', play_count: 8900 },
+  { id: '3', title: 'Movement', artist: 'O D Porter', album: 'Ambiguous EP', duration: '3:58', price: 5, audio_url: '', play_count: 15600 },
+  { id: '4', title: 'Lost in Transit', artist: 'O D Porter', album: 'Ambiguous EP', duration: '3:21', price: 5, audio_url: '', play_count: 6200 },
+  { id: '5', title: 'Ambiguous', artist: 'O D Porter', album: 'Ambiguous EP', duration: '4:02', price: 5, audio_url: '', play_count: 9800 },
 ];
 
 export default function DigitalPage() {

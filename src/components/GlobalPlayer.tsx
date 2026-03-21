@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAudio } from '@/lib/audio-context';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Sliders, X, Clock, Crown } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Sliders, X, Clock, Crown, ShoppingBag, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
 export function GlobalPlayer() {
@@ -10,6 +10,7 @@ export function GlobalPlayer() {
   const [showEQ, setShowEQ] = useState(false);
   const [showVolume, setShowVolume] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [eqSettings, setEqSettings] = useState({
     bass: 50,
     mid: 50,
@@ -23,6 +24,13 @@ export function GlobalPlayer() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Show upgrade modal when preview ends
+  useEffect(() => {
+    if (isPreview && !isSupporter && previewTimeRemaining <= 0 && currentTrack) {
+      setShowUpgrade(true);
+    }
+  }, [isPreview, isSupporter, previewTimeRemaining, currentTrack]);
 
   if (!currentTrack) return null;
 
@@ -41,21 +49,44 @@ export function GlobalPlayer() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
-    seek(percentage);
-  };
+  // Check if preview is running low
+  const previewEnding = isPreview && !isSupporter && previewTimeRemaining <= 30 && previewTimeRemaining > 0;
+  const previewEnded = isPreview && !isSupporter && previewTimeRemaining <= 0;
 
   return (
     <>
+      {/* Preview Warning Bar - shows when < 30 seconds left */}
+      {previewEnding && !showUpgrade && (
+        <div className="fixed bottom-[88px] md:bottom-[72px] left-0 right-0 bg-yellow-500/20 border-t border-yellow-500/50 py-2 px-4 z-40">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm">
+              <Clock size={16} className="text-yellow-400" />
+              <span className="text-yellow-400">
+                Preview ending in {Math.floor(previewTimeRemaining)}s
+              </span>
+            </div>
+            <button
+              onClick={() => setShowUpgrade(true)}
+              className="text-sm font-medium text-white bg-[var(--pf-orange)] px-3 py-1 rounded-full hover:bg-[var(--pf-orange)]/80"
+            >
+              Keep Playing →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Player */}
       <div className="fixed bottom-0 left-0 right-0 bg-[var(--pf-bg)] border-t border-[var(--pf-border)] z-50 safe-area-bottom">
-        {/* Mobile Progress Bar (always visible on mobile) */}
+        {/* Mobile Progress Bar */}
         {isMobile && (
           <div 
             className="h-1 bg-[var(--pf-surface)] cursor-pointer"
-            onClick={handleSeek}
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const percentage = (x / rect.width) * 100;
+              seek(percentage);
+            }}
           >
             <div className="h-full bg-[var(--pf-orange)] transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
@@ -113,7 +144,15 @@ export function GlobalPlayer() {
           {/* Desktop Progress */}
           {!isMobile && (
             <div className="flex-1 flex flex-col gap-1 max-w-md">
-              <div className="h-1 bg-[var(--pf-surface)] rounded-full overflow-hidden cursor-pointer">
+              <div 
+                className="h-1 bg-[var(--pf-surface)] rounded-full overflow-hidden cursor-pointer"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const percentage = (x / rect.width) * 100;
+                  seek(percentage);
+                }}
+              >
                 <div className="h-full bg-[var(--pf-orange)] transition-all duration-300" style={{ width: `${progress}%` }} />
               </div>
               <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
@@ -127,10 +166,13 @@ export function GlobalPlayer() {
                     <Clock size={12} />
                     Preview: {Math.floor(previewTimeRemaining / 60)}:{Math.floor(previewTimeRemaining % 60).toString().padStart(2, '0')}
                   </span>
-                  <Link href="/support" className="flex items-center gap-1 text-[var(--pf-orange)] hover:underline">
+                  <button 
+                    onClick={() => setShowUpgrade(true)}
+                    className="flex items-center gap-1 text-[var(--pf-orange)] hover:underline"
+                  >
                     <Crown size={12} />
-                    Unlock Full Track
-                  </Link>
+                    Keep Playing
+                  </button>
                 </div>
               )}
             </div>
@@ -150,12 +192,7 @@ export function GlobalPlayer() {
           {/* Volume */}
           <div className="flex items-center">
             <button 
-              onClick={() => {
-                if (isMobile) {
-                  setShowVolume(!showVolume);
-                }
-                setVolume(volume === 0 ? 80 : 0);
-              }} 
+              onClick={() => setVolume(volume === 0 ? 80 : 0)} 
               className="p-1.5 sm:p-2 rounded-full hover:bg-[var(--pf-surface)] transition-colors touch-manipulation" 
               aria-label={volume === 0 ? 'Unmute' : 'Mute'}
             >
@@ -175,14 +212,96 @@ export function GlobalPlayer() {
           </div>
         </div>
 
-        {/* Mobile Preview Full Track Link */}
+        {/* Mobile Upgrade Link */}
         {isMobile && isPreview && !isSupporter && (
-          <Link href="/support" className="block text-center py-2 text-xs text-[var(--pf-orange)] bg-[var(--pf-surface)] border-t border-[var(--pf-border)]">
+          <button 
+            onClick={() => setShowUpgrade(true)}
+            className="block w-full text-center py-2 text-xs text-[var(--pf-orange)] bg-[var(--pf-surface)] border-t border-[var(--pf-border)]"
+          >
             <Crown size={12} className="inline mr-1" />
-            Unlock Full Track
-          </Link>
+            Keep Playing — Support the Artist
+          </button>
         )}
       </div>
+
+      {/* Upgrade Modal */}
+      {showUpgrade && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
+          <div className="bg-[var(--pf-surface)] rounded-2xl p-6 w-full max-w-md">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center">
+                <Crown className="text-[var(--pf-orange)]" size={32} />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Keep Listening</h2>
+              <p className="text-[var(--pf-text-secondary)]">
+                Your 1-minute preview ended. Choose how to continue:
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {/* $1 Song */}
+              <button 
+                onClick={() => {
+                  // In production: Stripe checkout for $1
+                  alert('In production: Stripe checkout for $1');
+                }}
+                className="w-full p-4 rounded-xl border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors text-left flex items-center gap-4"
+              >
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
+                  <CreditCard size={20} className="text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold">This Song</div>
+                  <div className="text-sm text-[var(--pf-text-muted)]">Keep this track playing</div>
+                </div>
+                <div className="text-xl font-bold">$1</div>
+              </button>
+
+              {/* $5.99 Full Access */}
+              <button 
+                onClick={() => {
+                  // In production: Stripe checkout for $5.99
+                  window.location.href = '/support?tier=full';
+                }}
+                className="w-full p-4 rounded-xl border-2 border-[var(--pf-orange)] bg-[var(--pf-orange)]/10 hover:bg-[var(--pf-orange)]/20 transition-colors text-left flex items-center gap-4"
+              >
+                <div className="w-10 h-10 rounded-lg bg-[var(--pf-orange)]/20 flex items-center justify-center shrink-0">
+                  <Crown size={20} className="text-[var(--pf-orange)]" />
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold flex items-center gap-2">
+                    Full Access
+                    <span className="text-xs bg-[var(--pf-orange)] text-white px-2 py-0.5 rounded">BEST VALUE</span>
+                  </div>
+                  <div className="text-sm text-[var(--pf-text-muted)]">Every song, every album, forever</div>
+                </div>
+                <div className="text-xl font-bold">$5.99</div>
+              </button>
+
+              {/* Marketplace */}
+              <Link
+                href="/marketplace"
+                className="w-full p-4 rounded-xl border border-[var(--pf-border)] hover:border-purple-500 transition-colors text-left flex items-center gap-4 block"
+              >
+                <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center shrink-0">
+                  <ShoppingBag size={20} className="text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold">Shop Marketplace</div>
+                  <div className="text-sm text-[var(--pf-text-muted)]">Spend $10+ = full access included</div>
+                </div>
+              </Link>
+            </div>
+
+            <button 
+              onClick={() => setShowUpgrade(false)}
+              className="w-full mt-4 py-3 text-[var(--pf-text-muted)] hover:text-white transition-colors"
+            >
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* EQ Panel - Desktop only */}
       {showEQ && !isMobile && (

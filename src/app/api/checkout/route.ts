@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+// Lazy-initialize Stripe only when needed
+let stripeInstance: Stripe | null = null
+
+const getStripe = () => {
+  if (!stripeInstance && process.env.STRIPE_SECRET_KEY) {
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY)
+  }
+  return stripeInstance
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
     const body = await request.json()
     const { items, shipping, referralCode } = body
 
@@ -18,6 +27,24 @@ export async function POST(request: NextRequest) {
     const superfanShare = Math.round(subtotal * 0.03)
     const platformFee = Math.round(subtotal * 0.10)
     const sellerEarnings = subtotal - artistFund - superfanShare - platformFee
+
+    // Check if Stripe is configured
+    if (!stripe) {
+      // Demo mode - return mock session
+      return NextResponse.json({
+        sessionId: `demo_session_${Date.now()}`,
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/checkout/success?demo=true`,
+        demo: true,
+        message: 'Stripe not configured. Running in demo mode.',
+        breakdown: {
+          subtotal: subtotal / 100,
+          shipping: shippingCost / 100,
+          total: total / 100,
+          artistFund: artistFund / 100,
+          sellerEarnings: sellerEarnings / 100,
+        }
+      })
+    }
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({

@@ -1,20 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+// Lazy-initialize Stripe only when needed
+let stripeInstance: Stripe | null = null
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+const getStripe = () => {
+  if (!stripeInstance && process.env.STRIPE_SECRET_KEY) {
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY)
+  }
+  return stripeInstance
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-    if (!webhookSecret || webhookSecret === 'your_stripe_webhook_secret') {
-      console.log('⚠️ Webhook received but STRIPE_WEBHOOK_SECRET not configured')
+    // Check if Stripe is configured
+    const stripe = getStripe()
+    
+    if (!webhookSecret || webhookSecret === 'your_stripe_webhook_secret' || !stripe) {
+      console.log('⚠️ Webhook received but Stripe/webhook not configured')
       return NextResponse.json({ 
         received: true, 
-        warning: 'Webhook secret not configured. Set STRIPE_WEBHOOK_SECRET in .env.local' 
+        warning: 'Stripe webhook not configured' 
       })
     }
 
@@ -32,7 +42,6 @@ export async function POST(request: NextRequest) {
         console.log('   Superfan share:', session.metadata?.superfan_share)
         console.log('   Referral code:', session.metadata?.referral_code)
 
-        // Extract order data from session
         const orderData = {
           orderId: session.id,
           paymentIntentId: session.payment_intent as string,
@@ -51,14 +60,8 @@ export async function POST(request: NextRequest) {
         }
 
         // TODO: Store order in database
-        // await createOrderInDatabase(orderData)
-
         // TODO: Send confirmation email
-        // await sendOrderConfirmationEmail(orderData)
-
-        // TODO: Trigger fulfillment for dropship items
-        // await fetch('/api/fulfillment', { ... })
-
+        // TODO: Trigger fulfillment
         break
       }
       
@@ -84,7 +87,6 @@ export async function POST(request: NextRequest) {
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge
         console.log('💸 Refund processed:', charge.id)
-        // TODO: Handle refund - update order status, notify customer
         break
       }
       

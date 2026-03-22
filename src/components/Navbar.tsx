@@ -21,9 +21,6 @@ export function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 20)
-      // Close menus on scroll
-      setMobileOpen(false)
-      setProfileOpen(false)
     }
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
@@ -43,6 +40,12 @@ export function Navbar() {
     return () => document.removeEventListener('click', onClick)
   }, [])
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false)
+    setProfileOpen(false)
+  }, [])
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     window.location.href = '/'
@@ -55,7 +58,7 @@ export function Navbar() {
       <div className="pf-container">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group" onClick={() => { setMobileOpen(false); setProfileOpen(false) }}>
+          <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--pf-orange)] to-[var(--pf-orange-dark)] flex items-center justify-center shadow-lg shadow-[var(--pf-orange)]/20">
               <svg viewBox="0 0 200 200" fill="none" className="w-6 h-6">
                 <rect x="55" y="45" width="15" height="110" rx="4" fill="white" />
@@ -90,9 +93,9 @@ export function Navbar() {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {/* Wallet Balance */}
-            <Link href="/wallet" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/wallet" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <DollarSign className="text-[var(--pf-orange)]" size={18} />
               <span className="font-medium">{formatWalletBalance()}</span>
             </Link>
@@ -107,7 +110,7 @@ export function Navbar() {
             </button>
             
             {user ? (
-              <div className="relative" ref={profileRef}>
+              <div className="relative hidden md:block" ref={profileRef}>
                 <button 
                   onClick={(e) => { e.stopPropagation(); setProfileOpen(!profileOpen) }}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]"
@@ -115,7 +118,7 @@ export function Navbar() {
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
                     {user.email?.[0].toUpperCase()}
                   </div>
-                  <span className="hidden sm:block text-sm">{user.email?.split('@')[0]}</span>
+                  <span className="hidden lg:block text-sm">{user.email?.split('@')[0]}</span>
                 </button>
                 
                 {profileOpen && (
@@ -130,9 +133,6 @@ export function Navbar() {
                       <Link href="/dashboard/upload" className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--pf-orange)] hover:bg-[var(--pf-bg)]" onClick={() => setProfileOpen(false)}>
                         <Upload size={16} /> Upload Music
                       </Link>
-                      <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--pf-text-secondary)] hover:bg-[var(--pf-bg)] hover:text-white" onClick={() => setProfileOpen(false)}>
-                        <User size={16} /> Settings
-                      </Link>
                     </div>
                     <div className="border-t border-[var(--pf-border)] py-1">
                       <button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-2 w-full text-sm text-[var(--pf-text-secondary)] hover:bg-[var(--pf-bg)] hover:text-red-400">
@@ -143,77 +143,136 @@ export function Navbar() {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 <Link href="/login" className="px-4 py-2 text-[var(--pf-text-secondary)] hover:text-white">Sign In</Link>
                 <Link href="/signup" className="pf-btn pf-btn-primary">Get Started</Link>
               </div>
             )}
 
-            {/* Mobile Toggle */}
+            {/* Mobile Toggle - Always visible */}
             <button 
               onClick={(e) => { e.stopPropagation(); setMobileOpen(!mobileOpen) }}
-              className="md:hidden p-2 rounded-lg hover:bg-[var(--pf-surface)]"
+              className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
+              aria-label="Toggle menu"
             >
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-[var(--pf-bg)] border-b border-[var(--pf-border)] shadow-xl z-50" ref={mobileMenuRef}>
-            <div className="pf-container py-4">
-              {/* Wallet in mobile */}
-              <Link href="/wallet" className="flex items-center gap-3 px-4 py-3 bg-[var(--pf-orange)]/10 rounded-lg mb-2" onClick={() => setMobileOpen(false)}>
-                <DollarSign className="text-[var(--pf-orange)]" size={20} />
-                <span className="font-medium">{formatWalletBalance()}</span>
-              </Link>
-              
-              <div className="flex flex-col gap-1">
-                <Link href="/marketplace" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                  Shop
-                </Link>
-                <Link href="/digital" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                  Music
-                </Link>
-                <Link href="/radio" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                  Radio
-                </Link>
-                <Link href="/wallet" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                  Wallet
-                </Link>
-                <Link href="/support" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                  Proud to Pay
-                </Link>
-                {user ? (
-                  <>
-                    <div className="border-t border-[var(--pf-border)] my-2" />
-                    <Link href="/dashboard/artist" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                      Dashboard
-                    </Link>
-                    <Link href="/dashboard/earnings" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                      Earnings
-                    </Link>
-                    <Link href="/dashboard/upload" className="px-4 py-3 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                      Upload Music
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <div className="border-t border-[var(--pf-border)] my-2" />
-                    <Link href="/login" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
-                      Sign In
-                    </Link>
-                    <Link href="/signup" className="mx-4 mt-2 pf-btn pf-btn-primary text-center" onClick={() => setMobileOpen(false)}>
-                      Get Started
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile Menu - Outside container for full width */}
+      {mobileOpen && (
+        <div 
+          className="md:hidden fixed inset-0 top-16 bg-[var(--pf-bg)] z-40 overflow-y-auto"
+          ref={mobileMenuRef}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="p-4 space-y-2">
+            {/* Wallet */}
+            <Link 
+              href="/wallet" 
+              className="flex items-center gap-3 px-4 py-4 bg-[var(--pf-orange)]/10 rounded-xl text-[var(--pf-orange)] font-medium"
+              onClick={() => setMobileOpen(false)}
+            >
+              <DollarSign size={20} />
+              <span>Wallet: {formatWalletBalance()}</span>
+            </Link>
+
+            {/* Main Nav Links */}
+            <div className="pt-2 space-y-1">
+              <Link 
+                href="/marketplace" 
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <span className="text-lg">🛒</span> Shop
+              </Link>
+              <Link 
+                href="/digital" 
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <span className="text-lg">🎵</span> Music
+              </Link>
+              <Link 
+                href="/radio" 
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <span className="text-lg">📻</span> Radio
+              </Link>
+              <Link 
+                href="/playlists" 
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <span className="text-lg">📋</span> Playlists
+              </Link>
+              <Link 
+                href="/artist/od-porter" 
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <span className="text-lg">🎤</span> Artist Profile
+              </Link>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-[var(--pf-border)] my-3" />
+
+            {/* User Actions */}
+            {user ? (
+              <div className="space-y-1">
+                <Link 
+                  href="/dashboard/artist" 
+                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <User size={20} /> Dashboard
+                </Link>
+                <Link 
+                  href="/dashboard/upload" 
+                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-xl transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Upload size={20} /> Upload Music
+                </Link>
+                <Link 
+                  href="/settings" 
+                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  ⚙️ Settings
+                </Link>
+                <button 
+                  onClick={() => { handleSignOut(); setMobileOpen(false); }}
+                  className="flex items-center gap-3 px-4 py-3 w-full text-left text-red-400 hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                >
+                  <LogOut size={20} /> Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 pt-2">
+                <Link 
+                  href="/login" 
+                  className="flex items-center justify-center px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white border border-[var(--pf-border)] rounded-xl transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="flex items-center justify-center px-4 py-3 bg-[var(--pf-orange)] text-white rounded-xl font-medium"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Get Started
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   )
 }

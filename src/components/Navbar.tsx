@@ -164,11 +164,11 @@ export function Navbar() {
       {/* Mobile Menu - Outside container for full width */}
       {mobileOpen && (
         <div 
-          className="md:hidden fixed inset-0 top-16 bg-[var(--pf-bg)] z-40 overflow-y-auto"
+          className="md:hidden fixed inset-0 top-16 bg-[var(--pf-bg)] z-[60] overflow-y-auto"
           ref={mobileMenuRef}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-4 space-y-2">
+          <div className="p-4 space-y-2 min-h-[calc(100vh-4rem)]">
             {/* Wallet */}
             <Link 
               href="/wallet" 
@@ -183,38 +183,38 @@ export function Navbar() {
             <div className="pt-2 space-y-1">
               <Link 
                 href="/marketplace" 
-                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                 onClick={() => setMobileOpen(false)}
               >
-                <span className="text-lg">🛒</span> Shop
+                <span className="text-xl">🛒</span> Shop
               </Link>
               <Link 
                 href="/digital" 
-                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                 onClick={() => setMobileOpen(false)}
               >
-                <span className="text-lg">🎵</span> Music
+                <span className="text-xl">🎵</span> Music
               </Link>
               <Link 
                 href="/radio" 
-                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                 onClick={() => setMobileOpen(false)}
               >
-                <span className="text-lg">📻</span> Radio
+                <span className="text-xl">📻</span> Radio
               </Link>
               <Link 
                 href="/playlists" 
-                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                 onClick={() => setMobileOpen(false)}
               >
-                <span className="text-lg">📋</span> Playlists
+                <span className="text-xl">📋</span> Playlists
               </Link>
               <Link 
                 href="/artist/od-porter" 
-                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                 onClick={() => setMobileOpen(false)}
               >
-                <span className="text-lg">🎤</span> Artist Profile
+                <span className="text-xl">🎤</span> Artist Profile
               </Link>
             </div>
 
@@ -226,28 +226,28 @@ export function Navbar() {
               <div className="space-y-1">
                 <Link 
                   href="/dashboard/artist" 
-                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                   onClick={() => setMobileOpen(false)}
                 >
                   <User size={20} /> Dashboard
                 </Link>
                 <Link 
                   href="/dashboard/upload" 
-                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-xl transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-xl transition-colors text-base"
                   onClick={() => setMobileOpen(false)}
                 >
                   <Upload size={20} /> Upload Music
                 </Link>
                 <Link 
                   href="/settings" 
-                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                   onClick={() => setMobileOpen(false)}
                 >
                   ⚙️ Settings
                 </Link>
                 <button 
                   onClick={() => { handleSignOut(); setMobileOpen(false); }}
-                  className="flex items-center gap-3 px-4 py-3 w-full text-left text-red-400 hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 w-full text-left text-red-400 hover:bg-[var(--pf-surface)] rounded-xl transition-colors text-base"
                 >
                   <LogOut size={20} /> Sign Out
                 </button>
@@ -256,14 +256,14 @@ export function Navbar() {
               <div className="space-y-2 pt-2">
                 <Link 
                   href="/login" 
-                  className="flex items-center justify-center px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white border border-[var(--pf-border)] rounded-xl transition-colors"
+                  className="flex items-center justify-center px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white border border-[var(--pf-border)] rounded-xl transition-colors text-base"
                   onClick={() => setMobileOpen(false)}
                 >
                   Sign In
                 </Link>
                 <Link 
                   href="/signup" 
-                  className="flex items-center justify-center px-4 py-3 bg-[var(--pf-orange)] text-white rounded-xl font-medium"
+                  className="flex items-center justify-center px-4 py-3 bg-[var(--pf-orange)] text-white rounded-xl font-medium text-base"
                   onClick={() => setMobileOpen(false)}
                 >
                   Get Started

@@ -157,7 +157,7 @@ export default function Home() {
                   <h3 className="font-semibold group-hover:text-[var(--pf-orange)] transition-colors">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">{product.artist || product.brand}</p>
+                  <p className="text-sm text-[var(--pf-text-secondary)]">{product.artist}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-lg font-bold">${product.price}</span>
                     <div className="flex items-center gap-1 text-sm text-[var(--pf-text-muted)]">

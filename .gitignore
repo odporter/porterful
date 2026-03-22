@@ -35,3 +35,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
+
+# audio files (too large for GitHub - host on CDN instead)
+public/audio/
+*.mp3
+*.m4a
+*.wav
+*.flac

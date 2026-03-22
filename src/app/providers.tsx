@@ -5,6 +5,9 @@ import { createBrowserClient } from '@supabase/ssr'
 import { User, Session } from '@supabase/supabase-js'
 import { AudioProvider } from '@/lib/audio-context'
 import { ThemeProvider } from '@/lib/theme-context'
+import { WalletProvider } from '@/lib/wallet-context'
+import { PayoutProvider } from '@/lib/payout-context'
+import { CartProvider } from '@/lib/cart-context'
 
 const SupabaseContext = createContext<{
   supabase: ReturnType<typeof createBrowserClient> | null
@@ -61,7 +64,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SupabaseContext.Provider value={{ supabase, user, session, loading }}>
       <ThemeProvider>
         <AudioProvider>
-          {children}
+          <CartProvider>
+            <WalletProvider>
+              <PayoutProvider>
+                {children}
+              </PayoutProvider>
+            </WalletProvider>
+          </CartProvider>
         </AudioProvider>
       </ThemeProvider>
     </SupabaseContext.Provider>

@@ -1,25 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSupabase } from '@/app/providers';
 import { CreditCard, Lock, Check, DollarSign, Users, Gift, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { useCart } from '@/lib/cart-context';
+
+interface CartItem {
+  productId: string;
+  quantity: number;
+  size?: string;
+  color?: string;
+  price: number;
+  name: string;
+  artist: string;
+  image: string;
+  artistCut: number;
+}
 
 export default function CheckoutPage() {
   const { user } = useSupabase();
+  const { items: cartContextItems, clearCart } = useCart();
   const [step, setStep] = useState<'shipping' | 'payment' | 'review' | 'complete'>('shipping');
   const [processing, setProcessing] = useState(false);
   const [showSupportTip, setShowSupportTip] = useState(true);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   
   const [shipping, setShipping] = useState({
     name: '', email: '', address: '', city: '', state: '', zip: '', country: 'United States',
   });
 
-  // Demo cart
-  const cartItems = [
-    { id: '1', title: 'Ambiguous LP', artist: 'O D Porter', price: 25, quantity: 1, type: 'music', artistCut: 20 },
-    { id: '2', title: 'Premium Tee', artist: 'O D Porter', price: 28, quantity: 2, type: 'merch', artistCut: 22.40 },
-  ];
+  // Load cart items from context or localStorage
+  useEffect(() => {
+    if (cartContextItems && cartContextItems.length > 0) {
+      setCartItems(cartContextItems);
+    } else {
+      // Fallback to localStorage
+      const saved = localStorage.getItem('porterful-checkout-items');
+      if (saved) {
+        setCartItems(JSON.parse(saved));
+      }
+    }
+  }, [cartContextItems]);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const artistCut = cartItems.reduce((sum, item) => sum + item.artistCut * item.quantity, 0);
@@ -31,14 +53,22 @@ export default function CheckoutPage() {
     setProcessing(true);
     
     try {
-      // Call checkout API
+      // Convert cart items to Stripe format (prices in cents)
+      const stripeItems = cartItems.map(item => ({
+        title: item.name,
+        artist: item.artist,
+        price: Math.round(item.price * 100), // Convert to cents
+        quantity: item.quantity,
+        image: item.image,
+      }));
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: cartItems,
+          items: stripeItems,
           shipping,
-          referralCode: null, // TODO: Get from state
+          referralCode: null,
         }),
       });
 
@@ -50,6 +80,8 @@ export default function CheckoutPage() {
       } else {
         // Demo mode - simulate success
         await new Promise(resolve => setTimeout(resolve, 1500));
+        clearCart();
+        localStorage.removeItem('porterful-checkout-items');
         setStep('complete');
       }
     } catch (error) {
@@ -279,9 +311,9 @@ export default function CheckoutPage() {
                 <div className="border-t border-[var(--pf-border)] pt-4 mb-6">
                   <h3 className="text-sm text-[var(--pf-text-muted)] mb-4">Items</h3>
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex justify-between mb-3">
+                    <div key={item.productId} className="flex justify-between mb-3">
                       <div>
-                        <p className="font-medium">{item.title}</p>
+                        <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-[var(--pf-text-muted)]">{item.artist} × {item.quantity}</p>
                       </div>
                       <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
@@ -320,9 +352,9 @@ export default function CheckoutPage() {
               
               <div className="space-y-3 mb-4">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
+                  <div key={item.productId} className="flex justify-between text-sm">
                     <div>
-                      <p>{item.title}</p>
+                      <p>{item.name}</p>
                       <p className="text-[var(--pf-text-muted)]">{item.artist} × {item.quantity}</p>
                     </div>
                     <p>${(item.price * item.quantity).toFixed(2)}</p>

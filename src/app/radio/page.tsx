@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useAudio } from '@/lib/audio-context';
-import { Search, Play, Pause, SkipForward, SkipBack, Radio, Clock, Crown, Music } from 'lucide-react';
+import { useWallet } from '@/lib/wallet-context';
+import { Search, Play, Pause, SkipForward, SkipBack, Radio, Music, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { TRACKS } from '@/lib/data';
 
 const GENRES = ['All', 'Hip-Hop', 'R&B', 'Soul', 'Pop', 'Electronic', 'Jazz', 'Lo-Fi'];
-const MOODS = ['All', 'Chill', 'Hype', 'Emotional', 'Upbeat', 'Vibey', 'Smooth'];
 
 export default function RadioPage() {
   const audioContext = useAudio();
-  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, isPreview, previewTimeRemaining, isSupporter, isCountingDown, countdownSeconds, nextTrack, skipCountdown, setQueue, playTrack } = audioContext;
+  const { balance, formatBalance } = useWallet();
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, isPreview, previewTimeRemaining, setQueue, playTrack } = audioContext;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [filteredTracks, setFilteredTracks] = useState(TRACKS);
@@ -49,58 +50,37 @@ export default function RadioPage() {
   }, [searchQuery]);
 
   const handlePlayTrack = (track: typeof TRACKS[0]) => {
-    setQueue(TRACKS);
-    playTrack(track);
+    // Convert string duration to seconds if needed
+    const trackWithDuration = {
+      ...track,
+      duration: typeof track.duration === 'string' 
+        ? track.duration.split(':').reduce((acc: number, time: string) => (60 * acc) + parseInt(time, 10), 0)
+        : track.duration || 180,
+    };
+    setQueue(TRACKS.map(t => ({
+      ...t,
+      duration: typeof t.duration === 'string'
+        ? t.duration.split(':').reduce((acc: number, time: string) => (60 * acc) + parseInt(time, 10), 0)
+        : t.duration || 180
+    })));
+    playTrack(trackWithDuration as any);
   };
 
   return (
-    <div className="min-h-screen bg-[var(--pf-bg)] text-white">
-      {/* Countdown Overlay */}
-      {isCountingDown && nextTrack && !isSupporter && (
-        <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
-          <div className="text-center max-w-md">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center animate-pulse">
-              <Radio className="text-[var(--pf-orange)]" size={40} />
-            </div>
-            
-            <p className="text-sm text-[var(--pf-text-muted)] mb-2">Up Next</p>
-            <h2 className="text-2xl font-bold mb-1">{nextTrack.title}</h2>
-            <p className="text-[var(--pf-text-secondary)] mb-6">{nextTrack.artist}</p>
-            
-            <div className="text-6xl font-bold text-[var(--pf-orange)] mb-6">{countdownSeconds}</div>
-            
-            <p className="text-[var(--pf-text-muted)] mb-6">
-              Playing in {countdownSeconds} second{countdownSeconds !== 1 ? 's' : ''}...
-            </p>
-
-            <button onClick={skipCountdown} className="pf-btn pf-btn-primary mb-4 w-full">
-              Play Now
-            </button>
-            
-            <p className="text-sm text-[var(--pf-text-muted)]">
-              Get <Link href="/support" className="text-[var(--pf-orange)]">Full Access for $5.99</Link> — no interruptions
-            </p>
-          </div>
-        </div>
-      )}
-
+    <div className="min-h-screen bg-[var(--pf-bg)] text-[var(--pf-text)]">
       {/* Header */}
-      <div className="bg-gradient-to-b from-[var(--pf-orange)]/20 to-transparent pt-8 pb-16">
+      <div className="bg-gradient-to-b from-[var(--pf-orange)]/20 to-transparent pt-32 pb-16">
         <div className="pf-container">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-3">
                 <Radio className="text-[var(--pf-orange)]" />
-                Porterful Radio
+                Radio
               </h1>
               <p className="text-[var(--pf-text-secondary)] mt-1">
-                1-minute previews. Upgrade for full tracks.
+                Discover new music. Previews are free.
               </p>
             </div>
-            <Link href="/support" className="pf-btn pf-btn-primary hidden sm:flex items-center gap-2">
-              <Crown size={18} />
-              Full Access
-            </Link>
           </div>
 
           {/* Search */}
@@ -136,7 +116,7 @@ export default function RadioPage() {
 
       {/* Now Playing */}
       {currentTrack && (
-        <div className="sticky top-0 bg-[var(--pf-surface)] border-b border-[var(--pf-border)] z-40">
+        <div className="sticky top-16 md:top-20 bg-[var(--pf-surface)] border-b border-[var(--pf-border)] z-30">
           <div className="pf-container py-4">
             <div className="flex items-center gap-4">
               {/* Visualizer */}
@@ -163,14 +143,17 @@ export default function RadioPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium truncate">{currentTrack.title}</p>
-                  <p className="text-sm text-[var(--pf-text-muted)] truncate">{currentTrack.artist}</p>
+                  <Link href="/artist/od-porter" className="text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] truncate block">
+                    {currentTrack.artist}
+                  </Link>
                 </div>
               </div>
 
-              {/* Preview Warning */}
-              {isPreview && !isSupporter && (
-                <div className="hidden sm:flex items-center gap-2 text-sm text-yellow-400">
-                  <Clock size={14} />
+              {/* Preview Badge */}
+              {isPreview && (
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--pf-orange)]/10 text-[var(--pf-orange)] text-sm">
+                  <span>Preview</span>
+                  <span className="text-[var(--pf-text-muted)]">•</span>
                   <span>{Math.floor(previewTimeRemaining / 60)}:{Math.floor(previewTimeRemaining % 60).toString().padStart(2, '0')}</span>
                 </div>
               )}
@@ -226,7 +209,9 @@ export default function RadioPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{track.title}</p>
-                  <p className="text-sm text-[var(--pf-text-muted)] truncate">{track.artist}</p>
+                  <Link href="/artist/od-porter" className="text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] truncate block">
+                    {track.artist}
+                  </Link>
                 </div>
                 <span className="text-sm text-[var(--pf-text-muted)]">{track.duration}</span>
                 {currentTrack?.id === track.id && isPlaying && (
@@ -241,25 +226,23 @@ export default function RadioPage() {
           </div>
         )}
 
-        {/* Upgrade CTA */}
-        {!isSupporter && (
-          <div className="mt-12 p-6 rounded-xl bg-gradient-to-r from-[var(--pf-orange)]/20 to-purple-500/20 border border-[var(--pf-orange)]/30">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h3 className="text-xl font-bold mb-1">Tired of 1-Minute Previews?</h3>
-                <p className="text-[var(--pf-text-secondary)]">Get full tracks, no interruptions, forever.</p>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold">$5.99</p>
-                <p className="text-sm text-[var(--pf-text-muted)]">One-time payment</p>
-                <Link href="/support" className="pf-btn pf-btn-primary mt-2 inline-flex">
-                  <Crown size={16} className="mr-2" />
-                  Get Full Access
-                </Link>
-              </div>
+        {/* Add Funds CTA - Subtle */}
+        <div className="mt-12 p-6 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)]">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <p className="text-[var(--pf-text-secondary)] mb-1">
+                Want full tracks? Add funds to your wallet.
+              </p>
+              <p className="text-sm text-[var(--pf-text-muted)]">
+                Your balance: <span className="font-medium text-[var(--pf-orange)]">{formatBalance()}</span>
+              </p>
             </div>
+            <Link href="/wallet" className="pf-btn bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] flex items-center gap-2">
+              <Plus size={18} />
+              Add Funds
+            </Link>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

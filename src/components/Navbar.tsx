@@ -4,11 +4,13 @@ import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useTheme } from '@/lib/theme-context'
-import { Menu, X, User, LogOut, Upload, Sun, Moon } from 'lucide-react'
+import { useWallet } from '@/lib/wallet-context'
+import { Menu, X, User, LogOut, Upload, Sun, Moon, DollarSign } from 'lucide-react'
 
 export function Navbar() {
   const { user, supabase } = useSupabase()
   const { theme, toggleTheme } = useTheme()
+  const { balance, formatBalance: formatWalletBalance } = useWallet()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -86,6 +88,12 @@ export function Navbar() {
 
           {/* Right Side */}
           <div className="flex items-center gap-3">
+            {/* Wallet Balance */}
+            <Link href="/wallet" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+              <DollarSign className="text-[var(--pf-orange)]" size={18} />
+              <span className="font-medium">{formatWalletBalance()}</span>
+            </Link>
+            
             {/* Theme Toggle */}
             <button 
               onClick={toggleTheme}
@@ -152,6 +160,12 @@ export function Navbar() {
         {mobileOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-[var(--pf-bg)] border-b border-[var(--pf-border)] shadow-xl z-50" ref={mobileMenuRef}>
             <div className="pf-container py-4">
+              {/* Wallet in mobile */}
+              <Link href="/wallet" className="flex items-center gap-3 px-4 py-3 bg-[var(--pf-orange)]/10 rounded-lg mb-2" onClick={() => setMobileOpen(false)}>
+                <DollarSign className="text-[var(--pf-orange)]" size={20} />
+                <span className="font-medium">{formatWalletBalance()}</span>
+              </Link>
+              
               <div className="flex flex-col gap-1">
                 <Link href="/marketplace" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
                   Shop
@@ -162,6 +176,9 @@ export function Navbar() {
                 <Link href="/radio" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
                   Radio
                 </Link>
+                <Link href="/wallet" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                  Wallet
+                </Link>
                 <Link href="/support" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
                   Proud to Pay
                 </Link>
@@ -170,6 +187,9 @@ export function Navbar() {
                     <div className="border-t border-[var(--pf-border)] my-2" />
                     <Link href="/dashboard/artist" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
                       Dashboard
+                    </Link>
+                    <Link href="/dashboard/earnings" className="px-4 py-3 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
+                      Earnings
                     </Link>
                     <Link href="/dashboard/upload" className="px-4 py-3 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
                       Upload Music

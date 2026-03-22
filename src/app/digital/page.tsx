@@ -158,7 +158,9 @@ export default function DigitalPage() {
 
                       <div className="flex-1 min-w-0">
                         <p className={`font-semibold truncate ${playing === track.id ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
-                        <p className="text-sm text-[var(--pf-text-muted)]">{track.artist}</p>
+                        <p className="text-sm text-[var(--pf-text-muted)]">
+                          <Link href="/artist/od-porter" className="hover:text-[var(--pf-orange)]">{track.artist}</Link>
+                        </p>
                       </div>
 
                       <span className="text-sm text-[var(--pf-text-muted)] hidden sm:block">{(track.play_count / 1000).toFixed(0)}K plays</span>

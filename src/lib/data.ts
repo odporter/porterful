@@ -13,7 +13,7 @@ export const PRODUCTS = [
     colors: ['Black', 'White', 'Orange'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     inStock: true,
-    artistCut: 22.40, // 80%
+    artistCut: 22.40,
     sales: 142,
     rating: 4.8,
     reviews: 89
@@ -25,116 +25,32 @@ export const PRODUCTS = [
     price: 65,
     category: 'merch',
     type: 'Apparel',
-    description: 'Heavyweight hoodie with embroidered logo. Perfect for late nights in the studio.',
+    description: 'Heavyweight hoodie with embroidered logo.',
     image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500',
     colors: ['Black', 'Gray'],
     sizes: ['S', 'M', 'L', 'XL'],
     inStock: true,
-    artistCut: 52, // 80%
+    artistCut: 52,
     sales: 78,
     rating: 4.9,
     reviews: 45
   },
   {
     id: 'ambiguous-vinyl',
-    name: 'Ambiguous EP (Vinyl)',
+    name: 'Ambiguous Vinyl',
     artist: 'O D Porter',
     price: 35,
     category: 'music',
     type: 'Vinyl',
-    description: 'Limited edition vinyl pressing. 180g audiophile quality with printed inner sleeve.',
+    description: 'Limited edition vinyl. 180g audiophile quality.',
     image: 'https://images.unsplash.com/photo-1539185441755-7697f0f1e3ee?w=500',
     format: '12" Vinyl',
-    tracks: 5,
+    tracks: 21,
     inStock: true,
-    artistCut: 28, // 80%
+    artistCut: 28,
     sales: 234,
     rating: 5.0,
     reviews: 67
-  },
-  {
-    id: 'ambiguous-cassette',
-    name: 'Ambiguous Cassette',
-    artist: 'O D Porter',
-    price: 12,
-    category: 'music',
-    type: 'Cassette',
-    description: 'Hand-numbered cassette tape. Orange shell with black ink. Limited to 500.',
-    image: 'https://images.unsplash.com/photo-1618631824070-8a6c03e2e3ed?w=500',
-    format: 'Cassette',
-    tracks: 5,
-    inStock: true,
-    artistCut: 9.60, // 80%
-    sales: 189,
-    rating: 4.7,
-    reviews: 34,
-    limited: true,
-    limitedCount: 500
-  },
-  // Marketplace Items (20% to artists)
-  {
-    id: 'premium-headphones',
-    name: 'Premium Wireless Headphones',
-    brand: 'SoundMax',
-    price: 89,
-    category: 'electronics',
-    type: 'Electronics',
-    description: 'Studio-quality wireless headphones with 40-hour battery. Active noise cancellation.',
-    image: 'https://images.unsplash.com/photo-1505740420922-5e284d373aa6?w=500',
-    features: ['40hr battery', 'ANC', 'Bluetooth 5.2'],
-    inStock: true,
-    artistCut: 17.80, // 20%
-    sales: 567,
-    rating: 4.6,
-    reviews: 234
-  },
-  {
-    id: 'portable-speaker',
-    name: 'Portable Bluetooth Speaker',
-    brand: 'BassPro',
-    price: 49,
-    category: 'electronics',
-    type: 'Electronics',
-    description: 'Waterproof portable speaker with 360° sound. Perfect for outdoor sessions.',
-    image: 'https://images.unsplash.com/photo-1608043152269-56e1b2a1e354?w=500',
-    features: ['Waterproof', '12hr battery', '360° sound'],
-    inStock: true,
-    artistCut: 9.80, // 20%
-    sales: 892,
-    rating: 4.5,
-    reviews: 189
-  },
-  {
-    id: 'eco-toothbrush',
-    name: 'Bamboo Toothbrush Set',
-    brand: 'EcoBrush',
-    price: 12,
-    category: 'essentials',
-    type: 'Personal Care',
-    description: 'Sustainable bamboo toothbrushes. Biodegradable, vegan, and dentist-approved.',
-    image: 'https://images.unsplash.com/photo-1607613009820-a7a7e4e0b3b0?w=500',
-    features: ['Biodegradable', 'Charcoal bristles', '4-pack'],
-    inStock: true,
-    artistCut: 2.40, // 20%
-    sales: 1243,
-    rating: 4.4,
-    reviews: 456
-  },
-  {
-    id: 'organic-shampoo',
-    name: 'Organic Shampoo Bar',
-    brand: 'Naturals Co',
-    price: 14,
-    category: 'essentials',
-    type: 'Personal Care',
-    description: 'Zero-waste shampoo bar. No plastic, all natural, works for all hair types.',
-    image: 'https://images.unsplash.com/photo-1608248598036-0a3a22c4f7ce?w=500',
-    features: ['Zero waste', '60+ washes', 'All hair types'],
-    inStock: true,
-    artistCut: 2.80, // 20%
-    sales: 678,
-    rating: 4.7,
-    reviews: 198
   }
 ];
 
@@ -145,78 +61,123 @@ export const ARTISTS = [
     name: 'O D Porter',
     genre: 'Hip-Hop / R&B',
     location: 'St. Louis, MO',
-    bio: 'St. Louis artist blending hip-hop, R&B, and soul. Born in Miami, raised in New Orleans & St. Louis. Creating music that speaks to the human experience.',
+    bio: 'St. Louis artist blending hip-hop, R&B, and soul. Born in Miami, raised in New Orleans & St. Louis.',
     image: 'https://images.unsplash.com/photo-1493225457124-a3eb1614b109?w=500',
     verified: true,
     supporters: 2847,
     earnings: 8947,
-    tracks: 21,
-    products: 4
+    tracks: 58,
+    products: 3
   }
 ];
 
-// Featured tracks - only songs WITH cover art
-export const TRACKS = [
-  {
-    id: 'oddysee',
-    title: 'Oddysee',
+// ALBUMS with cover art
+export const ALBUMS = {
+  ambiguous: {
+    id: 'ambiguous',
+    name: 'Ambiguous',
     artist: 'O D Porter',
-    album: 'Ambiguous EP',
-    duration: 222, // 3:42 in seconds
-    price: 1,
-    plays: 125000,
-    image: '/covers/cover-art.png',
-    audio_url: '/audio/oddysee.mp3'
+    year: 2024,
+    image: '/album-art/Ambiguous.jpg',
+    tracks: 21
   },
-  {
-    id: 'too-stingy',
-    title: 'Too Stingy',
+  roxannity: {
+    id: 'roxannity',
+    name: 'Roxannity',
     artist: 'O D Porter',
-    album: 'Too Stingy (Single)',
-    duration: 195, // 3:15
-    price: 1,
-    plays: 89000,
-    image: '/covers/too-stingy-cover.png',
-    audio_url: '/audio/too-stingy.mp3'
+    year: 2024,
+    image: '/album-art/Roxannity.jpg',
+    tracks: 16
   },
-  {
+  oneDay: {
+    id: 'one-day',
+    name: 'One Day',
+    artist: 'O D Porter',
+    year: 2024,
+    image: '/album-art/One_Day.jpg',
+    tracks: 19
+  },
+  godIsGood: {
     id: 'god-is-good',
-    title: 'God Is Good',
+    name: 'God Is Good',
     artist: 'O D Porter',
-    album: 'God Is Good',
-    duration: 261, // 4:21
-    price: 1,
-    plays: 67000,
-    image: '/covers/god-is-good-cover.png',
-    audio_url: '/audio/god-is-good.mp3'
+    year: 2024,
+    image: '/album-art/God_Is_Good.jpg',
+    tracks: 1
   },
-  {
-    id: 'the-pains',
-    title: 'The Pains',
+  afterEffects: {
+    id: 'after-effects',
+    name: 'After Effects',
     artist: 'O D Porter',
-    album: 'God Is Good', // Same album as God Is Good
-    duration: 225, // 3:45
-    price: 1,
-    plays: 45000,
-    image: '/covers/god-is-good-cover.png', // Same cover
-    audio_url: '/audio/the-pains.mp3'
-  },
-  {
-    id: 'tlf',
-    title: 'TLF',
-    artist: 'O D Porter',
-    album: 'TLF (Single)',
-    duration: 208, // 3:28
-    price: 1,
-    plays: 32000,
-    image: '/covers/tlf-cover.png',
-    audio_url: '/audio/tlf.mp3'
+    year: 2024,
+    image: '/covers/after-effects-cover.png',
+    tracks: 1
   }
-];
+};
 
-// Hidden tracks (no art yet)
-export const HIDDEN_TRACKS = [
-  { id: 'movement', title: 'Movement', artist: 'O D Porter', album: 'Ambiguous EP' },
-  { id: 'vibes', title: 'Vibes', artist: 'O D Porter', album: 'Ambiguous EP' },
-  { id: 'ambiguous', title: 'Ambiguous', artist: 'O D Porter', album: 'Ambiguous EP' },
+// ALL TRACKS - Organized by album
+export const TRACKS = [
+  // AMBIGUOUS ALBUM (21 tracks)
+  { id: 'oddysee', title: 'Oddysee', artist: 'O D Porter', album: 'Ambiguous', duration: '2:44', price: 1, plays: 125000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'zarah', title: 'Zarah', artist: 'O D Porter', album: 'Ambiguous', duration: '3:34', price: 1, plays: 89000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'dopamines', title: 'Dopamines', artist: 'O D Porter', album: 'Ambiguous', duration: '3:26', price: 1, plays: 67000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'i-like-all', title: 'I Like All', artist: 'O D Porter', album: 'Ambiguous', duration: '4:04', price: 1, plays: 45000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'danielles-dance', title: 'Danielles Dance', artist: 'O D Porter', album: 'Ambiguous', duration: '3:26', price: 1, plays: 72000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'make-a-move', title: 'Make A Move', artist: 'O D Porter', album: 'Ambiguous', duration: '3:51', price: 1, plays: 152000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'pack-down', title: 'Pack Down', artist: 'O D Porter', album: 'Ambiguous', duration: '4:29', price: 1, plays: 39000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'lust-for-love', title: 'Lust For Love', artist: 'O D Porter', album: 'Ambiguous', duration: '4:41', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'oxymoron', title: 'Oxymoron (Interlude)', artist: 'O D Porter', album: 'Ambiguous', duration: '2:42', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'briauns-house', title: "Briauns House", artist: 'O D Porter', album: 'Ambiguous', duration: '4:00', price: 1, plays: 48000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'torys-total-trip', title: "Tory's Total Trip", artist: 'O D Porter', album: 'Ambiguous', duration: '4:30', price: 1, plays: 39000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'lecole', title: 'LeCole', artist: 'O D Porter', album: 'Ambiguous', duration: '4:36', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'cypher', title: 'Cypher', artist: 'O D Porter', album: 'Ambiguous', duration: '4:22', price: 1, plays: 38000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'bible', title: 'Bible', artist: 'O D Porter', album: 'Ambiguous', duration: '2:44', price: 1, plays: 34000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'dirty-world', title: 'Dirty World', artist: 'O D Porter', album: 'Ambiguous', duration: '3:01', price: 1, plays: 43000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'the-employee', title: 'The Employee', artist: 'O D Porter', album: 'Ambiguous', duration: '4:00', price: 1, plays: 36000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'veni-vidi-vici', title: 'Veni Vidi Vici', artist: 'O D Porter', album: 'Ambiguous', duration: '2:30', price: 1, plays: 40000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'pack-down-remix', title: 'Pack Down (Remix)', artist: 'O D Porter', album: 'Ambiguous', duration: '4:29', price: 1, plays: 27000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'lil-playa', title: 'Lil Playa', artist: 'O D Porter', album: 'Ambiguous', duration: '2:57', price: 1, plays: 60000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'nostalgism', title: 'Nostalgism', artist: 'O D Porter', album: 'Ambiguous', duration: '3:02', price: 1, plays: 31000, image: '/album-art/Ambiguous.jpg' },
+  { id: 'enlightened', title: 'Enlightened', artist: 'O D Porter', album: 'Ambiguous', duration: '3:40', price: 1, plays: 28000, image: '/album-art/Ambiguous.jpg' },
+
+  // ROXANNITY ALBUM (16 tracks)
+  { id: 'roxannity-intro', title: 'Roxannity (Intro)', artist: 'O D Porter', album: 'Roxannity', duration: '3:23', price: 1, plays: 54000, image: '/album-art/Roxannity.jpg' },
+  { id: 'decomposure', title: 'Decomposure', artist: 'O D Porter', album: 'Roxannity', duration: '2:17', price: 1, plays: 42000, image: '/album-art/Roxannity.jpg' },
+  { id: 'freak-like-me', title: 'Freak Like Me', artist: 'O D Porter', album: 'Roxannity', duration: '3:40', price: 1, plays: 78000, image: '/album-art/Roxannity.jpg' },
+  { id: 'spoken-wordz', title: 'Spoken Wordz', artist: 'O D Porter', album: 'Roxannity', duration: '3:56', price: 1, plays: 51000, image: '/album-art/Roxannity.jpg' },
+  { id: 'heart-and-soul', title: 'Heart & Soul', artist: 'O D Porter', album: 'Roxannity', duration: '2:31', price: 1, plays: 65000, image: '/album-art/Roxannity.jpg' },
+  { id: 'no-more', title: 'No More', artist: 'O D Porter', album: 'Roxannity', duration: '1:29', price: 1, plays: 89000, image: '/album-art/Roxannity.jpg' },
+  { id: 'gotta-get-it', title: 'Gotta Get It', artist: 'O D Porter', album: 'Roxannity', duration: '2:33', price: 1, plays: 47000, image: '/album-art/Roxannity.jpg' },
+  { id: 'job', title: 'Job', artist: 'O D Porter', album: 'Roxannity', duration: '2:31', price: 1, plays: 38000, image: '/album-art/Roxannity.jpg' },
+  { id: 'pure-lust', title: 'Pure Lust', artist: 'O D Porter', album: 'Roxannity', duration: '1:51', price: 1, plays: 52000, image: '/album-art/Roxannity.jpg' },
+  { id: 'red-pill-or-blue', title: 'Red Pill or The Blue', artist: 'O D Porter', album: 'Roxannity', duration: '3:06', price: 1, plays: 44000, image: '/album-art/Roxannity.jpg' },
+  { id: 'outsider', title: 'Outsider', artist: 'O D Porter', album: 'Roxannity', duration: '3:16', price: 1, plays: 39000, image: '/album-art/Roxannity.jpg' },
+  { id: 'you-better-stop', title: 'You Better Stop', artist: 'O D Porter', album: 'Roxannity', duration: '3:05', price: 1, plays: 41000, image: '/album-art/Roxannity.jpg' },
+  { id: 'rose', title: 'Rose', artist: 'O D Porter', album: 'Roxannity', duration: '4:06', price: 1, plays: 67000, image: '/album-art/Roxannity.jpg' },
+  { id: 'my-testamony', title: 'My Testamony', artist: 'O D Porter', album: 'Roxannity', duration: '1:32', price: 1, plays: 33000, image: '/album-art/Roxannity.jpg' },
+
+  // ONE DAY ALBUM (19 tracks)
+  { id: 'the-intro', title: 'The Intro', artist: 'O D Porter', album: 'One Day', duration: '1:32', price: 1, plays: 23000, image: '/album-art/One_Day.jpg' },
+  { id: 'pushn', title: "Push'N", artist: 'O D Porter', album: 'One Day', duration: '4:03', price: 1, plays: 21000, image: '/album-art/One_Day.jpg' },
+  { id: 'real-definition', title: 'Real Definition', artist: 'O D Porter', album: 'One Day', duration: '4:16', price: 1, plays: 19000, image: '/album-art/One_Day.jpg' },
+  { id: 'bandflow', title: 'BandFlow', artist: 'O D Porter', album: 'One Day', duration: '3:04', price: 1, plays: 23000, image: '/album-art/One_Day.jpg' },
+  { id: 'mfcch', title: 'MFCCH', artist: 'O D Porter', album: 'One Day', duration: '2:26', price: 1, plays: 19000, image: '/album-art/One_Day.jpg' },
+  { id: 'best-wishes', title: 'Best Wishes', artist: 'O D Porter', album: 'One Day', duration: '3:36', price: 1, plays: 19000, image: '/album-art/One_Day.jpg' },
+  { id: 'one-day-title', title: 'One Day', artist: 'O D Porter', album: 'One Day', duration: '3:58', price: 1, plays: 21000, image: '/album-art/One_Day.jpg' },
+  { id: 'back-at-it', title: 'Back At It', artist: 'O D Porter', album: 'One Day', duration: '4:18', price: 1, plays: 12000, image: '/album-art/One_Day.jpg' },
+  { id: 'same-house', title: 'Same House', artist: 'O D Porter', album: 'One Day', duration: '3:12', price: 1, plays: 19000, image: '/album-art/One_Day.jpg' },
+  { id: 'sunshine', title: 'Sunshine', artist: 'O D Porter', album: 'One Day', duration: '3:40', price: 1, plays: 15000, image: '/album-art/One_Day.jpg' },
+  { id: 'calling-for-me', title: 'Calling For Me', artist: 'O D Porter', album: 'One Day', duration: '3:57', price: 1, plays: 17000, image: '/album-art/One_Day.jpg' },
+  { id: 'artgasm', title: 'Artgasm', artist: 'O D Porter', album: 'One Day', duration: '2:26', price: 1, plays: 18000, image: '/album-art/One_Day.jpg' },
+  { id: 'the-interlude', title: 'The Interlude', artist: 'O D Porter', album: 'One Day', duration: '0:57', price: 1, plays: 50000, image: '/album-art/One_Day.jpg' },
+  { id: 'silhouette', title: 'Silhouette', artist: 'O D Porter', album: 'One Day', duration: '4:00', price: 1, plays: 17000, image: '/album-art/One_Day.jpg' },
+  { id: 'street-love', title: 'Street Love', artist: 'O D Porter', album: 'One Day', duration: '3:21', price: 1, plays: 13000, image: '/album-art/One_Day.jpg' },
+  { id: 'tracey-porter', title: 'Tracey Porter', artist: 'O D Porter', album: 'One Day', duration: '3:43', price: 1, plays: 12000, image: '/album-art/One_Day.jpg' },
+  { id: 'plus', title: 'Plus', artist: 'O D Porter', album: 'One Day', duration: '2:08', price: 1, plays: 16000, image: '/album-art/One_Day.jpg' },
+  { id: 'mike-tyson', title: 'Mike Tyson (One Round)', artist: 'O D Porter', album: 'One Day', duration: '1:43', price: 1, plays: 19000, image: '/album-art/One_Day.jpg' },
+
+  // SINGLES
+  { id: 'too-stingy', title: 'Too Stingy', artist: 'O D Porter', album: 'Singles', duration: '3:15', price: 1, plays: 89000, image: '/covers/too-stingy-cover.png' },
+  { id: 'god-is-good', title: 'God Is Good', artist: 'O D Porter', album: 'Singles', duration: '4:21', price: 1, plays: 67000, image: '/album-art/God_Is_Good.jpg' },
+  { id: 'after-effects', title: 'After Effects', artist: 'O D Porter', album: 'Singles', duration: '4:00', price: 1, plays: 28000, image: '/covers/after-effects-cover.png' }
 ];

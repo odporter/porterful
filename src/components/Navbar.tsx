@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useTheme } from '@/lib/theme-context'
 import { useWallet } from '@/lib/wallet-context'
@@ -14,48 +14,21 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const mobileMenuRef = useRef<HTMLDivElement>(null)
-  const profileRef = useRef<HTMLDivElement>(null)
 
   // Handle scroll
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+    const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('rollback', onScroll)
-  }, [])
-
-  // Close menus on outside click
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
-        setMobileOpen(false)
-      }
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setProfileOpen(false)
-      }
-    }
-    document.addEventListener('click', onClick)
-    return () => document.removeEventListener('click', onClick)
-  }, [])
-
-  // Close mobile menu on escape key
-  useEffect(() => {
-    const onEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMobileOpen(false)
-        setProfileOpen(false)
-      }
-    }
-    document.addEventListener('keydown', onEscape)
-    return () => document.removeEventListener('keydown', onEscape)
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     window.location.href = '/'
   }
+
+  const toggleMobile = () => setMobileOpen(!mobileOpen)
+  const closeMobile = () => setMobileOpen(false)
 
   return (
     <>
@@ -101,25 +74,19 @@ export function Navbar() {
 
             {/* Right Side */}
             <div className="flex items-center gap-2 md:gap-3">
-              {/* Wallet Balance */}
               <Link href="/wallet" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
                 <DollarSign className="text-[var(--pf-orange)]" size={18} />
                 <span className="font-medium">{formatWalletBalance()}</span>
               </Link>
               
-              {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
-                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
+              <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors">
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               
               {user ? (
-                <div className="hidden md:block relative" ref={profileRef}>
+                <div className="hidden md:block relative">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); setProfileOpen(!profileOpen) }}
+                    onClick={() => setProfileOpen(!profileOpen)}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]"
                   >
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
@@ -156,15 +123,11 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Mobile Toggle - Always visible */}
+              {/* Mobile Toggle */}
               <button 
-                onClick={(e) => { 
-                  e.stopPropagation(); 
-                  setMobileOpen(!mobileOpen);
-                }}
-                className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors touch-manipulation"
+                onClick={toggleMobile}
+                className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors touch-manipulation md:hidden"
                 aria-label="Toggle menu"
-                aria-expanded={mobileOpen}
               >
                 {mobileOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
@@ -173,118 +136,74 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
-      {mobileOpen && (
-        <div 
-          className="fixed inset-0 z-[100] bg-[var(--pf-bg)] md:hidden"
-          style={{ top: '64px' }}
-          ref={mobileMenuRef}
-        >
-          <div className="p-4 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
-            {/* Wallet */}
-            <Link 
-              href="/wallet" 
-              className="flex items-center gap-3 px-4 py-4 bg-[var(--pf-orange)]/10 rounded-xl text-[var(--pf-orange)] font-medium"
-              onClick={() => setMobileOpen(false)}
-            >
-              <DollarSign size={20} />
-              <span>Wallet: {formatWalletBalance()}</span>
-            </Link>
+      {/* Mobile Menu */}
+      <div 
+        className={`fixed inset-0 z-[100] bg-[var(--pf-bg)] overflow-y-auto transition-transform duration-300 md:hidden ${
+          mobileOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{ top: '64px' }}
+      >
+        <div className="p-4 space-y-2">
+          {/* Wallet */}
+          <Link 
+            href="/wallet" 
+            className="flex items-center gap-3 px-4 py-4 bg-[var(--pf-orange)]/10 rounded-xl text-[var(--pf-orange)] font-medium"
+            onClick={closeMobile}
+          >
+            <DollarSign size={20} />
+            <span>Wallet: {formatWalletBalance()}</span>
+          </Link>
 
-            {/* Main Nav Links */}
-            <div className="pt-2 space-y-1">
-              <Link 
-                href="/marketplace" 
-                className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-xl">🛒</span> Shop
+          {/* Nav Links */}
+          <div className="pt-2 space-y-1">
+            <Link href="/marketplace" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+              <span className="text-xl">🛒</span> Shop
+            </Link>
+            <Link href="/digital" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+              <span className="text-xl">🎵</span> Music
+            </Link>
+            <Link href="/radio" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+              <span className="text-xl">📻</span> Radio
+            </Link>
+            <Link href="/playlists" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+              <span className="text-xl">📋</span> Playlists
+            </Link>
+            <Link href="/artist/od-porter" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+              <span className="text-xl">🎤</span> Artist Profile
+            </Link>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[var(--pf-border)] my-2" />
+
+          {/* User Actions */}
+          {user ? (
+            <div className="space-y-1">
+              <Link href="/dashboard/artist" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+                <User size={20} /> Dashboard
               </Link>
-              <Link 
-                href="/digital" 
-                className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-xl">🎵</span> Music
+              <Link href="/dashboard/upload" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-xl transition-colors" onClick={closeMobile}>
+                <Upload size={20} /> Upload Music
               </Link>
-              <Link 
-                href="/radio" 
-                className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-xl">📻</span> Radio
+              <Link href="/settings" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+                ⚙️ Settings
               </Link>
-              <Link 
-                href="/playlists" 
-                className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-xl">📋</span> Playlists
+              <button onClick={() => { handleSignOut(); closeMobile(); }} className="flex items-center gap-3 px-4 py-4 w-full text-left text-red-400 hover:bg-[var(--pf-surface)] rounded-xl transition-colors">
+                <LogOut size={20} /> Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2 pt-2">
+              <Link href="/login" className="flex items-center justify-center px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white border border-[var(--pf-border)] rounded-xl transition-colors" onClick={closeMobile}>
+                Sign In
               </Link>
-              <Link 
-                href="/artist/od-porter" 
-                className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-xl">🎤</span> Artist Profile
+              <Link href="/signup" className="flex items-center justify-center px-4 py-4 bg-[var(--pf-orange)] text-white rounded-xl font-medium" onClick={closeMobile}>
+                Get Started
               </Link>
             </div>
-
-            {/* Divider */}
-            <div className="border-t border-[var(--pf-border)] my-2" />
-
-            {/* User Actions */}
-            {user ? (
-              <div className="space-y-1">
-                <Link 
-                  href="/dashboard/artist" 
-                  className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <User size={20} /> Dashboard
-                </Link>
-                <Link 
-                  href="/dashboard/upload" 
-                  className="flex items-center gap-3 px-4 py-4 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-xl transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <Upload size={20} /> Upload Music
-                </Link>
-                <Link 
-                  href="/settings" 
-                  className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  ⚙️ Settings
-                </Link>
-                <button 
-                  onClick={() => { handleSignOut(); setMobileOpen(false); }}
-                  className="flex items-center gap-3 px-4 py-4 w-full text-left text-red-400 hover:bg-[var(--pf-surface)] rounded-xl transition-colors"
-                >
-                  <LogOut size={20} /> Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2 pt-2">
-                <Link 
-                  href="/login" 
-                  className="flex items-center justify-center px-4 py-4 text-[var(--pf-text-secondary)] hover:text-white border border-[var(--pf-border)] rounded-xl transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  href="/signup" 
-                  className="flex items-center justify-center px-4 py-4 bg-[var(--pf-orange)] text-white rounded-xl font-medium"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Get Started
-                </Link>
-              </div>
-            )}
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </>
   )
 }

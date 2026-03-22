@@ -115,30 +115,33 @@ export const ALBUMS = {
   }
 };
 
-// ALL TRACKS - Organized by album
+// CDN base URL for audio
+const CDN_BASE = 'https://tsdjmiqczgxnkpvirkya.supabase.co/storage/v1/object/public/audio/albums';
+
+// ALL TRACKS - Organized by album with CDN audio URLs
 export const TRACKS = [
-  // AMBIGUOUS ALBUM (21 tracks)
-  { id: 'oddysee', title: 'Oddysee', artist: 'O D Porter', album: 'Ambiguous', duration: '2:44', price: 1, plays: 125000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'zarah', title: 'Zarah', artist: 'O D Porter', album: 'Ambiguous', duration: '3:34', price: 1, plays: 89000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'dopamines', title: 'Dopamines', artist: 'O D Porter', album: 'Ambiguous', duration: '3:26', price: 1, plays: 67000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'i-like-all', title: 'I Like All', artist: 'O D Porter', album: 'Ambiguous', duration: '4:04', price: 1, plays: 45000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'danielles-dance', title: 'Danielles Dance', artist: 'O D Porter', album: 'Ambiguous', duration: '3:26', price: 1, plays: 72000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'make-a-move', title: 'Make A Move', artist: 'O D Porter', album: 'Ambiguous', duration: '3:51', price: 1, plays: 152000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'pack-down', title: 'Pack Down', artist: 'O D Porter', album: 'Ambiguous', duration: '4:29', price: 1, plays: 39000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'lust-for-love', title: 'Lust For Love', artist: 'O D Porter', album: 'Ambiguous', duration: '4:41', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'oxymoron', title: 'Oxymoron (Interlude)', artist: 'O D Porter', album: 'Ambiguous', duration: '2:42', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'briauns-house', title: "Briauns House", artist: 'O D Porter', album: 'Ambiguous', duration: '4:00', price: 1, plays: 48000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'torys-total-trip', title: "Tory's Total Trip", artist: 'O D Porter', album: 'Ambiguous', duration: '4:30', price: 1, plays: 39000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'lecole', title: 'LeCole', artist: 'O D Porter', album: 'Ambiguous', duration: '4:36', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'cypher', title: 'Cypher', artist: 'O D Porter', album: 'Ambiguous', duration: '4:22', price: 1, plays: 38000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'bible', title: 'Bible', artist: 'O D Porter', album: 'Ambiguous', duration: '2:44', price: 1, plays: 34000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'dirty-world', title: 'Dirty World', artist: 'O D Porter', album: 'Ambiguous', duration: '3:01', price: 1, plays: 43000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'the-employee', title: 'The Employee', artist: 'O D Porter', album: 'Ambiguous', duration: '4:00', price: 1, plays: 36000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'veni-vidi-vici', title: 'Veni Vidi Vici', artist: 'O D Porter', album: 'Ambiguous', duration: '2:30', price: 1, plays: 40000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'pack-down-remix', title: 'Pack Down (Remix)', artist: 'O D Porter', album: 'Ambiguous', duration: '4:29', price: 1, plays: 27000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'lil-playa', title: 'Lil Playa', artist: 'O D Porter', album: 'Ambiguous', duration: '2:57', price: 1, plays: 60000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'nostalgism', title: 'Nostalgism', artist: 'O D Porter', album: 'Ambiguous', duration: '3:02', price: 1, plays: 31000, image: '/album-art/Ambiguous.jpg' },
-  { id: 'enlightened', title: 'Enlightened', artist: 'O D Porter', album: 'Ambiguous', duration: '3:40', price: 1, plays: 28000, image: '/album-art/Ambiguous.jpg' },
+  // AMBIGUOUS ALBUM (21 tracks) - ✅ UPLOADED
+  { id: 'oddysee', title: 'Oddysee', artist: 'O D Porter', album: 'Ambiguous', duration: '2:44', price: 1, plays: 125000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/01%20Oddysee.mp3` },
+  { id: 'zarah', title: 'Zarah', artist: 'O D Porter', album: 'Ambiguous', duration: '3:34', price: 1, plays: 89000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/02%20Zarah.mp3` },
+  { id: 'dopamines', title: 'Dopamines', artist: 'O D Porter', album: 'Ambiguous', duration: '3:26', price: 1, plays: 67000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/03%20Dopamines.mp3` },
+  { id: 'i-like-all', title: 'I Like All', artist: 'O D Porter', album: 'Ambiguous', duration: '4:04', price: 1, plays: 45000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/04%20I%20Like%20All.mp3` },
+  { id: 'danielles-dance', title: 'Danielles Dance', artist: 'O D Porter', album: 'Ambiguous', duration: '3:26', price: 1, plays: 72000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/05%20Danielles%20Dance.mp3` },
+  { id: 'make-a-move', title: 'Make A Move', artist: 'O D Porter', album: 'Ambiguous', duration: '3:51', price: 1, plays: 152000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/06%20Make%20A%20Move.mp3` },
+  { id: 'pack-down', title: 'Pack Down', artist: 'O D Porter', album: 'Ambiguous', duration: '4:29', price: 1, plays: 39000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/07%20Pack%20Down.mp3` },
+  { id: 'lust-for-love', title: 'Lust For Love', artist: 'O D Porter', album: 'Ambiguous', duration: '4:41', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/08%20Lust%20For%20Love.mp3` },
+  { id: 'oxymoron', title: 'Oxymoron (Interlude)', artist: 'O D Porter', album: 'Ambiguous', duration: '2:42', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/09%20Oxymoron%20(interlude).mp3` },
+  { id: 'briauns-house', title: "Briauns House", artist: 'O D Porter', album: 'Ambiguous', duration: '4:00', price: 1, plays: 48000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/10%20Briauns%20House.mp3` },
+  { id: 'torys-total-trip', title: "Tory's Total Trip", artist: 'O D Porter', album: 'Ambiguous', duration: '4:30', price: 1, plays: 39000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/11%20Torys%20Total%20Trip.mp3` },
+  { id: 'lecole', title: 'LeCole', artist: 'O D Porter', album: 'Ambiguous', duration: '4:36', price: 1, plays: 35000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/12%20LeCole.mp3` },
+  { id: 'cypher', title: 'Cypher', artist: 'O D Porter', album: 'Ambiguous', duration: '4:22', price: 1, plays: 38000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/13%20Cypher.mp3` },
+  { id: 'bible', title: 'Bible', artist: 'O D Porter', album: 'Ambiguous', duration: '2:44', price: 1, plays: 34000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/14%20Bible.mp3` },
+  { id: 'dirty-world', title: 'Dirty World', artist: 'O D Porter', album: 'Ambiguous', duration: '3:01', price: 1, plays: 43000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/15%20Dirty%20World.mp3` },
+  { id: 'the-employee', title: 'The Employee', artist: 'O D Porter', album: 'Ambiguous', duration: '4:00', price: 1, plays: 36000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/16%20The%20Employee.mp3` },
+  { id: 'veni-vidi-vici', title: 'Veni Vidi Vici', artist: 'O D Porter', album: 'Ambiguous', duration: '2:30', price: 1, plays: 40000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/17%20Veni%20Vidi%20Vici.mp3` },
+  { id: 'pack-down-remix', title: 'Pack Down (Remix)', artist: 'O D Porter', album: 'Ambiguous', duration: '4:29', price: 1, plays: 27000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/18%20Pack%20Down%20(Remix).mp3` },
+  { id: 'lil-playa', title: 'Lil Playa', artist: 'O D Porter', album: 'Ambiguous', duration: '2:57', price: 1, plays: 60000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/19%20Lil%20Playa.mp3` },
+  { id: 'nostalgism', title: 'Nostalgism', artist: 'O D Porter', album: 'Ambiguous', duration: '3:02', price: 1, plays: 31000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/20%20Nostalgism.mp3` },
+  { id: 'enlightened', title: 'Enlightened', artist: 'O D Porter', album: 'Ambiguous', duration: '3:40', price: 1, plays: 28000, image: '/album-art/Ambiguous.jpg', audio_url: `${CDN_BASE}/Ambiguous/21%20Enlightened.mp3` },
 
   // ROXANNITY ALBUM (16 tracks)
   { id: 'roxannity-intro', title: 'Roxannity (Intro)', artist: 'O D Porter', album: 'Roxannity', duration: '3:23', price: 1, plays: 54000, image: '/album-art/Roxannity.jpg' },

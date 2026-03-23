@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { TRACKS } from '@/lib/data'
 import Link from 'next/link'
+import { useAudio } from '@/lib/audio-context'
 import { Play, Pause, SkipForward, Radio, Heart, ShoppingBag } from 'lucide-react'
 
 // Shuffle array helper
@@ -22,133 +23,43 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-// Preview duration (1 minute)
-const PREVIEW_DURATION = 60
-
 export default function RadioPage() {
+  const { currentTrack, isPlaying, togglePlay, playNext, setQueue, currentIndex } = useAudio()
   const [shuffledTracks] = useState(() => shuffleArray(TRACKS))
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [showPurchasePrompt, setShowPurchasePrompt] = useState(false)
-  const [crossfade, setCrossfade] = useState(1)
   
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  // Initialize queue on mount
+  useEffect(() => {
+    setQueue(shuffledTracks.map(t => ({
+      ...t,
+      duration: typeof t.duration === 'string' ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : t.duration || 180
+    })))
+  }, [shuffledTracks, setQueue])
   
-  const currentTrack = shuffledTracks[currentIndex]
+  // Start playing first track
+  const startRadio = useCallback(() => {
+    if (shuffledTracks.length > 0 && !currentTrack) {
+      const firstTrack = {
+        ...shuffledTracks[0],
+        duration: typeof shuffledTracks[0].duration === 'string' 
+          ? shuffledTracks[0].duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) 
+          : shuffledTracks[0].duration || 180
+      }
+      setQueue(shuffledTracks.map(t => ({
+        ...t,
+        duration: typeof t.duration === 'string' ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : t.duration || 180
+      })))
+    }
+  }, [shuffledTracks, currentTrack, setQueue])
+  
+  // Auto-start on mount
+  useEffect(() => {
+    startRadio()
+  }, [])
+  
   const nextTrack = shuffledTracks[(currentIndex + 1) % shuffledTracks.length]
   
-  // Play track preview
-  const playTrack = useCallback(() => {
-    if (audioRef.current && currentTrack) {
-      audioRef.current.src = currentTrack.audio_url
-      audioRef.current.play().catch(() => {})
-      setIsPlaying(true)
-      setCurrentTime(0)
-      setShowPurchasePrompt(false)
-    }
-  }, [currentTrack])
-  
-  // Handle time update from audio element
-  const handleTimeUpdate = useCallback(() => {
-    if (audioRef.current && isPlaying) {
-      const time = audioRef.current.currentTime
-      setCurrentTime(Math.floor(time))
-      
-      // Crossfade in last 5 seconds
-      const remainingTime = (audioRef.current.duration || 60) - time
-      if (remainingTime <= 5 && remainingTime > 0) {
-        setCrossfade(remainingTime / 5)
-      } else {
-        setCrossfade(1)
-      }
-      
-      // Show purchase prompt at 60 seconds or end of track
-      if (time >= 60) {
-        // Show purchase prompt randomly
-        if (Math.random() > 0.7) {
-          setShowPurchasePrompt(true)
-          setIsPlaying(false)
-          audioRef.current.pause()
-        } else {
-          // Skip to next track
-          skipTrack()
-        }
-      }
-    }
-  }, [isPlaying])
-
-  // Handle audio ended
-  const handleEnded = useCallback(() => {
-    skipTrack()
-  }, [])
-  
-  // Setup audio event listeners
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    
-    audio.addEventListener('timeupdate', handleTimeUpdate)
-    audio.addEventListener('ended', handleEnded)
-    
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate)
-      audio.removeEventListener('ended', handleEnded)
-    }
-  }, [handleTimeUpdate, handleEnded])
-  
-  // Auto-play next track when index changes
-  useEffect(() => {
-    if (isPlaying) {
-      playTrack()
-    }
-  }, [currentIndex])
-  
-  // Start radio
-  const startRadio = () => {
-    playTrack()
-  }
-  
-  // Pause radio
-  const pauseRadio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-    }
-    setIsPlaying(false)
-  }
-  
-  // Resume radio
-  const resumeRadio = () => {
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {})
-    }
-    setIsPlaying(true)
-  }
-  
-  // Skip to next track
-  const skipTrack = () => {
-    setCurrentIndex(i => (i + 1) % shuffledTracks.length)
-    setShowPurchasePrompt(false)
-  }
-  
-  // Handle audio end
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    
-    const handleEnded = () => {
-      skipTrack()
-    }
-    
-    audio.addEventListener('ended', handleEnded)
-    return () => audio.removeEventListener('ended', handleEnded)
-  }, [])
-
   return (
     <div className="min-h-screen pt-20 pb-32">
-      <audio ref={audioRef} />
-      
       <div className="pf-container max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -157,7 +68,7 @@ export default function RadioPage() {
           </div>
           <h1 className="text-3xl font-bold mb-2">Porterful Radio</h1>
           <p className="text-[var(--pf-text-secondary)]">
-            Stream unlimited previews • 1-minute per track • Shuffle mode
+            Shuffle through all tracks • Click play to start
           </p>
         </div>
         
@@ -168,15 +79,15 @@ export default function RadioPage() {
             <img 
               src={currentTrack?.image || '/album-art/default.jpg'} 
               alt={currentTrack?.title || 'Now Playing'}
-              className={`w-full h-full object-cover transition-opacity duration-1000 ${crossfade < 1 ? 'opacity-50' : 'opacity-100'}`}
+              className={`w-full h-full object-cover transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-70'}`}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             
             {/* Live Badge */}
             <div className="absolute top-4 left-4 flex items-center gap-2">
               <span className="flex items-center gap-1 px-3 py-1 bg-red-500 rounded-full text-white text-sm font-medium shadow-lg">
-                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                LIVE
+                <span className={`w-2 h-2 bg-white rounded-full ${isPlaying ? 'animate-pulse' : ''}`} />
+                {isPlaying ? 'LIVE' : 'RADIO'}
               </span>
               <span className="px-3 py-1 bg-black/70 backdrop-blur rounded-full text-white text-sm">
                 {shuffledTracks.length} tracks
@@ -185,50 +96,33 @@ export default function RadioPage() {
             
             {/* Track Info Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{currentTrack?.title}</h2>
-              <Link 
-                href={`/artist/${currentTrack?.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
-                className="text-white/90 drop-shadow hover:text-[var(--pf-orange)] transition-colors"
-              >
-                {currentTrack?.artist}
-              </Link>
-              <span className="text-white/70"> • {currentTrack?.album}</span>
+              <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{currentTrack?.title || 'Select a track'}</h2>
+              {currentTrack && (
+                <>
+                  <Link 
+                    href={`/artist/${currentTrack.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
+                    className="text-white/90 drop-shadow hover:text-[var(--pf-orange)] transition-colors"
+                  >
+                    {currentTrack.artist}
+                  </Link>
+                  <span className="text-white/70"> • {currentTrack.album}</span>
+                </>
+              )}
             </div>
           </div>
           
-          {/* Progress Bar */}
+          {/* Controls */}
           <div className="p-4 bg-[var(--pf-bg)]">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-sm text-[var(--pf-text-muted)]">{formatTime(currentTime)}</span>
-              <div className="flex-1 h-2 bg-[var(--pf-surface)] rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-[var(--pf-orange)] to-purple-500 transition-all duration-1000"
-                  style={{ width: `${(currentTime / PREVIEW_DURATION) * 100}%` }}
-                />
-              </div>
-              <span className="text-sm text-[var(--pf-text-muted)]">1:00</span>
-            </div>
-            
-            {/* Controls */}
             <div className="flex items-center justify-center gap-4">
-              {isPlaying ? (
-                <button 
-                  onClick={pauseRadio}
-                  className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange-dark)] transition-colors"
-                >
-                  <Pause size={28} className="text-white" />
-                </button>
-              ) : (
-                <button 
-                  onClick={isPlaying ? resumeRadio : startRadio}
-                  className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange-dark)] transition-colors"
-                >
-                  <Play size={28} className="text-white ml-1" />
-                </button>
-              )}
+              <button 
+                onClick={togglePlay}
+                className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange-dark)] transition-colors"
+              >
+                {isPlaying ? <Pause size={28} className="text-white" /> : <Play size={28} className="text-white ml-1" />}
+              </button>
               
               <button 
-                onClick={skipTrack}
+                onClick={playNext}
                 className="w-12 h-12 rounded-full bg-[var(--pf-surface)] flex items-center justify-center hover:bg-[var(--pf-border)] transition-colors"
                 title="Skip to next track"
               >
@@ -238,54 +132,29 @@ export default function RadioPage() {
           </div>
         </div>
         
-        {/* Purchase Prompt (shows after some tracks) */}
-        {showPurchasePrompt && (
-          <div className="bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-600/20 rounded-2xl p-6 mb-6 border border-[var(--pf-orange)]/30">
-            <div className="text-center">
-              <h3 className="text-xl font-bold mb-2">Love this track?</h3>
-              <p className="text-[var(--pf-text-secondary)] mb-4">
-                Buy it for ${currentTrack?.price || 1} and own it forever.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        {/* Up Next */}
+        {nextTrack && (
+          <div className="bg-[var(--pf-surface)] rounded-xl p-4 mb-6 border border-[var(--pf-border)]">
+            <h3 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-3">UP NEXT</h3>
+            <div className="flex items-center gap-3">
+              <img 
+                src={nextTrack?.image || '/album-art/default.jpg'} 
+                alt={nextTrack?.title}
+                className="w-12 h-12 rounded object-cover"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{nextTrack?.title}</p>
                 <Link 
-                  href="/digital"
-                  className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2"
+                  href={`/artist/${nextTrack?.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
+                  className="text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors"
                 >
-                  <ShoppingBag size={18} />
-                  Buy This Track
+                  {nextTrack?.artist}
                 </Link>
-                <button 
-                  onClick={() => { setShowPurchasePrompt(false); startRadio(); }}
-                  className="pf-btn pf-btn-secondary"
-                >
-                  Keep Listening
-                </button>
               </div>
+              <span className="text-sm text-[var(--pf-text-muted)]">{nextTrack?.duration}</span>
             </div>
           </div>
         )}
-        
-        {/* Up Next */}
-        <div className="bg-[var(--pf-surface)] rounded-xl p-4 mb-6 border border-[var(--pf-border)]">
-          <h3 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-3">UP NEXT</h3>
-          <div className="flex items-center gap-3">
-            <img 
-              src={nextTrack?.image || '/album-art/default.jpg'} 
-              alt={nextTrack?.title}
-              className="w-12 h-12 rounded object-cover"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{nextTrack?.title}</p>
-              <Link 
-                href={`/artist/${nextTrack?.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
-                className="text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors"
-              >
-                {nextTrack?.artist}
-              </Link>
-            </div>
-            <span className="text-sm text-[var(--pf-text-muted)]">1 min</span>
-          </div>
-        </div>
         
         {/* How It Works */}
         <div className="bg-[var(--pf-surface)] rounded-xl p-6 border border-[var(--pf-border)]">
@@ -302,16 +171,16 @@ export default function RadioPage() {
             </div>
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
-                <span className="text-[var(--pf-orange)] font-bold">1:00</span>
+                <Heart size={20} className="text-[var(--pf-orange)]" />
               </div>
               <div>
-                <p className="font-medium">1-Minute Previews</p>
-                <p className="text-sm text-[var(--pf-text-secondary)]">Hear each track before buying</p>
+                <p className="font-medium">Full Tracks</p>
+                <p className="text-sm text-[var(--pf-text-secondary)]">Listen to complete songs</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
-                <Heart size={20} className="text-[var(--pf-orange)]" />
+                <ShoppingBag size={20} className="text-[var(--pf-orange)]" />
               </div>
               <div>
                 <p className="font-medium">Support Artists</p>
@@ -324,7 +193,7 @@ export default function RadioPage() {
         {/* CTA */}
         <div className="mt-8 text-center">
           <p className="text-[var(--pf-text-secondary)] mb-4">
-            Want unlimited access? Buy tracks to own them forever.
+            Want to own the music? Buy tracks to keep them forever.
           </p>
           <Link href="/digital" className="pf-btn pf-btn-primary inline-flex items-center gap-2">
             <ShoppingBag size={18} />

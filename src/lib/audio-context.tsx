@@ -10,7 +10,7 @@ interface Track {
   duration?: number;
   audio_url?: string;
   cover_url?: string;
-  image?: string; // Allow image as alias for cover_url
+  image?: string;
   plays?: number;
   price?: number;
 }
@@ -21,12 +21,6 @@ interface AudioContext {
   volume: number;
   progress: number;
   duration: number;
-  isPreview: boolean;
-  previewTimeRemaining: number;
-  isSupporter: boolean;
-  isCountingDown: boolean;
-  countdownSeconds: number;
-  nextTrack: Track | null;
   playTrack: (track: Track) => void;
   togglePlay: () => void;
   pause: () => void;
@@ -37,14 +31,7 @@ interface AudioContext {
   queue: Track[];
   setQueue: (tracks: Track[]) => void;
   currentIndex: number;
-  upgradeToFull: () => void;
-  skipCountdown: () => void;
 }
-
-// Preview duration in seconds (1 minute)
-const PREVIEW_DURATION = 60;
-// Countdown duration between tracks
-const COUNTDOWN_DURATION = 7;
 
 const AudioCtx = createContext<AudioContext | null>(null);
 
@@ -56,82 +43,16 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [queue, setQueue] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  const [isPreview, setIsPreview] = useState(true);
-  const [previewTimeRemaining, setPreviewTimeRemaining] = useState(PREVIEW_DURATION);
-  const [isSupporter, setIsSupporter] = useState(false);
-  const [isCountingDown, setIsCountingDown] = useState(false);
-  const [countdownSeconds, setCountdownSeconds] = useState(COUNTDOWN_DURATION);
-  const [nextTrack, setNextTrack] = useState<Track | null>(null);
   
-  // Use refs for values that need to be current in event handlers
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const isSupporterRef = useRef(false);
-  const isPreviewRef = useRef(true);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const queueRef = useRef<Track[]>([]);
   const currentIndexRef = useRef(-1);
 
-  // Keep refs in sync with state
-  useEffect(() => {
-    isSupporterRef.current = isSupporter;
-    isPreviewRef.current = isPreview;
-  }, [isSupporter, isPreview]);
-
-  // Keep queue and index refs in sync
+  // Keep refs in sync
   useEffect(() => {
     queueRef.current = queue;
     currentIndexRef.current = currentIndex;
   }, [queue, currentIndex]);
-
-  // Start countdown before next track
-  const startCountdown = useCallback((track: Track) => {
-    setNextTrack(track);
-    setIsCountingDown(true);
-    setCountdownSeconds(COUNTDOWN_DURATION);
-    setIsPlaying(false);
-    
-    countdownRef.current = setInterval(() => {
-      setCountdownSeconds(prev => {
-        if (prev <= 1) {
-          // Countdown finished, play next track
-          if (countdownRef.current) {
-            clearInterval(countdownRef.current);
-          }
-          setIsCountingDown(false);
-          setNextTrack(null);
-          
-          // Actually play the track
-          if (audioRef.current && track.audio_url) {
-            setCurrentTrack(track);
-            setProgress(0);
-            setIsPreview(!isSupporterRef.current);
-            setPreviewTimeRemaining(PREVIEW_DURATION);
-            audioRef.current.src = track.audio_url;
-            audioRef.current.play().catch(() => {});
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }, []);
-
-  // Skip countdown and play immediately
-  const skipCountdown = useCallback(() => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-    }
-    setIsCountingDown(false);
-    if (nextTrack && audioRef.current && nextTrack.audio_url) {
-      setCurrentTrack(nextTrack);
-      setProgress(0);
-      setIsPreview(!isSupporterRef.current);
-      setPreviewTimeRemaining(PREVIEW_DURATION);
-      audioRef.current.src = nextTrack.audio_url;
-      audioRef.current.play().catch(() => {});
-    }
-    setNextTrack(null);
-  }, [nextTrack]);
 
   // Create audio element on mount
   useEffect(() => {
@@ -139,62 +60,46 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       const audio = new Audio();
       audioRef.current = audio;
       audio.volume = volume / 100;
+      audio.preload = 'auto';
 
       const handleTimeUpdate = () => {
         if (audioRef.current && audioRef.current.duration) {
           const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
           setProgress(isNaN(pct) ? 0 : pct);
-
-          // Track preview time remaining - use refs for current values
-          if (isPreviewRef.current && !isSupporterRef.current) {
-            const timeRemaining = PREVIEW_DURATION - audioRef.current.currentTime;
-            setPreviewTimeRemaining(Math.max(0, timeRemaining));
-            
-            // Stop playback after preview duration
-            if (audioRef.current.currentTime >= PREVIEW_DURATION) {
-              audioRef.current.pause();
-              setIsPlaying(false);
-              setIsPreview(false);
-            }
-          }
         }
       };
 
       const handleLoadedMetadata = () => {
         if (audioRef.current) {
           setDuration(audioRef.current.duration);
-          setPreviewTimeRemaining(Math.min(PREVIEW_DURATION, audioRef.current.duration));
+        }
+      };
+
+      const handleCanPlay = () => {
+        // Auto-play when ready
+        if (audioRef.current && currentTrack) {
+          audioRef.current.play().catch(() => {});
         }
       };
 
       const handleEnded = () => {
-        // Get current queue and index from refs to ensure we have latest values
         const currentQueue = queueRef.current;
         const currentIdx = currentIndexRef.current;
         
-        if (!currentQueue || currentQueue.length === 0) return;
-        
-        const nextIdx = (currentIdx + 1) % currentQueue.length;
-        const nextTrackItem = currentQueue[nextIdx];
-        
-        if (!nextTrackItem) return;
-        
-        // For supporters, play next immediately
-        if (isSupporterRef.current) {
-          setCurrentIndex(nextIdx);
-          setCurrentTrack(nextTrackItem);
-          setProgress(0);
-          setIsPreview(false);
-          setPreviewTimeRemaining(PREVIEW_DURATION);
+        if (currentQueue.length > 0) {
+          const nextIdx = (currentIdx + 1) % currentQueue.length;
+          const nextTrackItem = currentQueue[nextIdx];
           
-          if (audioRef.current && nextTrackItem.audio_url) {
-            audioRef.current.src = nextTrackItem.audio_url;
-            audioRef.current.play().catch(() => {});
+          if (nextTrackItem) {
+            setCurrentIndex(nextIdx);
+            setCurrentTrack(nextTrackItem);
+            setProgress(0);
+            
+            if (audioRef.current && nextTrackItem.audio_url) {
+              audioRef.current.src = nextTrackItem.audio_url;
+              audioRef.current.play().catch(() => {});
+            }
           }
-        } else {
-          // Non-supporters: start countdown before next track
-          startCountdown(nextTrackItem);
-          setCurrentIndex(nextIdx);
         }
       };
 
@@ -203,6 +108,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
       audio.addEventListener('timeupdate', handleTimeUpdate);
       audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.addEventListener('canplay', handleCanPlay);
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('play', handlePlay);
       audio.addEventListener('pause', handlePause);
@@ -211,58 +117,45 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         audio.pause();
         audio.removeEventListener('timeupdate', handleTimeUpdate);
         audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audio.removeEventListener('canplay', handleCanPlay);
         audio.removeEventListener('ended', handleEnded);
         audio.removeEventListener('play', handlePlay);
         audio.removeEventListener('pause', handlePause);
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-        }
         audioRef.current = null;
       };
     }
-  }, [startCountdown]);
+  }, []);
+
+  // Update audio source when track changes
+  useEffect(() => {
+    if (audioRef.current && currentTrack?.audio_url) {
+      audioRef.current.src = currentTrack.audio_url;
+      audioRef.current.load();
+    }
+  }, [currentTrack?.id]);
 
   const playTrack = useCallback((track: Track) => {
-    // Cancel any pending countdown
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-    }
-    setIsCountingDown(false);
-    setNextTrack(null);
-    
     setCurrentTrack(track);
     const idx = queue.findIndex(t => t.id === track.id);
     if (idx >= 0) setCurrentIndex(idx);
     setProgress(0);
-    setIsPreview(!isSupporterRef.current);
-    setPreviewTimeRemaining(PREVIEW_DURATION);
 
     if (audioRef.current && track.audio_url) {
       audioRef.current.src = track.audio_url;
-      audioRef.current.play().catch(e => {
-        console.log('Playback failed:', e);
-        setIsPlaying(false);
-      });
+      audioRef.current.load();
+      audioRef.current.play().catch(() => {});
     }
   }, [queue]);
 
   const togglePlay = useCallback(() => {
-    if (isCountingDown) return; // Can't toggle during countdown
-    
-    if (!audioRef.current || !currentTrack) return;
+    if (!audioRef.current) return;
     
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      if (!audioRef.current.src && currentTrack.audio_url) {
-        audioRef.current.src = currentTrack.audio_url;
-      }
-      audioRef.current.play().catch(e => {
-        console.log('Playback failed:', e);
-        setIsPlaying(false);
-      });
+      audioRef.current.play().catch(() => {});
     }
-  }, [isPlaying, currentTrack, isCountingDown]);
+  }, [isPlaying]);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
@@ -273,58 +166,43 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const playNext = useCallback(() => {
     if (queue.length === 0) return;
     
-    // If counting down, skip to next
-    if (isCountingDown && nextTrack) {
-      skipCountdown();
-      return;
-    }
-    
     const nextIdx = (currentIndex + 1) % queue.length;
     setCurrentIndex(nextIdx);
     const track = queue[nextIdx];
     
-    if (isSupporterRef.current) {
-      // Supporters play immediately
-      if (track) {
-        setCurrentTrack(track);
-        setProgress(0);
-        setIsPreview(false);
-        setPreviewTimeRemaining(PREVIEW_DURATION);
-        
-        if (audioRef.current && track.audio_url) {
-          audioRef.current.src = track.audio_url;
-          audioRef.current.play().catch(() => {});
-        }
-      }
-    } else {
-      // Non-supporters: start countdown
-      if (track) {
-        startCountdown(track);
+    if (track) {
+      setCurrentTrack(track);
+      setProgress(0);
+      
+      if (audioRef.current && track.audio_url) {
+        audioRef.current.src = track.audio_url;
+        audioRef.current.load();
+        audioRef.current.play().catch(() => {});
       }
     }
-  }, [queue, currentIndex, isCountingDown, nextTrack, skipCountdown, startCountdown]);
+  }, [queue, currentIndex]);
 
   const playPrev = useCallback(() => {
     if (queue.length === 0) return;
     
-    // Cancel countdown if active
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
+    // If more than 3 seconds in, restart current track
+    if (audioRef.current && audioRef.current.currentTime > 3) {
+      audioRef.current.currentTime = 0;
+      setProgress(0);
+      return;
     }
-    setIsCountingDown(false);
-    setNextTrack(null);
     
     const prevIdx = (currentIndex - 1 + queue.length) % queue.length;
     setCurrentIndex(prevIdx);
     const track = queue[prevIdx];
+    
     if (track) {
       setCurrentTrack(track);
       setProgress(0);
-      setIsPreview(!isSupporterRef.current);
-      setPreviewTimeRemaining(PREVIEW_DURATION);
       
       if (audioRef.current && track.audio_url) {
         audioRef.current.src = track.audio_url;
+        audioRef.current.load();
         audioRef.current.play().catch(() => {});
       }
     }
@@ -339,26 +217,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
   const seek = useCallback((p: number) => {
     if (!audioRef.current || !duration) return;
-    
-    // Non-supporters can only seek within preview range
-    if (isPreviewRef.current && !isSupporterRef.current) {
-      const previewProgress = (PREVIEW_DURATION / duration) * 100;
-      const maxSeek = Math.min(p, previewProgress);
-      audioRef.current.currentTime = (maxSeek / 100) * duration;
-      setProgress(maxSeek);
-      setPreviewTimeRemaining(PREVIEW_DURATION - audioRef.current.currentTime);
-    } else {
-      audioRef.current.currentTime = (p / 100) * duration;
-      setProgress(p);
-    }
+    audioRef.current.currentTime = (p / 100) * duration;
+    setProgress(p);
   }, [duration]);
-
-  const upgradeToFull = useCallback(() => {
-    setIsSupporter(true);
-    setIsPreview(false);
-    isSupporterRef.current = true;
-    isPreviewRef.current = false;
-  }, []);
 
   // Initialize queue
   useEffect(() => {
@@ -375,12 +236,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       volume,
       progress,
       duration,
-      isPreview,
-      previewTimeRemaining,
-      isSupporter,
-      isCountingDown,
-      countdownSeconds,
-      nextTrack,
       playTrack,
       togglePlay,
       pause,
@@ -391,8 +246,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       queue,
       setQueue,
       currentIndex,
-      upgradeToFull,
-      skipCountdown,
     }}>
       {children}
     </AudioCtx.Provider>

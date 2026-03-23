@@ -9,71 +9,24 @@ import {
 import { useAudio } from '@/lib/audio-context'
 
 export function GlobalPlayer() {
-  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setQueue, seek, progress, duration } = useAudio()
-  const [volume, setVolume] = useState(80)
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setVolume, seek, progress, duration } = useAudio()
+  const [volume, setVolumeState] = useState(80)
   const [isMuted, setIsMuted] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [showVisualizer, setShowVisualizer] = useState(false)
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const audioContextRef = useRef<AudioContext | null>(null)
-  const analyserRef = useRef<AnalyserNode | null>(null)
-
-  // Update Media Session for iOS lock screen
-  useEffect(() => {
-    if (!currentTrack) return
-
-    if ('mediaSession' in navigator) {
-      const mediaSession = navigator.mediaSession
-      
-      mediaSession.metadata = new MediaMetadata({
-        title: currentTrack.title || 'Unknown Track',
-        artist: currentTrack.artist || 'Unknown Artist',
-        album: currentTrack.album || 'Unknown Album',
-        artwork: currentTrack.image ? [
-          { src: currentTrack.image, sizes: '512x512', type: 'image/jpeg' },
-          { src: currentTrack.image, sizes: '256x256', type: 'image/jpeg' },
-          { src: currentTrack.image, sizes: '128x128', type: 'image/jpeg' },
-          { src: currentTrack.image, sizes: '96x96', type: 'image/jpeg' },
-        ] : [],
-      })
-
-      mediaSession.setActionHandler('play', () => {
-        togglePlay()
-      })
-
-      mediaSession.setActionHandler('pause', () => {
-        togglePlay()
-      })
-
-      mediaSession.setActionHandler('previoustrack', () => {
-        playPrev()
-      })
-
-      mediaSession.setActionHandler('nexttrack', () => {
-        playNext()
-      })
-
-      mediaSession.setActionHandler('seekto', (details) => {
-        if (details.seekTime && seek) {
-          seek(details.seekTime)
-        }
-      })
-    }
-  }, [currentTrack, togglePlay, playPrev, playNext, seek])
-
-  // Update play state in Media Session
-  useEffect(() => {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused'
-    }
-  }, [isPlaying])
 
   // Volume control
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume / 100
+    setVolume(volume)
+  }, [volume, setVolume])
+
+  useEffect(() => {
+    if (isMuted) {
+      setVolume(0)
+    } else {
+      setVolume(volume)
     }
-  }, [volume, isMuted])
+  }, [isMuted])
 
   if (!currentTrack) return null
 
@@ -82,11 +35,7 @@ export function GlobalPlayer() {
   return (
     <>
       {/* Mini Player */}
-      <div 
-        className={`fixed bottom-0 left-0 right-0 bg-[var(--pf-surface)] border-t border-[var(--pf-border)] z-50 transition-all ${
-          expanded ? 'translate-y-full' : ''
-        }`}
-      >
+      <div className="fixed bottom-0 left-0 right-0 bg-[var(--pf-surface)] border-t border-[var(--pf-border)] z-50">
         <div className="pf-container">
           <div className="flex items-center gap-3 p-3">
             {/* Album Art */}
@@ -246,7 +195,7 @@ export function GlobalPlayer() {
                 min="0" 
                 max="100" 
                 value={isMuted ? 0 : volume}
-                onChange={(e) => setVolume(parseInt(e.target.value))}
+                onChange={(e) => setVolumeState(parseInt(e.target.value))}
                 className="flex-1"
               />
             </div>
@@ -293,7 +242,6 @@ export function GlobalPlayer() {
                   style={{ animationDuration: '3s' }}
                 />
               </div>
-              <p className="text-white/40 mt-8 text-sm">Visualizer Mode</p>
             </div>
           </div>
 
@@ -319,9 +267,6 @@ export function GlobalPlayer() {
                 <SkipForward size={24} className="text-white" />
               </button>
             </div>
-            <p className="text-center text-white/40 text-sm mt-4">
-              Lock screen shows artist info on iOS
-            </p>
           </div>
         </div>
       )}

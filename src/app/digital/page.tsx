@@ -188,7 +188,7 @@ export default function MusicPage() {
     : []
 
   // Get unique artists
-  const artists = [...new Set(TRACKS.map(t => t.artist))]
+  const artists = Array.from(new Set(TRACKS.map(t => t.artist)))
   
   // Group albums
   const albums = Object.values(ALBUMS)

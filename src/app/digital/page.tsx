@@ -339,16 +339,16 @@ export default function MusicPage() {
         {/* Search */}
         <div className="mb-6">
           <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]">
+              <Icon.Search />
+            </div>
             <input
               type="text"
               placeholder="Search artists, albums, songs..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-3 pl-10 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text)] placeholder:text-[var(--pf-text-muted)] focus:border-[var(--pf-orange)] focus:outline-none"
+              className="w-full px-4 py-3 pl-12 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text)] placeholder:text-[var(--pf-text-muted)] focus:border-[var(--pf-orange)] focus:outline-none"
             />
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]">
-              <Icon.Search />
-            </div>
           </div>
         </div>
 

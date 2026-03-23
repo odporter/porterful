@@ -1,232 +1,312 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useAudio } from '@/lib/audio-context'
-import { TRACKS, ALBUMS } from '@/lib/data'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { TRACKS } from '@/lib/data'
 import Link from 'next/link'
-import { 
-  Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
-  List, Heart, Share2, Clock, Disc3, ChevronDown, ChevronUp,
-  Maximize2, X
-} from 'lucide-react'
+import { Play, Pause, SkipForward, Radio, Heart, ShoppingBag } from 'lucide-react'
 
-// Sample supporters for the wall
-const SAMPLE_SUPPORTERS = [
-  { name: 'Mike J.', handle: '@mikej_music', date: '2024-03-20', amount: 25 },
-  { name: 'Sarah T.', handle: '@saraht_beats', date: '2024-03-20', amount: 50 },
-  { name: 'Marcus L.', handle: '@marcuslouis', date: '2024-03-19', amount: 10 },
-  { name: 'Jenny K.', handle: '@jennyk_prod', date: '2024-03-19', amount: 100 },
-  { name: 'David R.', handle: '@davidraphael', date: '2024-03-18', amount: 15 },
-  { name: 'Amber W.', handle: '@amberwave', date: '2024-03-18', amount: 30 },
-  { name: 'Chris M.', handle: '@chrism_audio', date: '2024-03-17', amount: 20 },
-  { name: 'Taylor N.', handle: '@taylorn_beats', date: '2024-03-17', amount: 45 },
-  { name: 'Jordan P.', handle: '@jordanp_music', date: '2024-03-16', amount: 60 },
-  { name: 'Alicia B.', handle: '@aliciab_sings', date: '2024-03-16', amount: 35 },
-]
+// Shuffle array helper
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+// Format time helper
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+// Preview duration (1 minute)
+const PREVIEW_DURATION = 60
 
 export default function RadioPage() {
-  const { currentTrack, isPlaying, playTrack, togglePlay, setQueue } = useAudio()
-  const [selectedAlbum, setSelectedAlbum] = useState<string | null>(null)
-  const [showQueue, setShowQueue] = useState(false)
-  const [isVisualizerOpen, setIsVisualizerOpen] = useState(false)
-
-  // Group tracks by album
-  const albums = TRACKS.reduce((acc, track) => {
-    const album = track.album || 'Singles'
-    if (!acc[album]) acc[album] = []
-    acc[album].push(track)
-    return acc
-  }, {} as Record<string, typeof TRACKS>)
-
-  const albumOrder = ['Singles', 'Ambiguous', 'Roxannity', 'One Day', 'From Feast to Famine', 'God Is Good']
-
-  const playAlbum = (albumName: string) => {
-    const tracks = albums[albumName] || []
-    if (tracks.length > 0) {
-      setQueue(tracks.map(t => ({
-        ...t,
-        duration: typeof t.duration === 'string' 
-          ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0)
-          : t.duration || 180
-      })))
-      playTrack({
-        ...tracks[0],
-        duration: typeof tracks[0].duration === 'string' 
-          ? tracks[0].duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0)
-          : tracks[0].duration || 180
-      } as any)
+  const [shuffledTracks] = useState(() => shuffleArray(TRACKS))
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [showPurchasePrompt, setShowPurchasePrompt] = useState(false)
+  const [crossfade, setCrossfade] = useState(1)
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  
+  const currentTrack = shuffledTracks[currentIndex]
+  const nextTrack = shuffledTracks[(currentIndex + 1) % shuffledTracks.length]
+  
+  // Play track preview
+  const playTrack = useCallback(() => {
+    if (audioRef.current && currentTrack) {
+      audioRef.current.src = currentTrack.audio_url
+      audioRef.current.play().catch(() => {})
+      setIsPlaying(true)
+      setCurrentTime(0)
+      setShowPurchasePrompt(false)
     }
+  }, [currentTrack])
+  
+  // Handle time update
+  useEffect(() => {
+    if (!isPlaying) return
+    
+    intervalRef.current = setInterval(() => {
+      setCurrentTime(prev => {
+        // Crossfade in last 5 seconds
+        if (prev >= PREVIEW_DURATION - 5) {
+          setCrossfade(1 - ((prev - (PREVIEW_DURATION - 5)) / 5))
+        } else {
+          setCrossfade(1)
+        }
+        
+        // End of preview
+        if (prev >= PREVIEW_DURATION) {
+          // Show purchase prompt randomly
+          if (Math.random() > 0.7) {
+            setShowPurchasePrompt(true)
+            setIsPlaying(false)
+          } else {
+            // Skip to next track
+            setCurrentIndex(i => (i + 1) % shuffledTracks.length)
+          }
+          return 0
+        }
+        return prev + 1
+      })
+    }, 1000)
+    
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [isPlaying, shuffledTracks.length])
+  
+  // Auto-play next track when index changes
+  useEffect(() => {
+    if (isPlaying) {
+      playTrack()
+    }
+  }, [currentIndex])
+  
+  // Start radio
+  const startRadio = () => {
+    playTrack()
   }
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
+  
+  // Pause radio
+  const pauseRadio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+    }
+    setIsPlaying(false)
   }
+  
+  // Resume radio
+  const resumeRadio = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {})
+    }
+    setIsPlaying(true)
+  }
+  
+  // Skip to next track
+  const skipTrack = () => {
+    setCurrentIndex(i => (i + 1) % shuffledTracks.length)
+    setShowPurchasePrompt(false)
+  }
+  
+  // Handle audio end
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    
+    const handleEnded = () => {
+      skipTrack()
+    }
+    
+    audio.addEventListener('ended', handleEnded)
+    return () => audio.removeEventListener('ended', handleEnded)
+  }, [])
 
   return (
     <div className="min-h-screen pt-20 pb-32">
-      <div className="pf-container max-w-6xl">
+      <audio ref={audioRef} />
+      
+      <div className="pf-container max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Disc3 size={32} className="text-[var(--pf-orange)]" />
-              Radio
-            </h1>
-            <p className="text-[var(--pf-text-secondary)]">Stream all tracks • Support artists</p>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 mb-4">
+            <Radio size={40} className="text-white" />
           </div>
-          <button
-            onClick={() => setIsVisualizerOpen(true)}
-            className="pf-btn pf-btn-secondary flex items-center gap-2"
-          >
-            <Maximize2 size={18} />
-            Visualizer
-          </button>
+          <h1 className="text-3xl font-bold mb-2">Porterful Radio</h1>
+          <p className="text-[var(--pf-text-secondary)]">
+            Stream unlimited previews • 1-minute per track • Shuffle mode
+          </p>
         </div>
-
-        {/* Now Playing */}
-        {currentTrack && (
-          <div className="bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-600/20 rounded-2xl p-6 mb-8">
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-xl overflow-hidden bg-[var(--pf-surface)] shrink-0">
-                <img 
-                  src={currentTrack.image || '/album-art/default.jpg'} 
-                  alt={currentTrack.title}
-                  className="w-full h-full object-cover"
+        
+        {/* Now Playing Card */}
+        <div className="bg-gradient-to-br from-[var(--pf-surface)] to-[var(--pf-bg)] rounded-2xl overflow-hidden border border-[var(--pf-border)] mb-6">
+          {/* Album Art */}
+          <div className="relative aspect-square max-h-80 overflow-hidden">
+            <img 
+              src={currentTrack?.image || '/album-art/default.jpg'} 
+              alt={currentTrack?.title || 'Now Playing'}
+              className={`w-full h-full object-cover transition-opacity duration-1000 ${crossfade < 1 ? 'opacity-50' : 'opacity-100'}`}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            
+            {/* Live Badge */}
+            <div className="absolute top-4 left-4 flex items-center gap-2">
+              <span className="flex items-center gap-1 px-3 py-1 bg-red-500 rounded-full text-white text-sm font-medium">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                LIVE
+              </span>
+              <span className="px-3 py-1 bg-black/50 rounded-full text-white text-sm">
+                {shuffledTracks.length} tracks
+              </span>
+            </div>
+            
+            {/* Track Info Overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <h2 className="text-2xl font-bold text-white mb-1">{currentTrack?.title}</h2>
+              <p className="text-white/80">{currentTrack?.artist} • {currentTrack?.album}</p>
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="p-4 bg-[var(--pf-bg)]">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-sm text-[var(--pf-text-muted)]">{formatTime(currentTime)}</span>
+              <div className="flex-1 h-2 bg-[var(--pf-surface)] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[var(--pf-orange)] to-purple-500 transition-all duration-1000"
+                  style={{ width: `${(currentTime / PREVIEW_DURATION) * 100}%` }}
                 />
               </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-bold truncate">{currentTrack.title}</h2>
-                <p className="text-[var(--pf-text-secondary)]">{currentTrack.artist}</p>
-                {currentTrack.album && (
-                  <p className="text-sm text-[var(--pf-text-muted)]">{currentTrack.album}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => togglePlay()}
-                  className="w-14 h-14 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange)]/80 transition-colors"
+              <span className="text-sm text-[var(--pf-text-muted)]">1:00</span>
+            </div>
+            
+            {/* Controls */}
+            <div className="flex items-center justify-center gap-4">
+              {isPlaying ? (
+                <button 
+                  onClick={pauseRadio}
+                  className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange-dark)] transition-colors"
                 >
-                  {isPlaying ? <Pause size={24} className="text-white" /> : <Play size={24} className="text-white ml-1" />}
+                  <Pause size={28} className="text-white" />
+                </button>
+              ) : (
+                <button 
+                  onClick={isPlaying ? resumeRadio : startRadio}
+                  className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange-dark)] transition-colors"
+                >
+                  <Play size={28} className="text-white ml-1" />
+                </button>
+              )}
+              
+              <button 
+                onClick={skipTrack}
+                className="w-12 h-12 rounded-full bg-[var(--pf-surface)] flex items-center justify-center hover:bg-[var(--pf-border)] transition-colors"
+                title="Skip to next track"
+              >
+                <SkipForward size={20} className="text-[var(--pf-text)]" />
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Purchase Prompt (shows after some tracks) */}
+        {showPurchasePrompt && (
+          <div className="bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-600/20 rounded-2xl p-6 mb-6 border border-[var(--pf-orange)]/30">
+            <div className="text-center">
+              <h3 className="text-xl font-bold mb-2">Love this track?</h3>
+              <p className="text-[var(--pf-text-secondary)] mb-4">
+                Buy it for ${currentTrack?.price || 1} and own it forever.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link 
+                  href="/digital"
+                  className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2"
+                >
+                  <ShoppingBag size={18} />
+                  Buy This Track
+                </Link>
+                <button 
+                  onClick={() => { setShowPurchasePrompt(false); startRadio(); }}
+                  className="pf-btn pf-btn-secondary"
+                >
+                  Keep Listening
                 </button>
               </div>
             </div>
           </div>
         )}
-
-        {/* Albums Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {albumOrder.map(albumName => {
-            const tracks = albums[albumName]
-            if (!tracks || tracks.length === 0) return null
-            
-            const isExpanded = selectedAlbum === albumName
-            
-            return (
-              <div key={albumName} className="bg-[var(--pf-surface)] rounded-xl overflow-hidden">
-                <button
-                  onClick={() => setSelectedAlbum(isExpanded ? null : albumName)}
-                  className="w-full p-4 flex items-center gap-4 hover:bg-[var(--pf-bg)] transition-colors"
-                >
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-[var(--pf-orange)]/30 to-purple-600/30 flex items-center justify-center shrink-0">
-                    <Disc3 size={24} className="text-white" />
-                  </div>
-                  <div className="flex-1 text-left min-w-0">
-                    <h3 className="font-bold truncate">{albumName}</h3>
-                    <p className="text-sm text-[var(--pf-text-muted)]">{tracks.length} tracks</p>
-                  </div>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); playAlbum(albumName) }}
-                    className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange)]/80 shrink-0"
-                  >
-                    <Play size={18} className="text-white ml-0.5" />
-                  </button>
-                  <div className="text-[var(--pf-text-muted)]">
-                    {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </div>
-                </button>
-                
-                {isExpanded && (
-                  <div className="border-t border-[var(--pf-border)] max-h-64 overflow-y-auto">
-                    {tracks.map((track, i) => (
-                      <button
-                        key={track.id}
-                        onClick={() => playTrack({
-                          ...track,
-                          duration: typeof track.duration === 'string' 
-                            ? track.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0)
-                            : track.duration || 180
-                        } as any)}
-                        className={`w-full p-3 flex items-center gap-3 hover:bg-[var(--pf-bg)] transition-colors ${
-                          currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/10' : ''
-                        }`}
-                      >
-                        <span className="w-6 text-center text-[var(--pf-text-muted)] text-sm">{i + 1}</span>
-                        <div className="flex-1 text-left min-w-0">
-                          <p className={`truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)] font-medium' : ''}`}>
-                            {track.title}
-                          </p>
-                          <p className="text-xs text-[var(--pf-text-muted)]">{track.duration}</p>
-                        </div>
-                        <span className="text-sm font-medium">${track.price}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+        
+        {/* Up Next */}
+        <div className="bg-[var(--pf-surface)] rounded-xl p-4 mb-6 border border-[var(--pf-border)]">
+          <h3 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-3">UP NEXT</h3>
+          <div className="flex items-center gap-3">
+            <img 
+              src={nextTrack?.image || '/album-art/default.jpg'} 
+              alt={nextTrack?.title}
+              className="w-12 h-12 rounded object-cover"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate">{nextTrack?.title}</p>
+              <p className="text-sm text-[var(--pf-text-muted)]">{nextTrack?.artist}</p>
+            </div>
+            <span className="text-sm text-[var(--pf-text-muted)]">1 min</span>
+          </div>
+        </div>
+        
+        {/* How It Works */}
+        <div className="bg-[var(--pf-surface)] rounded-xl p-6 border border-[var(--pf-border)]">
+          <h3 className="text-lg font-bold mb-4">How Radio Works</h3>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
+                <Radio size={20} className="text-[var(--pf-orange)]" />
               </div>
-            )
-          })}
+              <div>
+                <p className="font-medium">Shuffle Mode</p>
+                <p className="text-sm text-[var(--pf-text-secondary)]">Tracks play in random order</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
+                <span className="text-[var(--pf-orange)] font-bold">1:00</span>
+              </div>
+              <div>
+                <p className="font-medium">1-Minute Previews</p>
+                <p className="text-sm text-[var(--pf-text-secondary)]">Hear each track before buying</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
+                <Heart size={20} className="text-[var(--pf-orange)]" />
+              </div>
+              <div>
+                <p className="font-medium">Support Artists</p>
+                <p className="text-sm text-[var(--pf-text-secondary)]">80% goes to the artist</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* CTA */}
+        <div className="mt-8 text-center">
+          <p className="text-[var(--pf-text-secondary)] mb-4">
+            Want unlimited access? Buy tracks to own them forever.
+          </p>
+          <Link href="/digital" className="pf-btn pf-btn-primary inline-flex items-center gap-2">
+            <ShoppingBag size={18} />
+            Browse All Music
+          </Link>
         </div>
       </div>
-
-      {/* Full-screen Visualizer */}
-      {isVisualizerOpen && currentTrack && (
-        <div className="fixed inset-0 bg-black z-[100] flex flex-col">
-          {/* Track Info */}
-          <div className="p-6 bg-gradient-to-b from-black/80 to-transparent">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-bold text-white truncate">{currentTrack.title}</h2>
-                <p className="text-lg text-white/80 truncate">{currentTrack.artist}</p>
-                {currentTrack.album && (
-                  <p className="text-sm text-white/60 truncate">{currentTrack.album}</p>
-                )}
-              </div>
-              <button
-                onClick={() => setIsVisualizerOpen(false)}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20"
-              >
-                <X size={24} className="text-white" />
-              </button>
-            </div>
-          </div>
-
-          {/* Visualizer Area */}
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center text-white/20">
-              <Disc3 size={200} className="animate-spin mx-auto mb-4" style={{ animationDuration: '3s' }} />
-              <p className="text-xl">Visualizer</p>
-              <p className="text-sm mt-2">Playing: {currentTrack.title}</p>
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="p-6 bg-gradient-to-t from-black/80 to-transparent">
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => togglePlay()}
-                className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center"
-              >
-                {isPlaying ? <Pause size={28} className="text-white" /> : <Play size={28} className="text-white ml-1" />}
-              </button>
-            </div>
-            <p className="text-center text-white/40 text-sm mt-4">
-              Tap X to close • Artwork & track info on lock screen
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

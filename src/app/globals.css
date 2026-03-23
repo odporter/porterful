@@ -5,14 +5,16 @@
 :root {
   /* Light theme */
   --pf-bg: #ffffff;
-  --pf-bg-secondary: #f5f5f5;
+  --pf-bg-secondary: #f8f8f8;
   --pf-surface: #ffffff;
   --pf-border: #e5e5e5;
   --pf-text: #0a0a0a;
-  --pf-text-secondary: #525252;
-  --pf-text-muted: #737373;
-  --pf-orange: #ff6b00;
-  --pf-orange-light: #ff8c4a;
+  --pf-text-secondary: #404040;
+  --pf-text-muted: #6b6b6b;
+  --pf-orange: #f97316;
+  --pf-orange-dark: #ea580c;
+  --pf-orange-light: #fb923c;
+  --pf-purple: #7c3aed;
   
   --background: #ffffff;
   --foreground: #0a0a0a;
@@ -24,10 +26,12 @@
   --pf-surface: #1a1a1a;
   --pf-border: #2a2a2a;
   --pf-text: #ffffff;
-  --pf-text-secondary: #a3a3a3;
-  --pf-text-muted: #737373;
-  --pf-orange: #ff6b00;
-  --pf-orange-light: #ff8c4a;
+  --pf-text-secondary: #d4d4d4;
+  --pf-text-muted: #a3a3a3;
+  --pf-orange: #f97316;
+  --pf-orange-dark: #ea580c;
+  --pf-orange-light: #fb923c;
+  --pf-purple: #7c3aed;
   
   --background: #0a0a0a;
   --foreground: #ffffff;
@@ -96,137 +100,205 @@ body {
   padding: 0 1rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 767px) {
   .pf-container {
     padding: 0 2rem;
   }
 }
 
-/* Card */
-.pf-card {
-  background: var(--pf-surface);
-  border: 1px solid var(--pf-border);
-  border-radius: 0.75rem;
-}
-
 /* Buttons */
 .pf-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.2s;
-  cursor: pointer;
-  border: none;
-  font-size: 0.875rem;
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center justify-center gap-2;
 }
 
 .pf-btn-primary {
-  background: var(--pf-orange);
-  color: white;
-}
-
-.pf-btn-primary:hover {
-  background: var(--pf-orange-light);
+  @apply bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] active:scale-95;
 }
 
 .pf-btn-secondary {
-  background: var(--pf-surface);
+  @apply bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-orange)];
+}
+
+.pf-card {
+  @apply bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl;
+}
+
+/* Fix text visibility */
+.pf-text-primary {
   color: var(--pf-text);
-  border: 1px solid var(--pf-border);
 }
 
-.pf-btn-secondary:hover {
-  border-color: var(--pf-orange);
+.pf-text-secondary {
+  color: var(--pf-text-secondary);
 }
 
+.pf-text-muted {
+  color: var(--pf-text-muted);
+}
+
+/* High contrast labels */
+.pf-label {
+  @apply text-sm font-medium text-[var(--pf-text)];
+}
+
+.pf-label-muted {
+  @apply text-sm text-[var(--pf-text-muted)];
+}
+
+/* Form inputs - high contrast */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  @apply w-full px-4 py-3 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text)];
+  @apply placeholder:text-[var(--pf-text-muted)];
+  @apply focus:outline-none focus:border-[var(--pf-orange)] focus:ring-2 focus:ring-[var(--pf-orange)]/20;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: var(--pf-text-muted);
+}
+
+/* Logo fix for light mode */
+.logo-text {
+  @apply font-bold text-lg;
+  color: var(--pf-text);
+}
+
+.dark .logo-text {
+  color: white;
+}
+
+/* Icon button */
+.pf-icon-btn {
+  @apply p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors;
+}
+
+/* Badge */
+.pf-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.pf-badge-orange {
+  @apply bg-[var(--pf-orange)]/10 text-[var(--pf-orange)];
+}
+
+.pf-badge-purple {
+  @apply bg-purple-500/10 text-purple-400;
+}
+
+/* Custom Porterful Icons */
+.pf-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Music note icon - Porterful style */
+.pf-icon-music::before {
+  content: '';
+  display: block;
+  width: 1em;
+  height: 1em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Gradient text for headings */
+.pf-gradient-text {
+  background: linear-gradient(135deg, var(--pf-orange) 0%, var(--pf-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated gradient background */
+.pf-gradient-bg {
+  background: linear-gradient(135deg, 
+    var(--pf-orange) 0%, 
+    var(--pf-purple) 50%, 
+    var(--pf-orange) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Pulse animation for CTAs */
+.pf-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Mobile touch states */
+@media (hover: none) {
+  .pf-btn:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Focus states */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-[var(--pf-orange)] ring-offset-2 ring-offset-[var(--pf-bg)];
+}
+
+/* Disabled states */
 .pf-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Light theme adjustments */
-.light .pf-card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* Loading spinner */
+.pf-spinner {
+  @apply w-5 h-5 border-2 border-current border-r-transparent rounded-full animate-spin;
 }
 
-.light input, 
-.light textarea, 
-.light select {
+/* Source label fix for upload page */
+.source-label {
+  color: var(--pf-text) !important;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.source-value {
+  color: var(--pf-text-secondary);
   background: var(--pf-bg);
-  border-color: var(--pf-border);
-}
-
-/* Amazon-style marketplace cards */
-.marketplace-card {
-  background: var(--pf-surface);
-  border: 1px solid var(--pf-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.marketplace-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.marketplace-card:active {
-  transform: translateY(0);
-}
-
-/* Theme toggle button */
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--pf-surface);
-  border: 1px solid var(--pf-border);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.theme-toggle:hover {
-  border-color: var(--pf-orange);
-  background: var(--pf-bg);
-}
-
-/* Amazon-style header for marketplace */
-.marketplace-header {
-  background: var(--pf-surface);
-  border-bottom: 1px solid var(--pf-border);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-/* Mobile search bar */
-.mobile-search {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--pf-bg);
-  border: 1px solid var(--pf-border);
-  border-radius: 2rem;
   padding: 0.5rem 1rem;
-  flex: 1;
-}
-
-.mobile-search input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 1rem;
-  color: var(--pf-text);
-}
-
-.mobile-search input::placeholder {
-  color: var(--pf-text-muted);
+  border-radius: 0.5rem;
+  border: 1px solid var(--pf-border);
 }

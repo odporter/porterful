@@ -47,8 +47,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     products: products.slice(0, limit),
     total: products.length,
-    categories: [...new Set(products.map(p => p.category))],
-    subcategories: [...new Set(products.map(p => p.subcategory).filter(Boolean))]
+    categories: Array.from(new Set(products.map(p => p.category))),
+    subcategories: Array.from(new Set(products.map(p => p.subcategory).filter(Boolean)))
   })
 }
 

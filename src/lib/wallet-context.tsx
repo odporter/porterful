@@ -22,9 +22,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (savedBalance) {
       setBalance(parseInt(savedBalance, 10))
     } else {
-      // Give new users $1.00 to start
-      setBalance(100) // 100 cents = $1.00
-      localStorage.setItem('porterful_balance', '100')
+      // New users start with $0 (no demo money)
+      setBalance(0)
+      localStorage.setItem('porterful_balance', '0')
     }
     setIsLoading(false)
   }, [])

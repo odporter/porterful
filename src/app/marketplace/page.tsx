@@ -1,36 +1,28 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Search, ShoppingCart, Star, Truck, Shield, Sun, Moon, Plus, Check } from 'lucide-react';
-import { useTheme } from '@/lib/theme-context';
-import { useAudio } from '@/lib/audio-context';
-import { useCart } from '@/lib/cart-context';
-import { Play, Pause } from 'lucide-react';
-import { PRODUCTS } from '@/lib/data';
+import { useState } from 'react'
+import Link from 'next/link'
+import { useCart } from '@/lib/cart-context'
+import { PRODUCTS } from '@/lib/data'
+import { 
+  Search, ShoppingCart, Package, Star, Truck, Shield, 
+  Music, ShoppingBag, TrendingUp, Users, Sparkles,
+  Headphones, Disc3, Shirt, Watch, Package2, Gift,
+  ChevronDown, ChevronUp, Plus, Check
+} from 'lucide-react'
 
-// Categories for mobile scroll
+// Categories for filter
 const CATEGORIES = [
-  { id: 'all', name: 'All', icon: '🛒' },
-  { id: 'merch', name: 'Merch', icon: '👕' },
-  { id: 'music', name: 'Music', icon: '🎵' },
-];
-
-// Featured products (non-artist items for the "Everyday Essentials" section)
-const FEATURED = [
-  { id: 'feat-1', name: 'Wireless Earbuds Pro', price: 49.99, rating: 4.5, reviews: 2345, image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400', artistCut: 10, category: 'electronics' },
-  { id: 'feat-2', name: 'Premium Cotton Tee', price: 24.99, rating: 4.7, reviews: 892, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400', artistCut: 5, category: 'merch' },
-  { id: 'feat-3', name: 'LED Desk Lamp', price: 34.99, rating: 4.3, reviews: 567, image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400', artistCut: 7, category: 'home' },
-  { id: 'feat-4', name: 'Phone Case - Clear', price: 14.99, rating: 4.6, reviews: 3421, image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400', artistCut: 3, category: 'electronics' },
-];
+  { id: 'all', name: 'All', icon: ShoppingBag },
+  { id: 'merch', name: 'Merch', icon: Shirt },
+  { id: 'music', name: 'Music', icon: Music },
+]
 
 export default function MarketplacePage() {
-  const { theme, toggleTheme } = useTheme();
-  const { currentTrack, isPlaying, togglePlay } = useAudio();
-  const { items, addItem, itemCount } = useCart();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [addedToCart, setAddedToCart] = useState<string | null>(null);
+  const { items, addItem, itemCount } = useCart()
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [addedToCart, setAddedToCart] = useState<string | null>(null)
 
   const handleAddToCart = (product: typeof PRODUCTS[0]) => {
     addItem({
@@ -40,28 +32,25 @@ export default function MarketplacePage() {
       artist: product.artist,
       image: product.image,
       artistCut: product.artistCut,
-    });
-    setAddedToCart(product.id);
-    setTimeout(() => setAddedToCart(null), 1500);
-  };
+    })
+    setAddedToCart(product.id)
+    setTimeout(() => setAddedToCart(null), 1500)
+  }
 
   // Filter products
   const filteredProducts = selectedCategory === 'all' 
     ? PRODUCTS 
-    : PRODUCTS.filter(p => p.category === selectedCategory);
+    : PRODUCTS.filter(p => p.category === selectedCategory)
 
   return (
     <div className="min-h-screen bg-[var(--pf-bg-secondary)]">
       {/* Amazon-style Header */}
       <header className="bg-[#131921] text-white sticky top-0 z-50">
-        {/* Top Bar */}
         <div className="px-4 py-3 flex items-center gap-3">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-1 shrink-0">
             <span className="text-lg font-bold text-[var(--pf-orange)]">PORTERFUL</span>
           </Link>
 
-          {/* Search */}
           <div className="flex-1 flex items-center gap-2">
             <div className="flex-1 relative">
               <input
@@ -77,12 +66,6 @@ export default function MarketplacePage() {
             </div>
           </div>
 
-          {/* Theme Toggle */}
-          <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/10">
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-
-          {/* Cart */}
           <Link href="/cart" className="relative p-2">
             <ShoppingCart size={22} />
             {itemCount > 0 && (
@@ -93,20 +76,19 @@ export default function MarketplacePage() {
           </Link>
         </div>
 
-        {/* Category Bar */}
         <div className="bg-[#232F3E] overflow-x-auto">
           <div className="flex items-center gap-1 px-4 py-2 text-sm whitespace-nowrap">
             {CATEGORIES.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 ${
+                className={`px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${
                   selectedCategory === cat.id 
                     ? 'bg-white/20 text-white' 
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <span>{cat.icon}</span>
+                <cat.icon size={14} />
                 <span>{cat.name}</span>
               </button>
             ))}
@@ -118,8 +100,14 @@ export default function MarketplacePage() {
         {/* Artist Merch Grid */}
         <section className="p-4">
           <h2 className="text-lg font-bold mb-3 flex items-center justify-between">
-            <span>Artist Merch & Music</span>
-            <span className="text-sm text-green-400">80% to artists</span>
+            <span className="flex items-center gap-2">
+              <Sparkles size={20} className="text-[var(--pf-orange)]" />
+              Artist Merch & Music
+            </span>
+            <span className="text-sm text-green-400 flex items-center gap-1">
+              <Users size={14} />
+              80% to artists
+            </span>
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredProducts.map(product => (
@@ -128,8 +116,15 @@ export default function MarketplacePage() {
                   <div className="aspect-square relative">
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                     {product.category === 'music' && (
-                      <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full">
-                        🎵 Music
+                      <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Disc3 size={10} />
+                        Music
+                      </div>
+                    )}
+                    {product.category === 'merch' && (
+                      <div className="absolute top-2 left-2 bg-[var(--pf-orange)] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Shirt size={10} />
+                        Merch
                       </div>
                     )}
                   </div>
@@ -184,7 +179,7 @@ export default function MarketplacePage() {
             <p className="text-[10px] text-[var(--pf-text-muted)]">SSL</p>
           </div>
           <div className="bg-[var(--pf-surface)] rounded-xl p-3 text-center">
-            <Star size={20} className="mx-auto mb-1 text-[var(--pf-orange)]" />
+            <Users size={20} className="mx-auto mb-1 text-[var(--pf-orange)]" />
             <p className="text-xs font-medium">Artists</p>
             <p className="text-[10px] text-[var(--pf-text-muted)]">Get Paid</p>
           </div>
@@ -196,17 +191,17 @@ export default function MarketplacePage() {
             <h2 className="text-lg font-bold mb-4">How Porterful Works</h2>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <div className="text-2xl mb-2">🛒</div>
+                <ShoppingBag size={24} className="mx-auto mb-2 text-[var(--pf-orange)]" />
                 <p className="font-medium">Shop</p>
                 <p className="text-xs text-[var(--pf-text-muted)]">Same prices</p>
               </div>
               <div>
-                <div className="text-2xl mb-2">💜</div>
+                <Heart size={24} className="mx-auto mb-2 text-[var(--pf-orange)]" />
                 <p className="font-medium">Support</p>
                 <p className="text-xs text-[var(--pf-text-muted)]">Artists get paid</p>
               </div>
               <div>
-                <div className="text-2xl mb-2">✨</div>
+                <Sparkles size={24} className="mx-auto mb-2 text-[var(--pf-orange)]" />
                 <p className="font-medium">Feel Good</p>
                 <p className="text-xs text-[var(--pf-text-muted)]">Every purchase</p>
               </div>
@@ -233,5 +228,5 @@ export default function MarketplacePage() {
         )}
       </main>
     </div>
-  );
+  )
 }

@@ -238,20 +238,28 @@ export default function ProudToPayPage() {
         <div className="max-w-3xl mx-auto mb-16">
           <h2 className="text-2xl font-bold text-center mb-8">Why This Works</h2>
           <div className="pf-card p-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="text-center p-4">
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-red-500/10 rounded-lg">
                 <p className="text-sm text-red-400 mb-2">Spotify</p>
-                <p className="text-3xl font-bold mb-2">1,666 plays</p>
+                <p className="text-2xl font-bold mb-2">1,666 plays</p>
                 <p className="text-sm text-[var(--pf-text-muted)]">= $5 to artist</p>
+                <p className="text-xs text-[var(--pf-text-muted)] mt-1">($0.003/stream)</p>
               </div>
-              <div className="text-center p-4 bg-green-500/10 rounded-lg">
+              <div className="text-center p-4 bg-red-500/10 rounded-lg">
+                <p className="text-sm text-red-400 mb-2">Apple Music</p>
+                <p className="text-2xl font-bold mb-2">500 plays</p>
+                <p className="text-sm text-[var(--pf-text-muted)]">= $5 to artist</p>
+                <p className="text-xs text-[var(--pf-text-muted)] mt-1">($0.01/stream)</p>
+              </div>
+              <div className="text-center p-4 bg-green-500/10 rounded-lg border border-green-500/30">
                 <p className="text-sm text-green-400 mb-2">Porterful</p>
-                <p className="text-3xl font-bold mb-2">1 payment</p>
+                <p className="text-2xl font-bold mb-2">1 payment</p>
                 <p className="text-sm text-[var(--pf-text-muted)]">= $4.79 to artist (80%)</p>
+                <p className="text-xs text-green-400 mt-1">No subscription!</p>
               </div>
             </div>
             <p className="text-center text-sm text-[var(--pf-text-secondary)] mt-4">
-              Artists get paid fairly. You get everything. No subscription. No middleman.
+              Spotify and Apple Music pay per stream. Porterful pays 80% directly to artists — one payment, forever access.
             </p>
           </div>
         </div>

@@ -302,7 +302,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute top-2 right-2 bg-[var(--pf-orange)] text-white px-2 py-1 rounded text-sm font-medium">
-                      ${(product.salePrice || product.basePrice * 1.3).toFixed(2)}
+                      ${((product as any).price || 9.99).toFixed(2)}
                     </div>
                   </div>
                   <div className="p-4">

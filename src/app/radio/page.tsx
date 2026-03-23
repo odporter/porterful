@@ -50,39 +50,53 @@ export default function RadioPage() {
     }
   }, [currentTrack])
   
-  // Handle time update
-  useEffect(() => {
-    if (!isPlaying) return
-    
-    intervalRef.current = setInterval(() => {
-      setCurrentTime(prev => {
-        // Crossfade in last 5 seconds
-        if (prev >= PREVIEW_DURATION - 5) {
-          setCrossfade(1 - ((prev - (PREVIEW_DURATION - 5)) / 5))
+  // Handle time update from audio element
+  const handleTimeUpdate = useCallback(() => {
+    if (audioRef.current && isPlaying) {
+      const time = audioRef.current.currentTime
+      setCurrentTime(Math.floor(time))
+      
+      // Crossfade in last 5 seconds
+      const remainingTime = (audioRef.current.duration || 60) - time
+      if (remainingTime <= 5 && remainingTime > 0) {
+        setCrossfade(remainingTime / 5)
+      } else {
+        setCrossfade(1)
+      }
+      
+      // Show purchase prompt at 60 seconds or end of track
+      if (time >= 60) {
+        // Show purchase prompt randomly
+        if (Math.random() > 0.7) {
+          setShowPurchasePrompt(true)
+          setIsPlaying(false)
+          audioRef.current.pause()
         } else {
-          setCrossfade(1)
+          // Skip to next track
+          skipTrack()
         }
-        
-        // End of preview
-        if (prev >= PREVIEW_DURATION) {
-          // Show purchase prompt randomly
-          if (Math.random() > 0.7) {
-            setShowPurchasePrompt(true)
-            setIsPlaying(false)
-          } else {
-            // Skip to next track
-            setCurrentIndex(i => (i + 1) % shuffledTracks.length)
-          }
-          return 0
-        }
-        return prev + 1
-      })
-    }, 1000)
+      }
+    }
+  }, [isPlaying])
+
+  // Handle audio ended
+  const handleEnded = useCallback(() => {
+    skipTrack()
+  }, [])
+  
+  // Setup audio event listeners
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('ended', handleEnded)
     
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('ended', handleEnded)
     }
-  }, [isPlaying, shuffledTracks.length])
+  }, [handleTimeUpdate, handleEnded])
   
   // Auto-play next track when index changes
   useEffect(() => {

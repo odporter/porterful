@@ -104,7 +104,7 @@ export const TRACKS = [
   { id: 'stl-08', title: 'Bounce Dat Azz', artist: 'Jai Jai', album: 'Streets Thought I Left', duration: '2:58', price: 1, plays: 82000, image: ALBUM_ART.StreetsThoughtILeft, audio_url: audio('StreetsThoughtILeft', 'Jai_Jai_-_Bounce_Dat_Azz.mp3') },
   { id: 'stl-09', title: 'On Errthang', artist: 'Jai Jai', album: 'Streets Thought I Left', duration: '3:33', price: 1, plays: 71000, image: ALBUM_ART.StreetsThoughtILeft, audio_url: audio('StreetsThoughtILeft', 'Jai_Jai_-_On_Errthang.mp3') },
 
-  // ROXANNITY - 10 tracks
+  // ROXANNITY - 9 tracks (track 10 not available on CDN)
   { id: 'rox-01', title: 'Roxannity (Intro)', artist: 'O D Porter', album: 'Roxannity', duration: '3:23', price: 1, plays: 54000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '01_Roxannity__Intro_.mp3') },
   { id: 'rox-02', title: 'Decomposure', artist: 'O D Porter', album: 'Roxannity', duration: '2:17', price: 1, plays: 42000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '02_Decomposure.mp3') },
   { id: 'rox-03', title: 'Freak Like Me', artist: 'O D Porter', album: 'Roxannity', duration: '3:40', price: 1, plays: 78000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '03_Freak_Like_Me.mp3') },
@@ -114,7 +114,7 @@ export const TRACKS = [
   { id: 'rox-07', title: 'Gotta Get It', artist: 'O D Porter', album: 'Roxannity', duration: '2:33', price: 1, plays: 47000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '07_Gotta_Get_It.mp3') },
   { id: 'rox-08', title: 'Job', artist: 'O D Porter', album: 'Roxannity', duration: '2:14', price: 1, plays: 32000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '08_Job.mp3') },
   { id: 'rox-09', title: 'Pure Lust', artist: 'O D Porter', album: 'Roxannity', duration: '3:29', price: 1, plays: 58000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '09_Pure_Lust.mp3') },
-  { id: 'rox-10', title: 'Roxanne', artist: 'O D Porter', album: 'Roxannity', duration: '3:45', price: 1, plays: 92000, image: ALBUM_ART.Roxannity, audio_url: audio('Roxannity', '10_Roxanne.mp3') },
+  // Note: Track 10 "Roxanne" not available on CDN
 
   // ARTGASM - 2 tracks
   { id: 'art-01', title: 'Good Bye Kisses', artist: 'O D Porter', album: 'Artgasm', duration: '3:15', price: 1, plays: 34000, image: ALBUM_ART.Artgasm, audio_url: audio('Artgasm', '01_Good_Bye_Kisses.mp3') },
@@ -130,20 +130,16 @@ export const TRACKS = [
   { id: 'lev-07', title: 'Only Real Niggaz', artist: 'Jai Jai', album: 'Levi', duration: '3:55', price: 1, plays: 47000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai_Jai_-_Only_Real_Niggaz__LEVI_501_Vol.1_.mp3') },
   { id: 'lev-08', title: 'Pain', artist: 'Jai Jai', album: 'Levi', duration: '3:28', price: 1, plays: 39000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai_Jai_-_Pain__LEVI_501_Vol.1_.mp3') },
   { id: 'lev-09', title: 'Struggle', artist: 'Jai Jai', album: 'Levi', duration: '4:45', price: 1, plays: 55000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai_Jai_-_Struggle__LEVI_501_Vol.1_.mp3') },
-
-  // SINGLES - standalone releases
-  { id: 'sg-01', title: 'My Hustle', artist: 'O D Porter', album: 'Singles', duration: '3:15', price: 1, plays: 45000, image: ALBUM_ART.Singles, audio_url: audio('Singles', 'My_Hustle.mp3') },
-  { id: 'sg-02', title: 'Get Involved', artist: 'O D Porter', album: 'Singles', duration: '4:01', price: 1, plays: 67000, image: ALBUM_ART.Singles, audio_url: audio('Singles', 'Get_Involved.mp3') },
 ];
 
 // Album data
 export const ALBUMS = {
   ambiguous: { id: 'ambiguous', name: 'Ambiguous', artist: 'O D Porter', year: 2024, image: ALBUM_ART.Ambiguous, tracks: 21 },
-  fromFeastToFamine: { id: 'from-feast-to-famine', name: 'From Feast to Famine', artist: 'O D Porter', year: 2023, image: ALBUM_ART.FromFeastToFamine, tracks: 15 },
+  fromFeastToFamine: { id: 'from-feast-to-famine', name: 'From Feast to Famine', artist: 'O D Porter', year: 2023, image: ALBUM_ART.FromFeastToFamine, tracks: 10 },
   godIsGood: { id: 'god-is-good', name: 'God Is Good', artist: 'O D Porter', year: 2023, image: ALBUM_ART.GodIsGood, tracks: 9 },
   oneDay: { id: 'one-day', name: 'One Day', artist: 'O D Porter', year: 2024, image: ALBUM_ART.OneDay, tracks: 19 },
   streetsThoughtILeft: { id: 'streets-thought-i-left', name: 'Streets Thought I Left', artist: 'Jai Jai', year: 2023, image: ALBUM_ART.StreetsThoughtILeft, tracks: 9 },
-  roxannity: { id: 'roxannity', name: 'Roxannity', artist: 'O D Porter', year: 2024, image: ALBUM_ART.Roxannity, tracks: 30 },
+  roxannity: { id: 'roxannity', name: 'Roxannity', artist: 'O D Porter', year: 2024, image: ALBUM_ART.Roxannity, tracks: 9 },
   artgasm: { id: 'artgasm', name: 'Artgasm', artist: 'O D Porter', year: 2024, image: ALBUM_ART.Artgasm, tracks: 2 },
   levi: { id: 'levi', name: 'Levi', artist: 'Jai Jai', year: 2024, image: ALBUM_ART.Levi, tracks: 9 },
 };

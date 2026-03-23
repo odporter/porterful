@@ -4,7 +4,14 @@ import { NextRequest, NextResponse } from 'next/server'
 const PRINTFUL_API = 'https://api.printful.com'
 
 // Printful product catalog for artists
-export const PRINTFUL_PRODUCTS = [
+// Artist pricing tiers (margin they keep)
+const ARTIST_MARGINS = {
+  'new': 0.60,        // New artists: 60% of profit
+  'growing': 0.70,    // Growing: 70% of profit  
+  'established': 0.80 // Established: 80% of profit
+}
+
+const PRINTFUL_PRODUCTS = [
   // Apparel
   { id: 'tshirt-standard', name: 'Premium Cotton Tee', type: 'apparel', basePrice: 8.50, printfulId: 71, image: '/products/tshirt.jpg' },
   { id: 'hoodie-premium', name: 'Premium Hoodie', type: 'apparel', basePrice: 22.00, printfulId: 156, image: '/products/hoodie.jpg' },
@@ -26,20 +33,6 @@ export const PRINTFUL_PRODUCTS = [
   // Phone Cases
   { id: 'phone-case', name: 'Phone Case', type: 'accessory', basePrice: 6.00, printfulId: 159, image: '/products/phonecase.jpg' },
 ]
-
-// Artist pricing tiers (margin they keep)
-export const ARTIST_MARGINS = {
-  'new': 0.60,        // New artists: 60% of profit
-  'growing': 0.70,    // Growing: 70% of profit  
-  'established': 0.80 // Established: 80% of profit
-}
-
-// Calculate artist earnings
-export function calculateArtistEarnings(basePrice: number, salePrice: number, tier: keyof typeof ARTIST_MARGINS = 'new'): number {
-  const profit = salePrice - basePrice
-  const margin = ARTIST_MARGINS[tier]
-  return Math.round(profit * margin * 100) / 100
-}
 
 // Get Printful client
 function getPrintfulClient() {

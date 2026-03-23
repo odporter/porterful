@@ -9,7 +9,7 @@ import {
 import { useAudio } from '@/lib/audio-context'
 
 export function GlobalPlayer() {
-  const { currentTrack, isPlaying, togglePlay, nextTrack, prevTrack, queue, currentIndex, seek, progress, duration } = useAudio()
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setQueue, seek, progress, duration } = useAudio()
   const [volume, setVolume] = useState(80)
   const [isMuted, setIsMuted] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -46,11 +46,11 @@ export function GlobalPlayer() {
       })
 
       mediaSession.setActionHandler('previoustrack', () => {
-        if (prevTrack) prevTrack()
+        playPrev()
       })
 
       mediaSession.setActionHandler('nexttrack', () => {
-        if (nextTrack) nextTrack()
+        playNext()
       })
 
       mediaSession.setActionHandler('seekto', (details) => {
@@ -59,7 +59,7 @@ export function GlobalPlayer() {
         }
       })
     }
-  }, [currentTrack])
+  }, [currentTrack, togglePlay, playPrev, playNext, seek])
 
   // Update play state in Media Session
   useEffect(() => {
@@ -114,7 +114,7 @@ export function GlobalPlayer() {
             {/* Controls */}
             <div className="flex items-center gap-2">
               <button 
-                onClick={prevTrack}
+                onClick={playPrev}
                 className="p-2 rounded-full hover:bg-[var(--pf-bg)] transition-colors"
                 aria-label="Previous track"
               >
@@ -128,7 +128,7 @@ export function GlobalPlayer() {
                 {isPlaying ? <Pause size={20} className="text-white" /> : <Play size={20} className="text-white ml-0.5" />}
               </button>
               <button 
-                onClick={nextTrack}
+                onClick={playNext}
                 className="p-2 rounded-full hover:bg-[var(--pf-bg)] transition-colors"
                 aria-label="Next track"
               >
@@ -207,7 +207,7 @@ export function GlobalPlayer() {
           {/* Controls */}
           <div className="flex items-center justify-center gap-6 pb-8">
             <button 
-              onClick={prevTrack}
+              onClick={playPrev}
               className="p-3 rounded-full hover:bg-[var(--pf-surface)] transition-colors"
             >
               <SkipBack size={28} />
@@ -219,7 +219,7 @@ export function GlobalPlayer() {
               {isPlaying ? <Pause size={28} className="text-white" /> : <Play size={28} className="text-white ml-1" />}
             </button>
             <button 
-              onClick={nextTrack}
+              onClick={playNext}
               className="p-3 rounded-full hover:bg-[var(--pf-surface)] transition-colors"
             >
               <SkipForward size={28} />
@@ -286,7 +286,7 @@ export function GlobalPlayer() {
           <div className="p-6 bg-gradient-to-t from-black/80 to-transparent">
             <div className="flex items-center justify-center gap-6">
               <button 
-                onClick={prevTrack}
+                onClick={playPrev}
                 className="p-3 rounded-full bg-white/10 hover:bg-white/20"
               >
                 <SkipBack size={24} className="text-white" />
@@ -298,7 +298,7 @@ export function GlobalPlayer() {
                 {isPlaying ? <Pause size={24} className="text-white" /> : <Play size={24} className="text-white ml-0.5" />}
               </button>
               <button 
-                onClick={nextTrack}
+                onClick={playNext}
                 className="p-3 rounded-full bg-white/10 hover:bg-white/20"
               >
                 <SkipForward size={24} className="text-white" />

@@ -17,9 +17,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { items, shipping, referralCode } = body
 
-    // Calculate totals
-    const subtotal = items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)
-    const shippingCost = subtotal >= 5000 ? 0 : 500 // $5 or free over $50
+    // Check if this is digital (tracks) or physical (merch)
+    const isDigital = items.some((item: any) => item.type === 'track' || item.type === 'digital')
+    
+    // Calculate totals (in cents)
+    const subtotal = items.reduce((sum: number, item: any) => {
+      const price = Math.round(item.price * 100) // Convert to cents
+      return sum + (price * (item.quantity || 1))
+    }, 0)
+    
+    // No shipping for digital products
+    const shippingCost = isDigital ? 0 : (subtotal >= 5000 ? 0 : 500)
     const total = subtotal + shippingCost
 
     // Calculate artist earnings (67% to seller, 20% to artist fund, 3% to superfans, 10% platform)
@@ -49,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: items.map((item: any) => ({
         price_data: {
@@ -59,24 +67,29 @@ export async function POST(request: NextRequest) {
             description: item.artist ? `by ${item.artist}` : (item.description || ''),
             images: item.image ? [item.image] : [],
           },
-          // Convert dollars to cents (Stripe expects cents)
           unit_amount: Math.round(item.price * 100),
         },
         quantity: item.quantity || 1,
       })),
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/cart`,
-      shipping_address_collection: {
-        allowed_countries: ['US', 'CA'],
-      },
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://porterful.com'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://porterful.com'}/cart`,
       metadata: {
         artist_fund: artistFund.toString(),
         superfan_share: superfanShare.toString(),
         referral_code: referralCode || '',
         type: items[0]?.type || 'product',
       },
-    })
+    }
+
+    // Only collect shipping for physical products
+    if (!isDigital) {
+      sessionConfig.shipping_address_collection = {
+        allowed_countries: ['US', 'CA'],
+      }
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig)
 
     return NextResponse.json({
       sessionId: session.id,

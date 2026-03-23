@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { items, shipping, referralCode } = body
 
+    console.log('Checkout request:', JSON.stringify(items, null, 2))
+
     // Check if this is digital (tracks) or physical (merch)
     const isDigital = items.some((item: any) => item.type === 'track' || item.type === 'digital')
     
@@ -56,33 +58,41 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create Stripe checkout session
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://porterful.com'
+    // Base URL for absolute paths
+    const baseUrl = 'https://porterful.com'
     
     // Convert relative image URLs to absolute URLs
-    const absoluteImageUrl = (imagePath: string) => {
-      if (!imagePath) return []
-      if (imagePath.startsWith('http')) return [imagePath]
-      return [`${baseUrl}${imagePath}`]
+    const getAbsoluteUrl = (path: string | undefined): string[] => {
+      if (!path) return []
+      // Already absolute
+      if (path.startsWith('http://') || path.startsWith('https://')) return [path]
+      // Convert relative to absolute
+      return [`${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`]
     }
-    
+
+    // Create Stripe checkout session
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
-      line_items: items.map((item: any) => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: item.name || item.title,
-            description: item.artist ? `by ${item.artist}` : (item.description || ''),
-            images: absoluteImageUrl(item.image),
+      line_items: items.map((item: any) => {
+        const images = getAbsoluteUrl(item.image)
+        console.log(`Product: ${item.name}, Image: ${item.image} -> ${images[0] || 'none'}`)
+        
+        return {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: item.name || item.title || 'Product',
+              description: item.artist ? `by ${item.artist}` : (item.description || ''),
+              images: images,
+            },
+            unit_amount: Math.round(item.price * 100),
           },
-          unit_amount: Math.round(item.price * 100),
-        },
-        quantity: item.quantity || 1,
-      })),
+          quantity: item.quantity || 1,
+        }
+      }),
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://porterful.com'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://porterful.com'}/cart`,
+      success_url: `https://porterful.com/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://porterful.com/cart`,
       metadata: {
         artist_fund: artistFund.toString(),
         superfan_share: superfanShare.toString(),
@@ -98,7 +108,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log('Creating Stripe session...')
     const session = await stripe.checkout.sessions.create(sessionConfig)
+    console.log('Session created:', session.id, session.url)
 
     return NextResponse.json({
       sessionId: session.id,
@@ -113,8 +125,13 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Checkout error:', error)
+    console.error('Error details:', {
+      message: error.message,
+      type: error.type,
+      stack: error.stack
+    })
     return NextResponse.json(
-      { error: error.message || 'Checkout failed' },
+      { error: error.message || 'Checkout failed', details: error.type || 'unknown' },
       { status: 500 }
     )
   }

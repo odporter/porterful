@@ -150,29 +150,29 @@ export default function RadioPage() {
         {/* Now Playing Card */}
         <div className="bg-gradient-to-br from-[var(--pf-surface)] to-[var(--pf-bg)] rounded-2xl overflow-hidden border border-[var(--pf-border)] mb-6">
           {/* Album Art */}
-          <div className="relative aspect-square max-h-80 overflow-hidden">
+          <div className="relative aspect-square max-h-80 overflow-hidden bg-black">
             <img 
               src={currentTrack?.image || '/album-art/default.jpg'} 
               alt={currentTrack?.title || 'Now Playing'}
               className={`w-full h-full object-cover transition-opacity duration-1000 ${crossfade < 1 ? 'opacity-50' : 'opacity-100'}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             
             {/* Live Badge */}
             <div className="absolute top-4 left-4 flex items-center gap-2">
-              <span className="flex items-center gap-1 px-3 py-1 bg-red-500 rounded-full text-white text-sm font-medium">
+              <span className="flex items-center gap-1 px-3 py-1 bg-red-500 rounded-full text-white text-sm font-medium shadow-lg">
                 <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                 LIVE
               </span>
-              <span className="px-3 py-1 bg-black/50 rounded-full text-white text-sm">
+              <span className="px-3 py-1 bg-black/70 backdrop-blur rounded-full text-white text-sm">
                 {shuffledTracks.length} tracks
               </span>
             </div>
             
             {/* Track Info Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <h2 className="text-2xl font-bold text-white mb-1">{currentTrack?.title}</h2>
-              <p className="text-white/80">{currentTrack?.artist} • {currentTrack?.album}</p>
+              <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{currentTrack?.title}</h2>
+              <p className="text-white/90 drop-shadow">{currentTrack?.artist} • {currentTrack?.album}</p>
             </div>
           </div>
           

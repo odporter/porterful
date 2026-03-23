@@ -3,25 +3,30 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Check, Package, Mail, ArrowRight } from 'lucide-react';
+import { Check, Download, Mail, Music, Package, ArrowRight } from 'lucide-react';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [purchasedItems, setPurchasedItems] = useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate order processing
     const sessionId = searchParams.get('session_id');
     const demo = searchParams.get('demo');
 
     if (sessionId || demo) {
-      // In production, verify the session with Stripe
       setOrderId(sessionId || `ORD-${Date.now().toString(36).toUpperCase()}`);
+      
+      // In production, fetch purchased items from Stripe session
+      // For now, show demo items
+      setPurchasedItems([
+        { type: 'track', name: 'Your purchased track', artist: 'Artist Name', downloadUrl: '#' }
+      ]);
+      
       setLoading(false);
     } else {
-      // No session - redirect to home
       router.push('/');
     }
   }, [searchParams, router]);
@@ -30,11 +35,11 @@ function SuccessContent() {
     return (
       <div className="min-h-screen pt-24 pb-12">
         <div className="pf-container max-w-2xl">
-          <div className="pf-card p-12 text-center">
+          <div className="bg-[var(--pf-surface)] rounded-2xl p-12 text-center border border-[var(--pf-border)]">
             <div className="animate-pulse">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-surface)]" />
-              <div className="h-6 bg-[var(--pf-surface)] rounded w-1/2 mx-auto mb-4" />
-              <div className="h-4 bg-[var(--pf-surface)] rounded w-1/3 mx-auto" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-bg)]" />
+              <div className="h-6 bg-[var(--pf-bg)] rounded w-1/2 mx-auto mb-4" />
+              <div className="h-4 bg-[var(--pf-bg)] rounded w-1/3 mx-auto" />
             </div>
           </div>
         </div>
@@ -45,13 +50,13 @@ function SuccessContent() {
   return (
     <div className="min-h-screen pt-24 pb-12">
       <div className="pf-container max-w-2xl">
-        <div className="pf-card p-12 text-center">
+        <div className="bg-[var(--pf-surface)] rounded-2xl p-8 md:p-12 text-center border border-[var(--pf-border)]">
           {/* Success Icon */}
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
             <Check className="text-green-400" size={40} />
           </div>
 
-          <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
+          <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
           <p className="text-[var(--pf-text-secondary)] mb-2">
             Thank you for supporting independent artists.
           </p>
@@ -62,13 +67,54 @@ function SuccessContent() {
           )}
 
           {/* Artist Impact */}
-          <div className="bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-xl p-6 mb-8">
+          <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 border border-[var(--pf-orange)]/30 rounded-xl p-6 mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Package className="text-[var(--pf-orange)]" size={24} />
-              <span className="text-xl font-bold text-[var(--pf-orange)]">$XX.XX</span>
+              <span className="text-2xl font-bold text-[var(--pf-orange)]">80%</span>
             </div>
             <p className="text-sm text-[var(--pf-text-secondary)]">
-              Going directly to artists
+              of your purchase goes directly to artists
+            </p>
+          </div>
+
+          {/* Downloads Section */}
+          <div className="bg-[var(--pf-bg)] rounded-xl p-6 mb-8 text-left">
+            <h2 className="font-semibold mb-4 flex items-center gap-2">
+              <Download size={20} className="text-[var(--pf-orange)]" />
+              Your Downloads
+            </h2>
+            
+            {purchasedItems.length > 0 ? (
+              <div className="space-y-3">
+                {purchasedItems.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-[var(--pf-surface)] rounded-lg border border-[var(--pf-border)]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center">
+                        <Music size={20} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-[var(--pf-text-muted)]">{item.artist}</p>
+                      </div>
+                    </div>
+                    <a 
+                      href={item.downloadUrl}
+                      className="px-4 py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium hover:bg-[var(--pf-orange-dark)] transition-colors flex items-center gap-2"
+                    >
+                      <Download size={16} />
+                      Download
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[var(--pf-text-secondary)] text-center py-4">
+                Your downloads will appear here once payment is confirmed.
+              </p>
+            )}
+            
+            <p className="text-xs text-[var(--pf-text-muted)] mt-4">
+              A download link has also been sent to your email.
             </p>
           </div>
 
@@ -79,18 +125,18 @@ function SuccessContent() {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-[var(--pf-bg)]">
                 <Mail className="text-[var(--pf-orange)] shrink-0" size={20} />
                 <div>
-                  <p className="font-medium">Confirmation Email</p>
-                  <p className="text-sm text-[var(--pf-text-muted)]">
-                    Check your inbox for order details and tracking info.
+                  <p className="font-medium">Check your email</p>
+                  <p className="text-sm text-[var(--pf-text-secondary)]">
+                    We've sent a receipt and download links to your email address.
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-[var(--pf-bg)]">
-                <Package className="text-[var(--pf-orange)] shrink-0" size={20} />
+                <Music className="text-[var(--pf-orange)] shrink-0" size={20} />
                 <div>
-                  <p className="font-medium">Shipping Updates</p>
-                  <p className="text-sm text-[var(--pf-text-muted)]">
-                    We'll email you when your order ships.
+                  <p className="font-medium">Stream anytime</p>
+                  <p className="text-sm text-[var(--pf-text-secondary)]">
+                    Your purchased tracks are also available to stream in your library.
                   </p>
                 </div>
               </div>
@@ -98,41 +144,32 @@ function SuccessContent() {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/marketplace" className="pf-btn pf-btn-primary flex items-center justify-center gap-2">
-              Continue Shopping <ArrowRight size={18} />
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/digital" className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2">
+              <Music size={18} />
+              Browse More Music
             </Link>
-            <Link href="/dashboard" className="pf-btn pf-btn-secondary">
-              View Orders
+            <Link href="/" className="pf-btn pf-btn-secondary inline-flex items-center justify-center gap-2">
+              Go Home
+              <ArrowRight size={18} />
             </Link>
           </div>
-        </div>
-
-        {/* Support Artists CTA */}
-        <div className="mt-8 pf-card p-6">
-          <h3 className="font-semibold mb-2">Want to do more?</h3>
-          <p className="text-sm text-[var(--pf-text-secondary)] mb-4">
-            Become a Superfan and earn from every referral. Share the artists you love and build wealth in the new music economy.
-          </p>
-          <Link href="/signup/superfan" className="pf-btn pf-btn-secondary w-full">
-            Become a Superfan
-          </Link>
         </div>
       </div>
     </div>
   );
 }
 
-export default function CheckoutSuccessPage() {
+export default function SuccessPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen pt-24 pb-12">
         <div className="pf-container max-w-2xl">
-          <div className="pf-card p-12 text-center">
+          <div className="bg-[var(--pf-surface)] rounded-2xl p-12 text-center border border-[var(--pf-border)]">
             <div className="animate-pulse">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-surface)]" />
-              <div className="h-6 bg-[var(--pf-surface)] rounded w-1/2 mx-auto mb-4" />
-              <div className="h-4 bg-[var(--pf-surface)] rounded w-1/3 mx-auto" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-bg)]" />
+              <div className="h-6 bg-[var(--pf-bg)] rounded w-1/2 mx-auto mb-4" />
+              <div className="h-4 bg-[var(--pf-bg)] rounded w-1/3 mx-auto" />
             </div>
           </div>
         </div>
@@ -140,5 +177,5 @@ export default function CheckoutSuccessPage() {
     }>
       <SuccessContent />
     </Suspense>
-  );
+  )
 }

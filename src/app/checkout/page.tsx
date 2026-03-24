@@ -52,12 +52,95 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState({
     cardNumber: '', expiry: '', cvc: '',
   })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  // Format card number with spaces every 4 digits
+  const formatCardNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 16)
+    return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
+  }
+  
+  // Format expiry as MM/YY
+  const formatExpiry = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4)
+    if (digits.length >= 2) {
+      return digits.slice(0, 2) + '/' + digits.slice(2)
+    }
+    return digits
+  }
+  
+  // Validate a single field
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'cardNumber':
+        const digits = value.replace(/\s/g, '')
+        if (!digits) return 'Card number is required'
+        if (digits.length < 13 || digits.length > 19) return 'Enter a valid card number'
+        return ''
+      case 'expiry':
+        if (!value) return 'Expiry is required'
+        const [month, year] = value.split('/')
+        if (!month || !year || parseInt(month) < 1 || parseInt(month) > 12) return 'Enter valid expiry (MM/YY)'
+        const expYear = 2000 + parseInt(year)
+        const expMonth = parseInt(month)
+        const now = new Date()
+        if (expYear < now.getFullYear() || (expYear === now.getFullYear() && expMonth < now.getMonth() + 1)) {
+          return 'Card has expired'
+        }
+        return ''
+      case 'cvc':
+        if (!value) return 'CVC is required'
+        if (!/^\d{3,4}$/.test(value)) return 'Enter valid CVC'
+        return ''
+      default:
+        return ''
+    }
+  }
+  
+  // Validate shipping field
+  const validateShippingField = (name: string, value: string): string => {
+    switch (name) {
+      case 'name':
+        if (!value.trim()) return 'Name is required'
+        if (value.trim().length < 2) return 'Enter your full name'
+        return ''
+      case 'email':
+        if (!value) return 'Email is required'
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email'
+        return ''
+      case 'address':
+        if (!value.trim()) return 'Address is required'
+        return ''
+      case 'city':
+        if (!value.trim()) return 'City is required'
+        return ''
+      case 'state':
+        if (!value.trim()) return 'State is required'
+        return ''
+      case 'zip':
+        if (!value.trim()) return 'ZIP code is required'
+        if (!/^\d{5}(-\d{4})?$|^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(value)) return 'Enter a valid ZIP code'
+        return ''
+      default:
+        return ''
+    }
+  }
 
   const handlePaymentSubmit = () => {
-    if (!payment.cardNumber || !payment.expiry || !payment.cvc) {
-      alert('Please fill in all payment fields.')
+    // Validate all payment fields
+    const cardErr = validateField('cardNumber', payment.cardNumber)
+    const expiryErr = validateField('expiry', payment.expiry)
+    const cvcErr = validateField('cvc', payment.cvc)
+    
+    if (cardErr || expiryErr || cvcErr) {
+      setErrors({
+        cardNumber: cardErr,
+        expiry: expiryErr,
+        cvc: cvcErr,
+      })
       return
     }
+    setErrors({})
     setStep('review')
   }
 
@@ -205,6 +288,7 @@ export default function CheckoutPage() {
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">First Name</label>
                       <input 
                         type="text" 
+                        autoComplete="given-name"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
                         placeholder="First"
                         value={shipping.name.split(' ')[0] || ''}
@@ -215,6 +299,7 @@ export default function CheckoutPage() {
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Last Name</label>
                       <input 
                         type="text" 
+                        autoComplete="family-name"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
                         placeholder="Last"
                         value={shipping.name.split(' ').slice(1).join(' ') || ''}
@@ -226,6 +311,7 @@ export default function CheckoutPage() {
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Email</label>
                     <input 
                       type="email" 
+                      autoComplete="email"
                       className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
                       placeholder="you@email.com"
                       value={shipping.email}
@@ -236,6 +322,7 @@ export default function CheckoutPage() {
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Address</label>
                     <input 
                       type="text" 
+                      autoComplete="street-address"
                       className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
                       placeholder="Street address"
                       value={shipping.address}
@@ -247,6 +334,7 @@ export default function CheckoutPage() {
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">City</label>
                       <input 
                         type="text" 
+                        autoComplete="address-level2"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
                         value={shipping.city}
                         onChange={(e) => setShipping(s => ({ ...s, city: e.target.value }))}
@@ -256,6 +344,7 @@ export default function CheckoutPage() {
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">State</label>
                       <input 
                         type="text" 
+                        autoComplete="address-level1"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
                         value={shipping.state}
                         onChange={(e) => setShipping(s => ({ ...s, state: e.target.value }))}
@@ -267,6 +356,8 @@ export default function CheckoutPage() {
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">ZIP Code</label>
                       <input 
                         type="text" 
+                        autoComplete="postal-code"
+                        inputMode="numeric"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
                         value={shipping.zip}
                         onChange={(e) => setShipping(s => ({ ...s, zip: e.target.value }))}
@@ -288,8 +379,19 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <button onClick={() => {
-                  if (!shipping.name || !shipping.email || !shipping.address || !shipping.city || !shipping.state || !shipping.zip) {
-                    alert('Please fill in all required shipping fields.')
+                  // Validate shipping fields
+                  const newErrors: Record<string, string> = {}
+                  if (!shipping.name.trim() || shipping.name.trim().length < 2) newErrors.name = 'Enter your full name'
+                  if (!shipping.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shipping.email)) newErrors.email = 'Enter a valid email'
+                  if (!shipping.address.trim()) newErrors.address = 'Address is required'
+                  if (!shipping.city.trim()) newErrors.city = 'City is required'
+                  if (!shipping.state.trim()) newErrors.state = 'State is required'
+                  if (!shipping.zip.trim() || !/^\d{5}(-\d{4})?$|^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(shipping.zip)) newErrors.zip = 'Enter a valid ZIP code'
+                  
+                  if (Object.keys(newErrors).length > 0) {
+                    // Show first error
+                    const firstError = Object.values(newErrors)[0]
+                    alert(firstError)
                     return
                   }
                   setStep('payment')
@@ -328,32 +430,71 @@ export default function CheckoutPage() {
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Card Number</label>
                     <input 
                       type="text" 
+                      inputMode="numeric"
+                      autoComplete="cc-number"
                       placeholder="4242 4242 4242 4242" 
-                      className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                      className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                        errors.cardNumber ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                      }`}
                       value={payment.cardNumber}
-                      onChange={(e) => setPayment(p => ({ ...p, cardNumber: e.target.value }))}
+                      onChange={(e) => {
+                        const formatted = formatCardNumber(e.target.value)
+                        setPayment(p => ({ ...p, cardNumber: formatted }))
+                        if (errors.cardNumber) setErrors(pv => ({ ...pv, cardNumber: '' }))
+                      }}
+                      onBlur={(e) => {
+                        const err = validateField('cardNumber', e.target.value)
+                        if (err) setErrors(pv => ({ ...pv, cardNumber: err }))
+                      }}
                     />
+                    {errors.cardNumber && <p className="text-red-400 text-xs mt-1">{errors.cardNumber}</p>}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Expiry</label>
                       <input 
                         type="text" 
+                        inputMode="numeric"
+                        autoComplete="cc-exp"
                         placeholder="MM/YY" 
-                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                          errors.expiry ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                        }`}
                         value={payment.expiry}
-                        onChange={(e) => setPayment(p => ({ ...p, expiry: e.target.value }))}
+                        onChange={(e) => {
+                          const formatted = formatExpiry(e.target.value)
+                          setPayment(p => ({ ...p, expiry: formatted }))
+                          if (errors.expiry) setErrors(pv => ({ ...pv, expiry: '' }))
+                        }}
+                        onBlur={(e) => {
+                          const err = validateField('expiry', e.target.value)
+                          if (err) setErrors(pv => ({ ...pv, expiry: err }))
+                        }}
                       />
+                      {errors.expiry && <p className="text-red-400 text-xs mt-1">{errors.expiry}</p>}
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">CVC</label>
                       <input 
                         type="text" 
+                        inputMode="numeric"
+                        autoComplete="cc-csc"
                         placeholder="123" 
-                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                          errors.cvc ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                        }`}
                         value={payment.cvc}
-                        onChange={(e) => setPayment(p => ({ ...p, cvc: e.target.value }))}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
+                          setPayment(p => ({ ...p, cvc: digits }))
+                          if (errors.cvc) setErrors(pv => ({ ...pv, cvc: '' }))
+                        }}
+                        onBlur={(e) => {
+                          const err = validateField('cvc', e.target.value)
+                          if (err) setErrors(pv => ({ ...pv, cvc: err }))
+                        }}
                       />
+                      {errors.cvc && <p className="text-red-400 text-xs mt-1">{errors.cvc}</p>}
                     </div>
                   </div>
                 </div>

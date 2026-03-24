@@ -8,15 +8,17 @@ import { Play, Pause, Heart, Share2, Music, Package, Users, DollarSign, ChevronD
 
 // Music Videos from YouTube
 const MUSIC_VIDEOS = [
-  { title: 'Breathe (Official Video)', album: 'From Feast to Famine', youtubeId: '5vFE92yYRzU', views: '2.2K' },
-  { title: 'GOD IS GOOD Cypher Pt. 2', album: 'God Is Good', youtubeId: 'BysK2asswvI', views: '379' },
-  { title: 'Amen', album: 'God Is Good', youtubeId: 'juD-wfcw5Tw', views: '362' },
-  { title: 'Get Involved (Official Video)', album: 'One Day', youtubeId: 'FPLtdIN9zbM', views: '1.2K' },
-  { title: 'My Hustle (Snippet)', album: 'Singles', youtubeId: 'x_Ws5P9mH7w', views: '210' },
+  { title: 'Jai Jai - Peace Up Arch Down', album: 'Streets Thought I Left', youtubeId: 'qVUPQMo080Y', views: '' },
+  { title: 'Dex', album: 'Streets Thought I Left', youtubeId: 'T-Q0zVOAYC8', views: '' },
+  { title: 'I Got - Jai Jai x TTD Dex', album: 'Streets Thought I Left', youtubeId: '1AlI1ymOrhg', views: '' },
+  { title: '82 FAM TTD', album: 'Streets Thought I Left', youtubeId: 'rieh1ku8oXw', views: '' },
+  { title: "Jai'Jai As If", album: 'Levi', youtubeId: 'sqxPRE3EiNI', views: '' },
+  { title: 'Street Love by O D Music', album: 'One Day', youtubeId: 'oMEfjmdE2ls', views: '' },
+  { title: 'Mike Tyson By O D Music (Official Music Video)', album: 'One Day', youtubeId: '5523eYZ48GU', views: '' },
 ];
 
 // Album order - newest first
-const ALBUM_ORDER = ['Singles', 'Ambiguous', 'Roxannity', 'One Day', 'From Feast to Famine', 'God Is Good'];
+const ALBUM_ORDER = ['Singles', 'Ambiguous', 'Roxannity', 'One Day', 'Levi', 'Streets Thought I Left', 'From Feast to Famine', 'God Is Good'];
 
 // Group tracks by album
 function groupTracksByAlbum(tracks: typeof TRACKS) {

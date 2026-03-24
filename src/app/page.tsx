@@ -73,14 +73,19 @@ export default function Home() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-500/20 blur-3xl rounded-full" />
                   <div className="relative grid grid-cols-2 gap-4">
-                    {featuredTracks.slice(0, 4).map((track, i) => (
-                      <div 
-                        key={track.id}
+                    {[
+                      TRACKS.find(t => t.album === 'Ambiguous'),
+                      TRACKS.find(t => t.album === 'From Feast to Famine'),
+                      TRACKS.find(t => t.album === 'One Day'),
+                      TRACKS.find(t => t.album === 'God Is Good'),
+                    ].filter(Boolean).map((track, i) => (
+                      <div
+                        key={track!.id}
                         className={`aspect-square rounded-xl overflow-hidden shadow-2xl ${i === 0 ? 'col-span-2' : ''}`}
                       >
-                        <img 
-                          src={track.image} 
-                          alt={track.album || track.title}
+                        <img
+                          src={track!.image}
+                          alt={track!.album || track!.title}
                           className="w-full h-full object-cover"
                         />
                       </div>

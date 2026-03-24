@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Crown, Check, Music, Download, Zap, ArrowLeft } from 'lucide-react'
+import { TRACKS } from '@/lib/data'
 
 export default function UnlockPage() {
   const [loading, setLoading] = useState(false)
@@ -76,7 +77,7 @@ export default function UnlockPage() {
           <div className="space-y-3 mb-6">
             <div className="flex items-center gap-3">
               <Check size={20} className="text-green-400 shrink-0" />
-              <span className="text-[var(--pf-text)]"><strong>Every song unlocked</strong> — 114 tracks</span>
+              <span className="text-[var(--pf-text)]"><strong>Every song unlocked</strong> — {TRACKS.length} tracks</span>
             </div>
             <div className="flex items-center gap-3">
               <Check size={20} className="text-green-400 shrink-0" />
@@ -142,7 +143,7 @@ export default function UnlockPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
               <Music className="text-[var(--pf-orange)]" size={20} />
-              <span className="text-sm">114 tracks</span>
+              <span className="text-sm">{TRACKS.length} tracks</span>
             </div>
             <div className="flex items-center gap-2">
               <Download className="text-[var(--pf-orange)]" size={20} />

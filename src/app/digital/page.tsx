@@ -6,6 +6,32 @@ import { TRACKS, ALBUMS } from '@/lib/data'
 import Link from 'next/link'
 import { ArtistLink } from '@/components/ArtistLink'
 
+// Loading skeleton component
+function TrackSkeleton() {
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] animate-pulse">
+      <div className="w-12 h-12 rounded-lg bg-[var(--pf-bg)]" />
+      <div className="flex-1">
+        <div className="h-4 bg-[var(--pf-bg)] rounded w-3/4 mb-2" />
+        <div className="h-3 bg-[var(--pf-bg)] rounded w-1/2" />
+      </div>
+      <div className="w-20 h-8 bg-[var(--pf-bg)] rounded-lg" />
+    </div>
+  )
+}
+
+function AlbumSkeleton() {
+  return (
+    <div className="flex-shrink-0 w-44">
+      <div className="aspect-square bg-[var(--pf-surface)] rounded-xl animate-pulse" />
+      <div className="p-3">
+        <div className="h-4 bg-[var(--pf-surface)] rounded w-3/4 mb-2 animate-pulse" />
+        <div className="h-3 bg-[var(--pf-surface)] rounded w-1/2 animate-pulse" />
+      </div>
+    </div>
+  )
+}
+
 // Custom Porterful Icons
 const Icon = {
   Play: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>,
@@ -297,6 +323,13 @@ export default function MusicPage() {
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<'artists' | 'albums' | 'songs'>('artists')
   const [songsDisplayed, setSongsDisplayed] = useState(50)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Simulate initial load
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filteredTracks = search 
     ? TRACKS.filter(t => 
@@ -330,14 +363,16 @@ export default function MusicPage() {
               <h1 className="text-3xl font-bold text-[var(--pf-text)]">Music</h1>
               <p className="text-[var(--pf-text-secondary)]">{TRACKS.length} tracks • {albums.length} albums</p>
             </div>
-            <button onClick={playAll} className="pf-btn pf-btn-primary flex items-center gap-2">
-              {isPlaying ? <Icon.Pause /> : <Icon.Play />}
-              <span className="hidden sm:inline">Play All</span>
-            </button>
+            {!isLoading && (
+              <button onClick={playAll} className="pf-btn pf-btn-primary flex items-center gap-2">
+                {isPlaying ? <Icon.Pause /> : <Icon.Play />}
+                <span className="hidden sm:inline">Play All</span>
+              </button>
+            )}
           </div>
           
           {/* Now Playing */}
-          {currentTrack && (
+          {!isLoading && currentTrack && (
             <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-xl p-4 mb-4 border border-[var(--pf-orange)]/20">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
@@ -410,6 +445,26 @@ export default function MusicPage() {
         {/* Tabs */}
         {!search && (
           <>
+            {/* Loading skeletons */}
+            {isLoading ? (
+              <div className="space-y-6">
+                <div className="flex gap-2">
+                  <div className="h-10 w-20 bg-[var(--pf-surface)] rounded-lg animate-pulse" />
+                  <div className="h-10 w-20 bg-[var(--pf-surface)] rounded-lg animate-pulse" />
+                  <div className="h-10 w-20 bg-[var(--pf-surface)] rounded-lg animate-pulse" />
+                </div>
+                <div className="space-y-4">
+                  <div className="h-6 bg-[var(--pf-surface)] rounded w-32 animate-pulse" />
+                  <div className="flex gap-4 overflow-hidden">
+                    {[1,2,3,4,5].map(i => <AlbumSkeleton key={i} />)}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {[1,2,3,4,5,6].map(i => <TrackSkeleton key={i} />)}
+                </div>
+              </div>
+            ) : (
+              <>
             <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide">
               {['artists', 'albums', 'songs'].map(tab => (
                 <button
@@ -534,6 +589,8 @@ export default function MusicPage() {
                   </button>
                 )}
               </div>
+            )}
+              </>
             )}
           </>
         )}

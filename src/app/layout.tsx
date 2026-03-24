@@ -5,6 +5,7 @@ import { Navbar } from '@/components/Navbar'
 import { GlobalPlayer } from '@/components/GlobalPlayer'
 import { Footer } from '@/components/Footer'
 import { InstallPrompt, IOSInstallInstructions } from '@/components/InstallPrompt'
+import { KeyboardShortcuts } from '@/lib/keyboard-shortcuts'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
@@ -129,6 +130,7 @@ export default function RootLayout({
       <body className="antialiased">
         <Script src="/pwa.js" strategy="afterInteractive" />
         <Providers>
+          <KeyboardShortcuts />
           <Navbar />
           <main className="min-h-screen pb-24">
             {children}

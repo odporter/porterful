@@ -71,7 +71,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // Listen for auth changes with proper error handling
     const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
       // Handle SESSION_EXPIRED by attempting refresh
-      if (event === 'SESSION_EXPIRED') {
+      if ((event as string) === 'SESSION_EXPIRED') {
         try {
           const { data: { session: refreshedSession }, error } = await client.auth.refreshSession()
           if (error || !refreshedSession) {

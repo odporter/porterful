@@ -49,8 +49,20 @@ export default function CheckoutPage() {
   const shippingCost = subtotal >= 50 ? 0 : 5;
   const total = subtotal + shippingCost;
 
-  const handleSubmit = async () => {
-    setProcessing(true);
+  const [payment, setPayment] = useState({
+    cardNumber: '', expiry: '', cvc: '',
+  })
+
+  const handlePaymentSubmit = () => {
+    if (!payment.cardNumber || !payment.expiry || !payment.cvc) {
+      alert('Please fill in all payment fields.')
+      return
+    }
+    setStep('review')
+  }
+
+  const handleFinalSubmit = async () => {
+    setProcessing(true)
     
     try {
       // Convert cart items to Stripe format (prices in cents)
@@ -60,7 +72,7 @@ export default function CheckoutPage() {
         price: Math.round(item.price * 100), // Convert to cents
         quantity: item.quantity,
         image: item.image,
-      }));
+      }))
 
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -70,28 +82,28 @@ export default function CheckoutPage() {
           shipping,
           referralCode: null,
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.url && !data.demo) {
         // Redirect to Stripe Checkout
-        window.location.href = data.url;
+        window.location.href = data.url
       } else {
         // Demo mode - simulate success
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        clearCart();
-        localStorage.removeItem('porterful-checkout-items');
-        setStep('complete');
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        clearCart()
+        localStorage.removeItem('porterful-checkout-items')
+        setStep('complete')
       }
     } catch (error) {
-      console.error('Checkout failed:', error);
+      console.error('Checkout failed:', error)
       // Still show success in demo mode
-      setStep('complete');
+      setStep('complete')
     }
     
-    setProcessing(false);
-  };
+    setProcessing(false)
+  }
 
   if (step === 'complete') {
     return (
@@ -191,39 +203,82 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">First Name</label>
-                      <input type="text" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" placeholder="First" />
+                      <input 
+                        type="text" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                        placeholder="First"
+                        value={shipping.name.split(' ')[0] || ''}
+                        onChange={(e) => setShipping(s => ({ ...s, name: (e.target.value + ' ' + (s.name.split(' ')[1] || '')).trim() }))}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Last Name</label>
-                      <input type="text" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" placeholder="Last" />
+                      <input 
+                        type="text" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                        placeholder="Last"
+                        value={shipping.name.split(' ').slice(1).join(' ') || ''}
+                        onChange={(e) => setShipping(s => ({ ...s, name: ((s.name.split(' ')[0] || '') + ' ' + e.target.value).trim() }))}
+                      />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Email</label>
-                    <input type="email" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" placeholder="you@email.com" />
+                    <input 
+                      type="email" 
+                      className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                      placeholder="you@email.com"
+                      value={shipping.email}
+                      onChange={(e) => setShipping(s => ({ ...s, email: e.target.value }))}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Address</label>
-                    <input type="text" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" placeholder="Street address" />
+                    <input 
+                      type="text" 
+                      className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                      placeholder="Street address"
+                      value={shipping.address}
+                      onChange={(e) => setShipping(s => ({ ...s, address: e.target.value }))}
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">City</label>
-                      <input type="text" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" />
+                      <input 
+                        type="text" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        value={shipping.city}
+                        onChange={(e) => setShipping(s => ({ ...s, city: e.target.value }))}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">State</label>
-                      <input type="text" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" />
+                      <input 
+                        type="text" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        value={shipping.state}
+                        onChange={(e) => setShipping(s => ({ ...s, state: e.target.value }))}
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">ZIP Code</label>
-                      <input type="text" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" />
+                      <input 
+                        type="text" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        value={shipping.zip}
+                        onChange={(e) => setShipping(s => ({ ...s, zip: e.target.value }))}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Country</label>
-                      <select className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none">
+                      <select 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        value={shipping.country}
+                        onChange={(e) => setShipping(s => ({ ...s, country: e.target.value }))}
+                      >
                         <option>United States</option>
                         <option>Canada</option>
                         <option>United Kingdom</option>
@@ -232,7 +287,13 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setStep('payment')} className="w-full pf-btn pf-btn-primary mt-6">
+                <button onClick={() => {
+                  if (!shipping.name || !shipping.email || !shipping.address || !shipping.city || !shipping.state || !shipping.zip) {
+                    alert('Please fill in all required shipping fields.')
+                    return
+                  }
+                  setStep('payment')
+                }} className="w-full pf-btn pf-btn-primary mt-6">
                   Continue to Payment
                 </button>
               </div>
@@ -265,16 +326,34 @@ export default function CheckoutPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Card Number</label>
-                    <input type="text" placeholder="4242 4242 4242 4242" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" />
+                    <input 
+                      type="text" 
+                      placeholder="4242 4242 4242 4242" 
+                      className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                      value={payment.cardNumber}
+                      onChange={(e) => setPayment(p => ({ ...p, cardNumber: e.target.value }))}
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Expiry</label>
-                      <input type="text" placeholder="MM/YY" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" />
+                      <input 
+                        type="text" 
+                        placeholder="MM/YY" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        value={payment.expiry}
+                        onChange={(e) => setPayment(p => ({ ...p, expiry: e.target.value }))}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">CVC</label>
-                      <input type="text" placeholder="123" className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" />
+                      <input 
+                        type="text" 
+                        placeholder="123" 
+                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        value={payment.cvc}
+                        onChange={(e) => setPayment(p => ({ ...p, cvc: e.target.value }))}
+                      />
                     </div>
                   </div>
                 </div>
@@ -286,7 +365,7 @@ export default function CheckoutPage() {
 
                 <div className="flex gap-4 mt-6">
                   <button onClick={() => setStep('shipping')} className="pf-btn pf-btn-secondary">Back</button>
-                  <button onClick={() => setStep('review')} className="flex-1 pf-btn pf-btn-primary">Review Order</button>
+                  <button onClick={handlePaymentSubmit} className="flex-1 pf-btn pf-btn-primary">Review Order</button>
                 </div>
               </div>
             )}
@@ -300,8 +379,10 @@ export default function CheckoutPage() {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-sm text-[var(--pf-text-muted)]">Ship to</p>
-                      <p className="font-medium">John Doe</p>
-                      <p className="text-sm">123 Main St, New Orleans, LA 70112</p>
+                      <p className="font-medium">{shipping.name || 'Not provided'}</p>
+                      <p className="text-sm">
+                        {shipping.address ? `${shipping.address}, ` : ''}{shipping.city ? `${shipping.city}, ` : ''}{shipping.state || ''} {shipping.zip || ''}
+                      </p>
                     </div>
                     <button onClick={() => setStep('shipping')} className="text-[var(--pf-orange)] text-sm">Edit</button>
                   </div>
@@ -337,7 +418,7 @@ export default function CheckoutPage() {
 
                 <div className="flex gap-4">
                   <button onClick={() => setStep('payment')} className="pf-btn pf-btn-secondary">Back</button>
-                  <button onClick={handleSubmit} disabled={processing} className="flex-1 pf-btn pf-btn-primary">
+                  <button onClick={handleFinalSubmit} disabled={processing} className="flex-1 pf-btn pf-btn-primary">
                     {processing ? 'Processing...' : `Pay $${total.toFixed(2)}`}
                   </button>
                 </div>

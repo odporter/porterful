@@ -15,27 +15,47 @@ function SuccessContent() {
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     const demo = searchParams.get('demo');
-    const itemParam = searchParams.get('item');
 
-    if (sessionId || demo) {
-      setOrderId(sessionId || `ORD-${Date.now().toString(36).toUpperCase()}`);
-
-      let items: any[] = [];
-      if (itemParam) {
-        try {
-          items = [JSON.parse(decodeURIComponent(itemParam))];
-        } catch {
-          items = [];
-        }
-      }
-
-      // Also check for demo items
-      if (demo && items.length === 0) {
-        items = [{ type: 'track', name: 'Demo Track', artist: 'O D Porter', downloadUrl: null }];
-      }
-
-      setPurchasedItems(items);
+    if (demo) {
+      setOrderId(`ORD-${Date.now().toString(36).toUpperCase()}`);
+      setPurchasedItems([{
+        name: 'Demo Track',
+        artist: 'O D Porter',
+        audioUrl: null,
+        type: 'track'
+      }]);
       setLoading(false);
+      return;
+    }
+
+    if (sessionId) {
+      setOrderId(sessionId);
+
+      // Fetch session metadata from our API (which reads Stripe metadata)
+      fetch(`/api/session/${sessionId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.item?.name) {
+            setPurchasedItems([data.item]);
+          } else {
+            setPurchasedItems([{
+              name: 'Your Track',
+              artist: 'Artist',
+              audioUrl: null,
+              type: 'track'
+            }]);
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          setPurchasedItems([{
+            name: 'Your Track',
+            artist: 'Artist',
+            audioUrl: null,
+            type: 'track'
+          }]);
+          setLoading(false);
+        });
     } else {
       router.push('/');
     }

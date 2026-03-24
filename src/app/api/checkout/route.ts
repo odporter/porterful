@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `https://porterful.com/checkout/success?session_id={CHECKOUT_SESSION_ID}&item=${encodeURIComponent(JSON.stringify(items[0]))}`,
+      success_url: 'https://porterful.com/checkout/success?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: 'https://porterful.com/',
       metadata: {
         artist_fund: artistFund.toString(),
@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
         referral_code: referralCode || '',
         type: items[0]?.type || 'product',
         audio_url: items[0]?.audioUrl || '',
+        track_name: items[0]?.name || '',
+        track_artist: items[0]?.artist || '',
+        track_image: items[0]?.image || '',
       },
     }
 

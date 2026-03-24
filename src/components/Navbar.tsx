@@ -170,9 +170,6 @@ export function Navbar() {
   const toggleMobile = () => setMobileOpen(!mobileOpen)
   const closeMobile = () => setMobileOpen(false)
 
-  // Detect light mode for logo visibility
-  const isLightMode = typeof window !== 'undefined' && !document.documentElement.classList.contains('dark')
-
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all ${

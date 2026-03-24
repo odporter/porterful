@@ -2,172 +2,172 @@ import type { Metadata } from 'next';
 import './pdf.css';
 
 export const metadata: Metadata = {
-  title: 'Artist Guide — Porterful',
+  title: 'Pilot Onboarding — Porterful',
 };
 
-export default function OnboardingPDFPage() {
+const PILOT_ROLES = [
+  {
+    id: 'artist',
+    label: 'Artist',
+    icon: '🎤',
+    color: '#FF6B00',
+    steps: [
+      'Join the Discord server',
+      'Verify your account — type <span class="code">/verify</span> in any channel',
+      'Go to <span class="code">#artist-talk</span> and introduce yourself',
+      'Upload at least one piece of work (music, art, or merch)',
+      'Set a price on something',
+      'Make one small purchase to test checkout — even $1 counts',
+      'Turn on notifications for <span class="code">#feedback</span> and <span class="code">#bugs</span>',
+      'Share honest feedback in <span class="code">#feedback</span> — your voice shapes what we build',
+    ],
+  },
+  {
+    id: 'business',
+    label: 'Business',
+    icon: '🏪',
+    color: '#3B82F6',
+    steps: [
+      'Join the Discord server',
+      'Verify your account — type <span class="code">/verify</span> in any channel',
+      'Go to <span class="code">#general</span> and introduce yourself',
+      'List your first product on Porterful',
+      'Connect with artists for promotions',
+      'Turn on notifications for <span class="code">#feedback</span> and <span class="code">#bugs</span>',
+      'Share what you\'re selling in <span class="code">#feedback</span>',
+    ],
+  },
+  {
+    id: 'brand',
+    label: 'Brand',
+    icon: '💼',
+    color: '#10B981',
+    steps: [
+      'Join the Discord server',
+      'Verify your account — type <span class="code">/verify</span> in any channel',
+      'Go to <span class="code">#general</span> and introduce yourself',
+      'Explore the artist roster',
+      'Reach out directly to artists you want to sponsor',
+      'Turn on notifications for <span class="code">#feedback</span> and <span class="code">#bugs</span>',
+    ],
+  },
+  {
+    id: 'fan',
+    label: 'Supporter / Fan',
+    icon: '❤️',
+    color: '#A855F7',
+    steps: [
+      'Join the Discord server',
+      'Verify your account — type <span class="code">/verify</span> in any channel',
+      'Go to <span class="code">#general</span> and say hi',
+      'Browse porterful.com — find an artist you like',
+      'Make your first purchase',
+      'Optional: sign up as a Superfan to earn by sharing referral links',
+      'Turn on notifications for <span class="code">#general</span> so you don\'t miss updates',
+    ],
+  },
+];
+
+const DISCORD_STEPS = [
+  'Open Discord or download it at discord.com',
+  'Click the invite link we sent you',
+  'Accept the invite to the Porterful pilot server',
+  'Verify: type <span class="code">/verify</span> in any channel',
+  'Go to channel settings → Notifications → turn on all messages for this server',
+];
+
+export default function PilotOnboardingPDFPage() {
   return (
     <div className="pdf-page">
       {/* HEADER */}
       <header className="pdf-header">
         <div className="logo">PORTERFUL</div>
-        <div className="header-tag">Artist Guide</div>
+        <div className="header-tag">Pilot Onboarding</div>
       </header>
 
       {/* HERO */}
       <section className="pdf-hero">
-        <h1>Your music.<br />Your store.<br />Your retirement plan.</h1>
+        <h1>Welcome to the<br />Porterful Pilot. 🚀</h1>
         <p className="hero-sub">
-          Welcome to Porterful — the direct-to-artist commerce platform where every purchase
-          puts real money in artists' pockets. No labels. No middlemen. No gatekeepers.
+          This guide gets you set up in 10 minutes. Follow the steps for your role below.
+          When you need help, post in the channel — we read everything.
         </p>
       </section>
 
-      {/* STATS */}
-      <section className="pdf-stats">
-        <div className="stat">
-          <span className="stat-num">80%</span>
-          <span className="stat-label">You keep on every sale</span>
-        </div>
-        <div className="stat-divider" />
-        <div className="stat">
-          <span className="stat-num">$1 min</span>
-          <span className="stat-label">Set your own price for music</span>
-        </div>
-        <div className="stat-divider" />
-        <div className="stat">
-          <span className="stat-num">$0</span>
-          <span className="stat-label">Monthly or listing fees</span>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
+      {/* DISCORD SETUP — ALL ROLES */}
       <section className="pdf-section">
-        <h2>How It Works</h2>
-        <div className="steps">
-          <div className="step">
-            <div className="step-num">1</div>
-            <div>
-              <strong>Upload your music or merch</strong>
-              <p>Albums, singles, t-shirts, prints — anything you create.</p>
-            </div>
+        <h2>Step 1 — Get on Discord</h2>
+        <div className="discord-grid">
+          <div className="discord-steps">
+            {DISCORD_STEPS.map((step, i) => (
+              <div key={i} className="discord-step">
+                <div className="discord-num">{i + 1}</div>
+                <p dangerouslySetInnerHTML={{ __html: step }} />
+              </div>
+            ))}
           </div>
-          <div className="step">
-            <div className="step-num">2</div>
-            <div>
-              <strong>Set your own prices</strong>
-              <p>$1 minimum for music. Merch pricing is up to you. You control your income.</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-num">3</div>
-            <div>
-              <strong>Share your Porterful link</strong>
-              <p>Every artist gets a unique page. Share it everywhere — social, DMs, bio links.</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-num">4</div>
-            <div>
-              <strong>Get paid directly</strong>
-              <p>Sales pay out to your wallet. Track everything in your dashboard.</p>
-            </div>
+          <div className="discord-note">
+            <p className="note-title">⚠️ Don&apos;t skip notifications</p>
+            <p>We communicate exclusively through Discord during the pilot. If you don&apos;t turn on notifications, you&apos;ll miss updates, bug fixes, and feature drops.</p>
           </div>
         </div>
       </section>
 
-      {/* WHAT TO SELL */}
+      {/* ROLE-SPECIFIC STEPS */}
       <section className="pdf-section">
-        <h2>What You Can Sell</h2>
-        <div className="sell-grid">
-          <div className="sell-item">
-            <span className="sell-icon">🎵</span>
-            <strong>Music</strong>
-            <p>Albums, singles, beats, instrumentals. Set your own price.</p>
-          </div>
-          <div className="sell-item">
-            <span className="sell-icon">👕</span>
-            <strong>Merch</strong>
-            <p>Print-on-demand t-shirts, hoodies, prints. No inventory needed.</p>
-          </div>
-          <div className="sell-item">
-            <span className="sell-icon">📦</span>
-            <strong>Digital</strong>
-            <p>Courses, PDFs, presets, templates — anything digital.</p>
-          </div>
-          <div className="sell-item">
-            <span className="sell-icon">🏪</span>
-            <strong>Marketplace</strong>
-            <p>Art, photography, crafts. Reach music fans who want to support you.</p>
-          </div>
+        <h2>Step 2 — Your Role</h2>
+        <div className="roles-grid">
+          {PILOT_ROLES.map((role) => (
+            <div key={role.id} className="role-card">
+              <div className="role-header" style={{ borderColor: role.color }}>
+                <span className="role-icon">{role.icon}</span>
+                <span className="role-label" style={{ color: role.color }}>{role.label}</span>
+              </div>
+              <div className="role-steps">
+                {role.steps.map((step, i) => (
+                  <div key={i} className="role-step">
+                    <span className="role-step-num" style={{ color: role.color }}>{i + 1}</span>
+                    <p dangerouslySetInnerHTML={{ __html: step }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* SUPERFANS */}
-      <section className="pdf-section pdf-callout">
-        <div className="callout-inner">
-          <h2>Turn Fans Into Promoters</h2>
-          <p>
-            Porterful's Superfan system lets your biggest supporters earn money by sharing
-            your link. When someone buys through their code, they get a cut — and you still
-            keep 80%. It turns casual listeners into active promoters who have a real stake
-            in your success.
-          </p>
-        </div>
-      </section>
-
-      {/* REVENUE SPLIT */}
+      {/* CHANNEL GUIDE */}
       <section className="pdf-section">
-        <h2>Who Gets What</h2>
-        <table className="pdf-table">
-          <thead>
-            <tr>
-              <th>Who</th>
-              <th>Share</th>
-              <th>What this means</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Artist</strong></td>
-              <td className="highlight">80%</td>
-              <td>You earn on every music sale, merch sale, and marketplace item</td>
-            </tr>
-            <tr>
-              <td><strong>Superfan Referrer</strong></td>
-              <td className="highlight">3%</td>
-              <td>The fan who shared the link and drove the sale</td>
-            </tr>
-            <tr>
-              <td><strong>Porterful</strong></td>
-              <td className="highlight">10%</td>
-              <td>Platform maintenance, hosting, payments, support</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      {/* GETTING STARTED CHECKLIST */}
-      <section className="pdf-section">
-        <h2>Getting Started Checklist</h2>
-        <div className="checklist">
-          <div className="checklist-item">☐ &nbsp; Sign up and verify as an artist at porterful.com</div>
-          <div className="checklist-item">☐ &nbsp; Upload your first album, single, or product</div>
-          <div className="checklist-item">☐ &nbsp; Set your prices — you can always adjust later</div>
-          <div className="checklist-item">☐ &nbsp; Customize your artist page (bio, photo, links)</div>
-          <div className="checklist-item">☐ &nbsp; Share your link on social media and bios</div>
-          <div className="checklist-item">☐ &nbsp; Connect your wallet to receive payouts</div>
+        <h2>Channel Guide</h2>
+        <div className="channels">
+          <div className="channel">
+            <span className="channel-name">#general</span>
+            <span className="channel-desc">Introductions, chat with other pilots</span>
+          </div>
+          <div className="channel">
+            <span className="channel-name">#feedback</span>
+            <span className="channel-desc">Questions, ideas, feature requests — we read every post</span>
+          </div>
+          <div className="channel">
+            <span className="channel-name">#bugs</span>
+            <span className="channel-desc">Something broken? Describe what you did and what went wrong</span>
+          </div>
+          <div className="channel">
+            <span className="channel-name">#artist-talk</span>
+            <span className="channel-desc">Artists only — share work, ask questions, connect</span>
+          </div>
         </div>
+        <p className="channel-note">No @mentions needed. Don&apos;t DM us. Just post in the channel.</p>
       </section>
 
       {/* FOOTER */}
       <footer className="pdf-footer">
-        <div className="footer-logo">PORTERFUL</div>
+        <div className="footer-logo">PORTERFUL PILOT</div>
         <div className="footer-links">
-          <span>Dashboard: porterful.com/dashboard</span>
-          <span>Support: support@porterful.com</span>
+          <span>porterful.com</span>
+          <span>support@porterful.com</span>
         </div>
-        <p className="footer-tagline">The artist retirement plan.</p>
+        <p className="footer-tagline">Your feedback builds this thing.</p>
       </footer>
     </div>
   );

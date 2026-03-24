@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 interface WalletContextType {
   balance: number
   addFunds(amount: number): void
-  spendFunds(amount: number): boolean
+  spendFunds(amount: number): Promise<boolean>
   formatBalance(): string
   isLoading: boolean
   resetWallet(userId: string): Promise<void>

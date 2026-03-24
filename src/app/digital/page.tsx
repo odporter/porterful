@@ -280,6 +280,7 @@ export default function MusicPage() {
   const { currentTrack, isPlaying, playTrack, setQueue } = useAudio()
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<'artists' | 'albums' | 'songs'>('artists')
+  const [songsDisplayed, setSongsDisplayed] = useState(50)
 
   const filteredTracks = search 
     ? TRACKS.filter(t => 
@@ -476,9 +477,14 @@ export default function MusicPage() {
             {/* Songs Tab */}
             {activeTab === 'songs' && (
               <div className="mb-8">
-                <h2 className="text-lg font-bold mb-4 text-[var(--pf-text)]">All Songs</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-[var(--pf-text)]">All Songs</h2>
+                  <p className="text-sm text-[var(--pf-text-muted)]">
+                    Showing {Math.min(songsDisplayed, TRACKS.length)} of {TRACKS.length}
+                  </p>
+                </div>
                 <div className="space-y-2">
-                  {TRACKS.slice(0, 50).map(track => (
+                  {TRACKS.slice(0, songsDisplayed).map(track => (
                     <div
                       key={track.id}
                       className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
@@ -504,6 +510,14 @@ export default function MusicPage() {
                     </div>
                   ))}
                 </div>
+                {songsDisplayed < TRACKS.length && (
+                  <button
+                    onClick={() => setSongsDisplayed(prev => Math.min(prev + 50, TRACKS.length))}
+                    className="w-full mt-4 py-3 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-orange)] transition-colors font-medium"
+                  >
+                    Load More Songs ({TRACKS.length - songsDisplayed} remaining)
+                  </button>
+                )}
               </div>
             )}
           </>

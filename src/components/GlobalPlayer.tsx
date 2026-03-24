@@ -8,12 +8,19 @@ import {
 } from 'lucide-react'
 import { useAudio } from '@/lib/audio-context'
 
+function formatTime(seconds: number) {
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
 export function GlobalPlayer() {
   const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setVolume, seek, progress, duration } = useAudio()
   const [volume, setVolumeState] = useState(80)
   const [isMuted, setIsMuted] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [showVisualizer, setShowVisualizer] = useState(false)
+  const progressRef = useRef<HTMLDivElement>(null)
 
   // Volume control
   useEffect(() => {
@@ -27,6 +34,14 @@ export function GlobalPlayer() {
       setVolume(volume)
     }
   }, [isMuted])
+
+  // Seek on progress bar click
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!progressRef.current || !duration) return
+    const rect = progressRef.current.getBoundingClientRect()
+    const percent = (e.clientX - rect.left) / rect.width
+    seek(percent * duration)
+  }
 
   if (!currentTrack) return null
 
@@ -99,12 +114,24 @@ export function GlobalPlayer() {
             </button>
           </div>
 
-          {/* Progress Bar */}
-          <div className="h-1 bg-[var(--pf-bg)]">
+          {/* Progress Bar - Clickable */}
+          <div className="px-3 pb-2">
             <div 
-              className="h-full bg-[var(--pf-orange)] transition-all"
-              style={{ width: `${progressPercent}%` }}
-            />
+              ref={progressRef}
+              className="h-1 bg-[var(--pf-bg)] rounded-full cursor-pointer group"
+              onClick={handleProgressClick}
+            >
+              <div 
+                className="h-full bg-[var(--pf-orange)] rounded-full transition-all relative group-hover:bg-[var(--pf-orange)]/80"
+                style={{ width: `${progressPercent}%` }}
+              >
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md" />
+              </div>
+            </div>
+            <div className="flex justify-between mt-1 text-xs text-[var(--pf-text-muted)] px-1">
+              <span>{formatTime(progress)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -150,13 +177,18 @@ export function GlobalPlayer() {
 
           {/* Progress */}
           <div className="px-8 py-6">
-            <div className="h-1 bg-[var(--pf-bg)] rounded-full overflow-hidden">
+            <div 
+              className="h-2 bg-[var(--pf-bg)] rounded-full overflow-hidden cursor-pointer group"
+              onClick={handleProgressClick}
+            >
               <div 
-                className="h-full bg-[var(--pf-orange)] transition-all"
+                className="h-full bg-[var(--pf-orange)] transition-all relative"
                 style={{ width: `${progressPercent}%` }}
-              />
+              >
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
+              </div>
             </div>
-            <div className="flex justify-between mt-2 text-xs text-[var(--pf-text-muted)]">
+            <div className="flex justify-between mt-2 text-sm text-[var(--pf-text-muted)]">
               <span>{formatTime(progress)}</span>
               <span>{formatTime(duration)}</span>
             </div>

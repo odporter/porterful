@@ -10,15 +10,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/digital',
     '/marketplace',
     '/shop',
+    '/store',
     '/radio',
     '/playlists',
+    '/trending',
+    '/superfan',
     '/artist/od-porter',
     '/about',
+    '/contact',
+    '/faq',
     '/support',
     '/signup',
+    '/signup/superfan',
     '/login',
     '/dashboard/artist',
     '/dashboard/upload',
+    '/terms',
+    '/privacy',
+    '/press-kit',
   ]
   
   // Albums from data
@@ -38,12 +47,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // All pages
   const allPages = [...staticPages, ...albumPages]
   
+  const getPriority = (page: string): number => {
+    if (page === '') return 1.0
+    if (page.startsWith('/album')) return 0.7
+    if (page === '/digital' || page === '/marketplace' || page === '/store') return 0.9
+    return 0.8
+  }
+  
   return allPages.map(page => ({
     url: `${baseUrl}${page}`,
     lastModified: currentDate,
     changeFrequency: page === '' ? 'daily' : 'weekly',
-    priority: page === '' ? 1.0 : page.startsWith('/album') ? 0.7 : page === '/digital' || page === '/marketplace' || page === '/store' ? 0.9 : 0.8,
-  }))
-}rity: page === '' ? 1 : page.startsWith('/album') ? 0.7 : 0.8,
+    priority: getPriority(page),
   }))
 }

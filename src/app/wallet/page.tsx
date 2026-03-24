@@ -12,13 +12,37 @@ export default function WalletPage() {
 
   const handlePurchase = async (pkg: typeof FUND_PACKAGES[0]) => {
     setIsProcessing(true)
-    // In demo mode, just add funds
-    // In production, this would connect to Stripe
-    setTimeout(() => {
-      addFunds(pkg.amount + pkg.bonus)
-      setIsProcessing(false)
-      setSelectedPackage(null)
-    }, 1000)
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{
+            productId: `wallet-${pkg.id}`,
+            name: `Wallet Credit: ${pkg.label}`,
+            artist: 'Porterful',
+            price: pkg.price,
+            quantity: 1,
+            type: 'wallet',
+            image: '/logo.svg'
+          }],
+          successUrl: `/checkout/success?type=wallet&amount=${encodeURIComponent(pkg.label)}&session_id={CHECKOUT_SESSION_ID}`
+        })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        // No Stripe configured - show error
+        alert('Payment system not configured. Please add Stripe keys to enable wallet funding.');
+        setIsProcessing(false);
+        setSelectedPackage(null);
+      }
+    } catch (err) {
+      console.error('Purchase failed:', err);
+      alert('Payment failed. Please try again.');
+      setIsProcessing(false);
+    }
   }
 
   return (
@@ -108,17 +132,14 @@ export default function WalletPage() {
               className="w-full pf-btn pf-btn-primary flex items-center justify-center gap-2"
             >
               {isProcessing ? (
-                'Processing...'
+                'Redirecting to payment...'
               ) : (
                 <>
                   <CreditCard size={18} />
-                  Pay Now
+                  Pay ${FUND_PACKAGES.find(p => p.id === selectedPackage)?.price.toFixed(2)}
                 </>
               )}
             </button>
-            <p className="text-center text-sm text-[var(--pf-text-muted)] mt-4">
-              Demo mode • In production, this would connect to Stripe
-            </p>
           </div>
         )}
 

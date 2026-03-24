@@ -3,7 +3,7 @@ import './pdf.css';
 
 // ⚠️  REPLACE THIS WITH YOUR ACTUAL DISCORD INVITE LINK
 // e.g. https://discord.gg/XXXXX
-const DISCORD_INVITE_URL = 'YOUR_DISCORD_INVITE_LINK';
+const DISCORD_INVITE_URL = 'https://discord.gg/nqHT6rEP';
 
 const PILOT_ROLES = [
   {

@@ -65,7 +65,7 @@ export default function ArtistsPage() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <Link href="/artist/od" className="pf-btn pf-btn-primary">
+                  <Link href="/artist/od-porter" className="pf-btn pf-btn-primary">
                     Visit Store <ChevronRight className="inline ml-1" size={16} />
                   </Link>
                   <button className="pf-btn pf-btn-secondary flex items-center gap-2">

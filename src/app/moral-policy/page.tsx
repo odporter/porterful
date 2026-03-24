@@ -191,7 +191,7 @@ export default function MoralPolicyPage() {
             <Link href="/" className="pf-btn pf-btn-primary">
               Back to Home
             </Link>
-            <Link href="/artist/signup" className="pf-btn pf-btn-secondary">
+            <Link href="/signup?role=artist" className="pf-btn pf-btn-secondary">
               Join as Artist
             </Link>
           </div>

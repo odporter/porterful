@@ -24,7 +24,7 @@ function formatTime(seconds: number): string {
 }
 
 export default function RadioPage() {
-  const { currentTrack, isPlaying, togglePlay, playNext, setQueue, currentIndex } = useAudio()
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setQueue, currentIndex, isRadio, setIsRadio } = useAudio()
   const [shuffledTracks] = useState(() => shuffleArray(TRACKS))
   
   // Initialize queue on mount
@@ -54,6 +54,8 @@ export default function RadioPage() {
   // Auto-start on mount
   useEffect(() => {
     startRadio()
+    setIsRadio(true)
+    return () => setIsRadio(false)
   }, [])
   
   const nextTrack = shuffledTracks[(currentIndex + 1) % shuffledTracks.length]

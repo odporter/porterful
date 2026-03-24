@@ -31,6 +31,8 @@ interface AudioContext {
   queue: Track[];
   setQueue: (tracks: Track[]) => void;
   currentIndex: number;
+  isRadio: boolean;
+  setIsRadio: (v: boolean) => void;
 }
 
 const AudioCtx = createContext<AudioContext | null>(null);
@@ -43,7 +45,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [queue, setQueue] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  
+  const [isRadio, setIsRadio] = useState(false);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<Track[]>([]);
   const currentIndexRef = useRef(-1);
@@ -62,6 +65,15 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       audio.volume = volume / 100;
       audio.preload = 'auto';
 
+      let previewTimer: ReturnType<typeof setTimeout> | null = null;
+
+      const clearPreviewTimer = () => {
+        if (previewTimer) {
+          clearTimeout(previewTimer);
+          previewTimer = null;
+        }
+      };
+
       const handleTimeUpdate = () => {
         if (audioRef.current && audioRef.current.duration) {
           const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
@@ -75,28 +87,23 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         }
       };
 
-      const handleCanPlay = () => {
-        // Auto-play when ready
-        if (audioRef.current && currentTrack) {
-          audioRef.current.play().catch(() => {});
-        }
-      };
-
       const handleEnded = () => {
+        clearPreviewTimer();
         const currentQueue = queueRef.current;
         const currentIdx = currentIndexRef.current;
-        
+
         if (currentQueue.length > 0) {
           const nextIdx = (currentIdx + 1) % currentQueue.length;
           const nextTrackItem = currentQueue[nextIdx];
-          
+
           if (nextTrackItem) {
             setCurrentIndex(nextIdx);
             setCurrentTrack(nextTrackItem);
             setProgress(0);
-            
+
             if (audioRef.current && nextTrackItem.audio_url) {
               audioRef.current.src = nextTrackItem.audio_url;
+              audioRef.current.load();
               audioRef.current.play().catch(() => {});
             }
           }
@@ -106,31 +113,67 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       const handlePlay = () => setIsPlaying(true);
       const handlePause = () => setIsPlaying(false);
 
+      const startPreviewTimer = (trackDuration: number) => {
+        clearPreviewTimer();
+        // Radio mode: stop after 60 seconds and skip to next
+        if (isRadio) {
+          previewTimer = setTimeout(() => {
+            const currentQueue = queueRef.current;
+            const currentIdx = currentIndexRef.current;
+            if (currentQueue.length > 0) {
+              const nextIdx = (currentIdx + 1) % currentQueue.length;
+              const nextTrackItem = currentQueue[nextIdx];
+              if (nextTrackItem) {
+                setCurrentIndex(nextIdx);
+                setCurrentTrack(nextTrackItem);
+                setProgress(0);
+                if (audioRef.current && nextTrackItem.audio_url) {
+                  audioRef.current.src = nextTrackItem.audio_url;
+                  audioRef.current.load();
+                  audioRef.current.play().catch(() => {});
+                }
+              }
+            }
+          }, 60000); // 60 seconds
+        }
+      };
+
       audio.addEventListener('timeupdate', handleTimeUpdate);
       audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.addEventListener('canplay', handleCanPlay);
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('play', handlePlay);
       audio.addEventListener('pause', handlePause);
 
+      // Handle canplay — auto-play when ready
+      audio.addEventListener('canplay', () => {
+        clearPreviewTimer();
+        if (audioRef.current) {
+          audioRef.current.play().catch(() => {});
+        }
+        // Start radio preview timer after play begins
+        if (audioRef.current) {
+          startPreviewTimer(audioRef.current.duration);
+        }
+      });
+
       return () => {
+        clearPreviewTimer();
         audio.pause();
         audio.removeEventListener('timeupdate', handleTimeUpdate);
         audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audio.removeEventListener('canplay', handleCanPlay);
         audio.removeEventListener('ended', handleEnded);
         audio.removeEventListener('play', handlePlay);
         audio.removeEventListener('pause', handlePause);
         audioRef.current = null;
       };
     }
-  }, []);
+  }, [isRadio]);
 
   // Update audio source when track changes
   useEffect(() => {
     if (audioRef.current && currentTrack?.audio_url) {
       audioRef.current.src = currentTrack.audio_url;
-      audioRef.current.load();
+      audioRef.current.load(); // <-- was missing!
     }
   }, [currentTrack?.id]);
 
@@ -149,7 +192,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
   const togglePlay = useCallback(() => {
     if (!audioRef.current) return;
-    
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -164,49 +207,52 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const playNext = useCallback(() => {
-    if (queue.length === 0) return;
-    
-    const nextIdx = (currentIndex + 1) % queue.length;
-    setCurrentIndex(nextIdx);
-    const track = queue[nextIdx];
-    
+    const currentQueue = queueRef.current;
+    if (currentQueue.length === 0) return;
+
+    const currentIdx = currentIndexRef.current;
+    const nextIdx = (currentIdx + 1) % currentQueue.length;
+    const track = currentQueue[nextIdx];
+
     if (track) {
+      setCurrentIndex(nextIdx);
       setCurrentTrack(track);
       setProgress(0);
-      
+
       if (audioRef.current && track.audio_url) {
         audioRef.current.src = track.audio_url;
         audioRef.current.load();
         audioRef.current.play().catch(() => {});
       }
     }
-  }, [queue, currentIndex]);
+  }, []);
 
   const playPrev = useCallback(() => {
-    if (queue.length === 0) return;
-    
-    // If more than 3 seconds in, restart current track
     if (audioRef.current && audioRef.current.currentTime > 3) {
       audioRef.current.currentTime = 0;
       setProgress(0);
       return;
     }
-    
-    const prevIdx = (currentIndex - 1 + queue.length) % queue.length;
-    setCurrentIndex(prevIdx);
-    const track = queue[prevIdx];
-    
+
+    const currentQueue = queueRef.current;
+    if (currentQueue.length === 0) return;
+
+    const currentIdx = currentIndexRef.current;
+    const prevIdx = (currentIdx - 1 + currentQueue.length) % currentQueue.length;
+    const track = currentQueue[prevIdx];
+
     if (track) {
+      setCurrentIndex(prevIdx);
       setCurrentTrack(track);
       setProgress(0);
-      
+
       if (audioRef.current && track.audio_url) {
         audioRef.current.src = track.audio_url;
         audioRef.current.load();
         audioRef.current.play().catch(() => {});
       }
     }
-  }, [queue, currentIndex]);
+  }, []);
 
   const setVolume = useCallback((v: number) => {
     setVolumeState(v);
@@ -246,6 +292,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       queue,
       setQueue,
       currentIndex,
+      isRadio,
+      setIsRadio,
     }}>
       {children}
     </AudioCtx.Provider>

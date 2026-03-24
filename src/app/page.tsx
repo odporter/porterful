@@ -54,7 +54,7 @@ export default function Home() {
                 {/* Stats */}
                 <div className="flex gap-6 justify-center md:justify-start">
                   <div className="text-center md:text-left">
-                    <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">114</div>
+                    <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">{TRACKS.length}</div>
                     <div className="text-sm text-[var(--pf-text-muted)]">Tracks</div>
                   </div>
                   <div className="text-center md:text-left">

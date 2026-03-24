@@ -65,7 +65,8 @@ function BuyButton({ track }: { track: typeof TRACKS[0] }) {
             image: track.image,
             price: totalPrice,
             quantity: quantity,
-            type: 'track'
+            type: 'track',
+            audioUrl: track.audio_url,
           }]
         })
       })

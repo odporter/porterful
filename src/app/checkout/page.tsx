@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const [shipping, setShipping] = useState({
     name: '', email: '', address: '', city: '', state: '', zip: '', country: 'United States',
   });
+  const [shippingErrors, setShippingErrors] = useState<Record<string, string>>({});
 
   // Load cart items from context or localStorage
   useEffect(() => {
@@ -289,11 +290,17 @@ export default function CheckoutPage() {
                       <input 
                         type="text" 
                         autoComplete="given-name"
-                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                        className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                          shippingErrors.name ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                        }`}
                         placeholder="First"
                         value={shipping.name.split(' ')[0] || ''}
-                        onChange={(e) => setShipping(s => ({ ...s, name: (e.target.value + ' ' + (s.name.split(' ')[1] || '')).trim() }))}
+                        onChange={(e) => {
+                          setShipping(s => ({ ...s, name: (e.target.value + ' ' + (s.name.split(' ')[1] || '')).trim() }))
+                          if (shippingErrors.name) setShippingErrors(pv => ({ ...pv, name: '' }))
+                        }}
                       />
+                      {shippingErrors.name && <p className="text-red-400 text-xs mt-1">{shippingErrors.name}</p>}
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Last Name</label>
@@ -312,22 +319,34 @@ export default function CheckoutPage() {
                     <input 
                       type="email" 
                       autoComplete="email"
-                      className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                      className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                        shippingErrors.email ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                      }`}
                       placeholder="you@email.com"
                       value={shipping.email}
-                      onChange={(e) => setShipping(s => ({ ...s, email: e.target.value }))}
+                      onChange={(e) => {
+                        setShipping(s => ({ ...s, email: e.target.value }))
+                        if (shippingErrors.email) setShippingErrors(pv => ({ ...pv, email: '' }))
+                      }}
                     />
+                    {shippingErrors.email && <p className="text-red-400 text-xs mt-1">{shippingErrors.email}</p>}
                   </div>
                   <div>
                     <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Address</label>
                     <input 
                       type="text" 
                       autoComplete="street-address"
-                      className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
+                      className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                        shippingErrors.address ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                      }`}
                       placeholder="Street address"
                       value={shipping.address}
-                      onChange={(e) => setShipping(s => ({ ...s, address: e.target.value }))}
+                      onChange={(e) => {
+                        setShipping(s => ({ ...s, address: e.target.value }))
+                        if (shippingErrors.address) setShippingErrors(pv => ({ ...pv, address: '' }))
+                      }}
                     />
+                    {shippingErrors.address && <p className="text-red-400 text-xs mt-1">{shippingErrors.address}</p>}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -335,20 +354,32 @@ export default function CheckoutPage() {
                       <input 
                         type="text" 
                         autoComplete="address-level2"
-                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                          shippingErrors.city ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                        }`}
                         value={shipping.city}
-                        onChange={(e) => setShipping(s => ({ ...s, city: e.target.value }))}
+                        onChange={(e) => {
+                          setShipping(s => ({ ...s, city: e.target.value }))
+                          if (shippingErrors.city) setShippingErrors(pv => ({ ...pv, city: '' }))
+                        }}
                       />
+                      {shippingErrors.city && <p className="text-red-400 text-xs mt-1">{shippingErrors.city}</p>}
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">State</label>
                       <input 
                         type="text" 
                         autoComplete="address-level1"
-                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                          shippingErrors.state ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                        }`}
                         value={shipping.state}
-                        onChange={(e) => setShipping(s => ({ ...s, state: e.target.value }))}
+                        onChange={(e) => {
+                          setShipping(s => ({ ...s, state: e.target.value }))
+                          if (shippingErrors.state) setShippingErrors(pv => ({ ...pv, state: '' }))
+                        }}
                       />
+                      {shippingErrors.state && <p className="text-red-400 text-xs mt-1">{shippingErrors.state}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -358,10 +389,16 @@ export default function CheckoutPage() {
                         type="text" 
                         autoComplete="postal-code"
                         inputMode="numeric"
-                        className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
+                        className={`w-full bg-[var(--pf-bg)] border rounded-lg px-4 py-3 focus:outline-none ${
+                          shippingErrors.zip ? 'border-red-500' : 'border-[var(--pf-border)] focus:border-[var(--pf-orange)]'
+                        }`}
                         value={shipping.zip}
-                        onChange={(e) => setShipping(s => ({ ...s, zip: e.target.value }))}
+                        onChange={(e) => {
+                          setShipping(s => ({ ...s, zip: e.target.value }))
+                          if (shippingErrors.zip) setShippingErrors(pv => ({ ...pv, zip: '' }))
+                        }}
                       />
+                      {shippingErrors.zip && <p className="text-red-400 text-xs mt-1">{shippingErrors.zip}</p>}
                     </div>
                     <div>
                       <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Country</label>
@@ -389,11 +426,10 @@ export default function CheckoutPage() {
                   if (!shipping.zip.trim() || !/^\d{5}(-\d{4})?$|^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(shipping.zip)) newErrors.zip = 'Enter a valid ZIP code'
                   
                   if (Object.keys(newErrors).length > 0) {
-                    // Show first error
-                    const firstError = Object.values(newErrors)[0]
-                    alert(firstError)
+                    setShippingErrors(newErrors)
                     return
                   }
+                  setShippingErrors({})
                   setStep('payment')
                 }} className="w-full pf-btn pf-btn-primary mt-6">
                   Continue to Payment

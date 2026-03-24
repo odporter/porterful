@@ -177,6 +177,24 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
   }, [currentTrack?.id]);
 
+  // Update Media Session (lock screen / control center) when track or state changes
+  useEffect(() => {
+    if ('mediaSession' in navigator && currentTrack) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentTrack.title || 'Unknown Track',
+        artist: currentTrack.artist || 'Unknown Artist',
+        album: currentTrack.album || 'Porterful',
+        artwork: [
+          {
+            src: currentTrack.image || currentTrack.cover_url || '/album-art/default.jpg',
+            sizes: '512x512',
+            type: 'image/jpeg',
+          },
+        ],
+      });
+    }
+  }, [currentTrack?.id, currentTrack?.title, currentTrack?.artist, currentTrack?.album, currentTrack?.image]);
+
   const playTrack = useCallback((track: Track) => {
     setCurrentTrack(track);
     const idx = queue.findIndex(t => t.id === track.id);
@@ -295,9 +313,23 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       isRadio,
       setIsRadio,
     }}>
+      <MediaSessionHandlers togglePlay={togglePlay} playPrev={playPrev} playNext={playNext} />
       {children}
     </AudioCtx.Provider>
   );
+}
+
+// Media Session action handlers — lock screen / control center
+function MediaSessionHandlers({ togglePlay, playPrev, playNext }: { togglePlay: () => void; playPrev: () => void; playNext: () => void }) {
+  useEffect(() => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => togglePlay());
+      navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+      navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+      navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+    }
+  }, [togglePlay, playPrev, playNext]);
+  return null;
 }
 
 export function useAudio() {

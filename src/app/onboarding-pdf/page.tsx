@@ -12,7 +12,7 @@ const PILOT_ROLES = [
     icon: '🎤',
     color: '#FF6B00',
     porterfulSteps: [
-      'Sign up at porterful.com',
+      '<a href="https://porterful.com/signup" target="_blank">Sign up at porterful.com</a>',
       'Go to Settings → upload a photo and write your bio',
       'Go to Dashboard → Upload to add music or merch',
       'Set your prices — you can change them anytime',
@@ -26,7 +26,7 @@ const PILOT_ROLES = [
     icon: '🏪',
     color: '#3B82F6',
     porterfulSteps: [
-      'Sign up at porterful.com',
+      '<a href="https://porterful.com/signup" target="_blank">Sign up at porterful.com</a>',
       'Go to Settings → add your business name and logo',
       'Go to Dashboard → Add Product to list your first item',
       'Set your prices and fill in product details',
@@ -39,9 +39,9 @@ const PILOT_ROLES = [
     icon: '💼',
     color: '#10B981',
     porterfulSteps: [
-      'Sign up at porterful.com',
+      '<a href="https://porterful.com/signup" target="_blank">Sign up at porterful.com</a>',
       'Go to Settings → add your brand name and logo',
-      'Browse porterful.com/artists to find artists you want to sponsor',
+      '<a href="https://porterful.com/artists" target="_blank">Browse porterful.com/artists</a> to find artists you want to sponsor',
       'Message us in #feedback to set up a sponsorship deal',
     ],
   },
@@ -51,7 +51,7 @@ const PILOT_ROLES = [
     icon: '❤️',
     color: '#A855F7',
     porterfulSteps: [
-      'Sign up at porterful.com',
+      '<a href="https://porterful.com/signup" target="_blank">Sign up at porterful.com</a>',
       'Browse porterful.com — find artists you want to support',
       'Make your first purchase',
       'Optional: go to Dashboard → Superfan to get your referral link and start earning',
@@ -119,7 +119,7 @@ export default function PilotOnboardingPDFPage() {
                 {role.porterfulSteps.map((step, i) => (
                   <div key={i} className="porterful-step">
                     <span className="porterful-num" style={{ color: role.color }}>{i + 1}</span>
-                    <p>{step}</p>
+                    <p dangerouslySetInnerHTML={{ __html: step }} />
                   </div>
                 ))}
               </div>

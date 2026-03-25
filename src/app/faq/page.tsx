@@ -54,24 +54,24 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white py-16 px-6">
+    <div className="min-h-screen bg-[var(--pf-bg)] text-[var(--pf-text)] py-16 px-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-          <p className="text-gray-400">Everything you need to know about Porterful</p>
+          <p className="text-[var(--pf-text-secondary)]">Everything you need to know about Porterful</p>
         </div>
 
         {categories.map((category, i) => (
           <div key={i} className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-[#ff6b00]">{category.title}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-[var(--pf-orange)]">{category.title}</h2>
             <div className="space-y-4">
               {category.faqs.map((faq, j) => (
-                <details key={j} className="group bg-[#1a1a1a] rounded-lg border border-gray-800">
+                <details key={j} className="group bg-[var(--pf-surface)] rounded-lg border border-[var(--pf-border)]">
                   <summary className="cursor-pointer p-4 font-semibold flex justify-between items-center">
                     {faq.q}
-                    <span className="text-[#ff6b00] group-open:rotate-180 transition-transform">▼</span>
+                    <span className="text-[var(--pf-orange)] group-open:rotate-180 transition-transform">▼</span>
                   </summary>
-                  <div className="px-4 pb-4 text-gray-400">
+                  <div className="px-4 pb-4 text-[var(--pf-text-secondary)]">
                     {faq.a}
                   </div>
                 </details>
@@ -80,11 +80,11 @@ export default function FAQPage() {
           </div>
         ))}
 
-        <div className="text-center mt-16 pt-8 border-t border-gray-800">
-          <p className="text-gray-400 mb-4">Still have questions?</p>
+        <div className="text-center mt-16 pt-8 border-t border-[var(--pf-border)]">
+          <p className="text-[var(--pf-text-secondary)] mb-4">Still have questions?</p>
           <Link 
             href="/contact" 
-            className="inline-block bg-[#ff6b00] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#ff8533] transition-colors"
+            className="inline-block bg-[var(--pf-orange)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--pf-orange-dark)] transition-colors"
           >
             Contact Us
           </Link>

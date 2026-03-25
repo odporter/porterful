@@ -19,25 +19,25 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white py-16 px-6">
+    <div className="min-h-screen bg-[var(--pf-bg)] text-[var(--pf-text)] py-16 px-6">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Get in Touch</h1>
-          <p className="text-gray-400">
+          <p className="text-[var(--pf-text-secondary)]">
             Questions? Ideas? Want to partner? We're all ears.
           </p>
         </div>
 
         {submitted ? (
-          <div className="bg-[#1a1a1a] rounded-2xl p-8 text-center border border-[#ff6b00]/30">
+          <div className="bg-[var(--pf-surface)] rounded-2xl p-8 text-center border border-[var(--pf-orange)]/30">
             <div className="text-6xl mb-4">✉️</div>
             <h2 className="text-2xl font-bold mb-2">Message Sent!</h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-[var(--pf-text-secondary)] mb-6">
               We'll get back to you within 24-48 hours.
             </p>
             <Link 
               href="/" 
-              className="text-[#ff6b00] hover:underline"
+              className="text-[var(--pf-orange)] hover:underline"
             >
               ← Back to home
             </Link>
@@ -52,7 +52,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-[#ff6b00] transition-colors"
+                  className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] transition-colors"
                   placeholder="Your name"
                 />
               </div>
@@ -63,7 +63,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-[#ff6b00] transition-colors"
+                  className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -74,7 +74,7 @@ export default function ContactPage() {
               <select
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-[#ff6b00] transition-colors"
+                className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] transition-colors"
               >
                 <option value="">Select a topic</option>
                 <option value="artist">I'm an artist interested in joining</option>
@@ -93,21 +93,21 @@ export default function ContactPage() {
                 rows={5}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-[#ff6b00] transition-colors resize-none"
+                className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] transition-colors resize-none"
                 placeholder="Tell us more..."
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#ff6b00] text-white py-3 rounded-lg font-semibold hover:bg-[#ff8533] transition-colors"
+              className="w-full bg-[var(--pf-orange)] text-white py-3 rounded-lg font-semibold hover:bg-[var(--pf-orange-dark)] transition-colors"
             >
               Send Message
             </button>
 
-            <p className="text-center text-gray-500 text-sm">
+            <p className="text-center text-[var(--pf-text-muted)] text-sm">
               Or email us directly at{' '}
-              <a href="mailto:hello@porterful.com" className="text-[#ff6b00] hover:underline">
+              <a href="mailto:hello@porterful.com" className="text-[var(--pf-orange)] hover:underline">
                 hello@porterful.com
               </a>
             </p>
@@ -116,20 +116,20 @@ export default function ContactPage() {
 
         {/* Quick Links */}
         <div className="mt-16 grid md:grid-cols-3 gap-6">
-          <div className="bg-[#1a1a1a] rounded-xl p-6 text-center border border-gray-800">
+          <div className="bg-[var(--pf-surface)] rounded-xl p-6 text-center border border-[var(--pf-border)]">
             <div className="text-3xl mb-2">📚</div>
             <h3 className="font-semibold mb-1">Help Center</h3>
-            <p className="text-gray-500 text-sm">FAQs and guides</p>
+            <p className="text-[var(--pf-text-muted)] text-sm">FAQs and guides</p>
           </div>
-          <div className="bg-[#1a1a1a] rounded-xl p-6 text-center border border-gray-800">
+          <div className="bg-[var(--pf-surface)] rounded-xl p-6 text-center border border-[var(--pf-border)]">
             <div className="text-3xl mb-2">💬</div>
             <h3 className="font-semibold mb-1">Community</h3>
-            <p className="text-gray-500 text-sm">Join our Discord</p>
+            <p className="text-[var(--pf-text-muted)] text-sm">Join our Discord</p>
           </div>
-          <div className="bg-[#1a1a1a] rounded-xl p-6 text-center border border-gray-800">
+          <div className="bg-[var(--pf-surface)] rounded-xl p-6 text-center border border-[var(--pf-border)]">
             <div className="text-3xl mb-2">🐦</div>
             <h3 className="font-semibold mb-1">Twitter</h3>
-            <p className="text-gray-500 text-sm">@porterful</p>
+            <p className="text-[var(--pf-text-muted)] text-sm">@porterful</p>
           </div>
         </div>
       </div>

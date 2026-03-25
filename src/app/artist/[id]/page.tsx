@@ -18,7 +18,19 @@ const MUSIC_VIDEOS = [
 ];
 
 // Album order - newest first
-const ALBUM_ORDER = ['Singles', 'Ambiguous', 'Roxannity', 'One Day', 'Levi', 'Streets Thought I Left', 'From Feast to Famine', 'God Is Good'];
+const ALBUM_ORDER = ['Ambiguous', 'Roxannity', 'One Day', 'Levi', 'Streets Thought I Left', 'From Feast to Famine', 'God Is Good'];
+
+// Notable singles — featured tracks shown separately from albums
+const SINGLES = [
+  TRACKS.find(t => t.id === 'amb-06')!, // Make A Move
+  TRACKS.find(t => t.id === 'amb-01')!, // Oddysee
+  TRACKS.find(t => t.id === 'od-07')!,  // One Day
+  TRACKS.find(t => t.id === 'od-16')!,  // Street Love
+  TRACKS.find(t => t.id === 'stl-01')!, // Aint Gone Let Up
+  TRACKS.find(t => t.id === 'gig-04')!, // Amen
+  TRACKS.find(t => t.id === 'fff-02')!, // Breathe
+  TRACKS.find(t => t.id === 'lev-02')!, // Hero
+].filter(Boolean);
 
 // Group tracks by album
 function groupTracksByAlbum(tracks: typeof TRACKS) {
@@ -61,6 +73,19 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
 
   const albums = groupTracksByAlbum(TRACKS);
   const orderedAlbums = ALBUM_ORDER.filter(album => albums[album]?.length > 0);
+
+  const playSingles = () => {
+    if (SINGLES.length > 0) {
+      setQueue(SINGLES.map(t => ({
+        ...t,
+        duration: typeof t.duration === 'string' ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : t.duration || 180
+      })));
+      playTrack({
+        ...SINGLES[0],
+        duration: typeof SINGLES[0].duration === 'string' ? SINGLES[0].duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : SINGLES[0].duration || 180
+      } as any);
+    }
+  };
   
   // Featured merch for artist store
   const artistMerch = PRODUCTS.filter(p => p.category === 'merch').slice(0, 6);
@@ -188,115 +213,121 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
         {/* Music Tab */}
         {activeTab === 'music' && (
           <div className="space-y-6">
-            {/* Singles */}
-            {albums['Singles'] && albums['Singles'].length > 0 && (
-              <div>
-                <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-                  <span>⭐</span> Singles & New Releases
-                </h2>
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {albums['Singles'].slice(0, 6).map((track) => (
-                    <div 
-                      key={track.id} 
+            {/* Albums and Singles — side by side on desktop */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Albums — left/main column */}
+              <div className="flex-1 space-y-3">
+                <h2 className="text-lg font-bold">Albums</h2>
+                {orderedAlbums.map(albumName => {
+                  const albumTracks = albums[albumName];
+                  if (!albumTracks || albumTracks.length === 0) return null;
+                  const isExpanded = expandedAlbums[albumName];
+                  const albumInfo = Object.values(ALBUMS).find(a => a.name === albumName);
+
+                  return (
+                    <div key={albumName} className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)]">
+                      <button
+                        onClick={() => toggleAlbum(albumName)}
+                        className="w-full flex items-center gap-4 p-4 hover:bg-[var(--pf-bg)] transition-colors text-left"
+                      >
+                        <img
+                          src={albumInfo?.image || '/album-art/default.jpg'}
+                          alt={albumName}
+                          className="w-14 h-14 rounded-lg object-cover"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold">{albumName}</h3>
+                          <p className="text-sm text-[var(--pf-text-muted)]">{albumTracks.length} tracks</p>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); playAlbum(albumName); }}
+                          className="p-2 rounded-full bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors"
+                        >
+                          <Play size={16} className="ml-0.5" />
+                        </button>
+                        <div className="text-[var(--pf-text-muted)]">
+                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </div>
+                      </button>
+                      {isExpanded && (
+                        <div className="border-t border-[var(--pf-border)]">
+                          {albumTracks.map((track, i) => (
+                            <div
+                              key={track.id}
+                              className={`flex items-center gap-4 p-3 hover:bg-[var(--pf-bg)] transition-colors ${
+                                currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/5' : ''
+                              }`}
+                            >
+                              <span className="w-6 text-center text-[var(--pf-text-muted)] text-sm">{i + 1}</span>
+                              <button
+                                onClick={() => playTrack({
+                                  ...track,
+                                  duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : track.duration || 180
+                                } as any)}
+                                className="w-8 h-8 rounded-full bg-[var(--pf-bg)] flex items-center justify-center hover:bg-[var(--pf-orange)] transition-colors"
+                              >
+                                {currentTrack?.id === track.id && isPlaying ?
+                                  <Pause size={14} className="text-white" /> :
+                                  <Play size={14} className="text-white ml-0.5" />
+                                }
+                              </button>
+                              <div className="flex-1 min-w-0">
+                                <p className={`font-medium ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>
+                                  {track.title}
+                                </p>
+                              </div>
+                              <span className="text-sm text-[var(--pf-text-muted)]">{track.duration}</span>
+                              <span className="text-sm font-medium text-[var(--pf-orange)]">${track.price}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Singles — right sidebar */}
+              <div className="lg:w-80 space-y-3">
+                <h2 className="text-lg font-bold">Singles</h2>
+                <div className="space-y-2">
+                  {SINGLES.map((track) => (
+                    <div
+                      key={track.id}
                       className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                        currentTrack?.id === track.id 
-                          ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]' 
+                        currentTrack?.id === track.id
+                          ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]'
                           : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
                       }`}
                       onClick={() => playTrack({
                         ...track,
-                        duration: typeof track.duration === 'string' ? 180 : track.duration || 180
+                        duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : track.duration || 180
                       } as any)}
                     >
                       <img src={track.image} alt={track.title} className="w-12 h-12 rounded-lg object-cover" />
                       <div className="flex-1 min-w-0">
-                        <p className={`font-medium truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>
+                        <p className={`font-medium truncate text-sm ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>
                           {track.title}
                         </p>
-                        <p className="text-xs text-[var(--pf-text-muted)]">{track.duration}</p>
+                        <p className="text-xs text-[var(--pf-text-muted)]">{track.album}</p>
                       </div>
-                      <button className="w-8 h-8 rounded-full bg-[var(--pf-orange)] flex items-center justify-center">
-                        {currentTrack?.id === track.id && isPlaying ? 
-                          <Pause size={14} className="text-white" /> : 
+                      <button className="w-8 h-8 rounded-full bg-[var(--pf-orange)] flex items-center justify-center shrink-0">
+                        {currentTrack?.id === track.id && isPlaying ?
+                          <Pause size={14} className="text-white" /> :
                           <Play size={14} className="text-white ml-0.5" />
                         }
                       </button>
                     </div>
                   ))}
                 </div>
+                <button
+                  onClick={playSingles}
+                  className="w-full py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium hover:bg-[var(--pf-orange-dark)] transition-colors flex items-center justify-center gap-2"
+                >
+                  <Play size={14} />
+                  Play All Singles
+                </button>
               </div>
-            )}
-
-            {/* Albums */}
-            <div className="space-y-3">
-              <h2 className="text-lg font-bold">Albums</h2>
-              {orderedAlbums.filter(a => a !== 'Singles').map(albumName => {
-                const albumTracks = albums[albumName];
-                if (!albumTracks || albumTracks.length === 0) return null;
-                const isExpanded = expandedAlbums[albumName];
-                const albumInfo = Object.values(ALBUMS).find(a => a.name === albumName);
-                
-                return (
-                  <div key={albumName} className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)]">
-                    <button 
-                      onClick={() => toggleAlbum(albumName)} 
-                      className="w-full flex items-center gap-4 p-4 hover:bg-[var(--pf-bg)] transition-colors text-left"
-                    >
-                      <img 
-                        src={albumInfo?.image || '/album-art/default.jpg'} 
-                        alt={albumName} 
-                        className="w-14 h-14 rounded-lg object-cover" 
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold">{albumName}</h3>
-                        <p className="text-sm text-[var(--pf-text-muted)]">{albumTracks.length} tracks</p>
-                      </div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); playAlbum(albumName); }} 
-                        className="p-2 rounded-full bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors"
-                      >
-                        <Play size={16} className="ml-0.5" />
-                      </button>
-                      <div className="text-[var(--pf-text-muted)]">
-                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                      </div>
-                    </button>
-                    {isExpanded && (
-                      <div className="border-t border-[var(--pf-border)]">
-                        {albumTracks.map((track, i) => (
-                          <div 
-                            key={track.id} 
-                            className={`flex items-center gap-4 p-3 hover:bg-[var(--pf-bg)] transition-colors ${
-                              currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/5' : ''
-                            }`}
-                          >
-                            <span className="w-6 text-center text-[var(--pf-text-muted)] text-sm">{i + 1}</span>
-                            <button 
-                              onClick={() => playTrack({
-                                ...track,
-                                duration: typeof track.duration === 'string' ? 180 : track.duration || 180
-                              } as any)} 
-                              className="w-8 h-8 rounded-full bg-[var(--pf-bg)] flex items-center justify-center hover:bg-[var(--pf-orange)] transition-colors"
-                            >
-                              {currentTrack?.id === track.id && isPlaying ? 
-                                <Pause size={14} className="text-white" /> : 
-                                <Play size={14} className="text-white ml-0.5" />
-                              }
-                            </button>
-                            <div className="flex-1 min-w-0">
-                              <p className={`font-medium ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>
-                                {track.title}
-                              </p>
-                            </div>
-                            <span className="text-sm text-[var(--pf-text-muted)]">{track.duration}</span>
-                            <span className="text-sm font-medium text-[var(--pf-orange)]">${track.price}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           </div>
         )}

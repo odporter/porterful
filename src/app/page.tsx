@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Play, Headphones, Music, Star, Users, DollarSign, Upload, ShoppingCart, Package, Radio, Disc3 } from 'lucide-react';
 import { useSupabase } from '@/app/providers';
 import { TRACKS } from '@/lib/data';
@@ -81,12 +82,14 @@ export default function Home() {
                     ].filter(Boolean).map((track, i) => (
                       <div
                         key={track!.id}
-                        className={`aspect-square rounded-xl overflow-hidden shadow-2xl ${i === 0 ? 'col-span-2' : ''}`}
+                        className={`aspect-square rounded-xl overflow-hidden shadow-2xl ${i === 0 ? 'col-span-2' : ''} relative`}
                       >
-                        <img
+                        <Image
                           src={track!.image}
                           alt={track!.album || track!.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
                         />
                       </div>
                     ))}
@@ -210,7 +213,9 @@ export default function Home() {
                       href={`/artist/od-porter`}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--pf-bg)] transition-colors group"
                     >
-                      <img src={track.image} alt={track.title} className="w-12 h-12 rounded object-cover" />
+                      <div className="w-12 h-12 rounded relative shrink-0">
+                        <Image src={track.image} alt={track.title} fill sizes="48px" className="object-cover rounded" />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate group-hover:text-[var(--pf-orange)] transition-colors">
                           {track.title}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Star, Heart, Share2, ShoppingCart, Check } from 'lucide-react';
 import { PRODUCTS } from '@/lib/data';
@@ -82,11 +83,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
         <div className="grid md:grid-cols-2 gap-12">
           {/* Image */}
-          <div className="aspect-square bg-[var(--pf-surface)] rounded-2xl overflow-hidden sticky top-24">
-            <img 
+          <div className="aspect-square bg-[var(--pf-surface)] rounded-2xl overflow-hidden sticky top-24 relative">
+            <Image 
               src={product.image} 
               alt={product.name}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
             />
             {product.category === 'music' && (
               <div className="absolute top-4 left-4 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -104,7 +107,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 className="flex items-center gap-3 mb-4 hover:opacity-80 transition-opacity"
               >
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-sm font-bold overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1493225457124-a3eb1614b109?w=100" alt={product.artist} className="w-full h-full object-cover" />
+                  <Image src="https://images.unsplash.com/photo-1493225457124-a3eb1614b109?w=100" alt={product.artist} fill sizes="48px" className="object-cover" />
                 </div>
                 <div>
                   <span className="text-[var(--pf-text-secondary)]">by </span>

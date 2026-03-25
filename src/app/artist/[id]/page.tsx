@@ -153,7 +153,13 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                   <Play size={16} className="inline mr-1" />
                   Play Music
                 </button>
-                <button className="px-4 py-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg font-medium hover:border-[var(--pf-orange)] transition-colors">
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    // Could add toast notification here
+                  }} 
+                  className="px-4 py-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg font-medium hover:border-[var(--pf-orange)] transition-colors"
+                >
                   <Share2 size={16} className="inline mr-1" />
                   Share
                 </button>

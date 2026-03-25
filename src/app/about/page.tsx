@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { TRACKS } from '@/lib/data'
 
 export const metadata: Metadata = {
   title: 'About Porterful - The Artist Economy Platform',
@@ -50,7 +51,7 @@ export default function AboutPage() {
               <div className="text-sm text-[var(--pf-text-muted)]">to Artists</div>
             </div>
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
-              <div className="text-3xl md:text-4xl font-bold">114+</div>
+              <div className="text-3xl md:text-4xl font-bold">{TRACKS.length}+</div>
               <div className="text-sm text-[var(--pf-text-muted)]">Tracks</div>
             </div>
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">

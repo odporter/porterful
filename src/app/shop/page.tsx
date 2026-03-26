@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -76,6 +76,17 @@ interface Product {
   inStock: boolean
 }
 
+// Category mapping: URL slug -> product category value
+const CATEGORY_MAP: Record<string, string> = {
+  'all': '',
+  'apparel': 'Apparel',
+  'tech': 'Tech',
+  'home-living': 'Home & Living',
+  'art': 'Art',
+  'accessories': 'Accessories',
+  'music': 'Music',
+}
+
 const CATEGORIES = [
   { id: 'all', name: 'All Products', count: 0 },
   { id: 'apparel', name: 'Apparel', count: 0 },
@@ -86,6 +97,20 @@ const CATEGORIES = [
   { id: 'music', name: 'Music', count: 0 },
 ]
 
+// Price range filter options
+const PRICE_RANGES = [
+  { id: 'under-10', label: 'Under $10', min: 0, max: 10 },
+  { id: '10-25', label: '$10 - $25', min: 10, max: 25 },
+  { id: '25-50', label: '$25 - $50', min: 25, max: 50 },
+  { id: 'over-50', label: 'Over $50', min: 50, max: Infinity },
+]
+
+// Rating filter options
+const RATING_OPTIONS = [
+  { id: '4-plus', label: '4+ Stars', minRating: 4 },
+  { id: '3-plus', label: '3+ Stars', minRating: 3 },
+]
+
 export default function MarketplacePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -94,7 +119,10 @@ export default function MarketplacePage() {
   const [sortBy, setSortBy] = useState('popular')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showFilters, setShowFilters] = useState(false)
-  const [cart, setCart] = useState<{[key: string]: number}>({})
+  
+  // Active filters state
+  const [activePriceRanges, setActivePriceRanges] = useState<string[]>(['under-10', '10-25', '25-50', 'over-50'])
+  const [activeMinRating, setActiveMinRating] = useState<number | null>(null)
 
   // Fetch products from API
   useEffect(() => {
@@ -105,7 +133,7 @@ export default function MarketplacePage() {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (selectedCategory !== 'all') params.append('category', selectedCategory)
+      if (selectedCategory !== 'all') params.append('category', CATEGORY_MAP[selectedCategory] || selectedCategory)
       if (search) params.append('search', search)
       params.append('limit', '200')
       
@@ -120,24 +148,71 @@ export default function MarketplacePage() {
   }
 
   // Sort products
-  const sortedProducts = [...products].sort((a, b) => {
-    const aPrice = (a as any).salePrice || (a as any).price || 0
-    const bPrice = (b as any).salePrice || (b as any).price || 0
-    switch (sortBy) {
-      case 'price-low': return aPrice - bPrice
-      case 'price-high': return bPrice - aPrice
-      case 'rating': return b.rating - a.rating
-      case 'newest': return 0 // Already sorted by newest
-      default: return b.reviews - a.reviews // popular
+  const sortedProducts = useMemo(() => {
+    let result = [...products]
+    
+    // Apply price range filter
+    if (activePriceRanges.length < PRICE_RANGES.length) {
+      result = result.filter(p => {
+        const price = (p as any).salePrice || (p as any).price || 0
+        return activePriceRanges.some(rangeId => {
+          const range = PRICE_RANGES.find(r => r.id === rangeId)
+          return range && price >= range.min && price < range.max
+        })
+      })
     }
-  })
+    
+    // Apply rating filter
+    if (activeMinRating !== null) {
+      result = result.filter(p => p.rating >= activeMinRating)
+    }
+    
+    // Sort
+    const aPrice = (a: Product, b: Product) => {
+      const aP = (a as any).salePrice || (a as any).price || 0
+      const bP = (b as any).salePrice || (b as any).price || 0
+      return aP - bP
+    }
+    
+    switch (sortBy) {
+      case 'price-low': return result.sort((a, b) => aPrice(a, b))
+      case 'price-high': return result.sort((a, b) => aPrice(b, a))
+      case 'rating': return result.sort((a, b) => b.rating - a.rating)
+      case 'newest': return result
+      default: return result.sort((a, b) => b.reviews - a.reviews)
+    }
+  }, [products, sortBy, activePriceRanges, activeMinRating])
+
+  // Toggle price range filter
+  const togglePriceRange = (rangeId: string) => {
+    setActivePriceRanges(prev =>
+      prev.includes(rangeId)
+        ? prev.filter(id => id !== rangeId)
+        : [...prev, rangeId]
+    )
+  }
+
+  // Toggle rating filter
+  const toggleRating = (minRating: number | null) => {
+    setActiveMinRating(prev => prev === minRating ? null : minRating)
+  }
+
+  // Clear all filters
+  const clearFilters = () => {
+    setActivePriceRanges(PRICE_RANGES.map(r => r.id))
+    setActiveMinRating(null)
+    setSearch('')
+    setSelectedCategory('all')
+  }
+
+  const hasActiveFilters = activePriceRanges.length < PRICE_RANGES.length || activeMinRating !== null
 
   // Get category counts
   const categoryCounts = CATEGORIES.map(cat => ({
     ...cat,
     count: cat.id === 'all' 
       ? products.length 
-      : products.filter(p => p.category.toLowerCase() === cat.id).length
+      : products.filter(p => p.category.toLowerCase() === (CATEGORY_MAP[cat.id] || cat.id).toLowerCase()).length
   }))
 
   return (
@@ -163,13 +238,18 @@ export default function MarketplacePage() {
             {/* Filters Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`p-2.5 rounded-lg border transition-colors ${
+              className={`p-2.5 rounded-lg border transition-colors relative ${
                 showFilters 
                   ? 'bg-[var(--pf-orange)] text-white border-[var(--pf-orange)]' 
                   : 'border-[var(--pf-border)] text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)]'
               }`}
             >
               <Icon.Filter />
+              {hasActiveFilters && !showFilters && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--pf-orange)] text-white text-xs rounded-full flex items-center justify-center">
+                  {activeMinRating !== null ? '!' : '✓'}
+                </span>
+              )}
             </button>
 
             {/* Sort */}
@@ -232,28 +312,33 @@ export default function MarketplacePage() {
           {showFilters && (
             <div className="w-64 shrink-0 hidden md:block">
               <div className="bg-[var(--pf-surface)] rounded-xl p-4 sticky top-40">
-                <h3 className="font-bold mb-4 text-[var(--pf-text)]">Filters</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-[var(--pf-text)]">Filters</h3>
+                  {hasActiveFilters && (
+                    <button
+                      onClick={clearFilters}
+                      className="text-xs text-[var(--pf-orange)] hover:underline"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
                 
                 {/* Price Range */}
                 <div className="mb-6">
                   <h4 className="text-sm font-semibold mb-2 text-[var(--pf-text)]">Price Range</h4>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)]">
-                      <input type="checkbox" className="rounded border-[var(--pf-border)]" defaultChecked />
-                      Under $10
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)]">
-                      <input type="checkbox" className="rounded border-[var(--pf-border)]" defaultChecked />
-                      $10 - $25
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)]">
-                      <input type="checkbox" className="rounded border-[var(--pf-border)]" defaultChecked />
-                      $25 - $50
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)]">
-                      <input type="checkbox" className="rounded border-[var(--pf-border)]" defaultChecked />
-                      Over $50
-                    </label>
+                    {PRICE_RANGES.map(range => (
+                      <label key={range.id} className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={activePriceRanges.includes(range.id)}
+                          onChange={() => togglePriceRange(range.id)}
+                          className="rounded border-[var(--pf-border)] text-[var(--pf-orange)] focus:ring-[var(--pf-orange)]"
+                        />
+                        {range.label}
+                      </label>
+                    ))}
                   </div>
                 </div>
 
@@ -261,11 +346,16 @@ export default function MarketplacePage() {
                 <div>
                   <h4 className="text-sm font-semibold mb-2 text-[var(--pf-text)]">Rating</h4>
                   <div className="space-y-2">
-                    {[4, 3, 2].map(rating => (
-                      <label key={rating} className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)]">
-                        <input type="checkbox" className="rounded border-[var(--pf-border)]" />
+                    {RATING_OPTIONS.map(opt => (
+                      <label key={opt.id} className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={activeMinRating === opt.minRating}
+                          onChange={() => toggleRating(opt.minRating)}
+                          className="rounded border-[var(--pf-border)] text-[var(--pf-orange)] focus:ring-[var(--pf-orange)]"
+                        />
                         <span className="flex items-center">
-                          {rating}+ <Icon.Star />
+                          {opt.label} <Icon.Star />
                         </span>
                       </label>
                     ))}
@@ -370,7 +460,12 @@ export default function MarketplacePage() {
             {/* Products count */}
             {!loading && sortedProducts.length > 0 && (
               <p className="text-center text-[var(--pf-text-muted)] mt-6 text-sm">
-                Showing {sortedProducts.length} product{sortedProducts.length !== 1 ? 's' : ''}
+                Showing {sortedProducts.length} of {products.length} product{products.length !== 1 ? 's' : ''}
+                {hasActiveFilters && (
+                  <button onClick={clearFilters} className="ml-2 text-[var(--pf-orange)] hover:underline">
+                    Clear filters
+                  </button>
+                )}
               </p>
             )}
           </div>

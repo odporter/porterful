@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Trophy, DollarSign, Users, TrendingUp, Gift, Star, Zap, Crown, Target, Award } from 'lucide-react';
+import { Trophy, DollarSign, Users, TrendingUp, Gift, Star, Zap, Crown, Target, Award, Upload } from 'lucide-react';
 
 // Mock data - in production this comes from Supabase
 const PRIZES = [

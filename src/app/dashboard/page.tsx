@@ -323,8 +323,9 @@ export default function DashboardPage() {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          {/* Recent Orders */}
-          <div className="lg:col-span-2">
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Recent Orders */}
+            <div className="lg:col-span-2">
             <div className="pf-card">
               <div className="flex items-center justify-between p-4 border-b border-[var(--pf-border)]">
                 <h2 className="font-semibold">Recent Orders</h2>

@@ -483,12 +483,12 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                 </div>
                 <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">
                   <Users className="text-blue-400 mx-auto mb-2" size={24} />
-                  <p className="text-xl font-bold">{artist.supporters.toLocaleString()}</p>
+                  <p className="text-xl font-bold">{artist.supporters !== null ? artist.supporters.toLocaleString() : '—'}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Supporters</p>
                 </div>
                 <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">
                   <DollarSign className="text-green-400 mx-auto mb-2" size={24} />
-                  <p className="text-xl font-bold">${artist.earnings.toLocaleString()}</p>
+                  <p className="text-xl font-bold">${artist.earnings !== null ? artist.earnings.toLocaleString() : '0'}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Earned</p>
                 </div>
                 <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">

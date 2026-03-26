@@ -1,98 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
+import { TRACKS, ALBUMS, PRODUCTS } from '@/lib/data';
+
+// Static artist data derived from tracks/albums
+const STATIC_ARTISTS = [
+  {
+    id: 'od-porter',
+    name: 'O D Porter',
+    slug: 'od-porter',
+    genre: 'Hip-Hop',
+    trackCount: TRACKS.filter((t: any) => t.artist === 'O D Porter').length,
+    productCount: PRODUCTS.filter((p: any) => p.artist === 'O D Porter').length,
+  }
+];
+
+// Static albums as searchable items
+const STATIC_ALBUMS = Object.entries(ALBUMS).map(([key, album]: [string, any]) => ({
+  id: key.toLowerCase().replace(/\s+/g, '-'),
+  name: album.name || key,
+  type: 'album',
+  artist: 'O D Porter',
+  image: album.image,
+  year: album.year,
+  tracks: album.tracks,
+}));
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('q');
 
   if (!query || query.trim().length < 2) {
-    return NextResponse.json({ artists: [], products: [], stations: [] });
+    return NextResponse.json({ artists: [], products: [], tracks: [], albums: [] });
   }
 
+  const searchTerm = query.toLowerCase().trim();
+
   try {
-    const supabase = createServerClient();
-    const searchTerm = `%${query}%`;
+    // Search static artists
+    const artists = STATIC_ARTISTS.filter((artist: any) => 
+      artist.name.toLowerCase().includes(searchTerm) ||
+      artist.slug.toLowerCase().includes(searchTerm)
+    );
 
-    // Search artists
-    const { data: artists } = await supabase
-      .from('profiles')
-      .select(`
-        id,
-        name,
-        slug,
-        avatar_url,
-        genres
-      `)
-      .or(`name.ilike.${searchTerm},display_name.ilike.${searchTerm}`)
-      .limit(5);
+    // Search static albums
+    const albums = STATIC_ALBUMS.filter((album: any) =>
+      album.name.toLowerCase().includes(searchTerm) ||
+      album.artist.toLowerCase().includes(searchTerm)
+    );
 
-    // Search products
-    const { data: products } = await supabase
-      .from('products')
-      .select(`
-        id,
-        name,
-        price,
-        image,
-        artists:artist_id (
-          name
-        )
-      `)
-      .or(`name.ilike.${searchTerm}`)
-      .eq('is_active', true)
-      .limit(5);
+    // Search static tracks
+    const tracks = TRACKS.filter((track: any) =>
+      track.title.toLowerCase().includes(searchTerm) ||
+      track.artist.toLowerCase().includes(searchTerm) ||
+      (track.album && track.album.toLowerCase().includes(searchTerm))
+    ).slice(0, 10).map((track: any) => ({
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      image: track.image,
+      duration: track.duration,
+      price: track.price,
+    }));
 
-    // Format products with artist name
-    const formattedProducts = products?.map(p => ({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      image: p.image,
-      artistName: (p as any).artists?.name || 'Unknown Artist'
-    })) || [];
-
-    // Get track/product counts for artists
-    const artistIds = artists?.map(a => a.id) || [];
-    const artistStats: Record<string, { tracks: number; products: number }> = {};
-
-    if (artistIds.length > 0) {
-      // Get track counts
-      const { data: tracks } = await supabase
-        .from('tracks')
-        .select('artist_id')
-        .in('artist_id', artistIds);
-      
-      // Get product counts
-      const { data: prods } = await supabase
-        .from('products')
-        .select('artist_id')
-        .in('artist_id', artistIds)
-        .eq('is_active', true);
-
-      // Count per artist
-      artistIds.forEach(id => {
-        artistStats[id] = {
-          tracks: tracks?.filter(t => t.artist_id === id).length || 0,
-          products: prods?.filter(p => p.artist_id === id).length || 0
-        };
-      });
-    }
-
-    // Format artists with stats
-    const formattedArtists = artists?.map(a => ({
-      id: a.id,
-      name: a.name,
-      slug: a.slug,
-      avatar: a.avatar_url,
-      genre: a.genres?.[0] || null,
-      trackCount: artistStats[a.id]?.tracks || 0,
-      productCount: artistStats[a.id]?.products || 0
-    })) || [];
+    // Search static products
+    const products = PRODUCTS.filter((product: any) =>
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.artist.toLowerCase().includes(searchTerm) ||
+      product.category.toLowerCase().includes(searchTerm)
+    ).slice(0, 5).map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      artistName: product.artist,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+    }));
 
     return NextResponse.json({
-      artists: formattedArtists,
-      products: formattedProducts,
-      stations: []
+      artists,
+      albums,
+      tracks,
+      products,
     });
   } catch (error) {
     console.error('Search error:', error);

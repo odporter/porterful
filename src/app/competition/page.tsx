@@ -47,7 +47,7 @@ const FAQS = [
 export default function CompetitionPage() {
   const [faqs, setFaqs] = useState(FAQS);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState({ days: 14, hours: 0, mins: 0 });
+  const [timeLeft, setTimeLeft] = useState({ days: 14, hours: 0, mins: 0, secs: 0 });
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -63,6 +63,7 @@ export default function CompetitionPage() {
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
         mins: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        secs: Math.floor((diff % (1000 * 60)) / 1000),
       });
     }, 1000);
 
@@ -121,6 +122,7 @@ export default function CompetitionPage() {
                 { val: timeLeft.days, label: 'Days' },
                 { val: timeLeft.hours, label: 'Hours' },
                 { val: timeLeft.mins, label: 'Mins' },
+                { val: timeLeft.secs, label: 'Secs' },
               ].map((t, i) => (
                 <div key={i} className="text-center">
                   <div className="text-2xl font-bold text-[var(--pf-orange)]">{String(t.val).padStart(2, '0')}</div>

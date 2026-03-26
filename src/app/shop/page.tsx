@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ArrowUp } from 'lucide-react'
 
 // Custom Porterful Icons
 const Icon = {
@@ -468,9 +469,41 @@ export default function MarketplacePage() {
                 )}
               </p>
             )}
+
+            {/* Back to Top */}
+            <BackToTop />
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+// Back to Top component
+function BackToTop() {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      setVisible(window.scrollY > 600)
+    }
+    window.addEventListener('scroll', toggleVisibility, { passive: true })
+    return () => window.removeEventListener('scroll', toggleVisibility)
+  }, [])
+
+  const scrollTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  if (!visible) return null
+
+  return (
+    <button
+      onClick={scrollTop}
+      aria-label="Back to top"
+      className="fixed bottom-24 right-6 w-12 h-12 bg-[var(--pf-orange)] text-white rounded-full shadow-lg hover:bg-[var(--pf-orange-dark)] transition-all hover:scale-110 flex items-center justify-center z-50"
+    >
+      <ArrowUp size={20} />
+    </button>
   )
 }

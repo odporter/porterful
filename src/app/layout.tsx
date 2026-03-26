@@ -5,6 +5,7 @@ import { Navbar } from '@/components/Navbar'
 import { GlobalPlayer } from '@/components/GlobalPlayer'
 import { Footer } from '@/components/Footer'
 import { InstallPrompt, IOSInstallInstructions } from '@/components/InstallPrompt'
+import { CompetitionModal } from '@/components/CompetitionModal'
 import { KeyboardShortcuts } from '@/lib/keyboard-shortcuts'
 import Script from 'next/script'
 
@@ -158,10 +159,11 @@ export default function RootLayout({
         <Providers>
           <KeyboardShortcuts />
           <Navbar />
-          <main className="min-h-screen pb-24">
+          <main className="min-h-screen pb-24 pt-16 md:pt-20">
             {children}
           </main>
           <Footer />
+          <CompetitionModal />
           <GlobalPlayer />
           <InstallPrompt />
           <IOSInstallInstructions />

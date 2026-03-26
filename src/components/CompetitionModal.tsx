@@ -1,0 +1,177 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { X, Trophy, Star, Clock, Rocket, Check } from 'lucide-react';
+
+interface CompetitionModalProps {
+  onClose?: () => void;
+}
+
+export function CompetitionModal({ onClose }: CompetitionModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hasClosed, setHasClosed] = useState(false);
+  const [spotsLeft] = useState(38); // Could fetch from API
+
+  useEffect(() => {
+    // Check if user has closed before
+    const closed = localStorage.getItem('competition_modal_closed');
+    if (!closed) {
+      // Show after 2 seconds
+      const timer = setTimeout(() => setIsOpen(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setHasClosed(true);
+    localStorage.setItem('competition_modal_closed', 'true');
+    onClose?.();
+  };
+
+  if (!isOpen || hasClosed) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative w-full max-w-lg bg-[var(--pf-bg)] rounded-2xl shadow-2xl border border-[var(--pf-border)] overflow-hidden">
+        {/* Close Button */}
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] transition-colors"
+        >
+          <X size={20} className="text-[var(--pf-text-muted)]" />
+        </button>
+
+        {/* Header Banner */}
+        <div className="bg-gradient-to-r from-[var(--pf-orange)] to-purple-600 px-6 py-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1 rounded-full text-white text-sm font-medium mb-4">
+            <Rocket size={16} />
+            <span>Coming Soon</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            $10K Sign<br />Yourself Challenge
+          </h2>
+          <p className="text-white/80 text-sm">
+            First 50 artists to join lock in 2X prizes
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Progress */}
+          <div className="mb-6">
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-[var(--pf-text-muted)]">Founding Artists</span>
+              <span className="font-bold text-[var(--pf-orange)]">{50 - spotsLeft}/50</span>
+            </div>
+            <div className="h-3 bg-[var(--pf-surface)] rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[var(--pf-orange)] to-purple-500 rounded-full"
+                style={{ width: `${((50 - spotsLeft) / 50) * 100}%` }}
+              />
+            </div>
+            <p className="text-xs text-[var(--pf-text-muted)] mt-2 text-center">
+              {spotsLeft} spots remaining
+            </p>
+          </div>
+
+          {/* Benefits */}
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-6 h-6 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center">
+                <Check size={14} className="text-[var(--pf-orange)]" />
+              </div>
+              <span>2X bonus prizes for your first 30 days</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-6 h-6 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center">
+                <Check size={14} className="text-[var(--pf-orange)]" />
+              </div>
+              <span>Permanent "Founding Artist" badge</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-6 h-6 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center">
+                <Check size={14} className="text-[var(--pf-orange)]" />
+              </div>
+              <span>Exclusive Discord channel access</span>
+            </div>
+          </div>
+
+          {/* Tiers Preview */}
+          <div className="bg-[var(--pf-surface)] rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Trophy size={16} className="text-[var(--pf-orange)]" />
+              <span className="font-semibold text-sm">Milestone Prizes</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-[var(--pf-text-muted)]">First to $100</span>
+                <span className="font-bold text-[var(--pf-orange)]">$150</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--pf-text-muted)]">First to $500</span>
+                <span className="font-bold text-[var(--pf-orange)]">$250</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--pf-text-muted)]">First to $1K</span>
+                <span className="font-bold text-[var(--pf-orange)]">$500</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--pf-text-muted)]">First to $10K</span>
+                <span className="font-bold text-[var(--pf-orange)]">$2,500</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="flex flex-col gap-3">
+            <Link 
+              href="/signup?role=artist" 
+              onClick={handleClose}
+              className="w-full py-3 px-4 bg-[var(--pf-orange)] text-white rounded-xl font-bold text-center hover:bg-[var(--pf-orange)]/90 transition-colors"
+            >
+              Claim Founding Artist Status
+            </Link>
+            <button 
+              onClick={handleClose}
+              className="w-full py-2 text-[var(--pf-text-muted)] text-sm hover:text-[var(--pf-text)] transition-colors"
+            >
+              Maybe Later
+            </button>
+          </div>
+
+          {/* Small link */}
+          <p className="text-xs text-center text-[var(--pf-text-muted)] mt-4">
+            <Link href="/competition" onClick={handleClose} className="hover:text-[var(--pf-orange)]">
+              View full competition details →
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Hook to show the modal programmatically
+export function useCompetitionModal() {
+  const [showModal, setShowModal] = useState(false);
+  const [hasShown, setHasShown] = useState(false);
+
+  const show = () => {
+    const closed = localStorage.getItem('competition_modal_closed');
+    if (!closed && !hasShown) {
+      setShowModal(true);
+      setHasShown(true);
+    }
+  };
+
+  return { showModal, setShowModal, show };
+}

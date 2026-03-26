@@ -306,7 +306,7 @@ export function Navbar() {
         className={`fixed left-0 right-0 bottom-0 z-[100] bg-[var(--pf-bg)] overflow-y-auto transition-all duration-300 ${
           mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
         }`}
-        style={{ top: '64px' }}
+        style={{ top: '80px' }}
       >
         <div className="p-4 space-y-2">
           {/* Wallet */}

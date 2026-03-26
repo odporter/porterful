@@ -107,19 +107,8 @@ export function Footer() {
 
         <div className="border-t border-[var(--pf-border)] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[var(--pf-text-muted)] text-sm">
-            © {new Date().getFullYear()} Porterful. All rights reserved.
+            © {new Date().getFullYear()} Porterful. The Artist Economy.
           </p>
-          <div className="flex gap-6 text-sm">
-            <Link href="/terms" className="text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors">
-              Terms
-            </Link>
-            <Link href="/privacy" className="text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors">
-              Privacy
-            </Link>
-            <Link href="/contact" className="text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors">
-              Contact
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

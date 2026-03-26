@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Static pages
   const staticPages = [
     '',
+    '/competition',
     '/digital',
     '/marketplace',
     '/shop',
@@ -49,6 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   const getPriority = (page: string): number => {
     if (page === '') return 1.0
+    if (page === '/competition') return 0.95  // High priority - active campaign
     if (page.startsWith('/album')) return 0.7
     if (page === '/digital' || page === '/marketplace' || page === '/store') return 0.9
     return 0.8

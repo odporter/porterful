@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useTheme } from '@/lib/theme-context'
 import { useWallet } from '@/lib/wallet-context'
+import { Trophy } from 'lucide-react'
 
 // Custom Porterful Icons
 const PorterfulIcon = ({ name, size = 24, className = '' }: { name: string; size?: number; className?: string }) => {
@@ -193,21 +194,25 @@ export function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-1">
-              <Link href="/marketplace" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
+              <Link href="/marketplace" aria-label="Shop" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="shop" size={18} />
                 <span>Shop</span>
               </Link>
-              <Link href="/digital" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
+              <Link href="/digital" aria-label="Music" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="music" size={18} />
                 <span>Music</span>
               </Link>
-              <Link href="/radio" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
+              <Link href="/radio" aria-label="Radio" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="radio" size={18} />
                 <span>Radio</span>
               </Link>
-              <Link href="/playlists" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
+              <Link href="/playlists" aria-label="Playlists" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="playlist" size={18} />
                 <span>Playlists</span>
+              </Link>
+              <Link href="/competition" aria-label="Competition" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/10 transition-colors">
+                <Trophy size={18} />
+                <span>Competition</span>
               </Link>
               {user && (
                 <Link href="/dashboard/upload" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors">
@@ -332,6 +337,10 @@ export function Navbar() {
             <Link href="/playlists" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
               <PorterfulIcon name="playlist" size={20} />
               <span>Playlists</span>
+            </Link>
+            <Link href="/competition" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-orange)] font-medium hover:bg-[var(--pf-orange)]/10 rounded-xl transition-colors" onClick={closeMobile}>
+              <Trophy size={20} />
+              <span>Competition</span>
             </Link>
             <Link href="/artist/od-porter" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
               <PorterfulIcon name="artist" size={20} />

@@ -114,12 +114,29 @@ export function GlobalPlayer() {
             </button>
           </div>
 
-          {/* Progress Bar - Clickable */}
+          {/* Progress Bar - Clickable & Keyboard Accessible */}
           <div className="px-3 pb-2">
             <div 
               ref={progressRef}
               className="h-1 bg-[var(--pf-bg)] rounded-full cursor-pointer group"
               onClick={handleProgressClick}
+              onKeyDown={(e) => {
+                if (!duration) return
+                const step = duration * 0.05 // 5% step
+                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                  e.preventDefault()
+                  seek(Math.min(progress + step, duration))
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                  e.preventDefault()
+                  seek(Math.max(progress - step, 0))
+                }
+              }}
+              role="slider"
+              aria-label="Seek"
+              aria-valuemin={0}
+              aria-valuemax={duration || 0}
+              aria-valuenow={progress}
+              tabIndex={0}
             >
               <div 
                 className="h-full bg-[var(--pf-orange)] rounded-full transition-all relative group-hover:bg-[var(--pf-orange)]/80"
@@ -180,6 +197,23 @@ export function GlobalPlayer() {
             <div 
               className="h-2 bg-[var(--pf-bg)] rounded-full overflow-hidden cursor-pointer group"
               onClick={handleProgressClick}
+              onKeyDown={(e) => {
+                if (!duration) return
+                const step = duration * 0.05
+                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                  e.preventDefault()
+                  seek(Math.min(progress + step, duration))
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                  e.preventDefault()
+                  seek(Math.max(progress - step, 0))
+                }
+              }}
+              role="slider"
+              aria-label="Seek"
+              aria-valuemin={0}
+              aria-valuemax={duration || 0}
+              aria-valuenow={progress}
+              tabIndex={0}
             >
               <div 
                 className="h-full bg-[var(--pf-orange)] transition-all relative"

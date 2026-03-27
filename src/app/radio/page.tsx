@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { TRACKS } from '@/lib/data'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAudio } from '@/lib/audio-context'
 import { Play, Pause, SkipForward, Radio, Heart, ShoppingBag } from 'lucide-react'
 
@@ -56,6 +57,7 @@ export default function RadioPage() {
     startRadio()
     setIsRadio(true)
     return () => setIsRadio(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
   const nextTrack = shuffledTracks[(currentIndex + 1) % shuffledTracks.length]
@@ -78,10 +80,12 @@ export default function RadioPage() {
         <div className="bg-gradient-to-br from-[var(--pf-surface)] to-[var(--pf-bg)] rounded-2xl overflow-hidden border border-[var(--pf-border)] mb-6">
           {/* Album Art */}
           <div className="relative aspect-square max-h-80 overflow-hidden bg-black">
-            <img 
+            <Image 
               src={currentTrack?.image || '/album-art/default.jpg'} 
               alt={currentTrack?.title || 'Now Playing'}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-70'}`}
+              fill
+              sizes="(max-width: 768px) 100vw, 80vw"
+              className={`object-cover transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-70'}`}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             
@@ -139,11 +143,15 @@ export default function RadioPage() {
           <div className="bg-[var(--pf-surface)] rounded-xl p-4 mb-6 border border-[var(--pf-border)]">
             <h3 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-3">UP NEXT</h3>
             <div className="flex items-center gap-3">
-              <img 
-                src={nextTrack?.image || '/album-art/default.jpg'} 
-                alt={nextTrack?.title}
-                className="w-12 h-12 rounded object-cover"
-              />
+              <div className="relative w-12 h-12 rounded overflow-hidden bg-black shrink-0">
+                <Image 
+                  src={nextTrack?.image || '/album-art/default.jpg'} 
+                  alt={nextTrack?.title}
+                  fill
+                  sizes="48px"
+                  className="object-cover"
+                />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{nextTrack?.title}</p>
                 <Link 

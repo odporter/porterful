@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { 
   Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
   ChevronUp, ChevronDown, X, Maximize2
@@ -33,7 +34,7 @@ export function GlobalPlayer() {
     } else {
       setVolume(volume)
     }
-  }, [isMuted])
+  }, [isMuted, volume, setVolume])
 
   // Seek on progress bar click
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -55,13 +56,15 @@ export function GlobalPlayer() {
           <div className="flex items-center gap-3 p-3">
             {/* Album Art */}
             <div 
-              className="w-12 h-12 rounded-lg overflow-hidden bg-[var(--pf-bg)] shrink-0 cursor-pointer"
+              className="w-12 h-12 rounded-lg overflow-hidden bg-[var(--pf-bg)] shrink-0 cursor-pointer relative"
               onClick={() => setExpanded(true)}
             >
-              <img 
+              <Image 
                 src={currentTrack.image || '/album-art/default.jpg'} 
                 alt={currentTrack.title}
-                className="w-full h-full object-cover"
+                fill
+                sizes="48px"
+                className="object-cover"
               />
             </div>
 
@@ -169,11 +172,13 @@ export function GlobalPlayer() {
 
           {/* Album Art */}
           <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-sm aspect-square rounded-2xl overflow-hidden shadow-2xl">
-              <img 
+            <div className="w-full max-w-sm aspect-square rounded-2xl overflow-hidden shadow-2xl relative">
+              <Image 
                 src={currentTrack.image || '/album-art/default.jpg'} 
                 alt={currentTrack.title}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover"
               />
             </div>
           </div>
@@ -300,11 +305,13 @@ export function GlobalPlayer() {
           {/* Visualizer Area */}
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-64 h-64 mx-auto rounded-full overflow-hidden shadow-2xl">
-                <img 
+              <div className="w-64 h-64 mx-auto rounded-full overflow-hidden shadow-2xl relative">
+                <Image 
                   src={currentTrack.image || '/album-art/default.jpg'} 
                   alt={currentTrack.title}
-                  className={`w-full h-full object-cover ${isPlaying ? 'animate-spin' : ''}`}
+                  fill
+                  sizes="256px"
+                  className={`object-cover ${isPlaying ? 'animate-spin' : ''}`}
                   style={{ animationDuration: '3s' }}
                 />
               </div>

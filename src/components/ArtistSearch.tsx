@@ -231,7 +231,7 @@ export function ArtistSearch() {
                   {results.tracks.slice(0, 5).map((track: Track, i: number) => (
                     <Link
                       key={track.id}
-                      href={`/artist/od-porter`}
+                      href={`/digital?track=${track.id}`}
                       onClick={() => setIsOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 hover:bg-[var(--pf-bg)] transition-colors ${
                         selectedIndex === results.artists.length + i ? 'bg-[var(--pf-bg)]' : ''

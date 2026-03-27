@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="bg-[var(--pf-bg-secondary)] border-t border-[var(--pf-border)] py-12 mt-12">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 mb-8 md:mb-0">
             <h3 className="font-bold text-xl mb-3 text-[var(--pf-text)]">PORTERFUL</h3>
@@ -113,6 +113,17 @@ export function Footer() {
               <li><Link href="/contact" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Contact</Link></li>
               <li><Link href="/terms" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Terms</Link></li>
               <li><Link href="/privacy" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Privacy</Link></li>
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="font-semibold mb-4 text-[var(--pf-text)]">Resources</h3>
+            <ul className="space-y-2">
+              <li><a href="https://creditklimb.com" target="_blank" rel="noopener noreferrer" className="text-[var(--pf-text-secondary)] hover:text-green-400 transition-colors text-sm flex items-center gap-2">
+                Credit Klimb <span className="text-xs px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded">Free</span>
+              </a></li>
+              <li><Link href="/support" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Support Artists</Link></li>
             </ul>
           </div>
         </div>

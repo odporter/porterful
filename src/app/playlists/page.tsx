@@ -311,7 +311,9 @@ export default function PlaylistPage() {
               <div key={playlist.id} className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-bold text-lg text-[var(--pf-text)]">{playlist.name}</h3>
+                    <Link href={`/playlist/${playlist.id}`} className="font-bold text-lg text-[var(--pf-text)] hover:text-[var(--pf-orange)] transition-colors">
+                      {playlist.name}
+                    </Link>
                     <p className="text-sm text-[var(--pf-text-secondary)]">{playlist.description || 'No description'}</p>
                   </div>
                   <div className="flex gap-2">
@@ -358,7 +360,7 @@ export default function PlaylistPage() {
                   <button onClick={() => playPlaylist(playlist)} className="pf-btn pf-btn-primary flex-1 flex items-center justify-center gap-2">
                     <Icon.Play /> Play
                   </button>
-                  <button onClick={() => setActivePlaylist(playlist)} className="pf-btn pf-btn-secondary flex items-center gap-2">
+                  <button onClick={() => { setActivePlaylist(playlist); setShowTrackPicker(true); }} className="pf-btn pf-btn-secondary flex items-center gap-2">
                     <Icon.Plus /> Add
                   </button>
                 </div>

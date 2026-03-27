@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const quantityRef = useRef<HTMLButtonElement>(null);
   const [added, setAdded] = useState(false);
 
   // Find product by ID
@@ -151,13 +152,17 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
             {/* Colors */}
             {hasColors && product.colors && (
-              <div className="mb-6">
-                <label className="block font-medium mb-2">Color: {selectedColor || 'Select one'}</label>
-                <div className="flex gap-2 flex-wrap">
+              <fieldset className="mb-6">
+                <legend className="block font-medium mb-2">
+                  Color: <span className="text-[var(--pf-text-muted)]">{selectedColor || 'Select one'}</span>
+                </legend>
+                <div className="flex gap-2 flex-wrap" role="radiogroup" aria-label="Select color">
                   {product.colors.map((color: string) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
+                      aria-pressed={selectedColor === color}
+                      aria-label={`Select ${color} color`}
                       className={`px-4 py-2 rounded-lg border transition-colors ${
                         selectedColor === color
                           ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/10'
@@ -168,18 +173,22 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                     </button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
             )}
 
             {/* Sizes */}
             {hasSizes && product.sizes && (
-              <div className="mb-6">
-                <label className="block font-medium mb-2">Size: {selectedSize || 'Select one'}</label>
-                <div className="flex gap-2 flex-wrap">
+              <fieldset className="mb-6">
+                <legend className="block font-medium mb-2">
+                  Size: <span className="text-[var(--pf-text-muted)]">{selectedSize || 'Select one'}</span>
+                </legend>
+                <div className="flex gap-2 flex-wrap" role="radiogroup" aria-label="Select size">
                   {product.sizes.map((size: string) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
+                      aria-pressed={selectedSize === size}
+                      aria-label={`Select ${size} size`}
                       className={`w-12 h-12 rounded-lg border transition-colors font-medium ${
                         selectedSize === size
                           ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/10'
@@ -190,22 +199,33 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                     </button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
             )}
 
             {/* Quantity */}
             <div className="mb-6">
-              <label className="block font-medium mb-2">Quantity</label>
-              <div className="flex items-center gap-4">
+              <label id="quantity-label" className="block font-medium mb-2">Quantity</label>
+              <div className="flex items-center gap-4" role="group" aria-labelledby="quantity-label">
                 <button
+                  id="quantity-decrease"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 rounded-lg border border-[var(--pf-border)] flex items-center justify-center hover:border-[var(--pf-orange)] text-xl"
+                  aria-label="Decrease quantity"
+                  disabled={quantity <= 1}
+                  className="w-10 h-10 rounded-lg border border-[var(--pf-border)] flex items-center justify-center hover:border-[var(--pf-orange)] text-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   -
                 </button>
-                <span className="w-12 text-center text-xl font-bold">{quantity}</span>
+                <output
+                  htmlFor="quantity-decrease quantity-increase"
+                  aria-live="polite"
+                  className="w-12 text-center text-xl font-bold"
+                >
+                  {quantity}
+                </output>
                 <button
+                  id="quantity-increase"
                   onClick={() => setQuantity(quantity + 1)}
+                  aria-label="Increase quantity"
                   className="w-10 h-10 rounded-lg border border-[var(--pf-border)] flex items-center justify-center hover:border-[var(--pf-orange)] text-xl"
                 >
                   +

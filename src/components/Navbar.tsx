@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useTheme } from '@/lib/theme-context'
 import { useWallet } from '@/lib/wallet-context'
@@ -179,12 +179,24 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Close profile dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    if (profileOpen) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [profileOpen])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -277,7 +289,7 @@ export function Navbar() {
                 <span className="font-medium text-[var(--pf-text)]">{formatWalletBalance()}</span>
               </Link>
               
-              <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors">
+              <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors" aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
                 {theme === 'dark' ? (
                   <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--pf-text)]">
                     <circle cx="12" cy="12" r="5" />
@@ -298,7 +310,7 @@ export function Navbar() {
               </button>
               
               {user ? (
-                <div className="hidden md:block relative">
+                <div className="hidden md:block relative" ref={profileRef}>
                   <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
                       {user.email?.[0].toUpperCase()}

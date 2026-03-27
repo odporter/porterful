@@ -20,6 +20,15 @@ export default function ArtistDashboardPage() {
   useEffect(() => {
     async function checkAccess() {
       if (authLoading) return
+      
+      // Demo mode bypass
+      const isDemo = localStorage.getItem('porterful-demo-mode')
+      if (isDemo) {
+        setProfile({ role: 'artist', id: 'demo' })
+        setPageLoading(false)
+        return
+      }
+      
       if (!user) {
         router.push('/login')
         return

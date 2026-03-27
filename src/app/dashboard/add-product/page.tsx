@@ -48,6 +48,14 @@ export default function AddProductPage() {
 
   useEffect(() => {
     async function checkAccess() {
+      // Demo mode bypass
+      const isDemo = localStorage.getItem('porterful-demo-mode')
+      if (isDemo) {
+        setProfile({ role: 'artist', id: 'demo' })
+        setPageLoading(false)
+        return
+      }
+      
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) {
         router.push('/login')

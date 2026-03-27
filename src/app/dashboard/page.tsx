@@ -352,27 +352,27 @@ export default function DashboardPage() {
             <div className="pf-card p-6">
               <h2 className="font-semibold mb-4">Quick Actions</h2>
               <div className="space-y-3">
-                <button className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors">
+                <Link href="/dashboard/upload" className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors">
                   <span className="flex items-center gap-2">
                     <Upload size={18} />
                     Upload Product
                   </span>
                   <ChevronRight size={18} className="text-[var(--pf-text-muted)]" />
-                </button>
-                <button className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors">
+                </Link>
+                <Link href="/dashboard?tab=analytics" onClick={() => setActiveTab('analytics')} className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors">
                   <span className="flex items-center gap-2">
                     <BarChart3 size={18} />
                     View Analytics
                   </span>
                   <ChevronRight size={18} className="text-[var(--pf-text-muted)]" />
-                </button>
-                <button className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors">
+                </Link>
+                <Link href="/settings" className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors">
                   <span className="flex items-center gap-2">
                     <Settings size={18} />
                     Store Settings
                   </span>
                   <ChevronRight size={18} className="text-[var(--pf-text-muted)]" />
-                </button>
+                </Link>
               </div>
             </div>
 

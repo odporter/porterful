@@ -244,10 +244,7 @@ export function Navbar() {
                 <PorterfulIcon name="music" size={18} />
                 <span>Music</span>
               </Link>
-              <Link href="/radio" aria-label="Radio" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
-                <PorterfulIcon name="radio" size={18} />
-                <span>Radio</span>
-              </Link>
+              {/* Radio hidden - causes playback issues when browsing store */}
               <Link href="/playlists" aria-label="Playlists" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="playlist" size={18} />
                 <span>Playlists</span>
@@ -403,10 +400,7 @@ export function Navbar() {
               <PorterfulIcon name="music" size={20} />
               <span>Music</span>
             </Link>
-            <Link href="/radio" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
-              <PorterfulIcon name="radio" size={20} />
-              <span>Radio</span>
-            </Link>
+            {/* Radio hidden - causes playback issues when browsing */}
             <Link href="/playlists" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
               <PorterfulIcon name="playlist" size={20} />
               <span>Playlists</span>

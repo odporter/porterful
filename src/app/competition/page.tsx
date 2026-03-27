@@ -67,6 +67,14 @@ const FAQS = [
     a: 'Sign up and join within the Founding Artist Window. The first 50 artists to create an account and list a product become Founding Artists.',
   },
   {
+    q: 'How are payouts handled?',
+    a: 'Payouts are not required as a lump sum. We reserve the right to pay out over time based on our cash flow and business needs. Payouts may be made in installments, applied as account credits, or paid via your chosen payment method.',
+  },
+  {
+    q: 'What happens if we need to modify or cancel the competition?',
+    a: 'We reserve the right to modify, suspend, or cancel the competition at any time for any reason. This includes but is not limited to: insufficient funds in the prize pool, technical issues, or circumstances beyond our control. Any earned milestones will be honored at our discretion.',
+  },
+  {
     q: 'What happens when I hit a milestone?',
     a: 'Your bonus is automatically calculated based on your tier. First artist to hit each milestone wins. Once claimed, that milestone closes for everyone else.',
   },

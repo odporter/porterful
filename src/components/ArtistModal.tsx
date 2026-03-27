@@ -162,6 +162,14 @@ export function ArtistModal({ onClose }: { onClose?: () => void }) {
             </div>
           </div>
 
+          {/* Rules disclaimer */}
+          <p className="text-xs text-[var(--pf-text-muted)] mb-4">
+            <Link href="/competition" onClick={handleClose} className="hover:text-[var(--pf-orange)] underline">
+              Competition rules
+            </Link>{' '}
+            apply. Payouts may be made over time. We reserve the right to modify or cancel the competition.
+          </p>
+
           {/* CTA */}
           <div className="flex flex-col gap-3">
             <Link 

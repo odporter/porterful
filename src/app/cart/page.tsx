@@ -21,8 +21,8 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      <div className="pf-container max-w-4xl">
+    <div className="min-h-screen pt-24 pb-12 md:pb-12">
+      <div className="pf-container max-w-4xl pb-28 md:pb-0">
         <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
 
         {items.length === 0 ? (

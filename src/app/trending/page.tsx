@@ -208,11 +208,8 @@ export default function TrendingPage() {
                   fill
                   className="object-cover object-center"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  onError={(e) => {
-                    // Fallback for broken images
-                    const target = e.target as HTMLImageElement
-                    target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'
-                  }}
+                  unoptimized
+                  priority={i < 4}
                 />
               </div>
 

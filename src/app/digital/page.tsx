@@ -6,6 +6,7 @@ import { useAudio } from '@/lib/audio-context'
 import { TRACKS, ALBUMS } from '@/lib/data'
 import Link from 'next/link'
 import { ArtistLink } from '@/components/ArtistLink'
+import { ArrowUpDown } from 'lucide-react'
 
 // Loading skeleton component
 function TrackSkeleton() {
@@ -325,6 +326,7 @@ export default function MusicPage() {
   const [activeTab, setActiveTab] = useState<'artists' | 'albums' | 'songs'>('artists')
   const [songsDisplayed, setSongsDisplayed] = useState(50)
   const [isLoading, setIsLoading] = useState(true)
+  const [sortBy, setSortBy] = useState<'default' | 'price-low' | 'price-high' | 'title' | 'artist'>('default')
 
   // Simulate initial load
   useEffect(() => {
@@ -339,6 +341,22 @@ export default function MusicPage() {
         t.album?.toLowerCase().includes(search.toLowerCase())
       )
     : []
+
+  // Apply sorting to TRACKS
+  const sortedTracks = [...TRACKS].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return a.price - b.price
+      case 'price-high':
+        return b.price - a.price
+      case 'title':
+        return a.title.localeCompare(b.title)
+      case 'artist':
+        return a.artist.localeCompare(b.artist)
+      default:
+        return 0
+    }
+  })
 
   const artists = Array.from(new Set(TRACKS.map(t => t.artist)))
   const albums = Object.values(ALBUMS)
@@ -364,12 +382,29 @@ export default function MusicPage() {
               <h1 className="text-3xl font-bold text-[var(--pf-text)]">Music</h1>
               <p className="text-[var(--pf-text-secondary)]">{TRACKS.length} tracks • {albums.length} albums</p>
             </div>
-            {!isLoading && (
-              <button onClick={playAll} className="pf-btn pf-btn-primary flex items-center gap-2">
-                {isPlaying ? <Icon.Pause /> : <Icon.Play />}
-                <span className="hidden sm:inline">Play All</span>
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {!isLoading && (
+                <button onClick={playAll} className="pf-btn pf-btn-primary flex items-center gap-2">
+                  {isPlaying ? <Icon.Pause /> : <Icon.Play />}
+                  <span className="hidden sm:inline">Play All</span>
+                </button>
+              )}
+              {/* Sort Dropdown */}
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text)] text-sm focus:border-[var(--pf-orange)] focus:outline-none cursor-pointer"
+                >
+                  <option value="default">Default</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="title">Title A-Z</option>
+                  <option value="artist">Artist A-Z</option>
+                </select>
+                <ArrowUpDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] pointer-events-none" />
+              </div>
+            </div>
           </div>
           
           {/* Now Playing */}
@@ -551,11 +586,11 @@ export default function MusicPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-bold text-[var(--pf-text)]">All Songs</h2>
                   <p className="text-sm text-[var(--pf-text-muted)]">
-                    Showing {Math.min(songsDisplayed, TRACKS.length)} of {TRACKS.length}
+                    Showing {Math.min(songsDisplayed, sortedTracks.length)} of {sortedTracks.length}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  {TRACKS.slice(0, songsDisplayed).map(track => (
+                  {sortedTracks.slice(0, songsDisplayed).map(track => (
                     <div
                       key={track.id}
                       className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
@@ -581,12 +616,12 @@ export default function MusicPage() {
                     </div>
                   ))}
                 </div>
-                {songsDisplayed < TRACKS.length && (
+                {songsDisplayed < sortedTracks.length && (
                   <button
-                    onClick={() => setSongsDisplayed(prev => Math.min(prev + 50, TRACKS.length))}
+                    onClick={() => setSongsDisplayed(prev => Math.min(prev + 50, sortedTracks.length))}
                     className="w-full mt-4 py-3 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-orange)] transition-colors font-medium"
                   >
-                    Load More Songs ({TRACKS.length - songsDisplayed} remaining)
+                    Load More Songs ({sortedTracks.length - songsDisplayed} remaining)
                   </button>
                 )}
               </div>

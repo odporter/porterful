@@ -1,11 +1,15 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Checkout - Secure Purchase',
-  description: 'Complete your purchase securely. Support independent artists with every purchase.',
-  keywords: ['checkout', 'purchase', 'buy music', 'secure payment'],
+  title: 'Checkout | Porterful',
+  description: 'Complete your purchase securely. Support independent artists.',
+  robots: 'noindex',
 }
 
-export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+export default function CheckoutLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return children
 }

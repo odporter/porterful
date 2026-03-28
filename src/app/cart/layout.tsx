@@ -1,10 +1,15 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Cart - Your Shopping Cart',
-  description: 'Review your cart before checkout. Support independent artists by purchasing music and merchandise.',
+  title: 'Cart | Porterful',
+  description: 'Review your cart and proceed to checkout. Support independent artists with every purchase.',
+  robots: 'noindex',
 }
 
-export default function CartLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+export default function CartLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return children
 }

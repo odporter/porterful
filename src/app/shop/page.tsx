@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowUp } from 'lucide-react'
@@ -128,11 +128,7 @@ export default function MarketplacePage() {
   const [activeMinRating, setActiveMinRating] = useState<number | null>(null)
 
   // Fetch products from API
-  useEffect(() => {
-    fetchProducts()
-  }, [selectedCategory, search])
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -148,7 +144,11 @@ export default function MarketplacePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedCategory, search])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
 
   // Sort products
   const sortedProducts = useMemo(() => {

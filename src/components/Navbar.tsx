@@ -344,7 +344,7 @@ export function Navbar() {
               )}
 
               {/* Mobile Search Toggle */}
-              <button onClick={() => setMobileSearchOpen(!mobileSearchOpen)} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors touch-manipulation md:hidden" aria-label="Search">
+              <button onClick={() => setMobileSearchOpen(!mobileSearchOpen)} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors touch-manipulation md:hidden" aria-label="Search" aria-expanded={mobileSearchOpen} aria-controls="mobile-search-bar">
                 <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--pf-text)]">
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -352,7 +352,7 @@ export function Navbar() {
               </button>
 
               {/* Mobile Toggle */}
-              <button onClick={toggleMobile} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors touch-manipulation" aria-label="Toggle menu">
+              <button onClick={toggleMobile} className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors touch-manipulation" aria-label="Toggle menu" aria-expanded={mobileOpen} aria-controls="mobile-menu">
                 {mobileOpen ? (
                   <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--pf-text)]">
                     <line x1="18" y1="6" x2="6" y2="18" />
@@ -372,12 +372,13 @@ export function Navbar() {
       </nav>
 
       {/* Mobile Search Bar */}
-      <div className={`fixed top-16 left-0 right-0 z-[90] bg-[var(--pf-bg)] p-4 border-b border-[var(--pf-border)] transition-all duration-300 md:hidden ${mobileSearchOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+      <div id="mobile-search-bar" className={`fixed top-16 left-0 right-0 z-[90] bg-[var(--pf-bg)] p-4 border-b border-[var(--pf-border)] transition-all duration-300 md:hidden ${mobileSearchOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
         <ArtistSearch />
       </div>
 
       {/* Mobile Menu */}
       <div 
+        id="mobile-menu"
         className={`fixed left-0 right-0 bottom-0 z-[100] bg-[var(--pf-bg)] overflow-y-auto transition-all duration-300 ${
           mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
         }`}

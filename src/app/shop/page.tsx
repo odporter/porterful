@@ -86,10 +86,12 @@ const CATEGORY_MAP: Record<string, string> = {
   'art': 'Art',
   'accessories': 'Accessories',
   'music': 'Music',
+  'trending': 'trending',
 }
 
 const CATEGORIES = [
   { id: 'all', name: 'All Products', count: 0 },
+  { id: 'trending', name: '🔥 Trending', count: 0 },
   { id: 'apparel', name: 'Apparel', count: 0 },
   { id: 'tech', name: 'Tech', count: 0 },
   { id: 'home-living', name: 'Home & Living', count: 0 },

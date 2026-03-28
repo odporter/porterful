@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://porterful.com'
-  const currentDate = new Date().toISOString()
+  const currentDate = new Date().toISOString().split('T')[0]
   
   // Static pages
   const staticPages = [
@@ -24,11 +24,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/signup',
     '/signup/superfan',
     '/login',
+    '/dashboard',
     '/dashboard/artist',
     '/dashboard/upload',
     '/terms',
     '/privacy',
     '/press-kit',
+    '/onboarding',
+    '/challenge',
+    '/resources',
+    '/unlock',
+    '/verify',
+    '/wallet',
   ]
   
   // Albums from data

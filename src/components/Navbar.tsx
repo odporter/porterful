@@ -41,7 +41,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/marketplace', label: 'Shop' },
     { href: '/artists', label: 'Artists' },
-    { href: '/music', label: 'Music' },
+    { href: '/digital', label: 'Music' },
     { href: '/playlists', label: 'Playlists' },
   ]
 

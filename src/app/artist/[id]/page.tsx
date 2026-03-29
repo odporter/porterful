@@ -182,7 +182,11 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
         <div className="relative -mt-16 mb-8">
           <div className="flex flex-col md:flex-row gap-4 items-start">
             <div className={`w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden border-4 border-[var(--pf-bg)] shadow-xl bg-gradient-to-br ${artistData.coverGradient} flex items-center justify-center shrink-0`}>
-              <span className="text-4xl md:text-5xl">{artistData.image}</span>
+              {artistData.image && artistData.image.startsWith('/') ? (
+                <Image src={artistData.image} alt={artist.name} fill sizes="128px" className="object-cover" />
+              ) : (
+                <span className="text-4xl md:text-5xl font-bold text-white">{artist.name.split(' ').map(n => n[0]).join('').slice(0,2)}</span>
+              )}
             </div>
             <div className="flex-1 pt-4 md:pt-8">
               <div className="flex flex-wrap items-center gap-2 mb-1">

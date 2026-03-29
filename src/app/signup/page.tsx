@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSupabase } from '@/app/providers'
 import { useRouter } from 'next/navigation'
 import { Music, Store, Building2, Star, Globe, Youtube } from 'lucide-react'
@@ -44,6 +45,15 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const searchParams = useSearchParams()
+
+  // Pre-select role from URL param (e.g. /signup?role=artist)
+  useEffect(() => {
+    const roleParam = searchParams.get('role')
+    if (roleParam && ['supporter', 'artist', 'business', 'brand'].includes(roleParam)) {
+      setRole(roleParam)
+    }
+  }, [searchParams])
 
   // Role-specific fields
   const [youtube, setYoutube] = useState('')

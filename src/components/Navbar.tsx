@@ -82,15 +82,8 @@ export function Navbar() {
             </div>
 
             {/* Search - Desktop */}
-            <div className="hidden lg:block w-64">
-              <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]" />
-                <input 
-                  type="text"
-                  placeholder="Search artists..."
-                  className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[var(--pf-orange)] transition-colors"
-                />
-              </div>
+            <div className="hidden lg:block w-72">
+              <ArtistSearch />
             </div>
 
             {/* Right Side */}

@@ -24,7 +24,6 @@ const PRODUCTS = [
 // Featured artists on the platform
 const FEATURED_ARTISTS = [
   { id: 'od-porter', name: 'O D Porter', location: 'St. Louis, MO', specialty: 'Hip-Hop / R&B', avatar: 'OD' },
-  { id: 'jai-jai', name: 'Jai Jai', location: 'St. Louis, MO', specialty: 'Hip-Hop', avatar: 'JJ' },
 ]
 
 const CATEGORIES = ['All', 'Apparel', 'Accessories', 'Home', 'Art', 'Books']

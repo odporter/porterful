@@ -49,7 +49,7 @@ export default function SettingsPage() {
     
     if (data) {
       setProfile({
-        name: data.name || '',
+        name: data.full_name || data.name || '',
         email: data.email || user.email || '',
         bio: data.bio || '',
         location: data.location || '',
@@ -84,7 +84,7 @@ export default function SettingsPage() {
     const { error } = await supabase
       .from('profiles')
       .update({
-        name: profile.name,
+        full_name: profile.name,
         bio: profile.bio,
         location: profile.location,
         website: profile.website,

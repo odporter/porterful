@@ -92,23 +92,13 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        // Create profile — use correct column names matching the schema
-        const profileData: Record<string, any> = {
+        // Create profile — use correct column names matching the actual schema
+        const { error: profileError } = await supabase.from('profiles').insert({
           id: data.user.id,
           email: email,
-          name: name,
+          full_name: name,
           role: role,
-        }
-
-        if (role === 'artist' && youtube) {
-          profileData.youtube_url = youtube
-        }
-        if ((role === 'business' || role === 'brand') && website) {
-          profileData.website = website
-          profileData.industry = industry
-        }
-        
-        const { error: profileError } = await supabase.from('profiles').insert(profileData)
+        })
         if (profileError) {
           console.error('Profile creation error:', profileError)
         }
@@ -118,6 +108,7 @@ export default function SignupPage() {
           const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Math.random().toString(36).substr(2, 4)
           const { error: artistError } = await supabase.from('artists').insert({
             id: data.user.id,
+            name: name,  // required NOT NULL column
             slug: slug,
             bio: '',
             location: '',

@@ -11,6 +11,12 @@ const FEATURED_PRODUCTS = [
   { id: 'odp-nfc-wristband', name: 'Artist NFC Wristband', price: 15, category: 'Tech', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=500', featured: true, description: 'Tap In to visit the artist page. Reusable.' },
   { id: 'odp-nfc-tag', name: 'Artist NFC Tag (Set of 3)', price: 12, category: 'Tech', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1618401471353-b98af5f8b545?w=500', featured: true, description: 'Stick anywhere. Tap In to discover the artist.' },
   { id: 'odp-nfc-card', name: 'Artist NFC Card', price: 8, category: 'Tech', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=500', featured: false, description: 'Wallet-sized. Tap In to follow the artist.' },
+  // Brands
+  { id: 'aggressive-heights-tee', name: 'Agressive Heights Classic Tee', price: 32, category: 'Brand', artist: 'Agressive Heights Clothing', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500', featured: true, description: 'Premium cotton tee from Agressive Heights Clothing.' },
+  { id: 'aggressive-heights-hoodie', name: 'Agressive Heights Hoodie', price: 65, category: 'Brand', artist: 'Agressive Heights Clothing', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500', featured: false, description: 'Heavyweight hoodie from Agressive Heights.' },
+  { id: 'noble-naturals-candle', name: 'Noble Naturals Soy Candle', price: 28, category: 'Brand', artist: 'Noble Naturals', image: 'https://images.unsplash.com/photo-1602607714066-4908c9a0a2b9?w=500', featured: true, description: 'Hand-poured soy candle. Notes of vanilla, sandalwood, and cedar.' },
+  { id: 'noble-naturals-wax-melts', name: 'Noble Naturals Wax Melts', price: 14, category: 'Brand', artist: 'Noble Naturals', image: 'https://images.unsplash.com/photo-1608181831718-c9fbea8ce3bc?w=500', featured: false, description: 'Wax melts in assorted scents.' },
+  { id: 'eurnice-jean-candle', name: 'Eurnice Jean Luxury Candle', price: 35, category: 'Brand', artist: 'Eurnice Jean Candle Co.', image: 'https://images.unsplash.com/photo-1602607714066-4908c9a0a2b9?w=500', featured: true, description: 'Handmade luxury candle. Saint Louis, MO.' },
   { id: 'odp-tee-classic-black', name: 'Porterful Classic Tee', price: 28, category: 'Apparel', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500', featured: true },
   { id: 'odp-hoodie-classic-black', name: 'Porterful Classic Hoodie', price: 55, category: 'Apparel', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500', featured: false },
   { id: 'odp-mug-11oz-black', name: 'Porterful Mug', price: 18, category: 'Home', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500', featured: false },
@@ -27,7 +33,7 @@ const FEATURED_ARTISTS = [
 export default function StorePage() {
   const [activeCategory, setActiveCategory] = useState('All')
 
-  const categories = ['All', 'Apparel', 'Art', 'Books', 'Home', 'Tech']
+  const categories = ['All', 'Apparel', 'Art', 'Books', 'Home', 'Tech', 'Brand']
 
   const filteredProducts = activeCategory === 'All'
     ? FEATURED_PRODUCTS

@@ -6,6 +6,7 @@ import { GlobalPlayer } from '@/components/GlobalPlayer'
 import { Footer } from '@/components/Footer'
 import { InstallPrompt, IOSInstallInstructions } from '@/components/InstallPrompt'
 import { ArtistModal } from '@/components/ArtistModal'
+import { TrackLockedToast } from '@/components/TrackLockedToast'
 import { KeyboardShortcuts } from '@/lib/keyboard-shortcuts'
 import Script from 'next/script'
 
@@ -167,6 +168,7 @@ export default function RootLayout({
           </main>
           <Footer />
           <ArtistModal />
+          <TrackLockedToast />
           <GlobalPlayer />
           <InstallPrompt />
           <IOSInstallInstructions />

@@ -33,6 +33,9 @@ interface AudioContext {
   currentIndex: number;
   isRadio: boolean;
   setIsRadio: (v: boolean) => void;
+  purchasedTracks: Set<string>;
+  addPurchased: (trackId: string) => void;
+  hasPurchased: (trackId: string) => boolean;
 }
 
 const AudioCtx = createContext<AudioContext | null>(null);
@@ -46,16 +49,27 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [queue, setQueue] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isRadio, setIsRadio] = useState(false);
+  const [purchasedTracks, setPurchasedTracks] = useState<Set<string>>(new Set());
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<Track[]>([]);
   const currentIndexRef = useRef(-1);
+  const currentTrackRef = useRef<Track | null>(null);
+  const purchasedTracksRef = useRef<Set<string>>(new Set());
 
   // Keep refs in sync
   useEffect(() => {
     queueRef.current = queue;
     currentIndexRef.current = currentIndex;
   }, [queue, currentIndex]);
+
+  useEffect(() => {
+    currentTrackRef.current = currentTrack;
+  }, [currentTrack]);
+
+  useEffect(() => {
+    purchasedTracksRef.current = purchasedTracks;
+  }, [purchasedTracks]);
 
   // Create audio element on mount
   useEffect(() => {
@@ -78,6 +92,17 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         if (audioRef.current && audioRef.current.duration) {
           const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
           setProgress(isNaN(pct) ? 0 : pct);
+
+          // Preview lock: if not purchased and past 60 seconds, stop
+          const current = currentTrackRef.current;
+          if (current && !purchasedTracks.has(current.id) && audioRef.current.currentTime >= 60) {
+            audioRef.current.pause();
+            // Show "unlock" message or redirect to purchase
+            if (typeof window !== 'undefined') {
+              const event = new CustomEvent('track-locked', { detail: { trackId: current.id } });
+              window.dispatchEvent(event);
+            }
+          }
         }
       };
 
@@ -295,6 +320,24 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     setProgress(p);
   }, [duration]);
 
+  const addPurchased = useCallback((trackId: string) => {
+    setPurchasedTracks(prev => {
+      const next = new Set<string>();
+      prev.forEach(v => next.add(v));
+      next.add(trackId);
+      return next;
+    });
+  }, []);
+
+  const hasPurchased = useCallback((trackId: string) => {
+    return purchasedTracks.has(trackId);
+  }, [purchasedTracks]);
+
+  // Helper to check if track is locked (not purchased)
+  const isTrackLocked = useCallback((trackId: string) => {
+    return !purchasedTracks.has(trackId);
+  }, [purchasedTracks]);
+
   // Initialize queue
   useEffect(() => {
     if (queue.length > 0 && currentIndex === -1) {
@@ -322,6 +365,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       currentIndex,
       isRadio,
       setIsRadio,
+      purchasedTracks,
+      addPurchased,
+      hasPurchased,
     }}>
       <MediaSessionHandlers togglePlay={togglePlay} playPrev={playPrev} playNext={playNext} />
       {children}

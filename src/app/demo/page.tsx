@@ -209,28 +209,28 @@ function DemoPreview({ type, onBack }: { type: typeof DEMO_TYPES[0]; onBack: () 
             <div className="space-y-4">
               <div className="flex gap-4">
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
-                  <p className="text-sm text-[var(--pf-text-muted)] mb-1">Total Plays</p>
-                  <p className="text-2xl font-bold">2.4M</p>
-                  <p className="text-xs text-green-400">↑ 12% this month</p>
-                </div>
-                <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Earnings</p>
-                  <p className="text-2xl font-bold text-green-400">$12,847</p>
-                  <p className="text-xs text-green-400">↑ 23% this month</p>
+                  <p className="text-3xl font-bold text-green-400">$48,291</p>
+                  <p className="text-xs text-green-400">↑ $2,847 this month</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Fans</p>
-                  <p className="text-2xl font-bold">3,241</p>
+                  <p className="text-3xl font-bold">3,241</p>
                   <p className="text-xs text-green-400">↑ 8% this month</p>
                 </div>
               </div>
               <div className="p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
-                <p className="text-sm font-medium mb-3">Recent Sales</p>
+                <p className="text-sm font-medium mb-3">Recent Earnings</p>
                 <div className="space-y-2">
-                  <div className="flex justify-between"><span>Oddysee</span><span className="text-green-400">+$47.20</span></div>
-                  <div className="flex justify-between"><span>Ambiguous Vinyl</span><span className="text-green-400">+$89.60</span></div>
-                  <div className="flex justify-between"><span>Ambiguous Tee</span><span className="text-green-400">+$22.40</span></div>
+                  <div className="flex justify-between"><span>Oddysee</span><span className="text-green-400">+$847.20</span></div>
+                  <div className="flex justify-between"><span>Ambiguous Vinyl</span><span className="text-green-400">+$1,340.80</span></div>
+                  <div className="flex justify-between"><span>Ambiguous Tee</span><span className="text-green-400">+$672.40</span></div>
                 </div>
+              </div>
+              <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/30">
+                <p className="text-sm font-medium text-green-400 mb-1">Total Withdrawn</p>
+                <p className="text-2xl font-bold text-green-400">$38,420</p>
+                <p className="text-xs text-[var(--pf-text-muted)]">$9,871 pending next payout</p>
               </div>
             </div>
           )}

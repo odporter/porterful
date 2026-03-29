@@ -98,7 +98,10 @@ export async function PATCH(
 
     // Update artists table
     const artistUpdates: Record<string, string> = {}
+    if (name !== undefined) artistUpdates.name = name
     if (bio !== undefined) artistUpdates.bio = bio
+    if (location !== undefined) artistUpdates.location = location
+    if (website !== undefined) artistUpdates.website_url = website
     if (genre !== undefined) artistUpdates.genre = genre
     if (youtube_url !== undefined) artistUpdates.youtube_url = youtube_url
     if (twitter_url !== undefined) artistUpdates.twitter_url = twitter_url

@@ -81,7 +81,8 @@ export default function SettingsPage() {
     setSaving(true);
     setMessage('');
 
-    const { error } = await supabase
+    // Save to profiles
+    const { error: profileError } = await supabase
       .from('profiles')
       .update({
         full_name: profile.name,
@@ -91,11 +92,32 @@ export default function SettingsPage() {
       })
       .eq('id', user.id);
 
-    if (error) {
-      setMessage('Error saving: ' + error.message);
-    } else {
-      setMessage('Profile saved!');
+    if (profileError) {
+      setMessage('Error saving: ' + profileError.message);
+      setSaving(false);
+      return;
     }
+
+    // Also update artist record if this user is an artist
+    const { data: profileRow } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileRow?.role === 'artist') {
+      await supabase
+        .from('artists')
+        .update({
+          name: profile.name,
+          bio: profile.bio,
+          location: profile.location,
+          website_url: profile.website,
+        })
+        .eq('id', user.id);
+    }
+
+    setMessage('Profile saved!');
     setSaving(false);
   }
 

@@ -1,284 +1,171 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Play, Headphones, ShoppingBag, Heart, Share2 } from 'lucide-react';
+import { useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ShoppingBag, Heart, Star, ArrowRight } from 'lucide-react'
 
-// Artist data
-const ARTIST = {
-  id: 'od-porter',
-  name: 'O D Porter',
-  location: 'St. Louis, MO',
-  genre: 'Hip-Hop / R&B / Soul',
-  bio: 'St. Louis artist blending hip-hop, R&B, and soul. Born in Miami, raised in New Orleans & St. Louis.',
-  image: '/album-art/Ambiguous.jpg',
-  supporters: 2847,
-  earnings: 8947,
-  verified: true,
-};
+// Platform-curated featured products
+const FEATURED_PRODUCTS = [
+  { id: 'book-tiigh', name: 'There It Is, Here It Go', price: 25, category: 'Book', artist: 'O D Porter', image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500', featured: true },
+  { id: 'odp-tee-classic-black', name: 'Porterful Classic Tee', price: 28, category: 'Apparel', artist: 'Various Artists', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/71/71/mockup_71.png', featured: true },
+  { id: 'odp-hoodie-classic-black', name: 'Porterful Classic Hoodie', price: 55, category: 'Apparel', artist: 'Various Artists', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/156/156/mockup_156_black.png', featured: false },
+  { id: 'odp-mug-11oz-black', name: 'Porterful Mug', price: 18, category: 'Home', artist: 'Various Artists', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/14/14/mockup_14.png', featured: false },
+  { id: 'odp-canvas-16x20', name: 'Porterful Canvas', price: 55, category: 'Art', artist: 'Various Artists', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/101/101/mockup_101.png', featured: false },
+  { id: 'odp-poster-18x24', name: 'Porterful Poster', price: 22, category: 'Art', artist: 'Various Artists', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/69/69/mockup_69.png', featured: false },
+]
 
-// Releases (will come from database)
-const RELEASES = [
-  { 
-    id: 'ambiguous-vinyl', 
-    title: 'Ambiguous Vinyl', 
-    type: 'Vinyl', 
-    year: '2024',
-    price: 35,
-    image: '/album-art/Ambiguous.jpg',
-    format: 'Physical',
-    limited: true
-  },
-  { 
-    id: 'tiigh-book', 
-    title: 'There It Is, Here It Go', 
-    type: 'Book', 
-    year: '2025',
-    price: 25,
-    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500',
-    format: 'Physical',
-    description: 'The debut book from O D Porter'
-  },
-  { 
-    id: 'odp-hoodie-black', 
-    title: 'O D Porter Classic Hoodie', 
-    type: 'Merch', 
-    price: 55,
-    image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/156/156/mockup_156_black.png',
-    format: 'Merch'
-  },
-  { 
-    id: 'odp-tee-black', 
-    title: 'O D Porter Classic Tee', 
-    type: 'Merch', 
-    price: 28,
-    image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/71/71/mockup_71.png',
-    format: 'Merch'
-  },
-];
+// Featured artists
+const FEATURED_ARTISTS = [
+  { id: 'od-porter', name: 'O D Porter', specialty: 'Hip-Hop / R&B / Soul', location: 'St. Louis, MO', avatar: 'OD' },
+  { id: 'jai-jai', name: 'Jai Jai', specialty: 'Hip-Hop', location: 'St. Louis, MO', avatar: 'JJ' },
+]
 
-// Top tracks
-const TOP_TRACKS = [
-  { id: '1', title: 'Oddysee', plays: 125000 },
-  { id: '2', title: 'Midnight Drive', plays: 89000 },
-  { id: '3', title: 'Movement', plays: 67000 },
-  { id: '4', title: 'Vibes', plays: 45000 },
-  { id: '5', title: 'Ambiguous', plays: 32000 },
-];
+export default function StorePage() {
+  const [activeCategory, setActiveCategory] = useState('All')
 
-export default function ArtistStorePage() {
-  const [activeTab, setActiveTab] = useState<'all' | 'music' | 'merch'>('all');
+  const categories = ['All', 'Apparel', 'Art', 'Books', 'Home']
 
-  const formatPlays = (plays: number) => {
-    if (plays >= 1000000) return `${(plays / 1000000).toFixed(1)}M`;
-    if (plays >= 1000) return `${(plays / 1000).toFixed(0)}K`;
-    return plays.toString();
-  };
+  const filteredProducts = activeCategory === 'All'
+    ? FEATURED_PRODUCTS
+    : FEATURED_PRODUCTS.filter(p => p.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-[var(--pf-bg)]">
-      {/* Artist Hero */}
-      <section className="relative py-16 md:py-24">
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--pf-orange)]/5 via-transparent to-[var(--pf-bg)]" />
-        
-        <div className="relative z-10 pf-container">
-          <div className="max-w-4xl mx-auto">
-            {/* Artist Info */}
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              {/* Avatar */}
-              <div className="w-40 h-40 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center shadow-2xl shadow-[var(--pf-orange)]/20 overflow-hidden">
-                <img 
-                  src={ARTIST.image} 
-                  alt={ARTIST.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-                <span className="hidden text-6xl md:text-8xl">🎤</span>
-              </div>
+    <div className="min-h-screen pt-20 pb-24 bg-[var(--pf-bg)]">
+      {/* Hero Banner */}
+      <section className="relative py-16 bg-gradient-to-br from-[var(--pf-orange)]/10 via-purple-500/5 to-[var(--pf-bg)]">
+        <div className="pf-container">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Porterful <span className="text-[var(--pf-orange)]">Store</span>
+            </h1>
+            <p className="text-lg text-[var(--pf-text-secondary)] mb-2">
+              Curated merch and products from independent artists on the platform.
+            </p>
+            <p className="text-[var(--pf-text-muted)]">
+              Every purchase supports artists directly — they keep 80%.
+            </p>
+          </div>
+        </div>
+      </section>
 
-              {/* Info */}
-              <div className="flex-1 text-center md:text-left">
-                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                  <h1 className="text-3xl md:text-5xl font-bold">{ARTIST.name}</h1>
-                  {ARTIST.verified && (
-                    <span className="bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] px-2 py-0.5 rounded text-sm font-medium">
-                      ✓ Verified
-                    </span>
+      <div className="pf-container py-8">
+        {/* Featured Products Section */}
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Featured Products</h2>
+            <Link href="/marketplace" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
+              Browse All <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeCategory === cat
+                    ? 'bg-[var(--pf-orange)] text-white'
+                    : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-white'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {filteredProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={`/product/${product.id}`}
+                className="group"
+              >
+                <div className="aspect-square rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] overflow-hidden mb-3 relative">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {product.featured && (
+                    <div className="absolute top-3 left-3 bg-[var(--pf-orange)] text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                      <Star size={10} /> Featured
+                    </div>
                   )}
                 </div>
-                
-                <p className="text-lg text-[var(--pf-text-secondary)] mb-2">
-                  {ARTIST.location} • {ARTIST.genre}
+                <p className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">
+                  {product.category} • {product.artist}
                 </p>
-                
-                <p className="text-[var(--pf-text-muted)] mb-6 max-w-md">
-                  {ARTIST.bio}
-                </p>
-
-                {/* Stats */}
-                <div className="flex items-center justify-center md:justify-start gap-6 mb-6">
-                  <div>
-                    <p className="text-2xl font-bold">${ARTIST.earnings.toLocaleString()}</p>
-                    <p className="text-sm text-[var(--pf-text-muted)]">Earned</p>
-                  </div>
-                  <div className="w-px h-8 bg-[var(--pf-border)]" />
-                  <div>
-                    <p className="text-2xl font-bold">{ARTIST.supporters.toLocaleString()}</p>
-                    <p className="text-sm text-[var(--pf-text-muted)]">Supporters</p>
-                  </div>
-                  <div className="w-px h-8 bg-[var(--pf-border)]" />
-                  <div>
-                    <p className="text-2xl font-bold">21</p>
-                    <p className="text-sm text-[var(--pf-text-muted)]">Tracks</p>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                  <Link href="/digital" className="pf-btn pf-btn-primary">
-                    <Play className="inline mr-2" size={18} />
-                    Listen Now
-                  </Link>
-                  <button className="pf-btn pf-btn-secondary">
-                    <Heart className="inline mr-2" size={18} />
-                    Follow
-                  </button>
-                  <button className="pf-btn pf-btn-secondary">
-                    <Share2 className="inline mr-2" size={18} />
-                    Share
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Releases */}
-      <section className="py-12">
-        <div className="pf-container">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">Releases</h2>
-              
-              {/* Tabs */}
-              <div className="flex gap-2">
-                {(['all', 'music', 'merch'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === tab
-                        ? 'bg-[var(--pf-orange)] text-white'
-                        : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-white'
-                    }`}
-                  >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Products Grid */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {RELEASES
-                .filter(release => activeTab === 'all' || (activeTab === 'merch' ? release.format !== 'Digital' : release.format === 'Digital'))
-                .map((release) => (
-                  <Link 
-                    key={release.id}
-                    href={`/product/${release.id}`}
-                    className="group"
-                  >
-                    <div className="aspect-square bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-500/10 rounded-xl flex items-center justify-center text-6xl mb-4 relative overflow-hidden">
-                      {release.image}
-                      {release.limited && (
-                        <div className="absolute top-3 right-3 bg-[var(--pf-orange)] text-white text-xs font-bold px-2 py-1 rounded">
-                          LIMITED
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">
-                          {release.format}
-                        </p>
-                        <h3 className="text-lg font-semibold group-hover:text-[var(--pf-orange)] transition-colors">
-                          {release.title}
-                        </h3>
-                        <p className="text-sm text-[var(--pf-text-secondary)]">
-                          {release.type} {release.year ? `• ${release.year}` : ''}
-                        </p>
-                      </div>
-                      <span className="text-xl font-bold">${release.price}</span>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Top Tracks */}
-      <section className="py-12 bg-[var(--pf-bg-secondary)]">
-        <div className="pf-container">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">Top Tracks</h2>
-              <Link href="/digital" className="text-[var(--pf-orange)] hover:underline">
-                View all <Headphones className="inline ml-1" size={16} />
+                <h3 className="font-semibold group-hover:text-[var(--pf-orange)] transition-colors line-clamp-1">
+                  {product.name}
+                </h3>
+                <p className="font-bold text-[var(--pf-orange)] mt-1">${product.price}</p>
               </Link>
-            </div>
+            ))}
+          </div>
+        </section>
 
-            <div className="pf-card overflow-hidden">
-              <div className="divide-y divide-[var(--pf-border)]">
-                {TOP_TRACKS.map((track, i) => (
-                  <div 
-                    key={track.id}
-                    className="flex items-center gap-4 p-4 hover:bg-[var(--pf-surface-hover)] transition-colors group"
-                  >
-                    <span className="w-6 text-center text-[var(--pf-text-muted)] font-bold">{i + 1}</span>
-                    <button className="w-10 h-10 rounded-lg bg-[var(--pf-surface)] flex items-center justify-center group-hover:bg-[var(--pf-orange)] transition-colors">
-                      <Play size={16} className="text-white ml-0.5" />
-                    </button>
-                    <div className="flex-1">
-                      <p className="font-semibold">{track.title}</p>
-                      <p className="text-sm text-[var(--pf-text-muted)]">{ARTIST.name}</p>
-                    </div>
-                    <span className="text-sm text-[var(--pf-text-muted)]">{formatPlays(track.plays)} plays</span>
+        {/* Featured Artists */}
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Featured Artists</h2>
+            <Link href="/marketplace" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
+              View All Artists <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {FEATURED_ARTISTS.map(artist => (
+              <Link
+                key={artist.id}
+                href={`/artist/${artist.id}`}
+                className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+                    {artist.avatar}
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold group-hover:text-[var(--pf-orange)] transition-colors">{artist.name}</h3>
+                    <p className="text-sm text-[var(--pf-text-secondary)]">{artist.specialty}</p>
+                    <p className="text-xs text-[var(--pf-text-muted)]">{artist.location}</p>
+                  </div>
+                  <div className="text-[var(--pf-text-muted)] group-hover:text-[var(--pf-orange)] transition-colors">
+                    <ArrowRight size={20} />
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Support CTA */}
-      <section className="py-16">
-        <div className="pf-container">
-          <div className="max-w-4xl mx-auto">
-            <div className="pf-card p-8 text-center bg-gradient-to-r from-purple-500/10 to-[var(--pf-orange)]/10">
-              <h2 className="text-2xl font-bold mb-4">Support {ARTIST.name}</h2>
-              <p className="text-[var(--pf-text-secondary)] mb-6 max-w-xl mx-auto">
-                Every purchase supports independent art. 80% goes directly to the artist.
+        {/* Artist CTA */}
+        <section className="bg-gradient-to-r from-purple-500/10 to-[var(--pf-orange)]/10 rounded-2xl p-8 border border-[var(--pf-border)]">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="text-5xl shrink-0">🎤</div>
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-2xl font-bold mb-2">Open Your Own Store</h2>
+              <p className="text-[var(--pf-text-secondary)] mb-4">
+                Are you an artist? Sell your own merch with Porterful. You keep 80% of every sale. 
+                We handle printing, shipping, and customer service.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link href="/support" className="pf-btn pf-btn-primary">
-                  <Heart className="inline mr-2" size={18} />
-                  Become a Supporter
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                <Link href="/signup?role=artist" className="pf-btn pf-btn-primary">
+                  Start Selling Today
                 </Link>
-                <Link href="/shop" className="pf-btn pf-btn-secondary">
-                  <ShoppingBag className="inline mr-2" size={18} />
-                  Shop All Products
+                <Link href="/artist/od-porter" className="pf-btn pf-btn-secondary">
+                  See Example Store
                 </Link>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
-  );
+  )
 }

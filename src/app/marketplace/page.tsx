@@ -3,22 +3,28 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingBag, Heart, Share2, Filter } from 'lucide-react'
+import { ShoppingBag, Filter } from 'lucide-react'
 
-// Curated O D Porter merch products
+// Platform-curated featured products
 const PRODUCTS = [
-  { id: 'odp-tee-classic-black', name: 'O D Porter Classic Tee', price: 28, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/71/71/mockup_71.png', inStock: true },
-  { id: 'odp-hoodie-classic-black', name: 'O D Porter Classic Hoodie', price: 55, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/156/156/mockup_156_black.png', inStock: true },
-  { id: 'odp-snapback-black', name: 'O D Porter Snapback', price: 28, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/15/15/mockup_15.png', inStock: true },
-  { id: 'odp-beanie-black', name: 'O D Porter Beanie', price: 24, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/31/31/mockup_31.png', inStock: true },
-  { id: 'odp-mug-11oz-black', name: 'O D Porter Mug', price: 18, category: 'Home', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/14/14/mockup_14.png', inStock: true },
-  { id: 'odp-sticker-pack', name: 'O D Porter Sticker Pack', price: 15, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/86/86/mockup_86.png', inStock: true },
-  { id: 'odp-poster-18x24', name: 'O D Porter Poster', price: 22, category: 'Art', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/69/69/mockup_69.png', inStock: true },
-  { id: 'odp-canvas-16x20', name: 'O D Porter Canvas', price: 55, category: 'Art', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/101/101/mockup_101.png', inStock: true },
+  { id: 'odp-tee-classic-black', name: 'Porterful Classic Tee', price: 28, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/71/71/mockup_71.png', inStock: true },
+  { id: 'odp-hoodie-classic-black', name: 'Porterful Classic Hoodie', price: 55, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/156/156/mockup_156_black.png', inStock: true },
+  { id: 'odp-snapback-black', name: 'Porterful Snapback', price: 28, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/15/15/mockup_15.png', inStock: true },
+  { id: 'odp-beanie-black', name: 'Porterful Beanie', price: 24, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/31/31/mockup_31.png', inStock: true },
+  { id: 'odp-mug-11oz-black', name: 'Porterful Mug', price: 18, category: 'Home', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/14/14/mockup_14.png', inStock: true },
+  { id: 'odp-sticker-pack', name: 'Porterful Sticker Pack', price: 15, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/86/86/mockup_86.png', inStock: true },
+  { id: 'odp-poster-18x24', name: 'Porterful Poster', price: 22, category: 'Art', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/69/69/mockup_69.png', inStock: true },
+  { id: 'odp-canvas-16x20', name: 'Porterful Canvas', price: 55, category: 'Art', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/101/101/mockup_101.png', inStock: true },
   { id: 'odp-book-tiigh', name: 'There It Is, Here It Go', price: 25, category: 'Books', image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500', inStock: true },
-  { id: 'odp-tote-black', name: 'O D Porter Tote Bag', price: 20, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/18/18/mockup_18.png', inStock: true },
-  { id: 'odp-hoodie-zip-black', name: 'O D Porter Zip Hoodie', price: 62, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/179/179/mockup_179.png', inStock: true },
-  { id: 'odp-tee-vintage-black', name: 'O D Porter Vintage Tee', price: 32, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/171/171/mockup_171.png', inStock: true },
+  { id: 'odp-tote-black', name: 'Porterful Tote Bag', price: 20, category: 'Accessories', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/18/18/mockup_18.png', inStock: true },
+  { id: 'odp-hoodie-zip-black', name: 'Porterful Zip Hoodie', price: 62, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/179/179/mockup_179.png', inStock: true },
+  { id: 'odp-tee-vintage-black', name: 'Porterful Vintage Tee', price: 32, category: 'Apparel', image: 'https://printful-storage.s3.amazonaws.com/upload/final_product/171/171/mockup_171.png', inStock: true },
+]
+
+// Featured artists on the platform
+const FEATURED_ARTISTS = [
+  { id: 'od-porter', name: 'O D Porter', location: 'St. Louis, MO', specialty: 'Hip-Hop / R&B', avatar: 'OD' },
+  { id: 'jai-jai', name: 'Jai Jai', location: 'St. Louis, MO', specialty: 'Hip-Hop', avatar: 'JJ' },
 ]
 
 const CATEGORIES = ['All', 'Apparel', 'Accessories', 'Home', 'Art', 'Books']
@@ -37,28 +43,45 @@ export default function MarketplacePage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-[var(--pf-orange)]">O D Porter</span> Store
+            <span className="text-[var(--pf-orange)]">Porterful</span> Marketplace
           </h1>
           <p className="text-[var(--pf-text-secondary)]">
-            Official merch from St. Louis artist O D Porter. Every purchase supports independent music.
+            Discover music and merch from independent artists. 80% of every sale goes directly to creators.
           </p>
         </div>
 
-        {/* Artist Banner */}
+        {/* Featured Artists Sidebar */}
         <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl p-6 mb-8 border border-[var(--pf-border)]">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-3xl font-bold text-white shrink-0">
-              OD
+            <div className="shrink-0">
+              <h2 className="text-lg font-bold mb-3">Featured Artists</h2>
+              <div className="flex gap-3">
+                {FEATURED_ARTISTS.map(artist => (
+                  <Link 
+                    key={artist.id}
+                    href={`/artist/${artist.id}`}
+                    className="flex items-center gap-3 bg-[var(--pf-bg)] rounded-xl p-3 hover:bg-[var(--pf-surface)] transition-colors border border-transparent hover:border-[var(--pf-border)]"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                      {artist.avatar}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">{artist.name}</p>
+                      <p className="text-xs text-[var(--pf-text-muted)]">{artist.specialty}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-            <div className="flex-1 text-center md:text-left">
-              <h2 className="text-xl font-bold mb-1">Support Independent Music</h2>
-              <p className="text-[var(--pf-text-secondary)] text-sm">
-                80% of every sale goes directly to O D Porter. Print-on-demand — no inventory waste.
+            <div className="flex-1 text-center md:text-left border-t md:border-t-0 md:border-l border-[var(--pf-border)] md:pl-6 md:ml-6 pt-4 md:pt-0">
+              <h2 className="text-lg font-bold mb-1">Open Your Own Store</h2>
+              <p className="text-[var(--pf-text-secondary)] text-sm mb-3">
+                Are you an artist? Start selling your own merch with 80% earnings. Print-on-demand — no inventory needed.
               </p>
+              <Link href="/signup?role=artist" className="pf-btn pf-btn-primary whitespace-nowrap">
+                Start Selling
+              </Link>
             </div>
-            <Link href="/artist/od-porter" className="pf-btn pf-btn-secondary">
-              View Artist Profile
-            </Link>
           </div>
         </div>
 
@@ -147,8 +170,8 @@ export default function MarketplacePage() {
                 Submit your own designs for print-on-demand merch. No inventory needed — we handle printing and shipping.
               </p>
             </div>
-            <Link href="/dashboard/upload?type=product" className="pf-btn pf-btn-primary whitespace-nowrap">
-              Submit Design
+            <Link href="/signup?role=artist" className="pf-btn pf-btn-primary whitespace-nowrap">
+              Open Your Store
             </Link>
           </div>
         </div>

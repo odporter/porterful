@@ -1,174 +1,136 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { Music, Users, TrendingUp, Heart, ChevronRight, Search } from 'lucide-react'
-import { ARTISTS } from '@/lib/artists'
+import { Music, MapPin } from 'lucide-react'
 
-const GENRES = ['All', 'Hip-Hop', 'R&B', 'Indie Pop', 'Electronic', 'Alternative', 'Lo-Fi', 'Latin', 'Rock', 'Jazz']
+// Featured artists on the platform
+const ARTISTS = [
+  {
+    id: 'od-porter',
+    name: 'O D Porter',
+    location: 'St. Louis, MO',
+    specialty: 'Hip-Hop / R&B / Soul',
+    bio: 'St. Louis artist blending hip-hop, R&B, and soul. Born in Miami, raised in NOLA & STL. Building Porterful to help artists own everything.',
+    avatar: 'OD',
+    tracks: 21,
+    verified: true,
+  },
+  {
+    id: 'jai-jai',
+    name: 'Jai Jai',
+    location: 'St. Louis, MO',
+    specialty: 'Hip-Hop',
+    bio: 'St. Louis hip-hop artist. Part of the 82 FAM collective. Raw bars and authentic storytelling.',
+    avatar: 'JJ',
+    tracks: 12,
+    verified: true,
+  },
+]
 
 export default function ArtistsPage() {
-  const [activeGenre, setActiveGenre] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [artists, setArtists] = useState(ARTISTS)
-  
-  // Filter artists by genre and search
-  const filteredArtists = artists.filter(artist => {
-    const matchesGenre = activeGenre === 'All' || artist.genre?.toLowerCase().includes(activeGenre.toLowerCase())
-    const matchesSearch = !searchQuery || 
-      artist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artist.genre?.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesGenre && matchesSearch
-  })
-  
-  // Featured artist (first in list, usually O D Porter)
-  const featuredArtist = artists[0]
-
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      <div className="pf-container">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover <span className="text-[var(--pf-orange)]">Artists</span>
-          </h1>
-          <p className="text-xl text-[var(--pf-text-secondary)] max-w-2xl mx-auto">
-            Support independent artists. Every purchase helps them keep creating.
-          </p>
-        </div>
-
-        {/* Search */}
-        <div className="max-w-md mx-auto mb-8">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]" size={20} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search artists..."
-              className="w-full py-3 pl-12 pr-4 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-[var(--pf-text)] placeholder-[var(--pf-text-muted)] focus:outline-none focus:border-[var(--pf-orange)]"
-            />
+    <div className="min-h-screen pt-20 pb-24 bg-[var(--pf-bg)]">
+      {/* Hero */}
+      <section className="relative py-16 bg-gradient-to-br from-[var(--pf-orange)]/10 via-purple-500/5 to-[var(--pf-bg)]">
+        <div className="pf-container">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <span className="text-[var(--pf-orange)]">Artists</span> on Porterful
+            </h1>
+            <p className="text-lg text-[var(--pf-text-secondary)]">
+              Discover independent artists selling music and merch directly to fans. 
+              No labels, no middlemen — just artists and their community.
+            </p>
           </div>
         </div>
+      </section>
 
-        {/* Genre Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {GENRES.map((genre) => (
-            <button
-              key={genre}
-              onClick={() => setActiveGenre(genre)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeGenre === genre
-                  ? 'bg-[var(--pf-orange)] text-white'
-                  : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-white hover:bg-[var(--pf-surface-hover)]'
-              }`}
-            >
-              {genre}
-            </button>
-          ))}
-        </div>
-
-        {/* Featured Artist */}
-        {featuredArtist && (
-          <div className="mb-12">
-            <div className="pf-card p-8 bg-gradient-to-r from-[var(--pf-orange)]/10 to-transparent relative overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(255,107,0,0.1)_0%,transparent_70%)]" />
-              <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] rounded-full text-sm font-medium mb-4">
-                    <TrendingUp size={16} />
-                    Featured Artist
-                  </div>
-                  <h2 className="text-3xl font-bold mb-2">{featuredArtist.name}</h2>
-                  <p className="text-[var(--pf-text-secondary)] mb-4">{featuredArtist.genre}</p>
-                  <div className="flex gap-3">
-                    <Link href={`/artist/${featuredArtist.slug || featuredArtist.id}`} className="pf-btn pf-btn-primary">
-                      View Profile <ChevronRight className="inline ml-1" size={16} />
-                    </Link>
-                    <button className="pf-btn pf-btn-secondary flex items-center gap-2">
-                      <Heart size={18} />
-                      Follow
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-center">
-                  <Link href={`/artist/${featuredArtist.slug || featuredArtist.id}`} className="w-48 h-48 rounded-2xl bg-gradient-to-br from-[var(--pf-orange)] to-[var(--pf-orange-dark)] flex items-center justify-center text-8xl shadow-2xl shadow-[var(--pf-orange)]/30 overflow-hidden relative">
-                    {featuredArtist.image ? (
-                      <Image src={featuredArtist.image} alt={featuredArtist.name} fill sizes="192px" className="object-cover" />
-                    ) : (
-                      <span className="text-white">{featuredArtist.name.charAt(0)}</span>
-                    )}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Artists Grid */}
-        {filteredArtists.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArtists.map((artist) => (
-              <Link 
-                key={artist.id} 
-                href={`/artist/${artist.slug || artist.id}`}
-                className="pf-card group overflow-hidden hover:border-[var(--pf-orange)] transition-colors"
+      {/* Artists Grid */}
+      <section className="py-12">
+        <div className="pf-container">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ARTISTS.map((artist) => (
+              <Link
+                key={artist.id}
+                href={`/artist/${artist.id}`}
+                className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-all group"
               >
-                <div className="aspect-square bg-gradient-to-br from-[var(--pf-surface)] to-[var(--pf-bg-secondary)] flex items-center justify-center text-7xl relative overflow-hidden">
-                  {artist.image ? (
-                    <Image src={artist.image} alt={artist.name} fill sizes="(max-width: 640px) 50vw, 33vw" className="object-cover" />
-                  ) : (
-                    <span className="text-6xl">{artist.name.charAt(0)}</span>
-                  )}
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-lg">{artist.name}</h3>
-                    {artist.followers !== undefined && (
-                      <span className="text-xs text-[var(--pf-text-muted)] flex items-center gap-1">
-                        <Users size={12} />
-                        {artist.followers.toLocaleString()}
-                      </span>
-                    )}
+                {/* Artist Header */}
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+                    {artist.avatar}
                   </div>
-                  <p className="text-sm text-[var(--pf-text-muted)] mb-4">{artist.genre}</p>
-                  {artist.trackCount !== undefined && (
-                    <p className="text-xs text-[var(--pf-text-muted)]">{artist.trackCount} tracks</p>
-                  )}
-                  <button className="w-full py-2 rounded-lg bg-[var(--pf-orange)]/10 text-[var(--pf-orange)] text-sm font-medium group-hover:bg-[var(--pf-orange)] group-hover:text-white transition-colors mt-3">
-                    View Profile
-                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-bold truncate group-hover:text-[var(--pf-orange)] transition-colors">
+                        {artist.name}
+                      </h2>
+                      {artist.verified && (
+                        <span className="bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] px-2 py-0.5 rounded text-xs font-medium shrink-0">
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-[var(--pf-text-secondary)]">{artist.specialty}</p>
+                    <p className="text-xs text-[var(--pf-text-muted)] flex items-center gap-1 mt-1">
+                      <MapPin size={10} /> {artist.location}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                <p className="text-sm text-[var(--pf-text-secondary)] mb-4 line-clamp-2">
+                  {artist.bio}
+                </p>
+
+                {/* Stats */}
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1 text-[var(--pf-text-muted)]">
+                    <Music size={14} />
+                    <span>{artist.tracks} tracks</span>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="mt-4 pt-4 border-t border-[var(--pf-border)]">
+                  <span className="text-sm text-[var(--pf-orange)] font-medium group-hover:underline">
+                    View Artist Store →
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-[var(--pf-text-muted)] text-lg mb-4">No artists found.</p>
-            <button 
-              onClick={() => { setActiveGenre('All'); setSearchQuery(''); }}
-              className="pf-btn pf-btn-secondary"
-            >
-              View all artists
-            </button>
-          </div>
-        )}
 
-        {/* CTA for Artists */}
-        <div className="mt-16 text-center">
-          <div className="pf-card p-8 max-w-2xl mx-auto">
-            <Music className="mx-auto mb-4 text-[var(--pf-orange)]" size={48} />
-            <h2 className="text-2xl font-bold mb-2">Are You an Artist?</h2>
+          {/* Empty state - more artists coming */}
+          {ARTISTS.length === 1 && (
+            <div className="text-center py-12 text-[var(--pf-text-muted)]">
+              <p className="text-lg mb-2">More artists joining soon!</p>
+              <p className="text-sm">Are you an artist? <Link href="/signup?role=artist" className="text-[var(--pf-orange)] hover:underline">Start selling today</Link></p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Join CTA */}
+      <section className="py-12 bg-[var(--pf-bg-secondary)]">
+        <div className="pf-container">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-2xl font-bold mb-4">Are You an Artist?</h2>
             <p className="text-[var(--pf-text-secondary)] mb-6">
-              Join Porterful and start earning from every purchase on the platform — not just your merch.
+              Join Porterful and open your own store. Upload your music, sell custom merch, 
+              and keep 80% of every sale. No inventory, no hassle.
             </p>
-            <Link href="/signup?role=artist" className="pf-btn pf-btn-primary">
-              Apply as Artist <ChevronRight className="inline ml-1" size={16} />
-            </Link>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="/signup?role=artist" className="pf-btn pf-btn-primary">
+                Open Your Store
+              </Link>
+              <Link href="/marketplace" className="pf-btn pf-btn-secondary">
+                Browse the Marketplace
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

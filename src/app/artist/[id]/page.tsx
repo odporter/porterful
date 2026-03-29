@@ -482,11 +482,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                   <p className="text-xl font-bold">{TRACKS.length}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Tracks</p>
                 </div>
-                <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">
-                  <Users className="text-blue-400 mx-auto mb-2" size={24} />
-                  <p className="text-xl font-bold">{artist.supporters !== null ? artist.supporters.toLocaleString() : '—'}</p>
-                  <p className="text-xs text-[var(--pf-text-muted)]">Supporters</p>
-                </div>
+              </div>
               <div className="mt-6 pt-4 border-t border-[var(--pf-border)]">
                 <h3 className="font-semibold mb-2">Founder's Mission</h3>
                 <blockquote className="border-l-4 border-[var(--pf-orange)] pl-4 italic text-[var(--pf-text-secondary)]">

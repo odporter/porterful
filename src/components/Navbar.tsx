@@ -240,6 +240,10 @@ export function Navbar() {
                 <PorterfulIcon name="shop" size={18} />
                 <span>Shop</span>
               </Link>
+              <Link href="/artists" aria-label="Artists" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
+                <PorterfulIcon name="artist" size={18} />
+                <span>Artists</span>
+              </Link>
               <Link href="/digital" aria-label="Music" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="music" size={18} />
                 <span>Music</span>
@@ -410,9 +414,9 @@ export function Navbar() {
               <PorterfulIcon name="trophy" size={20} />
               <span>$10K Challenge</span>
             </Link>
-            <Link href="/artist/od-porter" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+            <Link href="/artists" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
               <PorterfulIcon name="artist" size={20} />
-              <span>Artist Profile</span>
+              <span>Artists</span>
             </Link>
           </div>
 

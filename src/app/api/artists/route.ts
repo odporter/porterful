@@ -1,55 +1,34 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-// GET /api/artists - List artists
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const cookieStore = await cookies()
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json({ artists: [], error: 'Database not configured' }, { status: 500 })
+    }
+
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/profiles?role=eq.artist&order=created_at.desc`,
       {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {}
-          },
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
         },
+        next: { revalidate: 60 } // Cache for 60 seconds
       }
     )
-    
-    const { searchParams } = new URL(request.url)
-    
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const offset = parseInt(searchParams.get('offset') || '0')
-    const genre = searchParams.get('genre')
 
-    let query = supabase
-      .from('artists')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
-
-    if (genre) {
-      query = query.contains('genre', [genre])
+    if (!res.ok) {
+      console.error('Supabase error:', await res.text())
+      return NextResponse.json({ artists: [], error: 'Failed to fetch' }, { status: 500 })
     }
 
-    const { data, error } = await query
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ artists: data })
+    const artists = await res.json()
+    return NextResponse.json({ artists })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch artists' }, { status: 500 })
+    console.error('API error:', error)
+    return NextResponse.json({ artists: [], error: 'Server error' }, { status: 500 })
   }
 }

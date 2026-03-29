@@ -244,7 +244,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
               <p className="text-[var(--pf-text-secondary)] text-sm mb-2">{artist.genre} • {artist.location}</p>
               <div className="flex flex-wrap gap-4 mb-4">
                 <div className="text-center">
-                  <p className="text-xl font-bold">{TRACKS.length}</p>
+                  <p className="text-xl font-bold">{displayTracks.length}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Tracks</p>
                 </div>
               </div>
@@ -539,7 +539,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-[var(--pf-border)]">
                 <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">
                   <Music className="text-purple-400 mx-auto mb-2" size={24} />
-                  <p className="text-xl font-bold">{TRACKS.length}</p>
+                  <p className="text-xl font-bold">{displayTracks.length}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Tracks</p>
                 </div>
               </div>

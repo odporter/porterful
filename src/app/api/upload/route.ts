@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Sanitize filename to comply with Supabase Storage filename rules
+function sanitizeFilename(name: string): string {
+  // Get the file extension
+  const ext = name.split('.').pop() || ''
+  const nameWithoutExt = name.slice(0, -(ext.length + 1))
+  
+  // Remove or replace problematic characters: < > : " / \ | ? * ( ) [ ]
+  // Also remove leading/trailing dots and spaces
+  const sanitized = nameWithoutExt
+    .replace(/[<>:"/\\|?*()[\]]/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/\.\.+/g, '.')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 100) // Cap at 100 chars to be safe
+  
+  const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+  
+  return `${sanitized || 'audio'}.${cleanExt || 'mp3'}`
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -17,9 +37,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Storage not configured' }, { status: 500 })
     }
 
-    // Generate unique filename
-    const ext = file.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${ext}`
+    // Sanitize filename to avoid Supabase Storage pattern validation errors
+    const safeFilename = sanitizeFilename(file.name)
+    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}-${safeFilename}`
     const path = `${folder}/${filename}`
 
     // Upload to Supabase Storage using service role (bypasses RLS)
@@ -29,7 +49,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${supabaseKey}`,
-          'Content-Type': file.type,
+          'Content-Type': file.type || 'audio/mpeg',
           'x-upsert': 'true'
         },
         body: await file.arrayBuffer()
@@ -49,6 +69,8 @@ export async function POST(request: NextRequest) {
       url: publicUrl,
       path,
       filename: file.name,
+      originalName: file.name,
+      safeName: safeFilename,
       size: file.size
     })
   } catch (error) {

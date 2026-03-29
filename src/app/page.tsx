@@ -14,87 +14,118 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[var(--pf-bg)] via-[var(--pf-bg-secondary)] to-[var(--pf-bg)]">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-[var(--pf-bg)] via-[var(--pf-bg-secondary)] to-[var(--pf-bg)]">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--pf-orange)]/5 via-transparent to-purple-500/5" />
         
         <div className="relative z-10 w-full py-12 md:py-20">
           <div className="pf-container">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               {/* Left - Text */}
-              <div className="text-center md:text-left">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-6">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  Now Streaming
+              <div className="text-center lg:text-left">
+                {/* Signup Banner */}
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--pf-orange)] text-white rounded-full text-sm font-semibold mb-6 shadow-lg shadow-[var(--pf-orange)]/20">
+                  <Star size={16} className="fill-current" />
+                  Sign up as an artist — your first 24 hours are on us
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-5 leading-tight">
                   Where Artists<br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pf-orange)] to-purple-500">
                     Own Everything
                   </span>
                 </h1>
 
-                <p className="text-lg md:text-xl text-[var(--pf-text-secondary)] mb-6 max-w-lg mx-auto md:mx-0">
+                <p className="text-lg md:text-xl text-[var(--pf-text-secondary)] mb-6 max-w-lg mx-auto lg:mx-0">
                   Sell music and merch. Keep <span className="text-[var(--pf-orange)] font-semibold">80%</span> of every sale.
                   No label. No middleman. Just you and your fans.
                 </p>
 
                 {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start mb-8">
-                  <Link href="/digital" className="pf-btn pf-btn-primary text-lg px-6 py-3 flex items-center justify-center gap-2">
-                    <Headphones size={20} />
-                    Listen Now
+                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
+                  <Link href="/signup?role=artist" className="pf-btn pf-btn-primary text-lg px-8 py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--pf-orange)]/10">
+                    <Star size={18} className="fill-current" />
+                    Start Selling — Free
                   </Link>
-                  <Link href="/marketplace" className="pf-btn pf-btn-secondary text-lg px-6 py-3 flex items-center justify-center gap-2">
-                    <ShoppingCart size={20} />
-                    Shop Merch
+                  <Link href="/digital" className="pf-btn pf-btn-secondary text-lg px-8 py-3.5 flex items-center justify-center gap-2">
+                    <Headphones size={18} />
+                    Listen Now
                   </Link>
                 </div>
 
                 {/* Stats */}
-                <div className="flex gap-6 justify-center md:justify-start">
-                  <div className="text-center md:text-left">
+                <div className="flex gap-8 justify-center lg:justify-start">
+                  <div className="text-center lg:text-left">
                     <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">{TRACKS.length}</div>
                     <div className="text-sm text-[var(--pf-text-muted)]">Tracks</div>
                   </div>
-                  <div className="text-center md:text-left">
+                  <div className="text-center lg:text-left">
                     <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">80%</div>
                     <div className="text-sm text-[var(--pf-text-muted)]">To Artists</div>
                   </div>
-                  <div className="text-center md:text-left">
+                  <div className="text-center lg:text-left">
                     <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">$0</div>
                     <div className="text-sm text-[var(--pf-text-muted)]">To Start</div>
                   </div>
                 </div>
               </div>
 
-              {/* Right - Featured Album Art */}
-              <div className="hidden md:block">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-500/20 blur-3xl rounded-full" />
-                  <div className="relative grid grid-cols-2 gap-4">
-                    {[
-                      TRACKS.find(t => t.album === 'Ambiguous'),
-                      TRACKS.find(t => t.album === 'From Feast to Famine'),
-                      TRACKS.find(t => t.album === 'One Day'),
-                      TRACKS.find(t => t.album === 'God Is Good'),
-                    ].filter(Boolean).map((track, i) => (
-                      <div
-                        key={track!.id}
-                        className={`aspect-square rounded-xl overflow-hidden shadow-2xl ${i === 0 ? 'col-span-2' : ''} relative`}
-                      >
-                        <Image
-                          src={track!.image}
-                          alt={track!.album || track!.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover"
-                          priority={i === 0}
-                        />
-                      </div>
-                    ))}
+              {/* Right - Image + Album Grid */}
+              <div className="relative">
+                {/* Background glow */}
+                <div className="absolute -inset-4 bg-gradient-to-br from-[var(--pf-orange)]/10 via-transparent to-purple-500/10 blur-3xl rounded-3xl" />
+                
+                {/* Main image - person listening to music */}
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl mb-4 aspect-[4/3]">
+                  <Image
+                    src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
+                    alt="Artist and fan listening to music"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover object-center"
+                    priority
+                  />
+                  {/* Dark overlay at bottom for text */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  {/* Caption overlay */}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="text-white text-sm font-medium drop-shadow-lg">
+                      🎧 Independent music, direct to fans
+                    </p>
+                  </div>
+                </div>
+
+                {/* Floating album art cards */}
+                <div className="absolute -top-4 -right-4 md:-right-8 grid grid-cols-2 gap-3">
+                  {[
+                    TRACKS.find(t => t.album === 'Ambiguous'),
+                    TRACKS.find(t => t.album === 'From Feast to Famine'),
+                  ].filter(Boolean).map((track, i) => (
+                    <div
+                      key={track!.id}
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden shadow-xl shadow-black/30 border-2 border-white/10 relative"
+                    >
+                      <Image
+                        src={track!.image}
+                        alt={track!.album || ''}
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Floating badge */}
+                <div className="absolute -bottom-3 -left-4 md:-left-8 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl px-4 py-3 shadow-xl">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <Headphones size={14} className="text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-[var(--pf-text-muted)]">Now Streaming</p>
+                      <p className="text-sm font-semibold text-[var(--pf-text)]">{TRACKS.length}+ tracks</p>
+                    </div>
                   </div>
                 </div>
               </div>

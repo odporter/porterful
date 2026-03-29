@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { FaGoogle, FaApple } from 'react-icons/fa'
+import { FaGoogle } from 'react-icons/fa'
 
 export default function LoginPage() {
   const { supabase } = useSupabase()
@@ -156,15 +156,6 @@ export default function LoginPage() {
             >
               <FaGoogle className="text-lg" />
               <span className="text-sm font-medium">Google</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleOAuthSignIn('apple')}
-              disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-[var(--pf-border)] hover:border-[var(--pf-border-hover)] transition-colors bg-[var(--pf-bg)]"
-            >
-              <FaApple className="text-lg" />
-              <span className="text-sm font-medium">Apple</span>
             </button>
           </div>
 

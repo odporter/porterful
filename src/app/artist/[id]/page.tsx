@@ -7,7 +7,7 @@ import { TRACKS, ALBUMS, PRODUCTS } from '@/lib/data';
 import { getArtistById, getArtistTracks, getAllArtistIds } from '@/lib/artists';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Play, Pause, Heart, Share2, Music, Package, Users, DollarSign, ChevronDown, ChevronUp, Youtube, ShoppingCart, ExternalLink } from 'lucide-react';
+import { Play, Pause, Share2, Music, Package, ChevronDown, ChevronUp, Youtube, ExternalLink, Bell, Check } from 'lucide-react';
 
 // Music Videos from YouTube
 const MUSIC_VIDEOS = [
@@ -59,10 +59,54 @@ const SAMPLE_SUPPORTERS = [
 export default function ArtistProfilePage({ params }: { params: { id: string } }) {
   const { currentTrack, isPlaying, playTrack, setQueue } = useAudio();
   const [activeTab, setActiveTab] = useState<'music' | 'store' | 'videos' | 'about'>('music');
-  const [following, setFollowing] = useState(false);
+  const [notify, setNotify] = useState(false);
+  const [notifyLoading, setNotifyLoading] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [expandedAlbums, setExpandedAlbums] = useState<Record<string, boolean>>({ Singles: true });
   const [notFound, setNotFound] = useState(false);
+
+  // Check notification status
+  useEffect(() => {
+    async function checkNotifyStatus() {
+      const email = localStorage.getItem('notify_email')
+      if (!email || !artistData) return
+      
+      try {
+        const res = await fetch(`/api/notifications?artistId=${params.id}&email=${encodeURIComponent(email)}`)
+        const data = await res.json()
+        if (data.subscribed) setNotify(true)
+      } catch (e) {}
+    }
+    checkNotifyStatus()
+  }, [params.id])
+
+  const handleNotify = async () => {
+    // Get or prompt for email
+    let email = localStorage.getItem('notify_email')
+    
+    if (!email) {
+      email = prompt('Enter your email to get notified when this artist drops new music:')
+      if (!email) return
+      localStorage.setItem('notify_email', email)
+    }
+    
+    setNotifyLoading(true)
+    try {
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artistId: params.id,
+          email,
+          action: notify ? 'unsubscribe' : 'subscribe'
+        })
+      })
+      setNotify(!notify)
+    } catch (e) {
+      console.error('Notify error:', e)
+    }
+    setNotifyLoading(false)
+  }
 
   // Look up artist by ID from URL
   const artistData = getArtistById(params.id);
@@ -205,27 +249,39 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <button 
-                  onClick={() => setFollowing(!following)} 
+                <button
+                  onClick={handleNotify}
+                  disabled={notifyLoading}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    following 
-                      ? 'bg-[var(--pf-orange)] text-white' 
+                    notify
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
                   }`}
                 >
-                  <Heart size={16} className={`inline mr-1 ${following ? 'fill-white' : ''}`} />
-                  {following ? 'Following' : 'Follow'}
+                  {notifyLoading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : notify ? (
+                    <>
+                      <Check size={16} className="inline mr-1" />
+                      Notified
+                    </>
+                  ) : (
+                    <>
+                      <Bell size={16} className="inline mr-1" />
+                      Notify Me
+                    </>
+                  )}
                 </button>
                 <button onClick={playAllArtistTracks} className="px-4 py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium hover:bg-[var(--pf-orange-dark)] transition-colors">
                   <Play size={16} className="inline mr-1" />
                   Play Music
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     setShareToast(true);
                     setTimeout(() => setShareToast(false), 2000);
-                  }} 
+                  }}
                   className="px-4 py-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg font-medium hover:border-[var(--pf-orange)] transition-colors"
                 >
                   <Share2 size={16} className="inline mr-1" />

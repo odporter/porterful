@@ -3,8 +3,35 @@
 import { useState } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useRouter } from 'next/navigation'
-import { Music, Store, Building2, Star } from 'lucide-react'
+import { Music, Store, Building2, Star, Globe, Youtube } from 'lucide-react'
 import { FaGoogle, FaFacebook, FaApple } from 'react-icons/fa'
+
+const ROLE_CONFIG = {
+  supporter: {
+    icon: Star,
+    label: 'Fan',
+    description: 'Support artists you love',
+    tagline: 'Support independent artists directly',
+  },
+  artist: {
+    icon: Music,
+    label: 'Artist',
+    description: 'Sell your music & merch',
+    tagline: 'Upload tracks, set prices, keep 80%',
+  },
+  business: {
+    icon: Store,
+    label: 'Business',
+    description: 'Print-on-demand store',
+    tagline: 'Merch fulfillment without inventory',
+  },
+  brand: {
+    icon: Building2,
+    label: 'Brand',
+    description: 'Connect with artists',
+    tagline: 'Sponsor releases, reach new audiences',
+  },
+}
 
 export default function SignupPage() {
   const { supabase } = useSupabase()
@@ -18,6 +45,11 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  // Role-specific fields
+  const [youtube, setYoutube] = useState('')
+  const [website, setWebsite] = useState('')
+  const [industry, setIndustry] = useState('')
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -30,19 +62,29 @@ export default function SignupPage() {
         return
       }
 
+      // Build metadata based on role
+      const metadata: Record<string, string> = { name, role }
+      
+      if (role === 'artist' && youtube) {
+        metadata.youtube_url = youtube
+      }
+      if ((role === 'business' || role === 'brand') && website) {
+        metadata.website = website
+        metadata.industry = industry
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name, role },
+          data: metadata,
           emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       })
 
       if (signUpError) {
-        // Handle Supabase email rate limit errors with friendly message
         if (signUpError.message.includes('rate limit') || signUpError.message.includes('Email rate limit')) {
-          setError('Too many signup attempts right now. Please wait a few minutes and try again, or contact support if you need help.')
+          setError('Too many signup attempts right now. Please wait a few minutes and try again.')
         } else {
           setError(signUpError.message)
         }
@@ -50,14 +92,24 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        // Create profile
-        await supabase.from('profiles').insert({
+        // Create profile with role-specific data
+        const profileData: Record<string, any> = {
           id: data.user.id,
           email: email,
           full_name: name,
           role: role,
           referral_code: 'PF-' + Math.random().toString(36).substr(2, 8).toUpperCase()
-        })
+        }
+
+        if (role === 'artist' && youtube) {
+          profileData.youtube_url = youtube
+        }
+        if ((role === 'business' || role === 'brand') && website) {
+          profileData.website = website
+          profileData.industry = industry
+        }
+        
+        await supabase.from('profiles').insert(profileData)
         
         setSuccess(true)
       }
@@ -76,7 +128,8 @@ export default function SignupPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback`,
+          scopes: provider === 'google' ? 'https://www.googleapis.com/auth/youtube.readonly' : undefined
         }
       })
       
@@ -109,9 +162,11 @@ export default function SignupPage() {
     )
   }
 
+  const currentRole = ROLE_CONFIG[role as keyof typeof ROLE_CONFIG]
+
   return (
     <div className="min-h-screen pt-24 pb-12">
-      <div className="pf-container max-w-md mx-auto">
+      <div className="pf-container max-w-lg mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Create Account</h1>
           <p className="text-[var(--pf-text-secondary)]">Join the artist economy</p>
@@ -123,16 +178,48 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSignup} className="space-y-4">
+        <form onSubmit={handleSignup} className="space-y-5">
+          
+          {/* Role Selection */}
           <div>
-            <label className="block text-sm font-medium mb-2">Name</label>
+            <label className="block text-sm font-medium mb-2">I am a...</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {Object.entries(ROLE_CONFIG).map(([value, config]) => {
+                const Icon = config.icon
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setRole(value)}
+                    className={`p-4 rounded-xl border text-center transition-all ${
+                      role === value
+                        ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/10'
+                        : 'border-[var(--pf-border)] hover:border-[var(--pf-border-hover)]'
+                    }`}
+                  >
+                    <Icon className={`mx-auto mb-2 ${role === value ? 'text-[var(--pf-orange)]' : ''}`} size={24} />
+                    <span className="text-sm font-medium">{config.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+            <p className="mt-2 text-sm text-[var(--pf-text-muted)]">
+              {currentRole.tagline}
+            </p>
+          </div>
+
+          {/* Basic Fields */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              {role === 'business' || role === 'brand' ? 'Business Name' : 'Full Name'}
+            </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)]"
-              placeholder="Your name"
+              placeholder={role === 'business' || role === 'brand' ? 'Your company name' : 'Your name'}
             />
           </div>
 
@@ -161,36 +248,74 @@ export default function SignupPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">I am a...</label>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { value: 'supporter', icon: Star, label: 'Fan' },
-                { value: 'artist', icon: Music, label: 'Artist' },
-                { value: 'business', icon: Store, label: 'Business' },
-                { value: 'brand', icon: Building2, label: 'Brand' },
-              ].map((r) => (
-                <button
-                  key={r.value}
-                  type="button"
-                  onClick={() => setRole(r.value)}
-                  className={`p-3 rounded-lg border text-center transition-all ${
-                    role === r.value
-                      ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/10'
-                      : 'border-[var(--pf-border)] hover:border-[var(--pf-border-hover)]'
-                  }`}
-                >
-                  <r.icon className="mx-auto mb-1" size={20} />
-                  <span className="text-sm">{r.label}</span>
-                </button>
-              ))}
+          {/* Role-Specific Fields */}
+          
+          {/* Artist: YouTube */}
+          {role === 'artist' && (
+            <div className="p-4 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
+              <div className="flex items-center gap-2 mb-3">
+                <Youtube size={18} className="text-red-500" />
+                <label className="text-sm font-medium">YouTube Channel</label>
+              </div>
+              <input
+                type="url"
+                value={youtube}
+                onChange={(e) => setYoutube(e.target.value)}
+                className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[var(--pf-orange)]"
+                placeholder="https://youtube.com/@yourchannel"
+              />
+              <p className="mt-2 text-xs text-[var(--pf-text-muted)]">
+                Connect your YouTube channel so fans can find your music videos on Porterful.
+              </p>
             </div>
-          </div>
+          )}
+
+          {/* Business/Brand: Website + Industry */}
+          {(role === 'business' || role === 'brand') && (
+            <div className="space-y-4 p-4 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe size={16} />
+                  <label className="text-sm font-medium">Website</label>
+                </div>
+                <input
+                  type="url"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  required
+                  className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[var(--pf-orange)]"
+                  placeholder="https://yourbusiness.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Industry</label>
+                <select
+                  value={industry}
+                  onChange={(e) => setIndustry(e.target.value)}
+                  required
+                  className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[var(--pf-orange)]"
+                >
+                  <option value="">Select your industry...</option>
+                  <option value="music">Music & Entertainment</option>
+                  <option value="fashion">Fashion & Apparel</option>
+                  <option value="tech">Technology</option>
+                  <option value="food">Food & Beverage</option>
+                  <option value="health">Health & Wellness</option>
+                  <option value="finance">Finance</option>
+                  <option value="education">Education</option>
+                  <option value="nonprofit">Non-Profit</option>
+                  <option value="agency">Marketing Agency</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full pf-btn pf-btn-primary py-4"
+            className="w-full pf-btn pf-btn-primary py-4 text-lg"
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>

@@ -42,7 +42,7 @@ export function Navbar() {
     { href: '/marketplace', label: 'Shop' },
     { href: '/artists', label: 'Artists' },
     { href: '/digital', label: 'Music' },
-    { href: '/playlists', label: 'Playlists' },
+    { href: '/tap-marketing', label: 'Tap Marketing' },
   ]
 
   return (

@@ -38,7 +38,7 @@ export default function ChallengePage() {
                 <Zap size={20} />
                 Join the Challenge
               </Link>
-              <Link href="/marketplace" className="pf-btn pf-btn-secondary text-lg px-8 py-4 flex items-center justify-center gap-2">
+              <Link href="#how-it-works" className="pf-btn pf-btn-secondary text-lg px-8 py-4 flex items-center justify-center gap-2 scroll-mt-24">
                 See How It Works
                 <ArrowRight size={20} />
               </Link>
@@ -64,7 +64,7 @@ export default function ChallengePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-24">
+      <section id="how-it-works" className="py-16 md:py-24">
         <div className="pf-container">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">How the Challenge Works</h2>

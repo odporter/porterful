@@ -3,10 +3,7 @@ import { createServerClient } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const supabase = createServerClient();
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
-    }
+    const supabase = createServerClient()!;
 
     // Get founding window status
     const { data: window } = await supabase

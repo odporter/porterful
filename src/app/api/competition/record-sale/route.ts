@@ -9,8 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing artistId or saleAmount' }, { status: 400 });
     }
 
-    const supabase = createServerClient();
-    if (!supabase) { return NextResponse.json({ error: "Database not configured" }, { status: 503 }); }
+    const supabase = createServerClient()!;
 
     // Check if artist is registered in competition
     const { data: existing } = await supabase

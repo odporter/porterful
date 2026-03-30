@@ -9,10 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing artistId' }, { status: 400 });
     }
 
-    const supabase = createServerClient();
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
-    }
+    const supabase = createServerClient()!;
 
     // Check founding window status
     const { data: window } = await supabase

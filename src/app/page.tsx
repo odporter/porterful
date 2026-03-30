@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Play, Headphones, Music, Star, Users, DollarSign, Upload, ShoppingCart, Package, Radio, Disc3 } from 'lucide-react';
 import { useSupabase } from '@/app/providers';
 import { TRACKS } from '@/lib/data';
-import { ArtistSearch } from '@/components/ArtistSearch';
 
 export default function Home() {
   const { user } = useSupabase();
@@ -13,15 +12,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-[var(--pf-bg)] via-[var(--pf-bg-secondary)] to-[var(--pf-bg)]">
+      {/* Hero - Split Image Design */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-gradient-to-br from-[var(--pf-bg)] via-[var(--pf-bg-secondary)] to-[var(--pf-bg)]">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--pf-orange)]/5 via-transparent to-purple-500/5" />
-        
+
         <div className="relative z-10 w-full py-12 md:py-20">
           <div className="pf-container">
-            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-6 items-center">
               {/* Left - Text */}
-              <div className="text-center lg:text-left">
+              <div className="text-center lg:text-left order-2 lg:order-1">
                 {/* Signup Banner */}
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--pf-orange)] text-white rounded-full text-sm font-semibold mb-6 shadow-lg shadow-[var(--pf-orange)]/20">
                   <Star size={16} className="fill-current" />
@@ -29,16 +28,15 @@ export default function Home() {
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-5 leading-tight">
-                  Where Artists<br />
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5 leading-tight">
+                  Support Artists<br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pf-orange)] to-purple-500">
-                    Own Everything
+                    While Living Your Life
                   </span>
                 </h1>
 
                 <p className="text-lg md:text-xl text-[var(--pf-text-secondary)] mb-6 max-w-lg mx-auto lg:mx-0">
-                  Sell music and merch. Keep <span className="text-[var(--pf-orange)] font-semibold">80%</span> of every sale.
-                  No label. No middleman. Just you and your fans.
+                  Stream music. Shop essentials. Power real people.
                 </p>
 
                 {/* CTAs */}
@@ -73,58 +71,85 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right - Image + Album Grid */}
-              <div className="relative">
+              {/* Right - Split Image (Culture + Commerce) */}
+              <div className="relative order-1 lg:order-2">
                 {/* Background glow */}
                 <div className="absolute -inset-4 bg-gradient-to-br from-[var(--pf-orange)]/10 via-transparent to-purple-500/10 blur-3xl rounded-3xl" />
-                
-                {/* Main image - person listening to music */}
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl mb-4 aspect-[4/3]">
-                  <Image
-                    src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
-                    alt="Artist and fan listening to music"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover object-center"
-                    priority
-                  />
-                  {/* Dark overlay at bottom for text */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  {/* Caption overlay */}
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-white text-sm font-medium drop-shadow-lg">
-                      🎧 Independent music, direct to fans
-                    </p>
+
+                {/* Split images */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Left - Culture: People listening */}
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[3/4]">
+                    <Image
+                      src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80"
+                      alt="People at concert listening to live music"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 25vw"
+                      className="object-cover"
+                      priority
+                    />
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <p className="text-white text-xs font-semibold drop-shadow-lg">🎵 Culture</p>
+                    </div>
+                  </div>
+
+                  {/* Right - Commerce: Products */}
+                  <div className="grid gap-3">
+                    {/* Top - Music */}
+                    <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3]">
+                      <Image
+                        src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80"
+                        alt="Artist performing"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 25vw"
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                      <div className="absolute bottom-2 left-2 right-2">
+                        <p className="text-white text-xs font-semibold drop-shadow-lg">🎤 Music</p>
+                      </div>
+                    </div>
+
+                    {/* Bottom - Shopping */}
+                    <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3]">
+                      <Image
+                        src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80"
+                        alt="Shopping and essentials"
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 25vw"
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                      <div className="absolute bottom-2 left-2 right-2">
+                        <p className="text-white text-xs font-semibold drop-shadow-lg">🛒 Shop</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Floating album art cards */}
-                <div className="absolute -top-4 -right-4 md:-right-8 grid grid-cols-2 gap-3">
-                  {[
-                    TRACKS.find(t => t.album === 'Ambiguous'),
-                    TRACKS.find(t => t.album === 'From Feast to Famine'),
-                  ].filter(Boolean).map((track, i) => (
-                    <Link key={track!.id} href={`/album/${track!.album.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden shadow-xl shadow-black/30 border-2 border-white/10 relative">
-                      <Image
-                        src={track!.image}
-                        alt={track!.album || ''}
-                        fill
-                        sizes="96px"
-                        className="object-cover hover:scale-105 transition-transform"
-                      />
-                    </Link>
-                  ))}
+                {/* Floating album art card */}
+                <div className="absolute -bottom-4 -left-4 md:-left-6">
+                  {(() => {
+                    const track = TRACKS.find(t => t.album === 'Ambiguous')
+                    return track ? (
+                      <Link href={`/album/ambiguous`} className="w-20 h-20 rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 relative block">
+                        <Image src={track.image} alt={track.album || ''} fill sizes="80px" className="object-cover hover:scale-105 transition-transform" />
+                      </Link>
+                    ) : null
+                  })()}
                 </div>
 
                 {/* Floating badge */}
-                <div className="absolute -bottom-3 -left-4 md:-left-8 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl px-4 py-3 shadow-xl">
+                <div className="absolute -top-3 -right-3 md:-right-5 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl px-4 py-3 shadow-xl">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <Headphones size={14} className="text-green-400" />
+                      <DollarSign size={14} className="text-green-400" />
                     </div>
                     <div>
-                      <p className="text-xs text-[var(--pf-text-muted)]">Now Streaming</p>
-                      <p className="text-sm font-semibold text-[var(--pf-text)]">{TRACKS.length}+ tracks</p>
+                      <div className="text-xs font-bold text-[var(--pf-text)]">80% to artists</div>
+                      <div className="text-[10px] text-[var(--pf-text-muted)]">Every sale</div>
                     </div>
                   </div>
                 </div>
@@ -134,23 +159,36 @@ export default function Home() {
         </div>
       </section>
 
-
-
       {/* How It Works */}
       <section className="py-16 md:py-24 bg-[var(--pf-bg-secondary)]">
         <div className="pf-container">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-            For Artists, <span className="text-[var(--pf-orange)]">By Artists</span>
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              How <span className="text-[var(--pf-orange)]">Porterful</span> Works
+            </h2>
+            <p className="text-[var(--pf-text-secondary)] max-w-2xl mx-auto">
+              The artist-first platform. No labels. No hidden fees. Just you and your fans.
+            </p>
+          </div>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
+                <Upload className="text-[var(--pf-orange)]" size={28} />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Upload Music</h3>
+              <p className="text-[var(--pf-text-secondary)] text-sm">
+                Upload your tracks in minutes. Set your price. You control everything.
+              </p>
+            </div>
+            
             <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
                 <Music className="text-[var(--pf-orange)]" size={28} />
               </div>
-              <h3 className="text-lg font-bold mb-2">Upload Your Music</h3>
+              <h3 className="text-lg font-bold mb-2">Build Your Fanbase</h3>
               <p className="text-[var(--pf-text-secondary)] text-sm">
-                Upload tracks, set your price. Fans can buy individual songs or tip more to support.
+                Fans discover your music. They stream, buy, and share with friends.
               </p>
             </div>
             
@@ -292,7 +330,7 @@ export default function Home() {
                   {featuredTracks.slice(0, 5).map(track => (
                     <Link 
                       key={track.id}
-                      href={`/artist/od-porter`}
+                      href={`/album/${track.album.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--pf-bg)] transition-colors group"
                     >
                       <div className="w-12 h-12 rounded relative shrink-0">
@@ -302,7 +340,7 @@ export default function Home() {
                         <p className="font-medium truncate group-hover:text-[var(--pf-orange)] transition-colors">
                           {track.title}
                         </p>
-                        <p className="text-sm text-[var(--pf-text-muted)] truncate hover:text-[var(--pf-orange)]">{track.artist}</p>
+                        <p className="text-sm text-[var(--pf-text-muted)] truncate group-hover:text-[var(--pf-orange)]">{track.artist}</p>
                       </div>
                       <span className="text-xs text-[var(--pf-text-muted)]">${track.price}</span>
                     </Link>

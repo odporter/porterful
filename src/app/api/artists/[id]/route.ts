@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-// GET /api/artists/[id] - Get artist profile
+export const dynamic = 'force-dynamic'
+
+// GET /api/artists/[id] - Get artist profile by ID or slug
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -22,26 +24,62 @@ export async function GET(
       }
     )
 
-    // Fetch profile
-    const { data: profile, error: profileError } = await supabase
+    // Try to fetch profile by ID first
+    let { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', params.id)
       .single()
 
+    // If not found by ID, try finding by slug in artists table
     if (profileError || !profile) {
+      const { data: artistBySlug } = await supabase
+        .from('artists')
+        .select('id')
+        .eq('slug', params.id)
+        .single()
+
+      if (artistBySlug) {
+        const { data: profileBySlug } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', artistBySlug.id)
+          .single()
+        if (profileBySlug) {
+          profile = profileBySlug
+          profileError = null
+        }
+      }
+    }
+
+    // Also check static artist data as fallback
+    const { ARTISTS } = await import('@/lib/artists')
+    const staticArtist = ARTISTS.find(a => a.id === params.id || a.slug === params.id)
+
+    if ((profileError || !profile) && !staticArtist) {
       return NextResponse.json({ error: 'Artist not found' }, { status: 404 })
     }
 
-    // Fetch artist-specific data
-    const { data: artistData } = await supabase
-      .from('artists')
-      .select('*')
-      .eq('id', params.id)
-      .single()
+    // Fetch artist-specific data (only if we have a profile)
+    let artistData = null
+    if (profile) {
+      const result = await supabase.from('artists').select('*').eq('id', profile.id).single()
+      artistData = result.data
+    }
+
+    // If we have a static artist but no DB profile, use static data
+    const profileData = profile
+      ? { ...profile, ...artistData }
+      : staticArtist
+        ? { full_name: staticArtist.name, ...staticArtist, name: staticArtist.name }
+        : null
+
+    if (!profileData) {
+      return NextResponse.json({ error: 'Artist not found' }, { status: 404 })
+    }
 
     return NextResponse.json({
-      profile: { ...profile, ...artistData }
+      profile: profileData
     })
   } catch (error) {
     console.error('Error fetching artist:', error)

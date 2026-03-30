@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { ARTISTS } from '@/lib/artists'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,7 +54,6 @@ export async function GET(
     }
 
     // Also check static artist data as fallback
-    const { ARTISTS } = await import('@/lib/artists')
     const staticArtist = ARTISTS.find(a => a.id === params.id || a.slug === params.id)
 
     if ((profileError || !profile) && !staticArtist) {

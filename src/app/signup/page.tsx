@@ -113,7 +113,7 @@ export default function SignupPage() {
           console.error('Profile creation error:', profileError)
         }
 
-        // If artist, also create an artist record
+        // If artist, also create an artist record AND register for competition
         if (role === 'artist') {
           const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Math.random().toString(36).substr(2, 4)
           const { error: artistError } = await supabase.from('artists').insert({
@@ -125,6 +125,17 @@ export default function SignupPage() {
           })
           if (artistError) {
             console.error('Artist creation error:', artistError)
+          }
+
+          // Register for competition after artist creation
+          try {
+            await fetch('/api/competition/join', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ artistId: data.user.id }),
+            })
+          } catch (e) {
+            console.error('Competition registration error:', e)
           }
         }
         

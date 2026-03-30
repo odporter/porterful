@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingBag, Filter } from 'lucide-react'
+import { useSupabase } from '@/app/providers'
 
 // Platform-curated featured products
 const PRODUCTS = [
@@ -32,9 +33,11 @@ export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState('All')
   const [sortBy, setSortBy] = useState('featured')
 
-  const filteredProducts = activeCategory === 'All' 
-    ? PRODUCTS 
+  const filteredProducts = activeCategory === 'All'
+    ? PRODUCTS
     : PRODUCTS.filter(p => p.category === activeCategory)
+
+  const { user } = useSupabase()
 
   return (
     <div className="min-h-screen pt-20 pb-24 bg-[var(--pf-bg)]">
@@ -77,8 +80,8 @@ export default function MarketplacePage() {
               <p className="text-[var(--pf-text-secondary)] text-sm mb-3">
                 Are you an artist? Start selling your own merch with 80% earnings. Print-on-demand — no inventory needed.
               </p>
-              <Link href="/signup?role=artist" className="pf-btn pf-btn-primary whitespace-nowrap">
-                Start Selling
+              <Link href={user?.user_metadata?.role === 'artist' ? '/dashboard' : '/signup?role=artist'} className="pf-btn pf-btn-primary whitespace-nowrap">
+                {user?.user_metadata?.role === 'artist' ? 'Go to Dashboard' : 'Start Selling'}
               </Link>
             </div>
           </div>

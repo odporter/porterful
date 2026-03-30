@@ -43,9 +43,12 @@ export default function Home() {
 
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
-                  <Link href="/signup?role=artist" className="pf-btn pf-btn-primary text-lg px-8 py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--pf-orange)]/10">
+                  <Link
+                    href={user?.user_metadata?.role === 'artist' ? '/dashboard' : '/signup?role=artist'}
+                    className="pf-btn pf-btn-primary text-lg px-8 py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--pf-orange)]/10"
+                  >
                     <Star size={18} className="fill-current" />
-                    Start Selling — Free
+                    {user?.user_metadata?.role === 'artist' ? 'Go to Dashboard' : 'Start Selling — Free'}
                   </Link>
                   <Link href="/digital" className="pf-btn pf-btn-secondary text-lg px-8 py-3.5 flex items-center justify-center gap-2">
                     <Headphones size={18} />
@@ -101,18 +104,15 @@ export default function Home() {
                     TRACKS.find(t => t.album === 'Ambiguous'),
                     TRACKS.find(t => t.album === 'From Feast to Famine'),
                   ].filter(Boolean).map((track, i) => (
-                    <div
-                      key={track!.id}
-                      className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden shadow-xl shadow-black/30 border-2 border-white/10 relative"
-                    >
+                    <Link key={track!.id} href={`/album/${track!.album.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden shadow-xl shadow-black/30 border-2 border-white/10 relative">
                       <Image
                         src={track!.image}
                         alt={track!.album || ''}
                         fill
                         sizes="96px"
-                        className="object-cover"
+                        className="object-cover hover:scale-105 transition-transform"
                       />
-                    </div>
+                    </Link>
                   ))}
                 </div>
 

@@ -143,7 +143,7 @@ export default function UploadPage() {
           body: formData
         })
         
-        const data = await res.json()
+        const data = await res.json().catch(() => ({ error: 'Invalid response from server' }))
         
         if (!res.ok || data.error) {
           throw new Error(data.error || data.details || 'Upload failed')

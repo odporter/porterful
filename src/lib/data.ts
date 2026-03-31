@@ -22,6 +22,7 @@ export const PRODUCTS = [
   { id: 'ambiguous-tee', name: 'Ambiguous Tour Tee', artist: 'O D Porter', price: 28, category: 'merch', type: 'Apparel', description: 'Premium cotton tee from the Ambiguous tour.', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500', colors: ['Black', 'White', 'Orange'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], inStock: true, artistCut: 22.40, sales: 142, rating: 4.8, reviews: 89 },
   { id: 'ambiguous-hoodie', name: 'Ambiguous Hoodie', artist: 'O D Porter', price: 65, category: 'merch', type: 'Apparel', description: 'Heavyweight hoodie with embroidered logo.', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500', colors: ['Black', 'Gray'], sizes: ['S', 'M', 'L', 'XL'], inStock: true, artistCut: 52, sales: 78, rating: 4.9, reviews: 45 },
   { id: 'ambiguous-vinyl', name: 'Ambiguous Vinyl', artist: 'O D Porter', price: 35, category: 'music', type: 'Vinyl', description: 'Limited edition vinyl. 180g audiophile quality.', image: 'https://images.unsplash.com/photo-1539185441755-7697f0f1e3ee?w=500', format: '12" Vinyl', tracks: 21, inStock: true, artistCut: 28, sales: 234, rating: 5.0, reviews: 67 },
+  { id: 'mettle', name: 'METTLE - Do It With a Smile', artist: 'Nikee Turbo', price: 40, category: 'merch', type: 'Apparel', description: 'PremiumMETTLE shirt. Do It With a Smile.', image: '/artists/nikee-turbo/products/mettle/IMG_4415.jpg', images: ['/artists/nikee-turbo/products/mettle/IMG_4413.jpg', '/artists/nikee-turbo/products/mettle/IMG_4414.jpg', '/artists/nikee-turbo/products/mettle/IMG_4415.jpg', '/artists/nikee-turbo/products/mettle/IMG_4416.jpg', '/artists/nikee-turbo/products/mettle/IMG_4417.jpg', '/artists/nikee-turbo/products/mettle/IMG_4418.jpg'], colors: ['Black', 'White'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], inStock: true, artistCut: 32, sales: 0, rating: 0, reviews: 0 },
 ];
 
 // All tracks with CDN audio URLs
@@ -130,6 +131,20 @@ export const TRACKS = [
   { id: 'lev-07', title: 'Only Real Niggaz', artist: 'O D Porter', album: 'Levi', duration: '3:55', price: 1, plays: 47000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai_Jai_-_Only_Real_Niggaz__LEVI_501_Vol.1_.mp3') },
   { id: 'lev-08', title: 'Pain', artist: 'O D Porter', album: 'Levi', duration: '3:28', price: 1, plays: 39000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai_Jai_-_Pain__LEVI_501_Vol.1_.mp3') },
   { id: 'lev-09', title: 'Struggle', artist: 'O D Porter', album: 'Levi', duration: '4:45', price: 1, plays: 55000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai_Jai_-_Struggle__LEVI_501_Vol.1_.mp3') },
+  // GUNE TRACKS
+  { id: 'gune-01', title: 'Call Back', artist: 'Gune', album: 'Singles', duration: '2:30', price: 1, plays: 0, image: '/artists/gune/ISIMG-1050533.JPG', audio_url: '/artists/gune/Gune - Call Back.mp3' },
+  { id: 'gune-02', title: 'Sorry in Advance', artist: 'Gune', album: 'Singles', duration: '3:12', price: 1, plays: 0, image: '/artists/gune/ISIMG-1050533.JPG', audio_url: '/artists/gune/Gune - Sorry in advance.mp3' },
+  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 0, image: '/artists/gune/ISIMG-1050533.JPG', audio_url: '/artists/gune/Gunebugtheplug - One more time .mp3' },
+  // O D PORTER SINGLES
+  { id: 'od-tlf', title: 'TLF', artist: 'O D Porter', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artists/od-porter/tlf-cover.png', audio_url: '/artists/od-porter/TLF.mp3' },
+  // NIKEE TURBO TRACKS
+  { id: 'nikee-01', title: 'Dominique', artist: 'Nikee Turbo', album: 'Singles', duration: '2:45', price: 1, plays: 0, image: '/artists/nikee-turbo/Cover Art.png', audio_url: '/artists/nikee-turbo/Dominique.mp3' },
+  { id: 'nikee-02', title: 'Harder', artist: 'Nikee Turbo', album: 'Singles', duration: '3:20', price: 1, plays: 0, image: '/artists/nikee-turbo/Cover Art.png', audio_url: '/artists/nikee-turbo/Harder.mp3' },
+  { id: 'nikee-03', title: 'Hide The Pain', artist: 'Nikee Turbo', album: 'Singles', duration: '2:55', price: 1, plays: 0, image: '/artists/nikee-turbo/Cover Art.png', audio_url: '/artists/nikee-turbo/Hide The pain (Unreleased Version).mp3' },
+  // ROB SOULE TRACKS
+  { id: 'rob-01', title: 'Believe In Me', artist: 'Rob Soule', album: 'Believe In Me', duration: '3:45', price: 1, plays: 0, image: '/artists/rob-soule/hq720.jpg', audio_url: '/artists/rob-soule/Believe In Me.mp3' },
+  { id: 'rob-02', title: 'Ride N Vibe', artist: 'Rob Soule', album: 'Ride N Vibe', duration: '4:10', price: 1, plays: 0, image: '/artists/rob-soule/hq720.jpg', audio_url: '/artists/rob-soule/Ride N Vibe.mp3' },
+  { id: 'rob-03', title: 'Roots', artist: 'Rob Soule', album: 'Roots', duration: '4:25', price: 1, plays: 0, image: '/artists/rob-soule/hq720.jpg', audio_url: '/artists/rob-soule/Roots.mp3' },
 ];
 
 // Album data

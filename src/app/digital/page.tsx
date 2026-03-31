@@ -1,635 +1,209 @@
-'use client'
+'use client';
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image';
+import Link from 'next/link';
+import { Play, Pause, SkipForward, Headphones, Lock, CreditCard } from 'lucide-react';
+import { useAudio } from '@/lib/audio-context';
+import { TRACKS } from '@/lib/data';
 
-import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
-import { useAudio } from '@/lib/audio-context'
-import { TRACKS, ALBUMS } from '@/lib/data'
-import Link from 'next/link'
-import { ArtistLink } from '@/components/ArtistLink'
-import { ArrowUpDown } from 'lucide-react'
+// Mixed radio — cycle through all 4 artists equally
+const ALL_TRACKS = TRACKS.filter(t =>
+  ['O D Porter', 'Gune', 'Nikee Turbo', 'Rob Soule'].includes(t.artist)
+);
 
-// Loading skeleton component
-function TrackSkeleton() {
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] animate-pulse">
-      <div className="w-12 h-12 rounded-lg bg-[var(--pf-bg)]" />
-      <div className="flex-1">
-        <div className="h-4 bg-[var(--pf-bg)] rounded w-3/4 mb-2" />
-        <div className="h-3 bg-[var(--pf-bg)] rounded w-1/2" />
-      </div>
-      <div className="w-20 h-8 bg-[var(--pf-bg)] rounded-lg" />
-    </div>
-  )
-}
+export default function DigitalPage() {
+  const [radioQueue, setRadioQueue] = useState<typeof ALL_TRACKS>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [countdown, setCountdown] = useState(99);
+  const { loadTrack, isPlaying: audioPlaying, currentTrack } = useAudio();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const shuffleRef = useRef<typeof ALL_TRACKS>([]);
 
-function AlbumSkeleton() {
-  return (
-    <div className="flex-shrink-0 w-44">
-      <div className="aspect-square bg-[var(--pf-surface)] rounded-xl animate-pulse" />
-      <div className="p-3">
-        <div className="h-4 bg-[var(--pf-surface)] rounded w-3/4 mb-2 animate-pulse" />
-        <div className="h-3 bg-[var(--pf-surface)] rounded w-1/2 animate-pulse" />
-      </div>
-    </div>
-  )
-}
-
-// Custom Porterful Icons
-const Icon = {
-  Play: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>,
-  Pause: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>,
-  Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-  ChevronLeft: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15,18 9,12 15,6"/></svg>,
-  ChevronRight: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9,18 15,12 9,6"/></svg>,
-  X: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-  Plus: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-  Minus: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-}
-
-// Buy Button with Quantity and Custom Amount
-function BuyButton({ track }: { track: typeof TRACKS[0] }) {
-  const [loading, setLoading] = useState(false)
-  const [showModal, setShowModal] = useState(false)
-  const [quantity, setQuantity] = useState(1)
-  const [tip, setTip] = useState(0)
-  const [customTip, setCustomTip] = useState('')
-  const [error, setError] = useState('')
-  const modalRef = useRef<HTMLDivElement>(null)
-
-  // Close modal on Escape key
+  // Shuffle tracks so artists are mixed — Gune, Nikee Turbo, Rob Soule first in order
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showModal) {
-        setShowModal(false)
-      }
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [showModal])
+    const guneTrack = ALL_TRACKS.find(t => t.id === 'gune-03'); // One More Time
+    const nikeeTrack = ALL_TRACKS.find(t => t.id === 'nikee-01'); // Dominique
+    const robTrack = ALL_TRACKS.find(t => t.id === 'rob-01'); // Believe In Me
+    const rest = ALL_TRACKS.filter(t => !['gune-03', 'nikee-01', 'rob-01'].includes(t.id));
+    const shuffled = rest.sort(() => Math.random() - 0.5);
+    const ordered = [guneTrack, nikeeTrack, robTrack, ...shuffled].filter((t): t is typeof ALL_TRACKS[0] => t !== undefined);
+    shuffleRef.current = ordered;
+    setRadioQueue(ordered);
+  }, []);
 
-  // Focus trap within modal
+  // Countdown timer
   useEffect(() => {
-    if (showModal && modalRef.current) {
-      modalRef.current.focus()
+    if (!isPlaying) return;
+    intervalRef.current = setInterval(() => {
+      setCountdown(c => {
+        if (c <= 1) {
+          // Skip to next track instead of stopping
+          setCurrentIndex(i => (i + 1) % radioQueue.length);
+          setCountdown(99);
+          return 99;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [isPlaying, radioQueue.length]);
+
+  const playRadio = () => {
+    if (!radioQueue.length) return;
+    const track = radioQueue[currentIndex];
+    loadTrack({ ...track, duration: 180 });
+    setIsPlaying(true);
+    setCountdown(99);
+    setShowPaywall(false);
+  };
+
+  // Load new track when currentIndex changes (skip or auto-skip)
+  useEffect(() => {
+    if (isPlaying && radioQueue[currentIndex]) {
+      loadTrack({ ...radioQueue[currentIndex], duration: 180 });
     }
-  }, [showModal])
-  
-  const handleBuy = async () => {
-    setLoading(true)
-    setError('')
-    
-    try {
-      const totalTip = tip + (customTip ? parseFloat(customTip) || 0 : 0)
-      const totalPrice = (track.price * quantity) + totalTip
-      
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: [{
-            productId: track.id,
-            name: track.title,
-            artist: track.artist,
-            image: track.image,
-            price: totalPrice,
-            quantity: quantity,
-            type: 'track',
-            audioUrl: track.audio_url,
-          }]
-        })
-      })
-      
-      const data = await res.json()
-      
-      if (data.error) {
-        setError(data.error)
-        setLoading(false)
-        return
-      }
-      
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        setError('Could not create checkout session. Please try again.')
-        setLoading(false)
-      }
-    } catch (err) {
-      console.error('Checkout error:', err)
-      setError('Something went wrong. Please try again.')
-      setLoading(false)
-    }
-  }
-  
-  const totalTip = tip + (customTip ? parseFloat(customTip) || 0 : 0)
-  const totalPrice = (track.price * quantity) + totalTip
-  
+  }, [currentIndex, isPlaying, radioQueue]);
+
+  const skipTrack = () => {
+    const next = (currentIndex + 1) % radioQueue.length;
+    setCurrentIndex(next);
+    loadTrack({ ...radioQueue[next], duration: 180 });
+  };
+
+  const currentTrackData = radioQueue[currentIndex];
+
   return (
-    <>
-      <button
-        onClick={() => setShowModal(true)}
-        className="px-4 py-2 bg-gradient-to-r from-[var(--pf-orange)] to-orange-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-2 shadow-lg"
-      >
-        Buy ${track.price}
-      </button>
-      
-      {showModal && (
-        <div 
-          ref={modalRef}
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" 
-          onClick={(e) => e.target === e.currentTarget && setShowModal(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="buy-modal-title"
-          tabIndex={-1}
-        >
-          <div className="bg-[var(--pf-bg)] rounded-2xl p-6 w-full max-w-md shadow-2xl border border-[var(--pf-border)]" onClick={e => e.stopPropagation()}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 id="buy-modal-title" className="text-xl font-bold text-[var(--pf-text)]">Buy "{track.title}"</h3>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-[var(--pf-surface)] rounded-lg transition-colors" aria-label="Close modal">
-                <Icon.X />
-              </button>
-            </div>
-            
-            {/* Quantity Selector */}
-            <div className="mb-4">
-              <p className="text-sm text-[var(--pf-text-secondary)] mb-2">Quantity</p>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-12 h-12 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] flex items-center justify-center hover:border-[var(--pf-orange)] transition-colors"
-                  disabled={quantity <= 1}
-                >
-                  <Icon.Minus />
-                </button>
-                <input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-20 h-10 text-center rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text)] font-medium"
-                  min="1"
-                />
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-12 h-12 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] flex items-center justify-center hover:border-[var(--pf-orange)] transition-colors"
-                >
-                  <Icon.Plus />
-                </button>
-              </div>
-            </div>
-            
-            {/* Tip Options */}
-            <div className="mb-4">
-              <p className="text-sm text-[var(--pf-text-secondary)] mb-2">Add a tip (supports the artist)</p>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {[0, 1, 2, 5, 10].map(amount => (
-                  <button
-                    key={amount}
-                    onClick={() => { setTip(amount); setCustomTip(''); }}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      tip === amount && !customTip
-                        ? 'bg-[var(--pf-orange)] text-white'
-                        : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
-                    }`}
-                  >
-                    {amount === 0 ? 'No tip' : `+$${amount}`}
-                  </button>
-                ))}
-              </div>
-              {/* Custom tip input */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[var(--pf-text-secondary)]">Custom:</span>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]">$</span>
-                  <input
-                    type="number"
-                    value={customTip}
-                    onChange={(e) => { setCustomTip(e.target.value); setTip(0); }}
-                    placeholder="0"
-                    className="w-24 h-10 pl-7 pr-3 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text)] focus:border-[var(--pf-orange)] focus:outline-none"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            {/* Total Breakdown */}
-            <div className="bg-[var(--pf-surface)] rounded-xl p-4 mb-4">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-[var(--pf-text-secondary)]">{track.title} × {quantity}</span>
-                <span className="text-[var(--pf-text)]">${(track.price * quantity).toFixed(2)}</span>
-              </div>
-              {totalTip > 0 && (
-                <div className="flex justify-between items-center mt-2 text-sm">
-                  <span className="text-[var(--pf-text-secondary)]">Tip</span>
-                  <span className="text-green-400">+${totalTip.toFixed(2)}</span>
-                </div>
-              )}
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-[var(--pf-border)]">
-                <span className="font-medium text-[var(--pf-text)]">Total</span>
-                <span className="font-bold text-xl text-[var(--pf-orange)]">${totalPrice.toFixed(2)}</span>
-              </div>
-            </div>
-            
-            {/* Error message */}
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                {error}
-              </div>
-            )}
-            
-            {/* Buy button */}
-            <button
-              onClick={handleBuy}
-              disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-[var(--pf-orange)] to-orange-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                  </svg>
-                  Processing...
-                </span>
-              ) : (
-                `Pay $${totalPrice.toFixed(2)}`
-              )}
-            </button>
-            
-            {/* One-time payment message */}
-            <div className="mt-4 text-center">
-              <p className="text-xs text-[var(--pf-text-muted)] mb-1">
-                One-time payment. No subscription.
-              </p>
-              <p className="text-xs text-[var(--pf-text-muted)]">
-                You'll receive a download link after purchase.
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen pt-20 pb-24">
+      {/* Header */}
+      <div className="relative py-16 bg-gradient-to-br from-[var(--pf-orange)]/20 via-[var(--pf-bg-secondary)] to-purple-900/20 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_var(--pf-orange)_0%,_transparent_50%)]"/>
         </div>
-      )}
-    </>
-  )
-}
-
-// Carousel Component
-function Carousel({ children }: { children: React.ReactNode }) {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
-
-  const checkScroll = () => {
-    if (!scrollRef.current) return
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
-    setCanScrollLeft(scrollLeft > 0)
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-  }
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-    el.addEventListener('scroll', checkScroll)
-    checkScroll()
-    return () => el.removeEventListener('scroll', checkScroll)
-  }, [])
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (!scrollRef.current) return
-    const scrollAmount = scrollRef.current.clientWidth * 0.8
-    scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
-  }
-
-  return (
-    <div className="relative">
-      {canScrollLeft && (
-        <button onClick={() => scroll('left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/80 rounded-full flex items-center justify-center text-white hover:bg-black">
-          <Icon.ChevronLeft />
-        </button>
-      )}
-      <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
-        {children}
-      </div>
-      {canScrollRight && (
-        <button onClick={() => scroll('right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/80 rounded-full flex items-center justify-center text-white hover:bg-black">
-          <Icon.ChevronRight />
-        </button>
-      )}
-    </div>
-  )
-}
-
-export default function MusicPage() {
-  const { currentTrack, isPlaying, playTrack, setQueue } = useAudio()
-  const [search, setSearch] = useState('')
-  const [activeTab, setActiveTab] = useState<'artists' | 'albums' | 'songs'>('artists')
-  const [songsDisplayed, setSongsDisplayed] = useState(50)
-  const [isLoading, setIsLoading] = useState(true)
-  const [sortBy, setSortBy] = useState<'default' | 'price-low' | 'price-high' | 'title' | 'artist'>('default')
-
-  // Simulate initial load
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800)
-    return () => clearTimeout(timer)
-  }, [])
-
-  const filteredTracks = search 
-    ? TRACKS.filter(t => 
-        t.title.toLowerCase().includes(search.toLowerCase()) ||
-        t.artist.toLowerCase().includes(search.toLowerCase()) ||
-        t.album?.toLowerCase().includes(search.toLowerCase())
-      )
-    : []
-
-  // Apply sorting to TRACKS
-  const sortedTracks = [...TRACKS].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price
-      case 'price-high':
-        return b.price - a.price
-      case 'title':
-        return a.title.localeCompare(b.title)
-      case 'artist':
-        return a.artist.localeCompare(b.artist)
-      default:
-        return 0
-    }
-  })
-
-  const artists = Array.from(new Set(TRACKS.map(t => t.artist)))
-  const albums = Object.values(ALBUMS)
-
-  const playAll = () => {
-    setQueue(TRACKS.map(t => ({
-      ...t,
-      duration: typeof t.duration === 'string' ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : t.duration || 180
-    })))
-    playTrack({
-      ...TRACKS[0],
-      duration: typeof TRACKS[0].duration === 'string' ? TRACKS[0].duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : TRACKS[0].duration || 180
-    } as any)
-  }
-
-  return (
-    <div className="min-h-screen pt-20 pb-24 overflow-x-hidden">
-      <div className="pf-container max-w-4xl">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-[var(--pf-text)]">Music</h1>
-              <p className="text-[var(--pf-text-secondary)]">{TRACKS.length} tracks • {albums.length} albums</p>
-            </div>
-            <div className="flex items-center gap-3">
-              {!isLoading && (
-                <button onClick={playAll} className="pf-btn pf-btn-primary flex items-center gap-2">
-                  {isPlaying ? <Icon.Pause /> : <Icon.Play />}
-                  <span className="hidden sm:inline">Play All</span>
-                </button>
-              )}
-              {/* Sort Dropdown */}
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text)] text-sm focus:border-[var(--pf-orange)] focus:outline-none cursor-pointer"
-                >
-                  <option value="default">Default</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="title">Title A-Z</option>
-                  <option value="artist">Artist A-Z</option>
-                </select>
-                <ArrowUpDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] pointer-events-none" />
-              </div>
-            </div>
+        <div className="pf-container relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/20 border border-[var(--pf-orange)]/40 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-4">
+            <Headphones size={14} className="fill-current" />
+            Porterful Radio
           </div>
-          
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pf-orange)] to-yellow-400">Hot 99.9</span>
+            <span className="text-white ml-3">Porterful Radio</span>
+          </h1>
+          <p className="text-[var(--pf-text-secondary)] text-lg max-w-xl mx-auto">
+            Listen to all our artists. Pay once, get lifetime access to everything — including your favorite artists.
+          </p>
+        </div>
+      </div>
+
+      <div className="pf-container py-12 max-w-2xl">
+
+        {/* Radio Player Card */}
+        <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl overflow-hidden mb-8">
           {/* Now Playing */}
-          {!isLoading && currentTrack && (
-            <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-xl p-4 mb-4 border border-[var(--pf-orange)]/20">
+          <div className="p-6 border-b border-[var(--pf-border)]">
+            <div className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-3">Now Playing</div>
+            {currentTrackData ? (
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 relative">
-                  <Image src={currentTrack.image || '/placeholder-album.png'} alt={currentTrack.title} fill className="object-cover" />
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-[var(--pf-bg-secondary)] shrink-0">
+                  <Image src={currentTrackData.image} alt={currentTrackData.title} width={64} height={64} className="object-cover w-full h-full" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[var(--pf-text)] truncate">{currentTrack.title}</p>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">{currentTrack.artist}</p>
+                  <div className="font-bold text-lg truncate">{currentTrackData.artist}</div>
+                  <div className="text-[var(--pf-text-secondary)] text-sm truncate">{currentTrackData.title}</div>
                 </div>
-                <BuyButton track={currentTrack as any} />
+                <div className="text-[var(--pf-orange)] text-sm font-medium shrink-0">{currentTrackData.duration}</div>
               </div>
+            ) : (
+              <div className="text-[var(--pf-text-muted)]">Press play to start listening</div>
+            )}
+          </div>
+
+          {/* Progress / Countdown */}
+          {isPlaying && (
+            <div className="px-6 py-4 border-b border-[var(--pf-border)]">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-xs text-[var(--pf-orange)] font-mono w-8">{countdown}s</span>
+                <div className="flex-1 h-1.5 bg-[var(--pf-bg-secondary)] rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[var(--pf-orange)] to-yellow-400 rounded-full transition-all duration-1000" style={{ width: `${(countdown / 99) * 100}%` }} />
+                </div>
+                <Lock size={12} className="text-[var(--pf-text-muted)]" />
+              </div>
+              <p className="text-xs text-[var(--pf-text-muted)]">Preview limited to 99 seconds. Pay once for unlimited access.</p>
             </div>
           )}
-        </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]">
-              <Icon.Search />
+          {/* Controls */}
+          <div className="p-6 flex items-center gap-4">
+            <button
+              onClick={isPlaying ? () => setIsPlaying(false) : playRadio}
+              className="w-14 h-14 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white rounded-full flex items-center justify-center transition-colors shadow-lg shadow-[var(--pf-orange)]/30"
+            >
+              {isPlaying ? <Pause size={24} className="fill-current" /> : <Play size={24} className="fill-current ml-1" />}
+            </button>
+            <button onClick={skipTrack} className="w-10 h-10 bg-[var(--pf-bg-secondary)] hover:bg-[var(--pf-border)] text-[var(--pf-text-secondary)] rounded-full flex items-center justify-center transition-colors">
+              <SkipForward size={18} />
+            </button>
+            <div className="flex-1" />
+            <div className="text-right">
+              <div className="text-sm font-medium">{radioQueue.filter(t => t.artist === 'O D Porter').length + radioQueue.filter(t => t.artist === 'Gune').length + radioQueue.filter(t => t.artist === 'Nikee Turbo').length + radioQueue.filter(t => t.artist === 'Rob Soule').length} tracks</div>
+              <div className="text-xs text-[var(--pf-text-muted)]">Mixed from all artists</div>
             </div>
-            <input
-              type="text"
-              placeholder="Search artists, albums, songs..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-3 pl-12 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text)] placeholder:text-[var(--pf-text-muted)] focus:border-[var(--pf-orange)] focus:outline-none"
-            />
           </div>
         </div>
 
-        {/* Search Results */}
-        {search && (
-          <div className="mb-8">
-            <h2 className="text-lg font-bold mb-3 text-[var(--pf-text)]">Results for "{search}"</h2>
-            {filteredTracks.length === 0 ? (
-              <p className="text-[var(--pf-text-secondary)]">No results found</p>
-            ) : (
-              <div className="space-y-2">
-                {filteredTracks.slice(0, 20).map(track => (
-                  <div
-                    key={track.id}
-                    className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                      currentTrack?.id === track.id
-                        ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]'
-                        : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
-                    }`}
-                    onClick={() => playTrack({
-                      ...track,
-                      duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : track.duration || 180
-                    } as any)}
-                  >
-                    <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative">
-                      <Image src={track.image || '/placeholder-album.png'} alt={track.title} fill className="object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : 'text-[var(--pf-text)]'}`}>
-                        {track.title}
-                      </p>
-                      <p className="text-sm text-[var(--pf-text-secondary)] truncate"><ArtistLink artist={track.artist} className="text-[var(--pf-text-secondary)]" /> • {track.album}</p>
-                    </div>
-                    <BuyButton track={track} />
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Paywall CTA */}
+        {showPaywall && (
+          <div className="bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-500/20 border border-[var(--pf-orange)]/30 rounded-2xl p-8 text-center">
+            <div className="w-16 h-16 bg-[var(--pf-orange)]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock size={28} className="text-[var(--pf-orange)]" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">That's the Preview</h2>
+            <p className="text-[var(--pf-text-secondary)] mb-6">Listen to all tracks from every artist. No limits. Lifetime access.</p>
+            <div className="text-3xl font-black mb-6">$5.99 <span className="text-sm font-normal text-[var(--pf-text-muted)]">lifetime</span></div>
+            <Link href="/checkout?plan=lifetime" className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white font-bold rounded-xl transition-colors shadow-lg shadow-[var(--pf-orange)]/30">
+              <CreditCard size={18} />
+              Get Full Access
+            </Link>
+            <p className="text-xs text-[var(--pf-text-muted)] mt-3">One payment. Everything. Forever.</p>
           </div>
         )}
 
-        {/* Tabs */}
-        {!search && (
-          <>
-            {/* Loading skeletons */}
-            {isLoading ? (
-              <div className="space-y-6">
-                <div className="flex gap-2">
-                  <div className="h-10 w-20 bg-[var(--pf-surface)] rounded-lg animate-pulse" />
-                  <div className="h-10 w-20 bg-[var(--pf-surface)] rounded-lg animate-pulse" />
-                  <div className="h-10 w-20 bg-[var(--pf-surface)] rounded-lg animate-pulse" />
+        {/* Artist Teasers */}
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Our Artists</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { name: 'O D Porter', genre: 'Hip-Hop, R&B, Soul', id: 'od-porter', img: '/artist-art/od-porter.jpg' },
+              { name: 'Gune', genre: 'Hip-Hop, R&B', id: 'gune', img: '/artists/gune/ISIMG-1050533.JPG' },
+              { name: 'Nikee Turbo', genre: 'Hip-Hop, R&B', id: 'nikee-turbo', img: '/artists/nikee-turbo/ab6761610000e5ebfddbec3845c421474dc2d779.jpeg' },
+              { name: 'Rob Soule', genre: 'Hip-Hop, R&B, Blues', id: 'rob-soule', img: '/artists/rob-soule/hq720.jpg' },
+            ].map(artist => (
+              <Link key={artist.id} href={`/artist/${artist.id}`} className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-3 hover:border-[var(--pf-orange)]/50 transition-colors group">
+                <div className="w-full aspect-square rounded-lg overflow-hidden bg-[var(--pf-bg-secondary)] mb-2">
+                  <Image src={artist.img} alt={artist.name} width={200} height={200} className="object-cover w-full h-full group-hover:scale-105 transition-transform" />
                 </div>
-                <div className="space-y-4">
-                  <div className="h-6 bg-[var(--pf-surface)] rounded w-32 animate-pulse" />
-                  <div className="flex gap-4 overflow-hidden">
-                    {[1,2,3,4,5].map(i => <AlbumSkeleton key={i} />)}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {[1,2,3,4,5,6].map(i => <TrackSkeleton key={i} />)}
-                </div>
-              </div>
-            ) : (
-              <>
-            <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide">
-              {['artists', 'albums', 'songs'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab as any)}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                    activeTab === tab
-                      ? 'bg-[var(--pf-orange)] text-white'
-                      : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)]'
-                  }`}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
+                <div className="font-bold text-sm">{artist.name}</div>
+                <div className="text-xs text-[var(--pf-text-muted)]">{artist.genre}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Artist Stats */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'O D Porter', tracks: ALL_TRACKS.filter(t => t.artist === 'O D Porter').length },
+            { label: 'Gune', tracks: ALL_TRACKS.filter(t => t.artist === 'Gune').length },
+            { label: 'Nikee Turbo', tracks: ALL_TRACKS.filter(t => t.artist === 'Nikee Turbo').length },
+            { label: 'Rob Soule', tracks: ALL_TRACKS.filter(t => t.artist === 'Rob Soule').length },
+          ].map(stat => (
+            <div key={stat.label} className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-4 text-center">
+              <div className="text-2xl font-black text-[var(--pf-orange)]">{stat.tracks}</div>
+              <div className="text-xs text-[var(--pf-text-muted)]">{stat.label} tracks</div>
             </div>
-
-            {/* Artists Tab */}
-            {activeTab === 'artists' && (
-              <div className="mb-8">
-                <h2 className="text-lg font-bold mb-4 text-[var(--pf-text)]">Artists</h2>
-                <Carousel>
-                  {artists.map(artist => (
-                    <Link key={artist} href={`/artist/${artist.toLowerCase().replace(/\s+/g, '-')}`} className="flex-shrink-0 w-40">
-                      <div className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-                        <div className="aspect-square bg-gradient-to-br from-[var(--pf-orange)]/30 to-purple-600/30 flex items-center justify-center">
-                          <span className="text-4xl font-bold text-white/80">{artist.charAt(0)}</span>
-                        </div>
-                        <div className="p-3">
-                          <p className="font-medium text-[var(--pf-text)] truncate">{artist}</p>
-                          <p className="text-xs text-[var(--pf-text-secondary)]">{TRACKS.filter(t => t.artist === artist).length} tracks</p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </Carousel>
-              </div>
-            )}
-
-            {/* Albums Tab */}
-            {activeTab === 'albums' && (
-              <div className="mb-8">
-                <h2 className="text-lg font-bold mb-4 text-[var(--pf-text)]">Albums</h2>
-                <Carousel>
-                  {albums.map(album => {
-                    const albumTracks = TRACKS.filter(t => t.album === album.name)
-                    return (
-                      <div key={album.id} className="flex-shrink-0 w-44">
-                        <div className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors cursor-pointer"
-                          onClick={() => {
-                            setQueue(albumTracks.map(t => ({
-                              ...t,
-                              duration: typeof t.duration === 'string' ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : t.duration || 180
-                            })))
-                            playTrack({
-                              ...albumTracks[0],
-                              duration: typeof albumTracks[0].duration === 'string' ? albumTracks[0].duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : albumTracks[0].duration || 180
-                            } as any)
-                          }}
-                        >
-                          <div className="aspect-square relative">
-                            <Image src={album.image || '/placeholder-album.png'} alt={album.name} fill className="object-cover" />
-                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                              <div className="w-12 h-12 rounded-full bg-[var(--pf-orange)] flex items-center justify-center">
-                                <Icon.Play />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="p-3">
-                            <p className="font-medium text-[var(--pf-text)] truncate">{album.name}</p>
-                            <p className="text-xs text-[var(--pf-text-secondary)]">{albumTracks.length} tracks</p>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </Carousel>
-              </div>
-            )}
-
-            {/* Songs Tab */}
-            {activeTab === 'songs' && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-[var(--pf-text)]">All Songs</h2>
-                  <p className="text-sm text-[var(--pf-text-muted)]">
-                    Showing {Math.min(songsDisplayed, sortedTracks.length)} of {sortedTracks.length}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {sortedTracks.slice(0, songsDisplayed).map(track => (
-                    <div
-                      key={track.id}
-                      className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                        currentTrack?.id === track.id
-                          ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]'
-                          : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
-                      }`}
-                      onClick={() => playTrack({
-                        ...track,
-                        duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0) : track.duration || 180
-                      } as any)}
-                    >
-                      <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative">
-                        <Image src={track.image || '/placeholder-album.png'} alt={track.title} fill className="object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`font-medium truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : 'text-[var(--pf-text)]'}`}>
-                          {track.title}
-                        </p>
-                        <p className="text-sm text-[var(--pf-text-secondary)] truncate"><ArtistLink artist={track.artist} className="text-[var(--pf-text-secondary)]" /> • {track.album}</p>
-                      </div>
-                      <BuyButton track={track} />
-                    </div>
-                  ))}
-                </div>
-                {songsDisplayed < sortedTracks.length && (
-                  <button
-                    onClick={() => setSongsDisplayed(prev => Math.min(prev + 50, sortedTracks.length))}
-                    className="w-full mt-4 py-3 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-orange)] transition-colors font-medium"
-                  >
-                    Load More Songs ({sortedTracks.length - songsDisplayed} remaining)
-                  </button>
-                )}
-              </div>
-            )}
-              </>
-            )}
-          </>
-        )}
+          ))}
+        </div>
       </div>
     </div>
   )

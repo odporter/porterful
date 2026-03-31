@@ -2,17 +2,26 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Crown, Check, Music, Download, Zap, ArrowLeft } from 'lucide-react'
+import { Heart, Check, Music, Download, ArrowLeft, Sparkles } from 'lucide-react'
 import { TRACKS } from '@/lib/data'
 
 export default function UnlockPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [customAmount, setCustomAmount] = useState('')
+  const selectedAmount = customAmount || '5.99'
 
   const handlePurchase = async () => {
     setLoading(true)
     setError('')
-    
+
+    const amount = parseFloat(selectedAmount)
+    if (isNaN(amount) || amount < 5.99) {
+      setError('Minimum contribution is $5.99 — thank you for understanding!')
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
@@ -21,20 +30,19 @@ export default function UnlockPage() {
           items: [{
             productId: 'full-access',
             name: 'Full Access - All Music Unlocked',
-            price: 5.99,
+            price: amount,
             quantity: 1,
             type: 'digital',
             image: '/logo.svg'
           }]
         })
       })
-      
+
       const data = await res.json()
-      
+
       if (data.url) {
         window.location.href = data.url
       } else if (data.demo) {
-        // Demo mode - redirect to success
         window.location.href = '/checkout/success?demo=true'
       } else {
         setError(data.error || 'Something went wrong. Please try again.')
@@ -50,28 +58,58 @@ export default function UnlockPage() {
     <div className="min-h-screen pt-20 pb-24 bg-[var(--pf-bg)]">
       <div className="pf-container max-w-2xl">
         {/* Back Link */}
-        <Link href="/support" className="inline-flex items-center gap-2 text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] mb-8">
           <ArrowLeft size={20} />
-          Back to pricing
+          Back to home
         </Link>
 
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 mb-4">
-            <Crown className="text-white" size={40} />
+            <Heart className="text-white" size={40} />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Unlock Everything</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Show Some Love</h1>
           <p className="text-[var(--pf-text-secondary)]">
-            One payment. All music. No subscription.
+            Support the artists directly. Minimum $5.99 — add more if you want.
           </p>
         </div>
 
-        {/* Price Card */}
+        {/* Contribution Card */}
         <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-2xl p-8 border border-[var(--pf-orange)]/30 mb-8">
           <div className="text-center mb-6">
-            <p className="text-sm text-[var(--pf-text-secondary)] mb-1">One-time payment</p>
-            <p className="text-5xl font-bold">$5.99</p>
-            <p className="text-sm text-[var(--pf-text-muted)]">USD</p>
+            <p className="text-sm text-[var(--pf-text-secondary)] mb-1">Your contribution goes directly to artists</p>
+            <div className="flex items-center justify-center gap-1 mt-2">
+              <span className="text-5xl font-bold">$</span>
+              <input
+                type="number"
+                min="5.99"
+                step="0.01"
+                value={customAmount}
+                onChange={e => setCustomAmount(e.target.value)}
+                placeholder="5.99"
+                className="text-5xl font-bold bg-transparent border-none outline-none text-center w-32"
+              />
+            </div>
+            <p className="text-sm text-[var(--pf-text-muted)]">USD · Minimum $5.99</p>
+          </div>
+
+          {/* Preset amounts */}
+          <div className="flex gap-2 mb-6 justify-center flex-wrap">
+            {['5.99', '9.99', '14.99', '19.99', '29.99'].map(amount => (
+              <button
+                key={amount}
+                onClick={() => setCustomAmount(amount)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  selectedAmount === amount && !customAmount
+                    ? 'bg-[var(--pf-orange)] text-white'
+                    : customAmount === amount
+                    ? 'bg-[var(--pf-orange)] text-white'
+                    : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
+                }`}
+              >
+                ${amount}
+              </button>
+            ))}
           </div>
 
           <div className="space-y-3 mb-6">
@@ -81,7 +119,7 @@ export default function UnlockPage() {
             </div>
             <div className="flex items-center gap-3">
               <Check size={20} className="text-green-400 shrink-0" />
-              <span className="text-[var(--pf-text)]"><strong>All albums</strong> — 8 full albums</span>
+              <span className="text-[var(--pf-text)]"><strong>All albums</strong> — full access forever</span>
             </div>
             <div className="flex items-center gap-3">
               <Check size={20} className="text-green-400 shrink-0" />
@@ -93,15 +131,7 @@ export default function UnlockPage() {
             </div>
             <div className="flex items-center gap-3">
               <Check size={20} className="text-green-400 shrink-0" />
-              <span className="text-[var(--pf-text)]"><strong>No subscription</strong> — pay once, own forever</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Check size={20} className="text-green-400 shrink-0" />
-              <span className="text-[var(--pf-text)]"><strong>Download rights</strong> — keep your music offline</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Check size={20} className="text-green-400 shrink-0" />
-              <span className="text-[var(--pf-text)]"><strong>80% to artists</strong> — support creators directly</span>
+              <span className="text-[var(--pf-text)]"><strong>80% to artists</strong> — your money goes further here</span>
             </div>
           </div>
 
@@ -126,8 +156,8 @@ export default function UnlockPage() {
               </>
             ) : (
               <>
-                <Zap size={20} />
-                Unlock Everything — $5.99
+                <Heart size={20} className="fill-current" />
+                Contribute ${selectedAmount} — Unlock Everything
               </>
             )}
           </button>
@@ -139,7 +169,10 @@ export default function UnlockPage() {
 
         {/* What You Get */}
         <div className="bg-[var(--pf-surface)] rounded-xl p-6 border border-[var(--pf-border)] mb-8">
-          <h3 className="font-bold mb-4">What You're Getting</h3>
+          <h3 className="font-bold mb-4 flex items-center gap-2">
+            <Sparkles size={16} className="text-[var(--pf-orange)]" />
+            What You're Getting
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
               <Music className="text-[var(--pf-orange)]" size={20} />
@@ -150,7 +183,7 @@ export default function UnlockPage() {
               <span className="text-sm">Download access</span>
             </div>
             <div className="flex items-center gap-2">
-              <Crown className="text-[var(--pf-orange)]" size={20} />
+              <Heart className="text-[var(--pf-orange)]" size={20} />
               <span className="text-sm">Full streaming</span>
             </div>
             <div className="flex items-center gap-2">
@@ -176,7 +209,7 @@ export default function UnlockPage() {
               <tbody>
                 <tr className="border-b border-[var(--pf-border)]">
                   <td className="py-2 pr-4">Cost</td>
-                  <td className="text-center py-2 px-4"><strong>$5.99 once</strong></td>
+                  <td className="text-center py-2 px-4"><strong>${selectedAmount} once</strong></td>
                   <td className="text-center py-2 px-4">$10.99/mo</td>
                   <td className="text-center py-2 px-4">$10.99/mo</td>
                 </tr>
@@ -186,54 +219,14 @@ export default function UnlockPage() {
                   <td className="text-center py-2 px-4">~$0.003/stream</td>
                   <td className="text-center py-2 px-4">~$0.01/stream</td>
                 </tr>
-                <tr className="border-b border-[var(--pf-border)]">
-                  <td className="py-2 pr-4">Subscription</td>
-                  <td className="text-center py-2 px-4"><strong className="text-green-400">No</strong></td>
-                  <td className="text-center py-2 px-4">Yes</td>
-                  <td className="text-center py-2 px-4">Yes</td>
-                </tr>
                 <tr>
-                  <td className="py-2 pr-4">Downloads</td>
-                  <td className="text-center py-2 px-4"><strong className="text-green-400">Yes</strong></td>
-                  <td className="text-center py-2 px-4">Premium only</td>
-                  <td className="text-center py-2 px-4">Premium only</td>
+                  <td className="py-2 pr-4">Subscription</td>
+                  <td className="text-center py-2 px-4"><strong className="text-green-400">Never</strong></td>
+                  <td className="text-center py-2 px-4">Forever</td>
+                  <td className="text-center py-2 px-4">Forever</td>
                 </tr>
               </tbody>
             </table>
-          </div>
-          <p className="text-xs text-[var(--pf-text-muted)] mt-4 text-center">
-            * Based on average streaming payouts. Artists on Porterful get 80% of every sale.
-          </p>
-        </div>
-
-        {/* FAQ */}
-        <div className="mt-8">
-          <h3 className="font-bold mb-4">Questions?</h3>
-          <div className="space-y-3">
-            <details className="bg-[var(--pf-surface)] rounded-lg p-4 border border-[var(--pf-border)]">
-              <summary className="font-medium cursor-pointer">Is this a subscription?</summary>
-              <p className="mt-2 text-[var(--pf-text-secondary)] text-sm">
-                No. You pay $5.99 once and get permanent access to all music on Porterful. No monthly fees, no recurring charges.
-              </p>
-            </details>
-            <details className="bg-[var(--pf-surface)] rounded-lg p-4 border border-[var(--pf-border)]">
-              <summary className="font-medium cursor-pointer">Can I download the music?</summary>
-              <p className="mt-2 text-[var(--pf-text-secondary)] text-sm">
-                Yes. Full access includes download rights for all tracks. Keep your music offline forever.
-              </p>
-            </details>
-            <details className="bg-[var(--pf-surface)] rounded-lg p-4 border border-[var(--pf-border)]">
-              <summary className="font-medium cursor-pointer">What if I only want one song?</summary>
-              <p className="mt-2 text-[var(--pf-text-secondary)] text-sm">
-                You can buy individual songs for $1 each on the <Link href="/digital" className="text-[var(--pf-orange)] hover:underline">Music page</Link>. Full Access is for listeners who want everything.
-              </p>
-            </details>
-            <details className="bg-[var(--pf-surface)] rounded-lg p-4 border border-[var(--pf-border)]">
-              <summary className="font-medium cursor-pointer">Do artists really get 80%?</summary>
-              <p className="mt-2 text-[var(--pf-text-secondary)] text-sm">
-                Yes. 80% goes directly to artists. 20% goes to the Artist Fund, which supports emerging artists on the platform. We take a small platform fee only to keep the lights on.
-              </p>
-            </details>
           </div>
         </div>
       </div>

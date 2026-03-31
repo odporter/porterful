@@ -173,7 +173,7 @@ export function Navbar() {
                   <Link href="/login" className="px-4 py-2 text-sm font-medium text-[var(--pf-text-secondary)] hover:text-white transition-colors">
                     Sign In
                   </Link>
-                  <Link href="/signup" className="px-4 py-2 text-sm font-semibold bg-[var(--pf-orange)] text-white rounded-lg hover:bg-[var(--pf-orange-dark)] transition-colors">
+                  <Link href="/apply" className="px-4 py-2 text-sm font-semibold bg-[var(--pf-orange)] text-white rounded-lg hover:bg-[var(--pf-orange-dark)] transition-colors">
                     Get Started
                   </Link>
                 </div>
@@ -252,7 +252,7 @@ export function Navbar() {
               <Link href="/login" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-medium border border-[var(--pf-border)] rounded-lg">
                 Sign In
               </Link>
-              <Link href="/signup" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-semibold bg-[var(--pf-orange)] text-white rounded-lg">
+              <Link href="/apply" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-semibold bg-[var(--pf-orange)] text-white rounded-lg">
                 Get Started
               </Link>
             </div>

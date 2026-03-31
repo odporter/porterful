@@ -26,8 +26,8 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     username: 'odporter',
     full_name: 'O D Porter',
     email: 'iamodmusic@gmail.com',
-    avatar_url: null,
-    bio: 'St. Louis artist blending hip-hop, R&B, and soul. Born in Miami, raised in NOLA & STL. Building Porterful to help artists own everything.',
+    avatar_url: '/artist-art/od-porter.jpg',
+    bio: 'Independent artist and founder of Porterful. Born in Miami, raised between New Orleans and St. Louis — most known from the STL.',
     genre: 'Hip-Hop / R&B / Soul',
     location: 'St. Louis, MO',
     verified: true,
@@ -35,69 +35,43 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     status: 'live',
   },
   {
-    id: 'atm-trap',
-    username: 'atm-trap',
-    full_name: 'ATM Trap',
+    id: 'gune',
+    username: 'gune',
+    full_name: 'Gune',
     email: null,
-    avatar_url: null,
-    bio: 'St. Louis trap with raw energy. ATM = All The Money.',
-    genre: 'Trap / Hip-Hop',
+    avatar_url: '/artists/gune/ISIMG-1050533.JPG',
+    bio: 'St. Louis rapper with a raw sound. Bringing authentic hip-hop to Porterful.',
+    genre: 'Hip-Hop',
     location: 'St. Louis, MO',
-    verified: false,
-    tracks: 0,
-    status: 'coming-soon',
+    verified: true,
+    tracks: 3,
+    status: 'live',
+  },
+  {
+    id: 'nikee-turbo',
+    username: 'nikee-turbo',
+    full_name: 'Nikee Turbo',
+    email: null,
+    avatar_url: '/artists/nikee-turbo/ab6761610000e5ebfddbec3845c421474dc2d779.jpeg',
+    bio: 'St. Louis rapper known for rhythm and flow. Featured in Riverfront Times for his dance craze.',
+    genre: 'Hip-Hop / Trap',
+    location: 'St. Louis, MO',
+    verified: true,
+    tracks: 3,
+    status: 'live',
   },
   {
     id: 'rob-soule',
     username: 'rob-soule',
     full_name: 'Rob Soule',
     email: null,
-    avatar_url: null,
-    bio: 'Soulful melodies meet hard-hitting bars. St. Louis native.',
-    genre: 'Hip-Hop / Soul',
+    avatar_url: '/artists/rob-soule/hq720.jpg',
+    bio: 'Rock artist out of St. Louis. Melodic rock with powerful vocals and guitar-driven sound.',
+    genre: 'Rock / Alternative',
     location: 'St. Louis, MO',
-    verified: false,
-    tracks: 0,
-    status: 'coming-soon',
-  },
-  {
-    id: 'ttd-dex',
-    username: 'ttd-dex',
-    full_name: 'TTD Dex',
-    email: null,
-    avatar_url: null,
-    bio: 'Part of the TTD collective. Coming hard with new sounds.',
-    genre: 'Hip-Hop',
-    location: 'St. Louis, MO',
-    verified: false,
-    tracks: 0,
-    status: 'coming-soon',
-  },
-  {
-    id: 'nick9',
-    username: 'nick9',
-    full_name: 'Nick9',
-    email: null,
-    avatar_url: null,
-    bio: 'Fresh out the lab. New sound loading.',
-    genre: 'Hip-Hop',
-    location: 'St. Louis, MO',
-    verified: false,
-    tracks: 0,
-    status: 'coming-soon',
-  },
-  {
-    id: 'gune',
-    username: 'gune',
-    full_name: 'Gune',
-    email: null,
-    avatar_url: null,
-    bio: 'Coming soon.',
-    genre: 'Hip-Hop',
-    location: 'St. Louis, MO',
-    verified: false,
-    tracks: 0,
-    status: 'coming-soon',
+    verified: true,
+    tracks: 3,
+    status: 'live',
   },
 ]
 
@@ -263,7 +237,7 @@ export default function ArtistsPage() {
 }
 
 function ArtistCard({ artist, isComingSoon = false }: { artist: any; isComingSoon?: boolean }) {
-  const initials = artist.full_name 
+  const initials = artist.full_name
     ? artist.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : (artist.username || 'AR').slice(0, 2).toUpperCase()
 
@@ -271,9 +245,15 @@ function ArtistCard({ artist, isComingSoon = false }: { artist: any; isComingSoo
     <>
       {/* Artist Header */}
       <div className="flex items-start gap-4 mb-4">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
-          {initials}
-        </div>
+        {artist.avatar_url ? (
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--pf-bg-secondary)] shrink-0">
+            <img src={artist.avatar_url} alt={artist.full_name || artist.username} className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+            {initials}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-bold truncate group-hover:text-[var(--pf-orange)] transition-colors">

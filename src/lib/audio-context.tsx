@@ -22,6 +22,7 @@ interface AudioContext {
   progress: number;
   duration: number;
   playTrack: (track: Track) => void;
+  loadTrack: (track: Track) => void;
   togglePlay: () => void;
   pause: () => void;
   playNext: () => void;
@@ -254,6 +255,19 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
   }, [queue]);
 
+  const loadTrack = useCallback((track: Track) => {
+    setCurrentTrack(track);
+    const idx = queue.findIndex(t => t.id === track.id);
+    if (idx >= 0) setCurrentIndex(idx);
+    setProgress(0);
+
+    if (audioRef.current && track.audio_url) {
+      audioRef.current.src = track.audio_url;
+      audioRef.current.load();
+      audioRef.current.play().catch(() => {});
+    }
+  }, [queue]);
+
   const togglePlay = useCallback(() => {
     if (!audioRef.current) return;
 
@@ -365,6 +379,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       progress,
       duration,
       playTrack,
+      loadTrack,
       togglePlay,
       pause,
       playNext,
@@ -402,7 +417,35 @@ function MediaSessionHandlers({ togglePlay, playPrev, playNext }: { togglePlay: 
 export function useAudio() {
   const ctx = useContext(AudioCtx);
   if (!ctx) {
-    throw new Error('useAudio must be used within AudioProvider');
+    // Return noop defaults for SSR/non-provider contexts
+    return {
+      currentTrack: null,
+      isPlaying: false,
+      volume: 1,
+      progress: 0,
+      duration: 0,
+      playTrack: () => {},
+      loadTrack: () => {},
+      togglePlay: () => {},
+      pause: () => {},
+      playNext: () => {},
+      playPrev: () => {},
+      setVolume: () => {},
+      seek: () => {},
+      queue: [],
+      setQueue: () => {},
+      currentIndex: 0,
+      isRadio: false,
+      setIsRadio: () => {},
+      addToQueue: () => {},
+      clearQueue: () => {},
+      playAlbum: () => {},
+      albums: {},
+      currentAlbum: null,
+      purchasedTracks: new Set(),
+      addPurchased: () => {},
+      hasPurchased: () => false,
+    };
   }
   return ctx;
 }

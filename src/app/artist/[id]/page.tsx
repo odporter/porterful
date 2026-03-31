@@ -6,37 +6,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/app/providers';
 import { useAudio } from '@/lib/audio-context';
-import { TRACKS, ALBUMS, PRODUCTS } from '@/lib/data';
+import { TRACKS, PRODUCTS } from '@/lib/data';
 import { getArtistById } from '@/lib/artists';
-import { 
-  Play, Pause, Share2, Music, Package, ChevronDown, ChevronUp, 
-  Youtube, ExternalLink, Bell, Check, Edit3, MapPin, Globe, 
-  Instagram, Twitter, Star, Users, Plus
+import {
+  Play, Pause, Share2, Music, Package, ChevronDown, ChevronUp,
+  Youtube, ExternalLink, Bell, Check, Edit3, MapPin, Globe,
+  Instagram, Twitter, Star, Users, Plus, Music2 as TikTokIcon, Crown, Heart
 } from 'lucide-react';
-
-// Music Videos from YouTube
-const MUSIC_VIDEOS = [
-  { title: 'Jai Jai - Peace Up Arch Down', album: 'Streets Thought I Left', youtubeId: 'qVUPQMo080Y', views: '' },
-  { title: 'Dex', album: 'Streets Thought I Left', youtubeId: 'T-Q0zVOAYC8', views: '' },
-  { title: 'I Got - Jai Jai x TTD Dex', album: 'Streets Thought I Left', youtubeId: '1AlI1ymOrhg', views: '' },
-  { title: '82 FAM TTD', album: 'Streets Thought I Left', youtubeId: 'rieh1ku8oXw', views: '' },
-  { title: "Jai'Jai As If", album: 'Levi', youtubeId: 'sqxPRE3EiNI', views: '' },
-  { title: 'Street Love by O D Music', album: 'One Day', youtubeId: 'oMEfjmdE2ls', views: '' },
-  { title: 'Mike Tyson By O D Music (Official Music Video)', album: 'One Day', youtubeId: '5523eYZ48GU', views: '' },
-];
-
-const ALBUM_ORDER = ['Ambiguous', 'Roxannity', 'One Day', 'Levi', 'Streets Thought I Left', 'From Feast to Famine', 'God Is Good'];
-
-const SINGLES = [
-  TRACKS.find(t => t.id === 'amb-06')!,
-  TRACKS.find(t => t.id === 'amb-01')!,
-  TRACKS.find(t => t.id === 'od-07')!,
-  TRACKS.find(t => t.id === 'od-16')!,
-  TRACKS.find(t => t.id === 'stl-01')!,
-  TRACKS.find(t => t.id === 'gig-04')!,
-  TRACKS.find(t => t.id === 'fff-02')!,
-  TRACKS.find(t => t.id === 'lev-02')!,
-].filter(Boolean);
 
 function groupTracksByAlbum(tracks: typeof TRACKS) {
   const groups: Record<string, typeof TRACKS> = {};
@@ -58,6 +34,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
   const [notifyLoading, setNotifyLoading] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [expandedAlbums, setExpandedAlbums] = useState<Record<string, boolean>>({ Singles: true });
+  const [coverSlideIndex, setCoverSlideIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
 
@@ -71,20 +48,50 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
         const res = await fetch(`/api/artists/${params.id}`);
         const data = await res.json();
         if (data.profile) {
-          setArtistData({
-            name: data.profile.full_name || data.profile.name || staticArtist?.name,
-            bio: data.profile.bio || staticArtist?.bio || '',
-            shortBio: data.profile.short_bio || staticArtist?.shortBio || '',
-            genre: data.profile.genre || staticArtist?.genre || '',
-            location: data.profile.location || staticArtist?.location || '',
-            verified: data.profile.verified || staticArtist?.verified || false,
-            avatar_url: data.profile.avatar_url || staticArtist?.image || null,
-            cover_url: data.profile.cover_url || null,
-            website: data.profile.website || null,
-            youtube_url: data.profile.youtube_url || staticArtist?.social?.youtube || null,
-            instagram_url: data.profile.instagram_url || staticArtist?.social?.instagram || null,
-            twitter_url: data.profile.twitter_url || staticArtist?.social?.twitter || null,
-          });
+          // Clean up bad DB data — prefer staticArtist data when DB is incomplete/wrong
+          const dbGenre = data.profile.genre || ''
+          const dbBio = data.profile.bio || ''
+          const dbLocation = data.profile.location || ''
+
+          // Fix genre if stored as JSON array string like ["Hip-Hop","R&B"]
+          let cleanGenre = dbGenre
+          if (dbGenre.startsWith('[')) {
+            try {
+              const parsed = JSON.parse(dbGenre)
+              cleanGenre = Array.isArray(parsed) ? parsed.join(', ') : dbGenre
+            } catch {
+              cleanGenre = dbGenre.replace(/[\[\]"]/g, '')
+            }
+          }
+
+          // If bio or location is too short/incomplete, use staticArtist
+          const fullBio = staticArtist?.bio || ''
+          const useBio = dbBio.length < fullBio.length ? (fullBio || dbBio) : dbBio
+          const useLocation = dbLocation.length < (staticArtist?.location?.length || 0) ? (staticArtist?.location || dbLocation) : dbLocation
+
+          // Build social URLs from static data or raw DB data
+            const instagramHandle = data.profile.instagram_url || staticArtist?.social?.instagram || ''
+            const twitterHandle = data.profile.twitter_url || staticArtist?.social?.twitter || ''
+            const youtubeHandle = data.profile.youtube_url || staticArtist?.social?.youtube || ''
+            const tiktokHandle = staticArtist?.social?.tiktok || ''
+
+            setArtistData({
+              name: data.profile.full_name || data.profile.name || staticArtist?.name,
+              bio: useBio,
+              shortBio: data.profile.short_bio || staticArtist?.shortBio || '',
+              genre: cleanGenre || staticArtist?.genre || '',
+              location: useLocation || staticArtist?.location || '',
+              verified: data.profile.verified || staticArtist?.verified || false,
+              avatar_url: data.profile.avatar_url || staticArtist?.image || null,
+              cover_url: data.profile.cover_url || null,
+              website: data.profile.website || staticArtist?.social?.website || null,
+              youtube_url: youtubeHandle ? (youtubeHandle.startsWith('http') ? youtubeHandle : `https://youtube.com/${youtubeHandle.replace('@', '')}`) : null,
+              instagram_url: instagramHandle ? (instagramHandle.startsWith('http') ? instagramHandle : `https://instagram.com/${instagramHandle}`) : null,
+              twitter_url: twitterHandle ? (twitterHandle.startsWith('http') ? twitterHandle : `https://twitter.com/${twitterHandle}`) : null,
+              tiktok_url: tiktokHandle ? `https://tiktok.com/@${tiktokHandle.replace('@', '')}` : null,
+              // Preserve staticArtist coverSlides if DB doesn't have them
+              coverSlides: data.profile.coverSlides || staticArtist?.coverSlides || null,
+            });
           // Check if current user owns this profile
           if (user && data.profile.id === user.id) {
             setIsOwner(true);
@@ -100,6 +107,14 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
     }
     loadArtistData();
   }, [params.id, user]);
+
+  // Auto-advance cover slideshow every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCoverSlideIndex(i => (i + 1) % 2)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     async function checkNotifyStatus() {
@@ -162,10 +177,10 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
     );
   }
 
-  const displayTracks = TRACKS;
+  const displayTracks = TRACKS.filter(t => t.artist === artistData.name);
   const albums = groupTracksByAlbum(displayTracks);
-  const orderedAlbums = ALBUM_ORDER.filter(album => albums[album]?.length > 0);
-  const artistMerch = PRODUCTS.filter(p => p.category === 'merch').slice(0, 6);
+  const albumNames = Object.keys(albums);
+  const artistMerch = PRODUCTS.filter(p => p.artist === artistData.name).slice(0, 6);
 
   // Default gradient if no cover image
   const coverStyle = artistData.cover_url
@@ -176,16 +191,17 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
   const initials = artistData.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || '?';
 
   const playSingles = () => {
-    if (!SINGLES.length) return;
-    setQueue(SINGLES.map(t => ({
+    const singles = displayTracks.filter(t => t.album === 'Singles');
+    if (!singles.length) return;
+    setQueue(singles.map(t => ({
       ...t,
       duration: typeof t.duration === 'string'
         ? t.duration.split(':').reduce((acc: number, p: string) => (60 * acc) + parseInt(p), 0)
         : t.duration || 180
     })));
-    playTrack({ ...SINGLES[0], duration: typeof SINGLES[0].duration === 'string'
-      ? SINGLES[0].duration.split(':').reduce((acc: number, p: string) => (60 * acc) + parseInt(p), 0)
-      : SINGLES[0].duration || 180
+    playTrack({ ...singles[0], duration: typeof singles[0].duration === 'string'
+      ? singles[0].duration.split(':').reduce((acc: number, p: string) => (60 * acc) + parseInt(p), 0)
+      : singles[0].duration || 180
     } as any);
   };
 
@@ -224,12 +240,56 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
 
         {/* HERO BANNER */}
         <div className="relative mb-8">
-          {/* Cover Image */}
-          <div 
-            className="h-48 md:h-64 lg:h-80 rounded-2xl overflow-hidden relative"
-            style={coverStyle}
-          >
+          {/* Fading Slideshow Cover */}
+          <div className="h-48 md:h-64 lg:h-80 rounded-2xl overflow-hidden relative">
+            {/* Artist-specific cover slides, or gradient fallback */}
+            {artistData.coverSlides ? (
+              artistData.coverSlides.map((slide: { src: string; alt: string; isVideo?: boolean }, i: number) => (
+                <div
+                  key={slide.src}
+                  className="absolute inset-0"
+                  style={{ opacity: coverSlideIndex === i ? 1 : 0, transition: 'opacity 1s ease-in-out' }}
+                >
+                  {slide.isVideo ? (
+                    <video
+                      src={slide.src.replace('.mp4', '.gif')}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="object-cover w-full h-full"
+                      style={{ width: '100%', height: '100%' }}
+                    />
+                  ) : (
+                    <Image
+                      src={slide.src}
+                      alt={slide.alt}
+                      fill
+                      sizes="100vw"
+                      className={`object-cover ${params.id === 'gune' ? 'animate-ken-burns' : ''}`}
+                      priority={i === 0}
+                    />
+                  )}
+                </div>
+              ))
+            ) : (
+              /* Gradient banner for artists without custom cover */
+              <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, var(--pf-orange) 0%, #7c3aed 100%)` }} />
+            )}
+            {/* Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            {/* Slide indicators - only show when multiple slides */}
+            {artistData.coverSlides && artistData.coverSlides.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                {artistData.coverSlides.map((_: any, i: number) => (
+                  <button
+                    key={i}
+                    onClick={() => setCoverSlideIndex(i)}
+                    className={`w-2 h-2 rounded-full transition-all ${coverSlideIndex === i ? 'bg-white w-6' : 'bg-white/40'}`}
+                  />
+                ))}
+              </div>
+            )}
             {/* Owner edit banner button */}
             {isOwner && (
               <Link
@@ -283,14 +343,10 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                   <p className="text-xl font-bold">{displayTracks.length}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Tracks</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold">{orderedAlbums.length}</p>
-                  <p className="text-xs text-[var(--pf-text-muted)]">Albums</p>
-                </div>
-                {artistData.supporters != null && (
+                {albumNames.filter(n => n !== 'Singles').length > 0 && (
                   <div className="text-center">
-                    <p className="text-xl font-bold">{artistData.supporters}</p>
-                    <p className="text-xs text-[var(--pf-text-muted)]">Supporters</p>
+                    <p className="text-xl font-bold">{albumNames.filter(n => n !== 'Singles').length}</p>
+                    <p className="text-xs text-[var(--pf-text-muted)]">Albums</p>
                   </div>
                 )}
               </div>
@@ -309,28 +365,38 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                   <Share2 size={14} /> Share
                 </button>
               </div>
+              {/* Unlock full access banner */}
+              <Link href="/unlock" className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors">
+                <Heart size={11} className="text-[var(--pf-orange-dark)]" />
+                <span>Experience Porterful to the fullest — <span className="underline">Contribute</span></span>
+              </Link>
             </div>
 
             {/* Social links */}
-            {(artistData.instagram_url || artistData.twitter_url || artistData.youtube_url || artistData.website) && (
+            {(artistData.social?.instagram || artistData.social?.twitter || artistData.social?.youtube || artistData.social?.tiktok || artistData.social?.website) && (
               <div className="flex flex-wrap gap-2 pb-2">
-                {artistData.youtube_url && (
-                  <a href={artistData.youtube_url} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-red-500 transition-colors">
+                {artistData.social?.youtube && (
+                  <a href={`https://youtube.com/${artistData.social.youtube.replace('@', '')}`} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-red-500 transition-colors">
                     <Youtube size={16} className="text-red-500" />
                   </a>
                 )}
-                {artistData.instagram_url && (
-                  <a href={artistData.instagram_url} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-pink-500 transition-colors">
+                {artistData.social?.instagram && (
+                  <a href={`https://instagram.com/${artistData.social.instagram.replace('@', '')}`} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-pink-500 transition-colors">
                     <Instagram size={16} className="text-pink-400" />
                   </a>
                 )}
-                {artistData.twitter_url && (
-                  <a href={artistData.twitter_url} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-blue-500 transition-colors">
+                {artistData.social?.twitter && (
+                  <a href={`https://twitter.com/${artistData.social.twitter.replace('@', '')}`} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-blue-500 transition-colors">
                     <Twitter size={16} className="text-blue-400" />
                   </a>
                 )}
-                {artistData.website && (
-                  <a href={artistData.website} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-[var(--pf-orange)] transition-colors">
+                {artistData.social?.tiktok && (
+                  <a href={`https://tiktok.com/@${artistData.social.tiktok.replace('@', '')}`} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-pink-600 transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-pink-500"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.73a8.26 8.26 0 0 0 4.83 1.54V6.78a4.85 4.85 0 0 1-1-.09z"/></svg>
+                  </a>
+                )}
+                {artistData.social?.website && (
+                  <a href={artistData.social?.website} target="_blank" rel="noopener" className="p-2 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-[var(--pf-orange)] transition-colors">
                     <Globe size={16} />
                   </a>
                 )}
@@ -363,85 +429,92 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
 
         {/* MUSIC TAB */}
         {activeTab === 'music' && (
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Albums */}
-            <div className="flex-1 space-y-3">
-              <h2 className="text-lg font-bold flex items-center gap-2"><Music size={18} className="text-[var(--pf-orange)]" /> Albums</h2>
-              {orderedAlbums.map(albumName => {
-                const albumTracks = albums[albumName];
-                if (!albumTracks?.length) return null;
-                const isExpanded = expandedAlbums[albumName];
-                const albumInfo = Object.values(ALBUMS).find((a: any) => a.name === albumName);
+          <div>
+            {/* If artist has albums — show albums. If only singles — show singles only. */}
+            {albumNames.filter(n => n !== 'Singles').length > 0 ? (
+              <div className="space-y-3">
+                <h2 className="text-lg font-bold flex items-center gap-2"><Music size={18} className="text-[var(--pf-orange)]" /> Albums</h2>
+                {albumNames.filter(n => n !== 'Singles').map(albumName => {
+                  const albumTracks = albums[albumName];
+                  if (!albumTracks?.length) return null;
+                  const isExpanded = expandedAlbums[albumName];
+                  const albumArt = albumTracks[0]?.image || artistData.image;
 
-                return (
-                  <div key={albumName} className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)]">
-                    <button
-                      onClick={() => setExpandedAlbums(prev => ({ ...prev, [albumName]: !prev[albumName] }))}
-                      className="w-full flex items-center gap-4 p-4 hover:bg-[var(--pf-bg)] transition-colors text-left"
+                  return (
+                    <div key={albumName} className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)]">
+                      <button
+                        onClick={() => setExpandedAlbums(prev => ({ ...prev, [albumName]: !prev[albumName] }))}
+                        className="w-full flex items-center gap-4 p-4 hover:bg-[var(--pf-bg)] transition-colors text-left"
+                      >
+                        <div className="w-14 h-14 rounded-lg overflow-hidden relative shrink-0">
+                          <Image src={albumArt} alt={albumName} fill sizes="56px" className="object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold">{albumName}</h3>
+                          <p className="text-sm text-[var(--pf-text-muted)]">{albumTracks.length} tracks</p>
+                        </div>
+                        <button onClick={(e) => { e.stopPropagation(); playAlbum(albumName); }} className="p-2 rounded-full bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors shrink-0">
+                          <Play size={14} className="ml-0.5" />
+                        </button>
+                        <ChevronDown size={18} className={`text-[var(--pf-text-muted)] shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      </button>
+                      {isExpanded && (
+                        <div className="border-t border-[var(--pf-border)]">
+                          {albumTracks.map((track: any, i: number) => (
+                            <div key={track.id} className={`flex items-center gap-3 p-3 hover:bg-[var(--pf-bg)] transition-colors ${currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/5' : ''}`}>
+                              <span className="w-5 text-center text-[var(--pf-text-muted)] text-sm">{i + 1}</span>
+                              <button onClick={() => playTrack({ ...track, duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((a: number, p: string) => (60 * a) + parseInt(p), 0) : track.duration || 180 } as any)} className="w-7 h-7 rounded-full bg-[var(--pf-bg)] flex items-center justify-center hover:bg-[var(--pf-orange)] transition-colors shrink-0">
+                                {currentTrack?.id === track.id && isPlaying ? <Pause size={12} className="text-white" /> : <Play size={12} className="text-white ml-0.5" />}
+                              </button>
+                              <div className="flex-1 min-w-0">
+                                <p className={`font-medium text-sm truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
+                              </div>
+                              <span className="text-xs text-[var(--pf-text-muted)] shrink-0">{track.duration}</span>
+                              <span className="text-xs font-medium text-[var(--pf-orange)] shrink-0">${track.price}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {/* Singles — always show if artist has tracks, even without albums */}
+            {displayTracks.length > 0 && (
+              <div className="mt-6">
+                <h2 className="text-lg font-bold flex items-center gap-2 mb-3"><Star size={16} className="text-[var(--pf-orange)]" /> Singles</h2>
+                <div className="space-y-2">
+                  {displayTracks.map((track: any) => (
+                    <div
+                      key={track.id}
+                      onClick={() => playTrack({ ...track, duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((a: number, p: string) => (60 * a) + parseInt(p), 0) : track.duration || 180 } as any)}
+                      className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
+                        currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]' : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
+                      }`}
                     >
-                      <div className="w-14 h-14 rounded-lg overflow-hidden relative shrink-0">
-                        <Image src={albumInfo?.image || '/album-art/default.jpg'} alt={albumName} fill sizes="56px" className="object-cover" />
+                      <div className="w-11 h-11 rounded-lg overflow-hidden relative shrink-0">
+                        <Image src={track.image || artistData.image} alt={track.title} fill sizes="44px" className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold">{albumName}</h3>
-                        <p className="text-sm text-[var(--pf-text-muted)]">{albumTracks.length} tracks</p>
+                        <p className={`font-medium text-sm truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
+                        <p className="text-xs text-[var(--pf-text-muted)]">{track.album !== 'Singles' ? track.album : artistData.name}</p>
                       </div>
-                      <button onClick={(e) => { e.stopPropagation(); playAlbum(albumName); }} className="p-2 rounded-full bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors shrink-0">
-                        <Play size={14} className="ml-0.5" />
-                      </button>
-                      <ChevronDown size={18} className={`text-[var(--pf-text-muted)] shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isExpanded && (
-                      <div className="border-t border-[var(--pf-border)]">
-                        {albumTracks.map((track: any, i: number) => (
-                          <div key={track.id} className={`flex items-center gap-3 p-3 hover:bg-[var(--pf-bg)] transition-colors ${currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/5' : ''}`}>
-                            <span className="w-5 text-center text-[var(--pf-text-muted)] text-sm">{i + 1}</span>
-                            <button onClick={() => playTrack({ ...track, duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((a: number, p: string) => (60 * a) + parseInt(p), 0) : track.duration || 180 } as any)} className="w-7 h-7 rounded-full bg-[var(--pf-bg)] flex items-center justify-center hover:bg-[var(--pf-orange)] transition-colors shrink-0">
-                              {currentTrack?.id === track.id && isPlaying ? <Pause size={12} className="text-white" /> : <Play size={12} className="text-white ml-0.5" />}
-                            </button>
-                            <div className="flex-1 min-w-0">
-                              <p className={`font-medium text-sm truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
-                            </div>
-                            <span className="text-xs text-[var(--pf-text-muted)] shrink-0">{track.duration}</span>
-                            <span className="text-xs font-medium text-[var(--pf-orange)] shrink-0">${track.price}</span>
-                          </div>
-                        ))}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-xs font-medium text-[var(--pf-orange)]">${track.price}</span>
+                        <button className="w-7 h-7 rounded-full bg-[var(--pf-orange)] flex items-center justify-center">
+                          {currentTrack?.id === track.id && isPlaying ? <Pause size={12} className="text-white" /> : <Play size={12} className="text-white ml-0.5" />}
+                        </button>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Singles sidebar */}
-            <div className="lg:w-80 space-y-3">
-              <h2 className="text-lg font-bold flex items-center gap-2"><Star size={16} className="text-[var(--pf-orange)]" /> Singles</h2>
-              <div className="space-y-2">
-                {SINGLES.map((track: any) => (
-                  <div
-                    key={track.id}
-                    onClick={() => playTrack({ ...track, duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((a: number, p: string) => (60 * a) + parseInt(p), 0) : track.duration || 180 } as any)}
-                    className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                      currentTrack?.id === track.id ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]' : 'bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
-                    }`}
-                  >
-                    <div className="w-11 h-11 rounded-lg overflow-hidden relative shrink-0">
-                      <Image src={track.image} alt={track.title} fill sizes="44px" className="object-cover" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium text-sm truncate ${currentTrack?.id === track.id ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
-                      <p className="text-xs text-[var(--pf-text-muted)]">{track.album}</p>
-                    </div>
-                    <button className="w-7 h-7 rounded-full bg-[var(--pf-orange)] flex items-center justify-center shrink-0">
-                      {currentTrack?.id === track.id && isPlaying ? <Pause size={12} className="text-white" /> : <Play size={12} className="text-white ml-0.5" />}
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <button onClick={playSingles} className="mt-4 w-full py-3 bg-[var(--pf-orange)] text-white rounded-xl font-medium hover:bg-[var(--pf-orange-dark)] transition-colors text-sm flex items-center justify-center gap-2">
+                  <Play size={14} /> Play All Tracks
+                </button>
               </div>
-              <button onClick={playSingles} className="w-full py-2.5 bg-[var(--pf-orange)] text-white rounded-xl font-medium hover:bg-[var(--pf-orange-dark)] transition-colors text-sm flex items-center justify-center gap-2">
-                <Play size={14} /> Play All Singles
-              </button>
-            </div>
+            )}
           </div>
         )}
 
@@ -492,25 +565,32 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2"><Youtube size={20} className="text-red-500" /> Music Videos</h2>
-              {artistData.youtube_url && (
-                <a href={artistData.youtube_url} target="_blank" rel="noopener" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm">
+              {artistData.social?.youtube && (
+                <a href={`https://youtube.com/${artistData.social.youtube.replace('@', '')}`} target="_blank" rel="noopener" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm">
                   <Youtube size={16} /> YouTube Channel
                 </a>
               )}
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              {MUSIC_VIDEOS.map((video, i) => (
-                <div key={i} className="rounded-xl overflow-hidden border border-[var(--pf-border)]">
-                  <div className="aspect-video bg-[var(--pf-surface)]">
-                    <iframe src={`https://www.youtube.com/embed/${video.youtubeId}`} title={video.title} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+            {artistData.videos && artistData.videos.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {artistData.videos.map((video: { youtubeId: string; title: string; album?: string }, i: number) => (
+                  <div key={i} className="rounded-xl overflow-hidden border border-[var(--pf-border)]">
+                    <div className="aspect-video bg-[var(--pf-surface)]">
+                      <iframe src={`https://www.youtube.com/embed/${video.youtubeId}`} title={video.title} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                    </div>
+                    <div className="p-4 bg-[var(--pf-surface)]">
+                      <h3 className="font-medium text-sm">{video.title}</h3>
+                      {video.album && <p className="text-xs text-[var(--pf-text-muted)]">{video.album}</p>}
+                    </div>
                   </div>
-                  <div className="p-4 bg-[var(--pf-surface)]">
-                    <h3 className="font-medium text-sm">{video.title}</h3>
-                    <p className="text-xs text-[var(--pf-text-muted)]">{video.album}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
+                <Youtube size={40} className="mx-auto mb-3 text-[var(--pf-text-muted)]" />
+                <p className="text-[var(--pf-text-secondary)]">No videos yet</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -521,9 +601,9 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
               <div className="bg-[var(--pf-surface)] rounded-xl p-6 border border-[var(--pf-border)]">
                 <h2 className="text-xl font-bold mb-4">About {artistData.name}</h2>
                 <p className="text-[var(--pf-text-secondary)] leading-relaxed">{artistData.bio}</p>
-                {artistData.website && (
-                  <a href={artistData.website} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 mt-4 text-[var(--pf-orange)] hover:underline text-sm">
-                    <Globe size={14} /> {artistData.website.replace(/^https?:\/\//, '')}
+                {artistData.social?.website && (
+                  <a href={artistData.social?.website} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 mt-4 text-[var(--pf-orange)] hover:underline text-sm">
+                    <Globe size={14} /> {artistData.social?.website.replace(/^https?:\/\//, '')}
                   </a>
                 )}
               </div>
@@ -537,16 +617,6 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                   <Music size={20} className="text-purple-400 mx-auto mb-1" />
                   <p className="text-xl font-bold">{displayTracks.length}</p>
                   <p className="text-xs text-[var(--pf-text-muted)]">Tracks</p>
-                </div>
-                <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">
-                  <Package size={20} className="text-[var(--pf-orange)] mx-auto mb-1" />
-                  <p className="text-xl font-bold">{orderedAlbums.length}</p>
-                  <p className="text-xs text-[var(--pf-text-muted)]">Albums</p>
-                </div>
-                <div className="text-center p-3 bg-[var(--pf-bg)] rounded-lg">
-                  <Users size={20} className="text-blue-400 mx-auto mb-1" />
-                  <p className="text-xl font-bold">{artistData.supporters || '—'}</p>
-                  <p className="text-xs text-[var(--pf-text-muted)]">Supporters</p>
                 </div>
               </div>
             </div>

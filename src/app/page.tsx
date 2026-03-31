@@ -1,419 +1,343 @@
 'use client';
-
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link';
 import Image from 'next/image';
-import { Play, Headphones, Music, Star, Users, DollarSign, Upload, ShoppingCart, Package, Radio, Disc3 } from 'lucide-react';
+import { Play, Headphones, Music, Star, Users, ArrowRight, Heart, ChevronDown, Zap, Shield, TrendingUp, Pause, SkipForward, Crown } from 'lucide-react';
 import { useSupabase } from '@/app/providers';
 import { TRACKS } from '@/lib/data';
+import { ARTISTS } from '@/lib/artists';
+
+const HERO_BG_IMAGES = [
+  '/images/hero/ai-bg-1.png',
+  '/images/hero/ai-bg-2.png',
+  '/images/hero/ai-bg-3.png',
+]
+
+// Alphabetical artists, Od at the end
+const PLATFORM_ARTISTS = ARTISTS.filter(a => ['gune', 'nikee-turbo', 'rob-soule', 'od-porter'].includes(a.id))
+  .sort((a, b) => {
+    if (a.id === 'od-porter') return 1;
+    if (b.id === 'od-porter') return -1;
+    return a.name.localeCompare(b.name);
+  });
+
+// All tracks shuffled for the hero player
+const HERO_TRACKS = TRACKS.filter(t =>
+  ['O D Porter', 'Gune', 'Nikee Turbo', 'Rob Soule'].includes(t.artist)
+).sort(() => Math.random() - 0.5);
 
 export default function Home() {
   const { user } = useSupabase();
-  const featuredTracks = TRACKS.slice(0, 6);
+  const [showWhyModal, setShowWhyModal] = useState(false);
+  const [heroBgIndex, setHeroBgIndex] = useState(0);
+  const [heroTrackIndex, setHeroTrackIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const howItWorksRef = useRef<HTMLDivElement>(null);
+  const trackIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Rotate track every 9 seconds
+  useEffect(() => {
+    trackIntervalRef.current = setInterval(() => {
+      setHeroTrackIndex(i => (i + 1) % HERO_TRACKS.length);
+      setIsPlaying(false);
+    }, 9000);
+    return () => { if (trackIntervalRef.current) clearInterval(trackIntervalRef.current); };
+  }, []);
+
+  // Change hero background as user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const howItWorksEl = howItWorksRef.current;
+      if (!howItWorksEl) return;
+      const sectionTop = howItWorksEl.getBoundingClientRect().top + window.scrollY;
+      const sectionHeight = howItWorksEl.offsetHeight;
+      if (scrollY > sectionTop + sectionHeight * 0.3) setHeroBgIndex(1);
+      if (scrollY > sectionTop + sectionHeight * 0.8) setHeroBgIndex(2);
+      if (scrollY < sectionTop) setHeroBgIndex(0);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const currentTrack = HERO_TRACKS[heroTrackIndex];
 
   return (
     <div className="min-h-screen">
-      {/* Hero - Split Image Design */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-gradient-to-br from-[var(--pf-bg)] via-[var(--pf-bg-secondary)] to-[var(--pf-bg)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--pf-orange)]/5 via-transparent to-purple-500/5" />
 
-        <div className="relative z-10 w-full py-12 md:py-20">
-          <div className="pf-container">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-6 items-center">
-              {/* Left - Text */}
-              <div className="text-center lg:text-left order-2 lg:order-1">
-                {/* Signup Banner */}
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--pf-orange)] text-white rounded-full text-sm font-semibold mb-6 shadow-lg shadow-[var(--pf-orange)]/20">
-                  <Star size={16} className="fill-current" />
-                  Sign up as an artist — your first 24 hours are on us
+      {/* WHY MODAL */}
+      {showWhyModal && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm overflow-y-auto" onClick={() => setShowWhyModal(false)}>
+          <div className="min-h-screen py-12 px-4 flex items-start justify-center" onClick={e => e.stopPropagation()}>
+            <div className="bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-2xl max-w-2xl w-full p-8 relative">
+              <button onClick={() => setShowWhyModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--pf-surface)] border border-[var(--pf-border)] flex items-center justify-center hover:border-[var(--pf-orange)] transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+              <h2 className="text-3xl font-bold mb-2">Why Porterful Exists</h2>
+              <p className="text-[var(--pf-text-secondary)] mb-8">The problem we're solving — and why we built this.</p>
+              <div className="space-y-6">
+                <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-5">
+                  <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><span className="text-[var(--pf-orange)]">01</span> The Spending Reality</h3>
+                  <p className="text-[var(--pf-text-secondary)] text-sm">Black Americans represent over $1.3 trillion in annual spending power. Yet the vast majority of those dollars flow out of our communities within 24 hours — to corporations and platforms that don't invest in us.</p>
                 </div>
+                <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-5">
+                  <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><span className="text-[var(--pf-orange)]">02</span> The Streaming Problem</h3>
+                  <p className="text-[var(--pf-text-secondary)] text-sm">Traditional platforms take 50-80% of every transaction. Artists get pennies. Fans are told their "engagement" is valuable — but never see a dollar.</p>
+                </div>
+                <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-5">
+                  <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><span className="text-[var(--pf-orange)]">03</span> The Superfan Solution</h3>
+                  <p className="text-[var(--pf-text-secondary)] text-sm">Porterful flips the script. Artists keep 80%+. Superfans earn 3% of everything their referrals buy. Every purchase, every stream, every referral — money recirculates back through the community instead of leaking out.</p>
+                </div>
+                <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-5">
+                  <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><span className="text-[var(--pf-orange)]">04</span> The Bigger Vision</h3>
+                  <p className="text-[var(--pf-text-secondary)] text-sm">Music is the entry point. Veterans, teachers, entrepreneurs — all part of the same ecosystem. One referral system. One community. All earning.</p>
+                </div>
+                <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 border border-[var(--pf-orange)]/20 rounded-xl p-5">
+                  <p className="text-sm font-medium"><span className="text-[var(--pf-orange)]">The goal:</span> Stop waiting for systems to support us. We build the infrastructure that makes money flow to us — by us.</p>
+                </div>
+              </div>
+              <button onClick={() => setShowWhyModal(false)} className="w-full mt-6 py-3 bg-[var(--pf-orange)] text-white font-bold rounded-xl hover:bg-[var(--pf-orange-dark)] transition-colors">Got It — Let's Build</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-                {/* Headline */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5 leading-tight">
-                  Support Artists<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pf-orange)] to-purple-500">
-                    While Living Your Life
-                  </span>
+      {/* HERO */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--pf-bg)] via-[#0a0a0a] to-[var(--pf-bg-secondary)]" />
+
+        {/* Hero background images — fading slideshow */}
+        <div className="absolute inset-0 z-[1]">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10" />
+          {[
+            '/images/hero/concert-music.png',
+            '/images/hero/Hero Homepage 1 People listening to music on porterful.png',
+            '/images/hero/hero home page 2 (products).png',
+          ].map((src, i) => (
+            <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: heroBgIndex === i ? 1 : 0 }}>
+              <Image src={src} alt="" fill sizes="100vw" className="object-cover" priority={i === 0} />
+            </div>
+          ))}
+        </div>
+
+        {/* AI art overlay */}
+        <div className="absolute inset-0 z-[2]">
+          {HERO_BG_IMAGES.map((src, i) => (
+            <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: (heroBgIndex === i ? 1 : 0) * 0.07 }}>
+              <Image src={src} alt="" fill sizes="100vw" className="object-cover contrast-125 brightness-[0.4]" />
+            </div>
+          ))}
+        </div>
+
+        <div className="relative z-20 w-full py-12 md:py-20">
+          <div className="pf-container">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              {/* Left */}
+              <div className="text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-6">
+                  <Zap size={14} className="fill-current" />
+                  The Creator Economy That Actually Pays
+                </div>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.05]">
+                  <span className="text-white">Make Music.</span><br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pf-orange)] to-yellow-400">Make Money.</span><br />
+                  <span className="text-white">Build an Audience.</span>
                 </h1>
-
-                <p className="text-lg md:text-xl text-[var(--pf-text-secondary)] mb-6 max-w-lg mx-auto lg:mx-0">
-                  Stream music. Shop essentials. Power real people.
+                <p className="text-lg md:text-xl text-white/70 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                  80% of every sale goes to artists. Fans earn rewards when they bring others. No labels. No middlemen. Just a platform that actually pays.
                 </p>
-
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
-                  <Link
-                    href={user?.user_metadata?.role === 'artist' ? '/dashboard' : '/signup?role=artist'}
-                    className="pf-btn pf-btn-primary text-lg px-8 py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--pf-orange)]/10"
-                  >
-                    <Star size={18} className="fill-current" />
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                  <Link href={user?.user_metadata?.role === 'artist' ? '/dashboard' : '/apply'} className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white font-bold rounded-xl transition-all shadow-lg shadow-[var(--pf-orange)]/20">
                     {user?.user_metadata?.role === 'artist' ? 'Go to Dashboard' : 'Start Selling — Free'}
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/digital" className="pf-btn pf-btn-secondary text-lg px-8 py-3.5 flex items-center justify-center gap-2">
+                  <Link href="/digital" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-xl transition-all">
                     <Headphones size={18} />
                     Listen Now
                   </Link>
                 </div>
-
-                {/* Stats */}
-                <div className="flex gap-8 justify-center lg:justify-start">
-                  <div className="text-center lg:text-left">
-                    <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">{TRACKS.length}</div>
-                    <div className="text-sm text-[var(--pf-text-muted)]">Tracks</div>
-                  </div>
-                  <div className="text-center lg:text-left">
-                    <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">80%</div>
-                    <div className="text-sm text-[var(--pf-text-muted)]">To Artists</div>
-                  </div>
-                  <div className="text-center lg:text-left">
-                    <div className="text-2xl md:text-3xl font-bold text-[var(--pf-orange)]">$0</div>
-                    <div className="text-sm text-[var(--pf-text-muted)]">To Start</div>
-                  </div>
+                <div className="flex flex-wrap gap-6 justify-center lg:justify-start text-sm">
+                  <div className="flex items-center gap-2 text-white/50"><Shield size={14} className="text-green-400" /> $0 to start</div>
+                  <div className="flex items-center gap-2 text-white/50"><TrendingUp size={14} className="text-green-400" /> 80% to artists</div>
+                  <div className="flex items-center gap-2 text-white/50"><Star size={14} className="text-yellow-400" /> 3% referral rewards</div>
                 </div>
+                <div className="mt-4">
+                  <Link href="/unlock" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors">
+                    <Crown size={12} /> Unlock full access — $5.99
+                  </Link>
+                </div>
+                <button onClick={() => setShowWhyModal(true)} className="mt-4 text-[var(--pf-orange)] hover:underline text-sm font-medium flex items-center gap-1 mx-auto lg:mx-0">
+                  Why we built this <ChevronDown size={14} />
+                </button>
               </div>
 
-              {/* Right - Split Image (Culture + Commerce) */}
-              <div className="relative order-1 lg:order-2">
-                {/* Background glow */}
-                <div className="absolute -inset-4 bg-gradient-to-br from-[var(--pf-orange)]/10 via-transparent to-purple-500/10 blur-3xl rounded-3xl" />
+              {/* Right - Cycling Track Cards */}
+              <div className="relative order-first lg:order-2">
+                <div className="absolute -inset-8 bg-gradient-to-br from-[var(--pf-orange)]/20 via-transparent to-purple-500/20 blur-3xl rounded-3xl" />
 
-                {/* Split images */}
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Left - Culture: People listening */}
-                  <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[3/4]">
-                    <Image
-                      src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80"
-                      alt="People at concert listening to live music"
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 25vw"
-                      className="object-cover"
-                      priority
-                    />
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <p className="text-white text-xs font-semibold drop-shadow-lg">🎵 Culture</p>
+                {/* Cycling track cards */}
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] border border-[var(--pf-border)] rounded-2xl p-4">
+                    <div className="text-xs text-white/40 uppercase tracking-wider mb-3">Featured Track</div>
+
+                    {currentTrack && (
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-[var(--pf-bg-secondary)] shrink-0">
+                          <Image src={currentTrack.image} alt={currentTrack.title} width={48} height={48} className="object-cover w-full h-full" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-sm truncate text-white">{currentTrack.title}</div>
+                          <div className="text-xs text-white/50 truncate">{currentTrack.artist}</div>
+                        </div>
+                        <button onClick={() => setHeroTrackIndex(i => (i + 1) % HERO_TRACKS.length)} className="w-8 h-8 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white rounded-full flex items-center justify-center shrink-0 transition-colors">
+                          <SkipForward size={13} />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Progress dots */}
+                    <div className="flex gap-1 mb-2">
+                      {HERO_TRACKS.slice(0, 6).map((_, i) => (
+                        <div key={i} className={`h-1 rounded-full transition-all ${i === heroTrackIndex % 6 ? 'w-4 bg-[var(--pf-orange)]' : 'w-1 bg-white/20'}`} />
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-white/30">
+                      <span>{currentTrack?.artist} · {currentTrack?.album}</span>
+                      <span>{heroTrackIndex + 1}/{HERO_TRACKS.length}</span>
                     </div>
                   </div>
 
-                  {/* Right - Commerce: Products */}
-                  <div className="grid gap-3">
-                    {/* Top - Music */}
-                    <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3]">
-                      <Image
-                        src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80"
-                        alt="Artist performing"
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <p className="text-white text-xs font-semibold drop-shadow-lg">🎤 Music</p>
-                      </div>
-                    </div>
-
-                    {/* Bottom - Shopping */}
-                    <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3]">
-                      <Image
-                        src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80"
-                        alt="Shopping and essentials"
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <p className="text-white text-xs font-semibold drop-shadow-lg">🛒 Shop</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating album art card */}
-                <div className="absolute -bottom-4 -left-4 md:-left-6">
-                  {(() => {
-                    const track = TRACKS.find(t => t.album === 'Ambiguous')
-                    return track ? (
-                      <Link href={`/album/ambiguous`} className="w-20 h-20 rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 relative block">
-                        <Image src={track.image} alt={track.album || ''} fill sizes="80px" className="object-cover hover:scale-105 transition-transform" />
+                  {/* Artist mini-avatars */}
+                  <div className="mt-3 flex items-center justify-center gap-2">
+                    {PLATFORM_ARTISTS.map(artist => (
+                      <Link key={artist.id} href={`/artist/${artist.id}`} className="group">
+                        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-transparent group-hover:border-[var(--pf-orange)] transition-all">
+                          <Image src={artist.image} alt={artist.name} width={32} height={32} className="object-cover w-full h-full" />
+                        </div>
                       </Link>
-                    ) : null
-                  })()}
+                    ))}
+                  </div>
+                  <p className="text-center text-xs text-[var(--pf-text-muted)] mt-1">4 Artists on Porterful</p>
                 </div>
 
-                {/* Floating badge */}
-                <div className="absolute -top-3 -right-3 md:-right-5 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl px-4 py-3 shadow-xl">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <DollarSign size={14} className="text-green-400" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-[var(--pf-text)]">80% to artists</div>
-                      <div className="text-[10px] text-[var(--pf-text-muted)]">Every sale</div>
-                    </div>
-                  </div>
-                </div>
+                {/* Floating badges */}
+                <div className="absolute -top-4 -right-4 bg-[var(--pf-orange)] text-white px-4 py-2 rounded-xl shadow-lg font-bold text-sm">80% to Artists</div>
+                <div className="absolute -bottom-4 -left-4 bg-purple-600 text-white px-4 py-2 rounded-xl shadow-lg font-bold text-sm">$0 to Start</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-16 md:py-24 bg-[var(--pf-bg-secondary)]">
+      {/* HOW IT WORKS */}
+      <section ref={howItWorksRef} className="py-20 bg-[var(--pf-bg-secondary)]">
         <div className="pf-container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              How <span className="text-[var(--pf-orange)]">Porterful</span> Works
-            </h2>
-            <p className="text-[var(--pf-text-secondary)] max-w-2xl mx-auto">
-              The artist-first platform. No labels. No hidden fees. Just you and your fans.
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">How It Works</h2>
+            <p className="text-[var(--pf-text-secondary)]">Three steps to start earning</p>
           </div>
-          
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <Upload className="text-[var(--pf-orange)]" size={28} />
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              { step: '01', title: 'Upload Your Music', desc: 'Free to start. Keep 80% of every sale. Your songs, your price, your store.', color: 'var(--pf-orange)' },
+              { step: '02', title: 'Share Your Link', desc: 'Every fan who joins through your link — you earn 3% of everything they buy. Forever.', color: 'purple-500' },
+              { step: '03', title: 'Build Real Income', desc: 'Music sales, merch, referrals. The more fans you bring, the more you earn.', color: 'green-500' },
+            ].map((item, i) => (
+              <div key={i} className="text-center">
+                <div className="text-6xl font-black mb-4 opacity-10" style={{ color: item.color }}>{item.step}</div>
+                <h3 className="font-bold text-xl mb-3">{item.title}</h3>
+                <p className="text-[var(--pf-text-secondary)]">{item.desc}</p>
               </div>
-              <h3 className="text-lg font-bold mb-2">Upload Music</h3>
-              <p className="text-[var(--pf-text-secondary)] text-sm">
-                Upload your tracks in minutes. Set your price. You control everything.
-              </p>
-            </div>
-            
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <Music className="text-[var(--pf-orange)]" size={28} />
-              </div>
-              <h3 className="text-lg font-bold mb-2">Build Your Fanbase</h3>
-              <p className="text-[var(--pf-text-secondary)] text-sm">
-                Fans discover your music. They stream, buy, and share with friends.
-              </p>
-            </div>
-            
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <Package className="text-[var(--pf-orange)]" size={28} />
-              </div>
-              <h3 className="text-lg font-bold mb-2">Sell Your Merch</h3>
-              <p className="text-[var(--pf-text-secondary)] text-sm">
-                Connect Printful or submit designs. We handle printing and shipping. You keep the profit.
-              </p>
-            </div>
-            
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <DollarSign className="text-[var(--pf-orange)]" size={28} />
-              </div>
-              <h3 className="text-lg font-bold mb-2">Earn 80%</h3>
-              <p className="text-[var(--pf-text-secondary)] text-sm">
-                No label taking 90%. You keep 80% of every sale. Platform takes 10%, artists fund gets 10%.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Superfan Section */}
-      <section className="py-16 md:py-24 bg-[var(--pf-bg)]">
+      {/* FOR EVERYONE */}
+      <section className="py-20">
         <div className="pf-container">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 via-purple-500/5 to-[var(--pf-bg)] rounded-3xl p-8 md:p-12 border border-[var(--pf-border)]">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/20 border border-[var(--pf-orange)]/30 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-4">
-                  <span className="text-lg">⭐</span>
-                  New: Superfan Program
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">Built For Everyone</h2>
+            <p className="text-[var(--pf-text-secondary)]">Whether you create, support, or both — you earn here.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              { icon: <Music size={24} />, title: "For Artists", highlight: "80%+ earnings", desc: "No labels taking half. No upfront costs. Your music, your money.", cta: "Start Selling" },
+              { icon: <Star size={24} />, title: "For Superfans", highlight: "3% rewards", desc: "Your support has value. Bring fans, earn from every purchase they make.", cta: "Join an Artist" },
+              { icon: <Users size={24} />, title: "For Collaborators", highlight: "Cross-promote", desc: "Feature other artists. Build together. Share audiences and grow the ecosystem.", cta: "Learn More" },
+            ].map((card, i) => (
+              <div key={i} className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-2xl p-6 hover:border-[var(--pf-orange)]/50 transition-all group">
+                <div className="w-12 h-12 bg-[var(--pf-orange)]/10 rounded-xl flex items-center justify-center text-[var(--pf-orange)] mb-4">{card.icon}</div>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-lg">{card.title}</h3>
+                  <span className="px-2 py-0.5 bg-[var(--pf-orange)]/10 text-[var(--pf-orange)] text-xs font-bold rounded-full">{card.highlight}</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Become a <span className="text-[var(--pf-orange)]">Superfan</span>
-                </h2>
-                <p className="text-[var(--pf-text-secondary)] text-lg max-w-2xl mx-auto">
-                  Earn rewards when your favorite artists succeed. Share your link, fans buy, you earn.
-                </p>
+                <p className="text-[var(--pf-text-secondary)] text-sm mb-4">{card.desc}</p>
+                <Link href="/apply" className="text-[var(--pf-orange)] text-sm font-medium hover:underline">{card.cta} →</Link>
               </div>
-              
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-[var(--pf-bg)]/50 rounded-xl p-6 text-center">
-                  <div className="text-3xl mb-3">🎁</div>
-                  <h3 className="font-bold mb-2">Earn Rewards</h3>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">Get 3% of every sale made through your unique Superfan link</p>
-                </div>
-                <div className="bg-[var(--pf-bg)]/50 rounded-xl p-6 text-center">
-                  <div className="text-3xl mb-3">👑</div>
-                  <h3 className="font-bold mb-2">Exclusive Access</h3>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">Unlock special badges, early drops, and behind-the-scenes content</p>
-                </div>
-                <div className="bg-[var(--pf-bg)]/50 rounded-xl p-6 text-center">
-                  <div className="text-3xl mb-3">💫</div>
-                  <h3 className="font-bold mb-2">Support Artists</h3>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">Your success directly funds the artists you love</p>
-                </div>
-              </div>
-              
-              <div className="text-center">
-                <Link href="/superfan" className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--pf-orange)] text-white rounded-xl font-bold hover:bg-[var(--pf-orange)]/90 transition-colors">
-                  Join the Superfan Program
-                  <span>→</span>
-                </Link>
-              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* THE BIGGER PICTURE */}
+      <section className="py-20 bg-gradient-to-br from-[var(--pf-orange)]/10 via-[var(--pf-bg-secondary)] to-purple-500/10">
+        <div className="pf-container">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">This Is Bigger Than Music</h2>
+            <p className="text-[var(--pf-text-secondary)] text-lg mb-8">Music is the entry point. Veterans, teachers, entrepreneurs — all part of the same ecosystem. One referral system. One community. All earning.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/challenge" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white font-bold rounded-xl transition-colors">Join The $10K Challenge</Link>
+              <button onClick={() => setShowWhyModal(true)} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium rounded-xl transition-colors">Learn More</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Artist */}
-      <section className="py-16 md:py-24 bg-[var(--pf-bg)]">
+      {/* QUICK LINKS */}
+      <section className="py-12">
         <div className="pf-container">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold">
-              Featured Artist
-            </h2>
-            <Link href="/artist/od-porter" className="text-[var(--pf-orange)] hover:underline text-sm font-medium">
-              View Profile →
-            </Link>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { href: '/artist/od-porter', icon: <Music size={20} />, label: 'O D Porter', sub: 'Featured Artist' },
+              { href: '/challenge', icon: <Star size={20} />, label: '$10K Challenge', sub: 'Compete & Win' },
+              { href: '/food', icon: <Heart size={20} />, label: 'Hunger Swipes', sub: 'Coming Soon' },
+              { href: '/about', icon: <Users size={20} />, label: 'About Us', sub: 'Our Mission' },
+            ].map((link) => (
+              <Link key={link.href} href={link.href} className="flex items-center gap-3 p-4 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl hover:border-[var(--pf-orange)]/50 transition-colors">
+                <div className="w-10 h-10 bg-[var(--pf-orange)]/10 rounded-lg flex items-center justify-center text-[var(--pf-orange)]">{link.icon}</div>
+                <div>
+                  <div className="font-medium text-sm">{link.label}</div>
+                  <div className="text-xs text-[var(--pf-text-muted)]">{link.sub}</div>
+                </div>
+              </Link>
+            ))}
           </div>
-          
-          <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl overflow-hidden border border-[var(--pf-border)]">
-            <div className="grid md:grid-cols-2 gap-0">
-              {/* Artist Info */}
-              <div className="p-6 md:p-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
-                    O
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold">O D Porter</h3>
-                      <span className="text-blue-400">✓</span>
-                    </div>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">St. Louis, MO</p>
-                  </div>
-                </div>
-                
-                <p className="text-[var(--pf-text-secondary)] mb-6">
-                  Independent artist and founder. Born in Miami, raised in NOLA & STL. 
-                  Building a platform where artists own everything.
-                </p>
-                
-                <div className="flex gap-4 mb-6">
-                  <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{TRACKS.length}</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Tracks</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{new Set(TRACKS.map(t => t.album)).size}</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Albums</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">12K+</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Listeners</div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/artist/od-porter" className="pf-btn pf-btn-primary">
-                    <Users size={18} className="mr-2" />
-                    Follow Artist
-                  </Link>
-                  <Link href="/digital" className="pf-btn pf-btn-secondary">
-                    <Play size={18} className="mr-2" />
-                    Play Music
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Latest Releases */}
-              <div className="p-6 md:p-10 bg-[var(--pf-surface)]">
-                <h4 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-4">LATEST RELEASES</h4>
-                <div className="space-y-3">
-                  {featuredTracks.slice(0, 5).map(track => (
-                    <Link 
-                      key={track.id}
-                      href={`/album/${track.album.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--pf-bg)] transition-colors group"
-                    >
-                      <div className="w-12 h-12 rounded relative shrink-0">
-                        <Image src={track.image} alt={track.title} fill sizes="48px" className="object-cover rounded" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate group-hover:text-[var(--pf-orange)] transition-colors">
-                          {track.title}
-                        </p>
-                        <p className="text-sm text-[var(--pf-text-muted)] truncate group-hover:text-[var(--pf-orange)]">{track.artist}</p>
-                      </div>
-                      <span className="text-xs text-[var(--pf-text-muted)]">${track.price}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+        </div>
+      </section>
+
+      {/* APP STORE */}
+      <section className="py-16 bg-gradient-to-t from-[var(--pf-bg)] via-[var(--pf-bg-secondary)] to-[var(--pf-bg)]">
+        <div className="pf-container">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-6">
+              <span className="w-2 h-2 bg-[var(--pf-orange)] rounded-full animate-pulse" /> Coming Soon
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Links */}
-      <section className="py-16 md:py-24 bg-[var(--pf-bg-secondary)]">
-        <div className="pf-container">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-            Explore Porterful
-          </h2>
-          
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/digital" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Music size={24} className="text-[var(--pf-orange)]" />
-              </div>
-              <h3 className="font-bold mb-1">Music</h3>
-              <p className="text-sm text-[var(--pf-text-secondary)]">Stream and buy tracks</p>
-            </Link>
-            
-            <Link href="/marketplace" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <ShoppingCart size={24} className="text-[var(--pf-orange)]" />
-              </div>
-              <h3 className="font-bold mb-1">Marketplace</h3>
-              <p className="text-sm text-[var(--pf-text-secondary)]">Merch and products</p>
-            </Link>
-            
-            <Link href="/radio" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Radio size={24} className="text-[var(--pf-orange)]" />
-              </div>
-              <h3 className="font-bold mb-1">Radio</h3>
-              <p className="text-sm text-[var(--pf-text-secondary)]">24/7 streaming</p>
-            </Link>
-            
-            <Link href="/playlists" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Disc3 size={24} className="text-[var(--pf-orange)]" />
-              </div>
-              <h3 className="font-bold mb-1">Playlists</h3>
-              <p className="text-sm text-[var(--pf-text-secondary)]">Curated collections</p>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-[var(--pf-orange)] to-purple-600">
-        <div className="pf-container text-center">
-          <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
-            Ready to Own Your Music?
-          </h2>
-          <p className="text-white/80 mb-8 max-w-xl mx-auto">
-            Join Porterful as an artist. Upload your music, sell merch, and keep 80% of everything.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup?role=artist" className="px-8 py-4 bg-white text-[var(--pf-orange)] rounded-xl font-bold hover:bg-gray-100 transition-colors">
-              Start as Artist
-            </Link>
-            <Link href="/digital" className="px-8 py-4 bg-white/10 text-white border border-white/30 rounded-xl font-bold hover:bg-white/20 transition-colors">
-              Browse Music
-            </Link>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Take Porterful Wherever You Go</h2>
+            <p className="text-[var(--pf-text-secondary)] text-lg mb-8">Full ecosystem in your pocket. Swipe food, stream music, support artists, earn rewards — all from your phone.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a href="#" className="flex items-center gap-3 px-5 py-3 bg-black hover:bg-gray-900 border border-white/10 rounded-xl transition-colors">
+                <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <div className="text-left"><div className="text-[10px] text-white/60 uppercase tracking-wider">Download on the</div><div className="text-sm font-semibold text-white -mt-0.5">App Store</div></div>
+              </a>
+              <a href="#" className="flex items-center gap-3 px-5 py-3 bg-black hover:bg-gray-900 border border-white/10 rounded-xl transition-colors">
+                <svg viewBox="0 0 512 512" className="w-7 h-7 text-white" fill="currentColor"><path d="M325.3 234.3L104.6 13.1L160 84.4l220.7 149.9-220.7 149.9z"/><path d="M407 179.3L187.3 399l-89.3-89.3 308.7-130.4z" fill="#3DDC84"/><path d="M17.7 169.3l89.3 89.3 220.7-220.7L238.4 49.3z" fill="#FC3F1D"/><path d="M104.6 13.1l89.3 89.3 89.3-89.3-89.3-89.3z" fill="#00AAFF"/></svg>
+                <div className="text-left"><div className="text-[10px] text-white/60 uppercase tracking-wider">Get it on</div><div className="text-sm font-semibold text-white -mt-0.5">Google Play</div></div>
+              </a>
+            </div>
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }

@@ -25,6 +25,7 @@ const PRODUCTS = [
 // Featured artists on the platform
 const FEATURED_ARTISTS = [
   { id: 'od-porter', name: 'O D Porter', location: 'St. Louis, MO', specialty: 'Hip-Hop / R&B', avatar: 'OD' },
+  { id: 'nikee-turbo', name: 'Nikee Turbo', location: 'St. Louis, MO', specialty: 'Hip-Hop', avatar: 'NT' },
 ]
 
 const CATEGORIES = ['All', 'Apparel', 'Accessories', 'Home', 'Art', 'Books']
@@ -51,6 +52,28 @@ export default function MarketplacePage() {
             Discover music and merch from independent artists. 80% of every sale goes directly to creators.
           </p>
         </div>
+
+        {/* METTLE Featured Product Banner */}
+        <Link href="/artist/nikee-turbo" className="block mb-8 group">
+          <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 hover:border-yellow-500/60 transition-all">
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="w-full md:w-64 h-48 relative">
+                <Image src="/artists/nikee-turbo/products/mettle/IMG_4415.jpg" alt="METTLE" fill sizes="256px" className="object-cover" />
+              </div>
+              <div className="flex-1 p-6">
+                <div className="text-xs text-yellow-400 font-medium uppercase tracking-wider mb-1">Featured Product</div>
+                <h3 className="text-2xl font-bold mb-1">METTLE - Do It With a Smile</h3>
+                <p className="text-[var(--pf-text-secondary)] mb-3">Premium apparel by Nikee Turbo. St. Louis rapper known for rhythm and flow.</p>
+                <div className="text-[var(--pf-orange)] font-bold text-lg">$40</div>
+              </div>
+              <div className="p-6">
+                <div className="px-6 py-3 bg-[var(--pf-orange)] text-white rounded-xl font-bold group-hover:bg-[var(--pf-orange-dark)] transition-colors">
+                  Shop Now
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
 
         {/* Featured Artists Sidebar */}
         <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl p-6 mb-8 border border-[var(--pf-border)]">

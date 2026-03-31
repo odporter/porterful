@@ -52,13 +52,20 @@ const TIERS = [
   },
 ];
 
+// Real artist progression data based on current artists
+const ARTIST_PROGRESSION = [
+  { artistId: 'od-porter', name: 'O D Porter', avatar: 'OD', earnings: 0, sales: 0, tracks: 21, products: 12, tier: 'bronze', nextMilestone: 100, progress: 0 },
+  { artistId: 'nikee-turbo', name: 'Nikee Turbo', avatar: 'NT', earnings: 0, sales: 0, tracks: 3, products: 1, tier: 'bronze', nextMilestone: 100, progress: 0 },
+  { artistId: 'gune', name: 'Gune', avatar: 'GU', earnings: 0, sales: 0, tracks: 3, products: 0, tier: 'bronze', nextMilestone: 100, progress: 0 },
+  { artistId: 'rob-soule', name: 'Rob Soule', avatar: 'RS', earnings: 0, sales: 0, tracks: 3, products: 0, tier: 'bronze', nextMilestone: 100, progress: 0 },
+];
+
 // Mock data fallback
 const MOCK_LEADERS = [
-  { rank: 1, artistId: 'mock-1', name: 'O D Porter', earnings: 1847, tier: 'Gold', isFounder: true },
-  { rank: 2, artistId: 'mock-2', name: 'Rob Soul', earnings: 892, tier: 'Silver', isFounder: true },
-  { rank: 3, artistId: 'mock-3', name: 'Gune', earnings: 654, tier: 'Silver', isFounder: true },
-  { rank: 4, artistId: 'mock-4', name: 'ATM Trap', earnings: 423, tier: 'Bronze', isFounder: false },
-  { rank: 5, artistId: 'mock-5', name: 'TTD Dex', earnings: 298, tier: 'Bronze', isFounder: false },
+  { rank: 1, artistId: 'od-porter', name: 'O D Porter', earnings: 0, tier: 'Bronze', isFounder: true },
+  { rank: 2, artistId: 'nikee-turbo', name: 'Nikee Turbo', earnings: 0, tier: 'Bronze', isFounder: true },
+  { rank: 3, artistId: 'gune', name: 'Gune', earnings: 0, tier: 'Bronze', isFounder: true },
+  { rank: 4, artistId: 'rob-soule', name: 'Rob Soule', earnings: 0, tier: 'Bronze', isFounder: true },
 ];
 
 const FAQS = [
@@ -513,80 +520,103 @@ export default function CompetitionPage() {
         </div>
       </section>
 
-      {/* Leaderboard */}
-      <section id="leaderboard" className="py-16 md:py-24 bg-[var(--pf-bg)]">
-        <div className="max-w-4xl mx-auto px-6">
+      {/* Artist Progression */}
+      <section id="progression" className="py-16 md:py-24 bg-[var(--pf-bg)]">
+        <div className="max-w-5xl mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-2">
-                Artist <span className="text-[var(--pf-orange)]">Leaderboard</span>
+                Artist <span className="text-[var(--pf-orange)]">Progression</span>
               </h2>
               <p className="text-[var(--pf-text-secondary)]">
-                {isLive ? 'Live rankings by total earnings' : 'Preview — updates when competition goes live'}
+                See who's building on Porterful — tracks, merch, and sales momentum
               </p>
             </div>
-            {!isLive && (
-              <Link href="/signup?role=artist" className="px-4 py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium text-sm hover:bg-[var(--pf-orange)]/90 transition-colors">
-                Join the Race
-              </Link>
-            )}
+            <Link href="/signup?role=artist" className="px-4 py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium text-sm hover:bg-[var(--pf-orange)]/90 transition-colors">
+              Join Them
+            </Link>
           </div>
 
-          <div className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] overflow-hidden">
-            {/* Header */}
-            <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-[var(--pf-bg)] border-b border-[var(--pf-border)] text-sm font-medium text-[var(--pf-text-muted)]">
-              <div className="col-span-1">Rank</div>
-              <div className="col-span-5">Artist</div>
-              <div className="col-span-3 text-right">Earnings</div>
-              <div className="col-span-3 text-right">Tier</div>
-            </div>
-            
-            {/* Rows */}
-            {leaders.map((leader, i) => (
-              <div 
-                key={leader.artistId || i}
-                className={`grid grid-cols-12 gap-4 px-6 py-4 border-b border-[var(--pf-border)] last:border-0 hover:bg-[var(--pf-bg)] transition-colors ${
-                  i === 0 ? 'bg-[var(--pf-orange)]/5' : ''
-                }`}
+          <div className="grid md:grid-cols-2 gap-6">
+            {ARTIST_PROGRESSION.map((artist, i) => (
+              <Link
+                key={artist.artistId}
+                href={`/artist/${artist.artistId}`}
+                className="group bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-all overflow-hidden"
               >
-                <div className="col-span-1 flex items-center">
-                  {i === 0 && <Trophy className="text-yellow-500 mr-2" size={18} />}
-                  <span className={`font-bold ${i === 0 ? 'text-yellow-500' : ''}`}>#{leader.rank || i + 1}</span>
-                </div>
-                <div className="col-span-5 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-500 flex items-center justify-center text-white font-bold">
-                    {leader.name?.charAt(0) || '?'}
-                  </div>
-                  <div>
-                    <div className="font-medium flex items-center gap-2">
-                      {leader.name || 'Unknown'}
-                      {leader.isFounder && (
-                        <span className="text-xs bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] px-2 py-0.5 rounded-full">
-                          Founder
-                        </span>
+                {/* Artist Header */}
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="relative">
+                      <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${i === 0 ? 'from-[var(--pf-orange)] to-purple-600' : i === 1 ? 'from-yellow-500 to-orange-500' : i === 2 ? 'from-blue-500 to-purple-600' : 'from-green-500 to-teal-500'} flex items-center justify-center text-white font-bold text-lg`}>
+                        {artist.avatar}
+                      </div>
+                      {i === 0 && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                          <Star size={12} className="text-white" />
+                        </div>
                       )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-bold text-lg flex items-center gap-2">
+                        {artist.name}
+                        {i === 0 && (
+                          <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
+                            Top
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-[var(--pf-text-muted)]">Bronze Tier</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-[var(--pf-orange)]">$0</div>
+                      <div className="text-xs text-[var(--pf-text-muted)]">earned</div>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="bg-[var(--pf-bg)] rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold">{artist.tracks}</div>
+                      <div className="text-xs text-[var(--pf-text-muted)]">Tracks</div>
+                    </div>
+                    <div className="bg-[var(--pf-bg)] rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold">{artist.products}</div>
+                      <div className="text-xs text-[var(--pf-text-muted)]">Products</div>
+                    </div>
+                    <div className="bg-[var(--pf-bg)] rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold">0</div>
+                      <div className="text-xs text-[var(--pf-text-muted)]">Sales</div>
+                    </div>
+                  </div>
+
+                  {/* Progress to First Milestone */}
+                  <div className="bg-[var(--pf-bg)] rounded-lg p-3">
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-[var(--pf-text-muted)]">Next milestone: $100</span>
+                      <span className="text-[var(--pf-orange)] font-medium">$0 / $100</span>
+                    </div>
+                    <div className="h-2 bg-[var(--pf-border)] rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[var(--pf-orange)] to-purple-500 w-0 transition-all duration-500" />
                     </div>
                   </div>
                 </div>
-                <div className="col-span-3 text-right font-bold text-[var(--pf-orange)]">
-                  ${(leader.earnings || 0).toLocaleString()}
+
+                {/* CTA */}
+                <div className="px-6 py-3 bg-[var(--pf-bg)] border-t border-[var(--pf-border)] flex items-center justify-between text-sm">
+                  <span className="text-[var(--pf-text-muted)]">View their store →</span>
+                  <span className="text-[var(--pf-orange)] group-hover:underline opacity-0 group-hover:opacity-100 transition-opacity">Listen & Shop</span>
                 </div>
-                <div className="col-span-3 text-right">
-                  <span className={`text-sm font-medium px-2 py-1 rounded ${
-                    leader.tier === 'Platinum' ? 'bg-purple-500/20 text-purple-400' :
-                    leader.tier === 'Gold' ? 'bg-yellow-500/20 text-yellow-400' :
-                    leader.tier === 'Silver' ? 'bg-gray-400/20 text-gray-300' :
-                    'bg-amber-600/20 text-amber-500'
-                  }`}>
-                    {leader.tier || 'Bronze'}
-                  </span>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
 
-          <div className="text-center mt-6 text-[var(--pf-text-muted)] text-sm">
-            <p>{isLive ? 'Rankings update in real-time' : 'Full leaderboard unlocks when competition goes live'}</p>
+          <div className="mt-8 text-center">
+            <p className="text-[var(--pf-text-muted)] mb-4">More artists joining soon</p>
+            <Link href="/signup?role=artist" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--pf-orange)] text-white rounded-xl font-bold hover:bg-[var(--pf-orange)]/90 transition-colors">
+              <Rocket size={18} />
+              Become a Founding Artist
+            </Link>
           </div>
         </div>
       </section>

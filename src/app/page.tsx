@@ -6,6 +6,7 @@ import { Play, Headphones, Music, Star, Users, ArrowRight, Heart, ChevronDown, Z
 import { useSupabase } from '@/app/providers';
 import { TRACKS } from '@/lib/data';
 import { ARTISTS } from '@/lib/artists';
+import { useAudio } from '@/lib/audio-context';
 
 const HERO_BG_IMAGES = [
   '/images/hero/ai-bg-1.png',
@@ -28,21 +29,22 @@ const HERO_TRACKS = TRACKS.filter(t =>
 
 export default function Home() {
   const { user } = useSupabase();
+  const { currentTrack: audioTrack, isPlaying, playTrack } = useAudio();
   const [showWhyModal, setShowWhyModal] = useState(false);
   const [heroBgIndex, setHeroBgIndex] = useState(0);
   const [heroTrackIndex, setHeroTrackIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const howItWorksRef = useRef<HTMLDivElement>(null);
   const trackIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isHeroPlaying = audioTrack && HERO_TRACKS.some(t => t.id === audioTrack.id);
 
-  // Rotate track every 9 seconds
+  // Rotate track every 9 seconds (only when not playing from hero)
   useEffect(() => {
+    if (isHeroPlaying) return; // Don't rotate while hero track is playing
     trackIntervalRef.current = setInterval(() => {
       setHeroTrackIndex(i => (i + 1) % HERO_TRACKS.length);
-      setIsPlaying(false);
     }, 9000);
     return () => { if (trackIntervalRef.current) clearInterval(trackIntervalRef.current); };
-  }, []);
+  }, [isHeroPlaying]);
 
   // Change hero background as user scrolls
   useEffect(() => {
@@ -181,7 +183,7 @@ export default function Home() {
                     <div className="text-xs text-white/40 uppercase tracking-wider mb-3">Featured Track</div>
 
                     {currentTrack && (
-                      <Link href={`/artist/${currentTrack.artist.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`} className="flex items-center gap-3 mb-3 hover:opacity-80 transition-opacity">
+                      <div className="flex items-center gap-3 mb-3">
                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-[var(--pf-bg-secondary)] shrink-0">
                           <Image src={currentTrack.image} alt={currentTrack.title} width={48} height={48} className="object-cover w-full h-full" />
                         </div>
@@ -189,10 +191,16 @@ export default function Home() {
                           <div className="font-bold text-sm truncate text-white">{currentTrack.title}</div>
                           <div className="text-xs text-white/50 truncate">{currentTrack.artist}</div>
                         </div>
-                        <button onClick={(e) => { e.preventDefault(); setHeroTrackIndex(i => (i + 1) % HERO_TRACKS.length); }} className="w-8 h-8 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white rounded-full flex items-center justify-center shrink-0 transition-colors">
+                        <button
+                          onClick={() => playTrack({ ...currentTrack, duration: typeof currentTrack.duration === 'string' ? currentTrack.duration.split(':').reduce((a: number, p: string) => (60 * a) + parseInt(p), 0) : currentTrack.duration || 180 } as any)}
+                          className="w-8 h-8 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white rounded-full flex items-center justify-center shrink-0 transition-colors"
+                        >
+                          {isHeroPlaying ? <Pause size={13} /> : <Play size={13} className="ml-0.5" />}
+                        </button>
+                        <button onClick={() => setHeroTrackIndex(i => (i + 1) % HERO_TRACKS.length)} className="w-8 h-8 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center shrink-0 transition-colors">
                           <SkipForward size={13} />
                         </button>
-                      </Link>
+                      </div>
                     )}
 
                     {/* Progress dots */}
@@ -203,7 +211,7 @@ export default function Home() {
                     </div>
 
                     <div className="flex items-center justify-between text-[10px] text-white/30">
-                      <span>{currentTrack?.artist} · {currentTrack?.album}</span>
+                      <span>{isHeroPlaying ? `▶ ${currentTrack?.artist} · ${currentTrack?.title}` : `${currentTrack?.artist} · ${currentTrack?.album}`}</span>
                       <span>{heroTrackIndex + 1}/{HERO_TRACKS.length}</span>
                     </div>
                   </div>

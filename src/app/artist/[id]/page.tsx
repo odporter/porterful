@@ -481,12 +481,12 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
               </div>
             ) : null}
 
-            {/* Singles — always show if artist has tracks, even without albums */}
-            {displayTracks.length > 0 && (
+            {/* Singles — only show actual singles (not album tracks) */}
+            {displayTracks.filter(t => t.album === 'Singles').length > 0 && (
               <div className="mt-6">
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-3"><Star size={16} className="text-[var(--pf-orange)]" /> Singles</h2>
+                <h2 className="text-lg font-bold flex items-center gap-2 mb-3"><Star size={16} className="text-[var(--pf-orange)]" /> Featured Singles</h2>
                 <div className="space-y-2">
-                  {displayTracks.map((track: any) => (
+                  {displayTracks.filter(t => t.album === 'Singles').map((track: any) => (
                     <div
                       key={track.id}
                       onClick={() => playTrack({ ...track, duration: typeof track.duration === 'string' ? track.duration.split(':').reduce((a: number, p: string) => (60 * a) + parseInt(p), 0) : track.duration || 180 } as any)}

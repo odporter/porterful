@@ -19,15 +19,6 @@ const ALBUM_ART = {
   Singles: '/album-art/Singles.jpg',
 };
 
-// Products for marketplace
-export const PRODUCTS = [
-  { id: 'ambiguous-tee', name: 'Ambiguous Tour Tee', artist: 'O D Porter', price: 28, category: 'merch', type: 'Apparel', description: 'Premium cotton tee from the Ambiguous tour.', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500', colors: ['Black', 'White', 'Orange'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], inStock: true, artistCut: 22.40, sales: 142, rating: 4.8, reviews: 89 },
-  { id: 'ambiguous-hoodie', name: 'Ambiguous Hoodie', artist: 'O D Porter', price: 65, category: 'merch', type: 'Apparel', description: 'Heavyweight hoodie with embroidered logo.', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500', colors: ['Black', 'Gray'], sizes: ['S', 'M', 'L', 'XL'], inStock: true, artistCut: 52, sales: 78, rating: 4.9, reviews: 45 },
-  { id: 'ambiguous-vinyl', name: 'Ambiguous Vinyl', artist: 'O D Porter', price: 35, category: 'music', type: 'Vinyl', description: 'Limited edition vinyl. 180g audiophile quality.', image: 'https://images.unsplash.com/photo-1539185441755-7697f0f1e3ee?w=500', format: '12" Vinyl', tracks: 21, inStock: true, artistCut: 28, sales: 234, rating: 5.0, reviews: 67 },
-  { id: 'mettle', name: 'METTLE - Do It With a Smile', artist: 'Nikee Turbo', price: 40, category: 'merch', type: 'Apparel', description: 'PremiumMETTLE shirt. Do It With a Smile.', image: '/artists/nikee-turbo/products/mettle/IMG_4415.jpg', images: ['/artists/nikee-turbo/products/mettle/IMG_4413.jpg', '/artists/nikee-turbo/products/mettle/IMG_4414.jpg', '/artists/nikee-turbo/products/mettle/IMG_4415.jpg', '/artists/nikee-turbo/products/mettle/IMG_4416.jpg', '/artists/nikee-turbo/products/mettle/IMG_4417.jpg', '/artists/nikee-turbo/products/mettle/IMG_4418.jpg'], colors: ['Black', 'White'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], inStock: true, artistCut: 32, sales: 0, rating: 0, reviews: 0 },
-  { id: 'gune-shirt', name: 'Gune Classic Tee', artist: 'Gune', price: 40, category: 'merch', type: 'Apparel', description: 'Official Gune merch. Limited edition shirt.', image: '/artists/gune/gune-shirt.jpg', colors: ['Black', 'White'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], inStock: true, artistCut: 32, sales: 0, rating: 0, reviews: 0 },
-];
-
 // All tracks with CDN audio URLs
 export const TRACKS = [
   // AMBIGUOUS - 21 tracks

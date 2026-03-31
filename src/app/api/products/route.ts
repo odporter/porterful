@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { ALL_PRODUCTS } from '@/lib/products'
+import { PRODUCTS } from '@/lib/products'
 
 // Artist margin based on tier
 const ARTIST_MARGINS = {
@@ -18,16 +18,11 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get('search')
   const limit = parseInt(searchParams.get('limit') || '200')
   
-  let products = [...ALL_PRODUCTS]
+  let products = [...PRODUCTS]
   
   // Filter by category
   if (category && category !== 'all') {
     products = products.filter(p => p.category.toLowerCase() === category.toLowerCase())
-  }
-  
-  // Filter by subcategory
-  if (subcategory) {
-    products = products.filter(p => p.subcategory?.toLowerCase() === subcategory.toLowerCase())
   }
   
   // Search
@@ -36,21 +31,20 @@ export async function GET(request: NextRequest) {
     products = products.filter(p => 
       p.name.toLowerCase().includes(searchLower) ||
       p.category.toLowerCase().includes(searchLower) ||
-      p.subcategory?.toLowerCase().includes(searchLower)
+      p.artist.toLowerCase().includes(searchLower)
     )
   }
   
   // Calculate sale price (30% markup default)
   products = products.map(p => ({
     ...p,
-    salePrice: Math.round((p.basePrice || 5) * 1.3 * 100) / 100,
+    salePrice: Math.round((p.price || 5) * 1.3 * 100) / 100,
   }))
   
   return NextResponse.json({
     products: products.slice(0, limit),
     total: products.length,
     categories: Array.from(new Set(products.map(p => p.category))),
-    subcategories: Array.from(new Set(products.map(p => p.subcategory).filter(Boolean)))
   })
 }
 

@@ -3,36 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingBag, Heart, Star, ArrowRight } from 'lucide-react'
-
-// Platform-curated featured products
-const FEATURED_PRODUCTS = [
-  { id: 'book-tiigh', name: 'There It Is, Here It Go', price: 25, category: 'Book', artist: 'O D Porter', image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500', featured: true },
-  { id: 'odp-nfc-wristband', name: 'Artist NFC Wristband', price: 15, category: 'Tech', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=500', featured: true, description: 'Tap In to visit the artist page. Reusable.' },
-  { id: 'odp-nfc-tag', name: 'Artist NFC Tag (Set of 3)', price: 12, category: 'Tech', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1618401471353-b98af5f8b545?w=500', featured: true, description: 'Stick anywhere. Tap In to discover the artist.' },
-  { id: 'odp-nfc-card', name: 'Artist NFC Card', price: 8, category: 'Tech', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=500', featured: false, description: 'Wallet-sized. Tap In to follow the artist.' },
-  // Brands
-  { id: 'aggressive-heights-tee', name: 'Agressive Heights Classic Tee', price: 32, category: 'Brand', artist: 'Agressive Heights Clothing', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500', featured: true, description: 'Premium cotton tee from Agressive Heights Clothing.' },
-  { id: 'aggressive-heights-hoodie', name: 'Agressive Heights Hoodie', price: 65, category: 'Brand', artist: 'Agressive Heights Clothing', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500', featured: false, description: 'Heavyweight hoodie from Agressive Heights.' },
-  { id: 'noble-naturals-candle', name: 'Noble Naturals Soy Candle', price: 28, category: 'Brand', artist: 'Noble Naturals', image: 'https://images.unsplash.com/photo-1602607714066-4908c9a0a2b9?w=500', featured: true, description: 'Hand-poured soy candle. Notes of vanilla, sandalwood, and cedar.' },
-  { id: 'noble-naturals-wax-melts', name: 'Noble Naturals Wax Melts', price: 14, category: 'Brand', artist: 'Noble Naturals', image: 'https://images.unsplash.com/photo-1608181831718-c9fbea8ce3bc?w=500', featured: false, description: 'Wax melts in assorted scents.' },
-  { id: 'eurnice-jean-candle', name: 'Eurnice Jean Luxury Candle', price: 35, category: 'Brand', artist: 'Eurnice Jean Candle Co.', image: 'https://images.unsplash.com/photo-1602607714066-4908c9a0a2b9?w=500', featured: true, description: 'Handmade luxury candle. Saint Louis, MO.' },
-  { id: 'odp-tee-classic-black', name: 'Porterful Classic Tee', price: 28, category: 'Apparel', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500', featured: true },
-  { id: 'odp-hoodie-classic-black', name: 'Porterful Classic Hoodie', price: 55, category: 'Apparel', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500', featured: false },
-  { id: 'odp-mug-11oz-black', name: 'Porterful Mug', price: 18, category: 'Home', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500', featured: false },
-  { id: 'odp-canvas-16x20', name: 'Porterful Canvas', price: 55, category: 'Art', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1549497538-303791108f95?w=500', featured: false },
-  { id: 'odp-poster-18x24', name: 'Porterful Poster', price: 22, category: 'Art', artist: 'Various Artists', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500', featured: false },
-]
-
-// Featured artists
-const FEATURED_ARTISTS = [
-  { id: 'od-porter', name: 'O D Porter', specialty: 'Hip-Hop / R&B / Soul', location: 'St. Louis, MO', avatar: 'OD' },
-]
+import { Star, ArrowRight } from 'lucide-react'
+import { PRODUCTS, FEATURED_PRODUCTS, Product } from '@/lib/products'
+import { ARTISTS } from '@/lib/artists'
 
 export default function StorePage() {
   const [activeCategory, setActiveCategory] = useState('All')
 
-  const categories = ['All', 'Apparel', 'Art', 'Books', 'Home', 'Tech', 'Brand']
+  const categories = ['All', 'Apparel', 'Art', 'Books', 'Home', 'Tech', 'Merch']
 
   const filteredProducts = activeCategory === 'All'
     ? FEATURED_PRODUCTS
@@ -48,7 +26,7 @@ export default function StorePage() {
               Porterful <span className="text-[var(--pf-orange)]">Store</span>
             </h1>
             <p className="text-lg text-[var(--pf-text-secondary)] mb-2">
-              Curated merch and products from independent artists on the platform.
+              Merch, music, and more from independent artists on the platform.
             </p>
             <p className="text-[var(--pf-text-muted)]">
               Every purchase supports artists directly — they keep 80%.
@@ -58,13 +36,10 @@ export default function StorePage() {
       </section>
 
       <div className="pf-container py-8">
-        {/* Featured Products Section */}
+        {/* Featured Products */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">Featured Products</h2>
-            <Link href="/marketplace" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
-              Browse All <ArrowRight size={14} />
-            </Link>
           </div>
 
           {/* Category Filter */}
@@ -76,7 +51,7 @@ export default function StorePage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeCategory === cat
                     ? 'bg-[var(--pf-orange)] text-white'
-                    : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-white'
+                    : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-white border border-[var(--pf-border)]'
                 }`}
               >
                 {cat}
@@ -122,30 +97,31 @@ export default function StorePage() {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">Featured Artists</h2>
-            <Link href="/marketplace" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
+            <Link href="/artists" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
               View All Artists <ArrowRight size={14} />
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {FEATURED_ARTISTS.map(artist => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {ARTISTS.map(artist => (
               <Link
                 key={artist.id}
                 href={`/artist/${artist.id}`}
-                className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors group"
+                className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl p-5 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors group"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
-                    {artist.avatar}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--pf-border)] group-hover:border-[var(--pf-orange)] mb-3">
+                    <Image
+                      src={artist.image}
+                      alt={artist.name}
+                      width={64}
+                      height={64}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold group-hover:text-[var(--pf-orange)] transition-colors">{artist.name}</h3>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">{artist.specialty}</p>
-                    <p className="text-xs text-[var(--pf-text-muted)]">{artist.location}</p>
-                  </div>
-                  <div className="text-[var(--pf-text-muted)] group-hover:text-[var(--pf-orange)] transition-colors">
-                    <ArrowRight size={20} />
-                  </div>
+                  <h3 className="font-bold group-hover:text-[var(--pf-orange)] transition-colors">{artist.name}</h3>
+                  <p className="text-xs text-[var(--pf-text-muted)] mt-1">{artist.genre}</p>
+                  <p className="text-xs text-[var(--pf-text-muted)]">{artist.location}</p>
                 </div>
               </Link>
             ))}
@@ -159,7 +135,7 @@ export default function StorePage() {
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-2xl font-bold mb-2">Open Your Own Store</h2>
               <p className="text-[var(--pf-text-secondary)] mb-4">
-                Are you an artist? Sell your own merch with Porterful. You keep 80% of every sale. 
+                Are you an artist? Sell your own merch with Porterful. You keep 80% of every sale.
                 We handle printing, shipping, and customer service.
               </p>
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">

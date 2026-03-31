@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/app/providers';
-import { TRACKS, ALBUMS, PRODUCTS } from '@/lib/data';
+import { TRACKS, ALBUMS } from '@/lib/data';
+import { PRODUCTS } from '@/lib/products';
 import Link from 'next/link';
 
 // Custom Icons

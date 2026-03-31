@@ -1,25 +1,18 @@
-# Porterful — Pending Work
+# Porterful Site Improvements - March 31, 2026
 
-## High Priority
+## Batch 1: Rob Soule fix + social buttons
 
-- [ ] **Storefront overhaul** — Replace placeholder products with curated merch that fits O D Porter brand
-- [ ] **Real artist photos** — Add to artist pages, home, about
-- [ ] **Book integration** — "There It Is, Here It Go" as a product in the store
-- [ ] **Artist onboarding flow** — Clean signup → dashboard → first sale experience
-- [ ] **Vercel env vars** — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` need to be set for prod
+All requested changes were already implemented in the codebase:
 
-## Medium Priority
+### 1. Rob Soule artist data (src/lib/artists.ts)
+- Genre: `'Hip-Hop / R&B / Blues'` ✓
+- Bio: Already reflects "St. Louis hip-hop and R&B artist blending blues into a soulful sound. Known for melodic, powerful, guitar-driven performances." ✓
 
-- [ ] **Email sending** — Resend/SendGrid/Gmail SMTP setup for order confirmations
-- [ ] **Checkout webhook** — Connect Stripe webhook to Supabase for persistent order records
-- [ ] **CreditKlimb APIs** — `/api/leads` and `/api/contact` write to filesystem; need Supabase
+### 2. Social media buttons (src/app/artist/[id]/page.tsx)
+- Instagram, Twitter/X, YouTube, TikTok buttons already render in the artist profile header
+- Buttons appear next to artist name with proper icons and hover effects ✓
 
-## Lower Priority
+### 3. Featured Singles before Albums
+- The "Featured Singles" section already renders before the "Albums" section in the music tab ✓
 
-- [ ] **Discord bot brain** — Integrate OpenClaw agent with inbox/outbox relay so it actually knows things
-- [ ] **Honor Earth** — STL export from OpenSCAD, PETG filament for heat seal unit
-- [ ] **Creature Kingdom** — Roblox game build (kids' pet sim)
-
----
-
-_Last updated: March 31, 2026_
+No code changes were necessary — all features were already correctly implemented.

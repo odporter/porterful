@@ -465,5 +465,3 @@ export const TRENDING_CATEGORIES = [
   { id: 'tech', name: 'Tech', icon: '📱', margin: '35-55%' },
   { id: 'beauty', name: 'Beauty', icon: '💄', margin: '40-70%' },
 ]
-
-console.log(`Trending products loaded: ${TRENDING_PRODUCTS.length}`)

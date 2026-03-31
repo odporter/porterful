@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TRACKS, ALBUMS, PRODUCTS } from '@/lib/data';
+import { TRACKS, ALBUMS } from '@/lib/data';
+import { PRODUCTS } from '@/lib/products';
 
 // Static artist data derived from tracks/albums
 const STATIC_ARTISTS = [

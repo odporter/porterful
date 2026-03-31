@@ -90,11 +90,6 @@ export function Navbar() {
             {/* Right Side */}
             <div className="flex items-center gap-3">
               
-              {/* Mobile Search */}
-              <button className="md:hidden p-2 -mr-2">
-                <Search size={20} className="text-[var(--pf-text-secondary)]" />
-              </button>
-
               {/* Wallet - Desktop */}
               <Link href="/wallet" className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
                 <span className="text-sm font-medium">{formatWalletBalance()}</span>

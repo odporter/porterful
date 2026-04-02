@@ -136,11 +136,11 @@ On Porterful, Nikee Turbo's fans are superfans — earning rewards every time th
     slug: 'rob-soule',
     genre: 'Hip-Hop / R&B / Blues',
     location: 'St. Louis, MO',
-    bio: `Rob Soule bringing something you don't hear every day — hip-hop and R&B fused with the blues. Born and raised in St. Louis, he grew up on the sounds of the city: the soul, the struggle, the stories that come from living it. He didn't just absorb that — he translated it into something new.
+    bio: `Rob Soule is a St. Louis hip-hop and R&B artist bringing a sound you don't hear every day — one that blends the blues into something raw and soulful. Born and raised in the Lou, he grew up on the city's sounds: the soul, the struggle, the stories that come from living it. He didn't just absorb that — he translated it into something new.
 
-His music sits at the intersection where hip-hop meets the blues. Where the 808 meets the guitar. Where the street meets the soul. It's St. Louis music because it could only come from here — from the blocks, the history, the people.
+His music sits at the intersection where hip-hop meets the blues. Where the 808 meets the guitar. Where the street meets the soul. It's St. Louis music because it could only come from here — from the blocks, the history, the people. The result is a soulful sound rooted in the blues, filtered through hip-hop and R&B.
 
-Rob been building his sound track by track, learning what works and what doesn't, and Porterful is where he's planting his flag. This is STL music for STL people and everyone else who can feel it.`,
+Rob's been building his sound track by track, learning what works and what doesn't, and Porterful is where he's planting his flag. This is STL music for STL people and everyone else who can feel it.`,
     shortBio: 'STL artist blending hip-hop, R&B, and blues into something only the Lou could birth.',
     verified: true,
     image: '/artists/rob-soule/hq720.jpg',

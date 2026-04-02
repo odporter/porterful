@@ -1,34 +1,75 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
-  // Allow API routes, static files, and the maintenance page itself
-  if (
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/static') ||
-    pathname.includes('.') || // static files with extensions
-    pathname === '/maintenance'
-  ) {
-    return NextResponse.next()
+  // Create a Supabase client configured to use cookies
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // Refresh session if expired
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Protected routes that require authentication
+  const protectedPaths = ['/dashboard', '/settings', '/wallet']
+  const isProtectedPath = protectedPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  // Public paths that should redirect to dashboard if logged in
+  const publicPaths = ['/login', '/signup']
+  const isPublicPath = publicPaths.some(path => request.nextUrl.pathname.startsWith(path))
+
+  // If user is not signed in and trying to access protected route
+  if (!user && isProtectedPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
-  // Redirect everything else to maintenance page
-  const maintenanceUrl = new URL('/maintenance', request.url)
-  return NextResponse.redirect(maintenanceUrl)
+  // If user is signed in and trying to access login/signup
+  if (user && isPublicPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
+
+  return supabaseResponse
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
-     * - api routes
-     * - _next (Next.js internals)
-     * - static files
-     * - maintenance page itself
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     * - api routes (except auth)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|maintenance).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public|api(?!/auth)).*)',
   ],
 }

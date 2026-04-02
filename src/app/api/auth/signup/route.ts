@@ -1,0 +1,86 @@
+import { createServerClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+
+export async function POST(request: Request) {
+  try {
+    const { email, password, name, role, youtube, website, industry } = await request.json()
+
+    if (!email || !password || !name || !role) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+    // Create auth user with service role key (bypasses RLS)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    
+    const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Skip email confirmation for smoother signup
+      user_metadata: { name, role }
+    })
+
+    if (signUpError) {
+      console.error('Signup error:', signUpError)
+      return NextResponse.json({ error: signUpError.message }, { status: 400 })
+    }
+
+    if (!authData.user) {
+      return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
+    }
+
+    const userId = authData.user.id
+
+    // Create profile
+    const { error: profileError } = await supabase.from('profiles').insert({
+      id: userId,
+      email: email,
+      name: name,
+      role: role,
+    })
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError)
+      // Continue anyway - profile might already exist
+    }
+
+    // If artist, create artist record
+    if (role === 'artist') {
+      const slug = name.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') + '-' + Math.random().toString(36).substr(2, 4)
+      
+      await supabase.from('artists').insert({
+        id: userId,
+        name: name,
+        slug: slug,
+        bio: '',
+        location: '',
+        ...(youtube ? { social_links: { youtube } } : {}),
+      })
+    }
+
+    // If business/brand, update with website and industry
+    if ((role === 'business' || role === 'brand') && website) {
+      await supabase.from('profiles').update({
+        website,
+        industry,
+      }).eq('id', userId)
+    }
+
+    // Return success - client will handle session creation via email/password login
+    return NextResponse.json({ 
+      success: true,
+      userId,
+      message: 'Account created successfully'
+    })
+
+  } catch (err: any) {
+    console.error('Signup API error:', err)
+    return NextResponse.json({ error: err.message || 'Signup failed' }, { status: 500 })
+  }
+}

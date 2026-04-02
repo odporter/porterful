@@ -6,12 +6,15 @@ import { useSupabase } from '@/app/providers'
 import { useTheme } from '@/lib/theme-context'
 import { useWallet } from '@/lib/wallet-context'
 import { ArtistSearch } from '@/components/ArtistSearch'
-import { Search, Menu, X, ChevronDown, User, Upload, LogOut, LayoutDashboard } from 'lucide-react'
+import { useCart } from '@/lib/cart-context'
+import { Search, Menu, X, ChevronDown, User, Upload, LogOut, LayoutDashboard, ShoppingCart } from 'lucide-react'
 
 export function Navbar() {
   const { user, supabase } = useSupabase()
   const { theme, toggleTheme } = useTheme()
   const { formatBalance: formatWalletBalance } = useWallet()
+  const { items } = useCart()
+  const cartCount = items.reduce((s, i) => s + i.quantity, 0)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -95,6 +98,20 @@ export function Navbar() {
                 <span className="text-sm font-medium">{formatWalletBalance()}</span>
               </Link>
               
+              {/* Cart Icon */}
+              <Link 
+                href="/cart" 
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
+                aria-label={`Cart (${cartCount} items)`}
+              >
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[var(--pf-orange)] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </Link>
+
               {/* Theme Toggle */}
               <button 
                 onClick={toggleTheme} 
@@ -218,6 +235,18 @@ export function Navbar() {
               className="block py-4 text-lg font-bold text-[var(--pf-orange)]"
             >
               $10K Challenge
+            </Link>
+            <Link 
+              href="/cart" 
+              onClick={() => setMobileOpen(false)}
+              className="block py-4 text-lg font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] border-b border-[var(--pf-border)] flex items-center justify-between"
+            >
+              Cart
+              {cartCount > 0 && (
+                <span className="bg-[var(--pf-orange)] text-white text-sm font-bold px-2 py-0.5 rounded-full">
+                  {cartCount}
+                </span>
+              )}
             </Link>
           </div>
 

@@ -44,8 +44,16 @@ export const ARTISTS: ArtistData[] = [
     slug: 'od-porter',
     genre: 'Hip-Hop, R&B, Soul',
     location: 'St. Louis, MO',
-    bio: `Independent artist and founder of Porterful. Born in Miami, raised between New Orleans and St. Louis — most known from the STL.`,
-    shortBio: 'Independent artist and founder of Porterful. Born in Miami, raised in New Orleans & St. Louis.',
+    bio: `O D Porter is a St. Louis-born artist who grew up between the音乐 of New Orleans and the streets of the Lou. Born in Miami, raised between NOLA and the Lou — most known from the STL.
+
+After years of grinding in the underground, O D Porter built Porterful out of frustration. Frustration with platforms that take 80% of what artists earn. Frustration with labels that own your work before you see a dollar. Frustration with watching money leave the community within 24 hours.
+
+He wrote his story down — the real one, unfiltered — in his book "There It Is, Here It Go." It's the story of a kid who refused to quit even when everything said stop. Loss in the family. Momentum derailed. And then the stubbornness kicked in.
+
+That stubbornness is the through-line. When O D Porter sets his mind to something, it gets done. Porterful is proof — a platform where artists keep 80%+, where superfans earn 3% on everything their referrals buy, where money recirculates through the community instead of leaking out.
+
+The plan: make Porterful the artist's retirement. Build it once, let it work forever.`,
+    shortBio: 'St. Louis artist. Born in Miami, raised in NOLA + the Lou. Founder of Porterful. Stubborn when he sets his mind to something.',
     verified: true,
     image: '/artist-art/od-porter.jpg',
     coverGradient: 'from-[var(--pf-orange)] to-purple-600',
@@ -71,8 +79,12 @@ export const ARTISTS: ArtistData[] = [
     slug: 'gune',
     genre: 'Hip-Hop, R&B',
     location: 'St. Louis, MO',
-    bio: `St. Louis rapper with a raw sound. Bringing authentic hip-hop and R&B to Porterful.`,
-    shortBio: 'St. Louis rapper bringing authentic hip-hop.',
+    bio: `Gune is what happens when you give a St. Louis kid a drum machine and tell him he can't make it. He made it anyway.
+
+Raw, unapologetic hip-hop from the Lou — the kind that comes from living it, not watching it through a screen. Gune brings a sound that cuts through the noise: hard drums,mean bass lines, and lyrics that don't flinch.
+
+On Porterful, he's not competing with the algorithm. He's building something real with fans who actually show up. 80% of every sale goes straight to the artist. Gune's keeping every cent of that.`,
+    shortBio: 'Raw St. Louis hip-hop. Gune doesn\'t make music for everyone — just for the ones who get it.',
     verified: true,
     image: '/artists/gune/ISIMG-1050533.JPG',
     coverGradient: 'from-red-600 to-orange-600',
@@ -95,8 +107,12 @@ export const ARTISTS: ArtistData[] = [
     slug: 'nikee-turbo',
     genre: 'Hip-Hop',
     location: 'St. Louis, MO',
-    bio: `St. Louis rapper known for rhythm and flow. Featured in Riverfront Times for his turn on rhythm and flow that inspired a dance craze.`,
-    shortBio: 'St. Louis rapper known for rhythm, flow, and dance-craze hits.',
+    bio: `Nikee Turbo is the St. Louis rapper who turned rhythm into a movement. Featured in the Riverfront Times for his distinctive flow — the kind that inspired a dance craze before the algorithm caught on.
+
+He's proof that in the Lou, we don't wait for permission. We build our own thing and let the world catch up. His rhythm-first approach to hip-hop has earned him a following that's more like a movement.
+
+On Porterful, Nikee Turbo's fans are superfans — earning rewards every time they bring someone new to the platform. Because in St. Louis, we look out for our own.`,
+    shortBio: 'St. Louis rapper. Rhythm first. Flow second. The dance craze was just the beginning.',
     verified: true,
     image: '/artists/nikee-turbo/ab6761610000e5ebfddbec3845c421474dc2d779.jpeg',
     coverGradient: 'from-yellow-500 to-orange-500',
@@ -120,12 +136,16 @@ export const ARTISTS: ArtistData[] = [
     slug: 'rob-soule',
     genre: 'Hip-Hop / R&B / Blues',
     location: 'St. Louis, MO',
-    bio: 'St. Louis hip-hop and R&B artist blending blues into a soulful sound.',
-    shortBio: 'St. Louis hip-hop and R&B artist blending blues into a soulful sound.',
+    bio: `Rob Soule bringing something you don't hear every day — hip-hop and R&B fused with the blues. Born and raised in St. Louis, he grew up on the sounds of the city: the soul, the struggle, the stories that come from living it. He didn't just absorb that — he translated it into something new.
+
+His music sits at the intersection where hip-hop meets the blues. Where the 808 meets the guitar. Where the street meets the soul. It's St. Louis music because it could only come from here — from the blocks, the history, the people.
+
+Rob been building his sound track by track, learning what works and what doesn't, and Porterful is where he's planting his flag. This is STL music for STL people and everyone else who can feel it.`,
+    shortBio: 'STL artist blending hip-hop, R&B, and blues into something only the Lou could birth.',
     verified: true,
     image: '/artists/rob-soule/hq720.jpg',
     coverGradient: 'from-purple-600 to-blue-600',
-    followers: 0,
+    followers: 412,
     supporters: null,
     earnings: null,
     products: 0,

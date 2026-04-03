@@ -1,12 +1,14 @@
-'use client';
+'use client'
 import { useState, useEffect, useRef } from 'react'
-import Link from 'next/link';
-import Image from 'next/image';
-import { Play, Headphones, Music, Star, Users, ArrowRight, Heart, ChevronDown, Zap, Shield, TrendingUp, Pause, SkipForward, Crown } from 'lucide-react';
-import { useSupabase } from '@/app/providers';
-import { TRACKS } from '@/lib/data';
-import { ARTISTS } from '@/lib/artists';
-import { useAudio } from '@/lib/audio-context';
+import Link from 'next/link'
+import Image from 'next/image'
+import { Play, Headphones, Music, Star, Users, ArrowRight, Heart, ChevronDown, Zap, Shield, TrendingUp, Pause, SkipForward, Crown } from 'lucide-react'
+import { useSupabase } from '@/app/providers'
+import { TRACKS } from '@/lib/data'
+import { ARTISTS } from '@/lib/artists'
+import { FEATURED_PRODUCTS } from '@/lib/products'
+import { useAudio } from '@/lib/audio-context'
+import { EmailCapture } from '@/components/EmailCapture'
 
 const HERO_BG_IMAGES = [
   '/images/hero/ai-bg-1.png',
@@ -302,65 +304,134 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED — O D PORTER'S BOOK */}
-      <section className="py-16">
+      {/* MUSIC DISCOVERY — Lead with the actual product */}
+      <section className="py-16 border-b border-[var(--pf-border)]">
         <div className="pf-container">
-          <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 via-purple-500/5 to-[var(--pf-orange)]/10 rounded-2xl p-8 border border-[var(--pf-orange)]/20">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Book cover placeholder */}
-              <div className="shrink-0">
-                <div className="w-40 h-56 bg-gradient-to-br from-[var(--pf-orange)] to-purple-700 rounded-xl shadow-2xl flex items-center justify-center p-4 text-center">
-                  <div>
-                    <div className="text-white/90 text-xs font-bold uppercase tracking-wider mb-1">O D Porter</div>
-                    <div className="text-white font-black text-sm leading-tight">There It Is,<br />Here It Go</div>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold">Trending Tracks</h2>
+            <Link href="/digital" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
+              All Tracks <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {TRACKS.slice(0, 8).map((track) => (
+              <Link key={track.id} href={`/album/${track.album ? track.album.toLowerCase().replace(/\s+/g, '-') : 'single'}?track=${track.id}`} className="group">
+                <div className="aspect-square rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] overflow-hidden mb-2 relative">
+                  <Image src={track.image} alt={track.title} fill sizes="200px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Play size={32} className="text-white" fill="white" />
                   </div>
+                  {track.price > 0 && (
+                    <div className="absolute top-2 right-2 bg-[var(--pf-orange)] text-white text-xs font-bold px-2 py-0.5 rounded">
+                      ${track.price}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="flex-1 text-center md:text-left">
-                <div className="inline-block px-3 py-1 bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] text-xs font-bold rounded-full mb-3">📖 New Release</div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-3">"There It Is, Here It Go"</h2>
-                <p className="text-[var(--pf-text-secondary)] mb-4 max-w-lg">
-                  A raw, personal memoir from O D Porter — the St. Louis artist who built Porterful so independent musicians never have to choose between art and survival. His story, his truth, his city.
-                </p>
-                <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                  <Link href="/product/book-tiigh" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--pf-orange)] text-white font-bold rounded-xl hover:bg-[var(--pf-orange-dark)] transition-colors shadow-lg shadow-[var(--pf-orange)]/20">
-                    Get the Book — $25
-                  </Link>
-                  <Link href="/artist/od-porter" className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-xl transition-colors">
-                    <Music size={16} /> Explore O D Porter's Music
-                  </Link>
-                </div>
-              </div>
-            </div>
+                <p className="font-semibold text-sm group-hover:text-[var(--pf-orange)] line-clamp-1">{track.title}</p>
+                <p className="text-xs text-[var(--pf-text-muted)]">{track.artist}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURED ALBUMS */}
-      <section className="py-12">
+      {/* ALBUMS */}
+      <section className="py-16">
+        <div className="pf-container">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold">Albums</h2>
+            <Link href="/digital" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
+              Browse All <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {(() => {
+              const seen = new Set()
+              return TRACKS.filter(t => t.album && !seen.has(t.album) && (seen.add(t.album), true)).slice(0, 4).map(track => {
+                const albumSlug = track.album.toLowerCase().replace(/\s+/g, '-')
+                const albumTracks = TRACKS.filter(t => t.album === track.album)
+                return (
+                  <Link key={albumSlug} href={`/album/${albumSlug}`} className="group">
+                    <div className="aspect-square rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] overflow-hidden mb-2 relative">
+                      <Image src={track.image} alt={track.album} fill sizes="200px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Play size={36} className="text-white" fill="white" />
+                      </div>
+                      <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
+                        {albumTracks.length} tracks
+                      </div>
+                    </div>
+                    <p className="font-semibold text-sm group-hover:text-[var(--pf-orange)] line-clamp-1">{track.album}</p>
+                    <p className="text-xs text-[var(--pf-text-muted)]">{track.artist}</p>
+                  </Link>
+                )
+              })
+            })()}
+          </div>
+        </div>
+      </section>
+
+      {/* STORE — Merch comes after music discovery */}
+      <section className="py-16 bg-[var(--pf-surface)]/50">
+        <div className="pf-container">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold">Merch & More</h2>
+            <Link href="/store" className="text-[var(--pf-orange)] hover:underline flex items-center gap-1 text-sm font-medium">
+              Full Store <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {FEATURED_PRODUCTS.slice(0, 4).map((product) => (
+              <Link key={product.id} href={`/product/${product.id}`} className="group">
+                <div className="aspect-square rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] overflow-hidden mb-2 relative">
+                  <Image src={product.image} alt={product.name} fill sizes="200px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  {product.category === 'Book' && (
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded">Book</div>
+                  )}
+                </div>
+                <p className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-0.5">{product.category}</p>
+                <h3 className="font-semibold text-sm group-hover:text-[var(--pf-orange)] line-clamp-1">{product.name}</h3>
+                <p className="font-bold text-sm text-[var(--pf-orange)]">${product.price}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Artists */}
+      <section className="py-16">
         <div className="pf-container">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Featured Albums</h2>
-            <Link href="/artist/od-porter" className="text-[var(--pf-orange)] hover:underline text-sm font-medium flex items-center gap-1">
+            <h2 className="text-2xl font-bold">Featured Artists</h2>
+            <Link href="/artists" className="text-[var(--pf-orange)] hover:underline text-sm font-medium flex items-center gap-1">
               View All <ArrowRight size={14} />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { name: 'Ambiguous', image: '/album-art/Ambiguous.jpg', tracks: 21 },
-              { name: 'From Feast to Famine', image: '/album-art/From_Feast_to_Famine.jpg', tracks: 10 },
-              { name: 'God Is Good', image: '/album-art/God_Is_Good.jpg', tracks: 9 },
-              { name: 'One Day', image: '/album-art/One_Day.jpg', tracks: 19 },
-            ].map((album) => (
-              <Link key={album.name} href="/artist/od-porter" className="group">
-                <div className="aspect-square rounded-xl overflow-hidden bg-[var(--pf-surface)] border border-[var(--pf-border)] mb-2 relative">
-                  <Image src={album.image} alt={album.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+            {ARTISTS.slice(0, 4).map((artist) => (
+              <Link key={artist.id} href={`/artist/${artist.id}`} className="group">
+                <div className="aspect-square rounded-xl bg-[var(--pf-surface)] border border-[var(--pf-border)] overflow-hidden mb-2 relative">
+                  <Image src={artist.image} alt={artist.name} fill sizes="200px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Play size={36} className="text-white" fill="white" />
+                  </div>
                 </div>
-                <h3 className="font-semibold text-sm group-hover:text-[var(--pf-orange)] transition-colors truncate">{album.name}</h3>
-                <p className="text-xs text-[var(--pf-text-muted)]">{album.tracks} tracks</p>
+                <p className="font-semibold text-sm group-hover:text-[var(--pf-orange)] line-clamp-1">{artist.name}</p>
+                <p className="text-xs text-[var(--pf-text-muted)]">{artist.genre}</p>
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Email Capture */}
+      <section className="py-16 bg-gradient-to-r from-[var(--pf-orange)]/10 via-purple-500/10 to-[var(--pf-orange)]/10 border-y border-[var(--pf-border)]">
+        <div className="pf-container text-center">
+          <h2 className="text-2xl md:text-3xl font-black mb-3">Stay in the Loop</h2>
+          <p className="text-[var(--pf-text-secondary)] mb-6 max-w-md mx-auto text-sm">
+            First access to new music, exclusive drops, and artist announcements from O D Porter and the Porterful community.
+          </p>
+          <EmailCapture source="homepage-hero" />
         </div>
       </section>
 

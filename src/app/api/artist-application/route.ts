@@ -31,6 +31,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email and phone are required' }, { status: 400 })
     }
 
+    // Lazy init — only create client when actually needed (not at module load)
+    const { createServerClient } = await import('@/lib/supabase')
     const supabase = createServerClient()
     if (!supabase) return NextResponse.json({ error: 'Server not configured' }, { status: 500 })
 
@@ -92,6 +94,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { createServerClient } = await import('@/lib/supabase')
   const supabase = createServerClient()
   if (!supabase) return NextResponse.json({ error: 'Server not configured' }, { status: 500 })
 

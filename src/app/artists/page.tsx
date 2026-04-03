@@ -17,6 +17,9 @@ interface ArtistProfile {
   verified?: boolean
   tracks?: number
   status?: string
+  youtube_url?: string
+  instagram_url?: string
+  twitter_url?: string
 }
 
 // Hardcoded artists with full profiles (for artists with complete info)
@@ -27,12 +30,15 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     full_name: 'O D Porter',
     email: 'iamodmusic@gmail.com',
     avatar_url: '/artist-art/od-porter.jpg',
-    bio: 'Independent artist and founder of Porterful. Born in Miami, raised between New Orleans and St. Louis — most known from the STL.',
+    bio: 'Artist. Architect of Porterful. Born Miami, raised New Orleans & St. Louis. Building the retirement plan for artists — one platform at a time.',
     genre: 'Hip-Hop / R&B / Soul',
     location: 'St. Louis, MO',
     verified: true,
     tracks: 21,
     status: 'live',
+    youtube_url: 'https://youtube.com/@odporter',
+    instagram_url: 'https://instagram.com/odporter',
+    twitter_url: 'https://twitter.com/odporter',
   },
   {
     id: 'gune',

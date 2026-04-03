@@ -2,9 +2,9 @@ import SystemSelector from '@/components/SystemSelector';
 
 export const metadata = {
   title: 'Porterful — The Ecosystem',
-  description: 'Music. Land. Mind. Law. Commerce. Credit. Navigate the Porterful ecosystem.',
+  description: 'Navigate the Porterful ecosystem. Music. Land. Mind. Law. Commerce. Credit.',
 };
 
-export default function HomePage() {
+export default function SystemsPage() {
   return <SystemSelector />;
 }

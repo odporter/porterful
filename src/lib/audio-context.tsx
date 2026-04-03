@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useRef, useEffect, ReactNode, useCallback } from 'react';
 
-interface Track {
+export interface Track {
   id: string;
   title: string;
   artist: string;

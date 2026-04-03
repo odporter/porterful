@@ -45,6 +45,7 @@ export function Navbar() {
     { href: '/marketplace', label: 'Shop' },
     { href: '/artists', label: 'Artists' },
     { href: '/digital', label: 'Music' },
+    { href: '/kids-chains', label: 'Kids Chains' },
     { href: '/services', label: 'Services' },
     { href: '/tap-in', label: 'Tap In' },
   ]

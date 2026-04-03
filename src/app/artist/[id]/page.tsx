@@ -12,7 +12,7 @@ import { getArtistById } from '@/lib/artists';
 import {
   Play, Pause, Share2, Music, Package, ChevronDown, ChevronUp,
   Youtube, ExternalLink, Bell, Check, Edit3, MapPin, Globe,
-  Instagram, Twitter, Star, Users, Plus, Music2 as TikTokIcon, Crown, Heart
+  Instagram, Twitter, Star, Users, Plus, Crown, Heart
 } from 'lucide-react';
 
 function groupTracksByAlbum(tracks: typeof TRACKS) {

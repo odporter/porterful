@@ -434,7 +434,7 @@ export default function HomePage() {
                 <p
                   className="text-sm tracking-widest uppercase transition-all duration-500"
                   style={{
-                    color: isActive ? system.glowColor : '#1a1a1a',
+                    color: isActive ? system.glowColor : '#3d3d3d',
                     opacity: isActive ? 0.9 : 0,
                     transform: isActive ? `translateY(${breathe * 3}px)` : 'translateY(8px)',
                     textShadow: isActive ? `0 0 20px ${system.glowColor}40` : 'none',
@@ -464,7 +464,7 @@ export default function HomePage() {
                 {i === 0 && activeIndex === 0 && (
                   <div
                     className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-                    style={{ color: '#2a2a2a' }}
+                    style={{ color: '#4a4a4a' }}
                   >
                     <span className="text-xs uppercase tracking-widest animate-pulse">Scroll</span>
                     <div className="w-px h-8 bg-current opacity-30 animate-pulse" />
@@ -511,7 +511,7 @@ export default function HomePage() {
               }}
               className="w-2 h-2 rounded-full transition-all duration-300"
               style={{
-                background: isActive ? system.glowColor : '#2a2a2a',
+                background: isActive ? system.glowColor : '#555555',
                 boxShadow: isActive ? `0 0 8px ${system.glowColor}80, 0 0 16px ${system.glowColor}40` : 'none',
                 transform: isActive ? `scale(1.5)` : 'scale(1)',
               }}
@@ -524,7 +524,7 @@ export default function HomePage() {
       {/* FOOTER */}
       <footer
         className="fixed bottom-0 left-0 right-0 px-8 py-4 text-center z-50"
-        style={{ color: '#1a1a1a' }}
+        style={{ color: '#4a4a4a' }}
       >
         <span className="text-xs tracking-widest uppercase">Porterful Ecosystem</span>
       </footer>

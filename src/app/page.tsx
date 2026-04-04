@@ -17,34 +17,6 @@ const SYSTEMS = [
     ),
   },
   {
-    id: 'learn',
-    label: 'LEARN',
-    subtitle: 'Build the next generation.',
-    route: '/teachyoung-inquiry',
-    glowColor: '#ec4899',
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'systems',
-    label: 'SYSTEMS',
-    subtitle: 'Explore the wider ecosystem.',
-    route: '/systems',
-    glowColor: '#f97316',
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="5" r="2"/>
-        <circle cx="5" cy="19" r="2"/>
-        <circle cx="19" cy="19" r="2"/>
-        <path d="M12 7v4M12 11l-5.5 5M12 11l5.5 5"/>
-      </svg>
-    ),
-  },
-  {
     id: 'mind',
     label: 'CREDIT',
     subtitle: 'Protect and build.',
@@ -69,6 +41,34 @@ const SYSTEMS = [
         <rect x="14" y="3" width="7" height="7" rx="1"/>
         <rect x="3" y="14" width="7" height="7" rx="1"/>
         <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'systems',
+    label: 'SYSTEMS',
+    subtitle: 'Explore the wider ecosystem.',
+    route: '/systems',
+    glowColor: '#f97316',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="5" r="2"/>
+        <circle cx="5" cy="19" r="2"/>
+        <circle cx="19" cy="19" r="2"/>
+        <path d="M12 7v4M12 11l-5.5 5M12 11l5.5 5"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'learn',
+    label: 'LEARN',
+    subtitle: 'Build the next generation.',
+    route: '/teachyoung-inquiry',
+    glowColor: '#ec4899',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
     ),
   },

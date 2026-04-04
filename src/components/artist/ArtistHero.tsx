@@ -3,7 +3,7 @@
 import { useAudio, Track } from '@/lib/audio-context'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Play, Pause, Headphones, Users, Disc, Verified, ChevronLeft } from 'lucide-react'
+import { Play, Pause, Disc, Verified, ChevronLeft } from 'lucide-react'
 
 // Social platform icons as inline SVG components
 function InstagramIcon({ size = 18 }: { size?: number }) {
@@ -55,7 +55,7 @@ interface ArtistHeroProps {
   totalPlays: number
 }
 
-function formatPlays(n: number): string {
+function formatFollowers(n: number): string {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
   if (n >= 1000) return (n / 1000).toFixed(0) + 'K'
   return n.toString()
@@ -131,18 +131,10 @@ export function ArtistHero({ artist, featuredTrack, totalPlays }: ArtistHeroProp
             )}
 
             {/* Stats */}
-            <div className="flex items-center justify-center lg:justify-start gap-6">
-              <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
-                <Headphones size={16} />
-                <span className="text-sm font-mono">{formatPlays(totalPlays)}+ plays</span>
-              </div>
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
                 <Disc size={16} />
                 <span className="text-sm font-mono">{artist.trackCount || 0} tracks</span>
-              </div>
-              <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
-                <Users size={16} />
-                <span className="text-sm font-mono">{formatPlays(artist.followers)} followers</span>
               </div>
             </div>
 

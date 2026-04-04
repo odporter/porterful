@@ -1,7 +1,8 @@
 {
   "date": "2026-04-04",
-  "count": 9,
+  "count": 10,
   "history": [
+    { "time": "16:32 CDT", "msg": "Fix artist images - od-porter copy, verify atm-trap paths" },
     { "time": "16:26 CDT", "msg": "Trigger deploy via git push after env fix" },
     { "time": "16:26 CDT", "msg": "Fix NEXT_PUBLIC_SUPABASE env vars" },
     { "time": "16:12 CDT", "msg": "Add ATM Trap tracks and cover art" },

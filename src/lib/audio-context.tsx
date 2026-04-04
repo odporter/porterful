@@ -7,7 +7,7 @@ export interface Track {
   title: string;
   artist: string;
   album?: string | null;
-  duration?: number;
+  duration?: string | number;
   audio_url?: string;
   cover_url?: string;
   image?: string;

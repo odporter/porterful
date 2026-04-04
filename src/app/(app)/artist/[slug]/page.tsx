@@ -1,0 +1,181 @@
+import { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { getArtistById, getArtistTracks, ARTISTS } from '@/lib/artists'
+import { FEATURED_PRODUCTS } from '@/lib/products'
+import { ArtistHero } from '@/components/artist/ArtistHero'
+import { ArtistTrackList } from '@/components/artist/ArtistTrackList'
+import { ArtistSupportCard } from '@/components/artist/ArtistSupportCard'
+import { ArtistProducts } from '@/components/artist/ArtistProducts'
+
+interface PageProps {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateStaticParams() {
+  return ARTISTS.map(artist => ({
+    slug: artist.slug,
+  }))
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const artist = getArtistById(slug)
+  if (!artist) return { title: 'Artist Not Found' }
+
+  return {
+    title: `${artist.name} — Porterful`,
+    description: artist.shortBio,
+    openGraph: {
+      title: `${artist.name} on Porterful`,
+      description: artist.shortBio,
+      images: artist.image ? [{ url: artist.image }] : [],
+    },
+  }
+}
+
+export default async function ArtistPage({ params }: PageProps) {
+  const { slug } = await params
+  const artist = getArtistById(slug)
+
+  if (!artist) {
+    notFound()
+  }
+
+  const tracks = getArtistTracks(slug)
+  const featuredTrack = tracks[0]
+  const totalPlays = tracks.reduce((sum, t) => sum + (t.plays || 0), 0)
+  const products = FEATURED_PRODUCTS.slice(0, 4)
+
+  return (
+    <div className="min-h-screen pb-24">
+      {/* Hero Section */}
+      <ArtistHero artist={artist} featuredTrack={featuredTrack} totalPlays={totalPlays} />
+
+      {/* Content Grid */}
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid lg:grid-cols-3 gap-12">
+
+          {/* Main Column — Tracks */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Bio Section */}
+            <section>
+              <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-3">About</p>
+              <div className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)]">
+                <p className="text-[var(--pf-text-secondary)] leading-relaxed whitespace-pre-line">
+                  {artist.bio}
+                </p>
+                {artist.social && (
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-[var(--pf-border)]">
+                    {artist.social.instagram && (
+                      <a
+                        href={`https://instagram.com/${artist.social.instagram}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-full bg-[var(--pf-bg)] text-xs font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors"
+                      >
+                        @{artist.social.instagram}
+                      </a>
+                    )}
+                    {artist.social.youtube && (
+                      <a
+                        href={artist.social.youtube.startsWith('http') ? artist.social.youtube : `https://youtube.com/${artist.social.youtube}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-full bg-[var(--pf-bg)] text-xs font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors"
+                      >
+                        YouTube
+                      </a>
+                    )}
+                    {artist.social.twitter && (
+                      <a
+                        href={`https://twitter.com/${artist.social.twitter}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-full bg-[var(--pf-bg)] text-xs font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors"
+                      >
+                        @{artist.social.twitter}
+                      </a>
+                    )}
+                    {artist.social.tiktok && (
+                      <a
+                        href={`https://tiktok.com/@${artist.social.tiktok}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-full bg-[var(--pf-bg)] text-xs font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors"
+                      >
+                        TikTok
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Track List */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)]">Music</p>
+                <span className="text-sm text-[var(--pf-text-muted)]">{tracks.length} tracks</span>
+              </div>
+              <ArtistTrackList tracks={tracks} />
+            </section>
+          </div>
+
+          {/* Sidebar Column */}
+          <div className="space-y-6">
+
+            {/* Support Card */}
+            <ArtistSupportCard artist={artist} />
+
+            {/* Products */}
+            {products.length > 0 && (
+              <ArtistProducts products={products} artistName={artist.name} />
+            )}
+
+            {/* Superfan CTA */}
+            <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-2xl p-6 border border-[var(--pf-orange)]/20">
+              <div className="text-2xl mb-2">⭐</div>
+              <h3 className="font-bold text-lg mb-1">Become a Superfan</h3>
+              <p className="text-sm text-[var(--pf-text-secondary)] mb-4">
+                Earn 3% on everything your referrals buy. Help {artist.name.split(' ')[0]} grow without spending a dime.
+              </p>
+              <Link
+                href="/superfan"
+                className="block w-full py-2.5 rounded-xl text-center text-sm font-semibold bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors"
+              >
+                Learn More
+              </Link>
+            </div>
+
+            {/* Platform Stats */}
+            <div className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)]">
+              <p className="text-sm uppercase tracking-widest text-[var(--pf-text-muted)] mb-4">Platform</p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[var(--pf-text-secondary)]">Artist revenue share</span>
+                  <span className="text-sm font-semibold text-[var(--pf-orange)]">80%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[var(--pf-text-secondary)]">Superfan commission</span>
+                  <span className="text-sm font-semibold">3–8%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[var(--pf-text-secondary)]">Platform fee</span>
+                  <span className="text-sm font-semibold">10%</span>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-[var(--pf-border)]">
+                <Link href="/ecosystem" className="text-sm text-[var(--pf-orange)] hover:underline">
+                  How Porterful works →
+                </Link>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -29,7 +29,7 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     username: 'odporter',
     full_name: 'O D Porter',
     email: 'iamodmusic@gmail.com',
-    avatar_url: '/artist-art/od-porter.jpg',
+    avatar_url: '/artists/od-porter/od-porter.jpg',
     bio: 'Artist. Architect of Porterful. Born Miami, raised New Orleans & St. Louis. Building the retirement plan for artists — one platform at a time.',
     genre: 'Hip-Hop / R&B / Soul',
     location: 'St. Louis, MO',

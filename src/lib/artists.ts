@@ -55,7 +55,7 @@ That stubbornness is the through-line. When O D Porter sets his mind to somethin
 The plan: make Porterful the artist's retirement. Build it once, let it work forever.`,
     shortBio: 'St. Louis artist. Born in Miami, raised in NOLA + the Lou. Founder of Porterful. Stubborn when he sets his mind to something.',
     verified: true,
-    image: '/artist-art/od-porter.jpg',
+    image: '/artists/od-porter/od-porter.jpg',
     coverGradient: 'from-[var(--pf-orange)] to-purple-600',
     followers: 2847,
     supporters: null,

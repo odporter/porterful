@@ -1,0 +1,13 @@
+{
+  "date": "2026-04-04",
+  "count": 9,
+  "history": [
+    { "time": "16:26 CDT", "msg": "Trigger deploy via git push after env fix" },
+    { "time": "16:26 CDT", "msg": "Fix NEXT_PUBLIC_SUPABASE env vars" },
+    { "time": "16:12 CDT", "msg": "Add ATM Trap tracks and cover art" },
+    { "time": "16:09 CDT", "msg": "Set Thought We Was Bruddaz as featured single" },
+    { "time": "15:58 CDT", "msg": "Add ATM Trap to artist roster" },
+    { "time": "15:42 CDT", "msg": "Deploy with homepage animation overhaul" },
+    { "time": "earlier", "msg": "Apr 3 stabilization + rebuild passes" }
+  ]
+}

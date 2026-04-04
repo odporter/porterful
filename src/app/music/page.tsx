@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Play, Pause, SkipForward, Volume2, VolumeX, Clock, Headphones, Heart, Share2, Verified, ChevronRight, Disc, Music2, Users, Star } from 'lucide-react';
+import { Play, Pause, SkipForward, Volume2, VolumeX, Clock, Headphones, Heart, Share2, Verified, ChevronRight, Disc, Music2, Users, Star, Search, X, SlidersHorizontal, LayoutGrid } from 'lucide-react';
 import { useAudio, Track } from '@/lib/audio-context';
 import { TRACKS } from '@/lib/data';
 import { ARTISTS } from '@/lib/artists';
@@ -100,6 +100,11 @@ export default function MusicPage() {
   const [heroTrackIndex, setHeroTrackIndex] = useState(0);
   const heroIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Search & filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [albumFilter, setAlbumFilter] = useState<string>('all');
+  const [selectedAlbum, setSelectedAlbum] = useState<string | null>(null);
+
   // Hero auto-advance
   useEffect(() => {
     if (!currentTrack) {
@@ -130,10 +135,51 @@ export default function MusicPage() {
   const heroTrack = TOP_TRACKS[heroTrackIndex] || TOP_TRACKS[0];
   const isHeroActive = currentTrack?.id === heroTrack?.id;
 
-  const displayedTracks = showAllTracks ? OD_TRACKS : OD_TRACKS.slice(0, 10) as unknown as Track[];
+  // Get unique albums from OD_TRACKS
+  const uniqueAlbums = useMemo(() => {
+    const albumMap = new Map<string, { name: string; image: string; count: number }>();
+    OD_TRACKS.forEach(t => {
+      if (!albumMap.has(t.album || 'Unknown')) {
+        albumMap.set(t.album || 'Unknown', { name: t.album || 'Unknown', image: t.image || '', count: 0 });
+      }
+      albumMap.get(t.album || 'Unknown')!.count++;
+    });
+    return Array.from(albumMap.values());
+  }, []);
+
+  // Filter tracks based on search, album filter, and selected album card
+  const filteredTracks = useMemo(() => {
+    let tracks = OD_TRACKS;
+
+    // Album card filter (takes precedence)
+    if (selectedAlbum) {
+      tracks = tracks.filter(t => t.album === selectedAlbum);
+    }
+
+    // Dropdown album filter
+    if (albumFilter !== 'all') {
+      tracks = tracks.filter(t => t.album === albumFilter);
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      tracks = tracks.filter(t => t.title.toLowerCase().includes(q));
+    }
+
+    return tracks;
+  }, [searchQuery, albumFilter, selectedAlbum]);
+
+  const displayedTracks = showAllTracks ? filteredTracks : filteredTracks.slice(0, 10) as unknown as Track[];
 
   // Od's artist data
   const odArtist = ARTISTS.find(a => a.id === 'od-porter');
+
+  // Clear album card selection
+  const clearAlbumFilter = () => {
+    setSelectedAlbum(null);
+    setAlbumFilter('all');
+  };
 
   return (
     <div className="min-h-screen pb-24">
@@ -233,7 +279,7 @@ export default function MusicPage() {
                 </div>
                 <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
                   <Disc size={16} />
-                  <span className="text-sm">2 albums</span>
+                  <span className="text-sm">{uniqueAlbums.length} albums</span>
                 </div>
               </div>
             </div>
@@ -241,36 +287,289 @@ export default function MusicPage() {
         </div>
       </section>
 
-      {/* LATEST ALBUM */}
-      <section className="max-w-6xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-1">Latest Release</p>
-            <h3 className="text-2xl font-bold">Ambiguous</h3>
+      {/* ============================================================
+          1. ARTIST BROWSE SECTION
+      ============================================================ */}
+      <section className="border-b border-[var(--pf-border)]">
+        <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Users size={18} className="text-[var(--pf-orange)]" />
+              <h3 className="text-lg font-bold">Browse Artists</h3>
+            </div>
           </div>
-          <button
-            onClick={() => setShowAllTracks(!showAllTracks)}
-            className="text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] flex items-center gap-1 transition-colors"
-          >
-            {showAllTracks ? 'Show less' : `All ${OD_TRACKS.length} tracks`}
-            <ChevronRight size={16} className={showAllTracks ? 'rotate-90' : ''} />
-          </button>
+
+          {/* Horizontal scrollable artist cards */}
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide">
+            {ARTISTS.map((artist) => {
+              const artistTracks = TRACKS.filter(t => t.artist === artist.name || t.artist === artist.id);
+              return (
+                <Link
+                  key={artist.id}
+                  href={`/artist/${artist.slug}`}
+                  className="flex-shrink-0 w-56 group"
+                >
+                  <div className="bg-[var(--pf-surface)] rounded-2xl p-4 border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40 transition-all duration-200 hover:shadow-lg hover:shadow-[var(--pf-orange)]/5">
+                    {/* Avatar */}
+                    <div className="relative w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[var(--pf-border)] group-hover:border-[var(--pf-orange)]/60 transition-colors">
+                      <Image
+                        src={artist.image}
+                        alt={artist.name}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
+                    </div>
+                    {/* Info */}
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1.5 mb-1">
+                        <p className="font-semibold truncate">{artist.name}</p>
+                        {artist.verified && (
+                          <Verified size={14} className="text-[var(--pf-orange)] flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-[var(--pf-text-secondary)] truncate mb-2">{artist.genre}</p>
+                      <div className="flex items-center justify-center gap-3 text-xs text-[var(--pf-text-muted)]">
+                        <span className="flex items-center gap-1">
+                          <Music2 size={12} />
+                          {artistTracks.length} tracks
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          4. ALBUMS SECTION
+      ============================================================ */}
+      <section className="border-b border-[var(--pf-border)]">
+        <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Disc size={18} className="text-[var(--pf-orange)]" />
+              <h3 className="text-lg font-bold">Albums</h3>
+            </div>
+            {selectedAlbum && (
+              <button
+                onClick={clearAlbumFilter}
+                className="flex items-center gap-1.5 text-sm text-[var(--pf-orange)] hover:text-[var(--pf-orange)]/80 transition-colors"
+              >
+                <X size={14} />
+                Clear filter
+              </button>
+            )}
+          </div>
+
+          {/* Album cards grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {uniqueAlbums.map((album) => {
+              const isSelected = selectedAlbum === album.name || albumFilter === album.name;
+              return (
+                <button
+                  key={album.name}
+                  onClick={() => {
+                    if (isSelected) {
+                      clearAlbumFilter();
+                    } else {
+                      setSelectedAlbum(album.name);
+                      setAlbumFilter('all');
+                    }
+                  }}
+                  className={`group text-left rounded-xl overflow-hidden border transition-all duration-200 ${
+                    isSelected
+                      ? 'border-[var(--pf-orange)] shadow-lg shadow-[var(--pf-orange)]/10'
+                      : 'border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40'
+                  }`}
+                >
+                  {/* Album art */}
+                  <div className="relative aspect-square w-full overflow-hidden">
+                    {album.image ? (
+                      <Image
+                        src={album.image}
+                        alt={album.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[var(--pf-surface)] flex items-center justify-center">
+                        <Disc size={32} className="text-[var(--pf-text-muted)]" />
+                      </div>
+                    )}
+                    {/* Overlay on hover */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center">
+                        <Play size={18} className="text-white ml-0.5" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Album info */}
+                  <div className="p-3">
+                    <p className="font-medium text-sm truncate">{album.name}</p>
+                    <p className="text-xs text-[var(--pf-text-muted)] mt-0.5">{album.count} tracks</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          TRACK LIST with SEARCH & FILTER
+      ============================================================ */}
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            {selectedAlbum || albumFilter !== 'all' || searchQuery ? (
+              <div>
+                <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-1">Filtered Results</p>
+                <h3 className="text-2xl font-bold">
+                  {selectedAlbum || (albumFilter !== 'all' ? albumFilter : 'Search Results')}
+                  <span className="text-[var(--pf-text-secondary)] font-normal ml-2">· {filteredTracks.length} tracks</span>
+                </h3>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-1">All Tracks</p>
+                <h3 className="text-2xl font-bold">{OD_TRACKS.length} tracks</h3>
+              </div>
+            )}
+          </div>
+
+          {/* Search & Filter row */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Search bar */}
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]" />
+              <input
+                type="text"
+                placeholder="Search tracks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 pr-9 py-2.5 w-full sm:w-64 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 focus:ring-1 focus:ring-[var(--pf-orange)]/20 transition-all placeholder:text-[var(--pf-text-muted)]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] hover:text-[var(--pf-text)] transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Album filter dropdown */}
+            <div className="relative">
+              <SlidersHorizontal size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] pointer-events-none" />
+              <select
+                value={albumFilter}
+                onChange={(e) => {
+                  setAlbumFilter(e.target.value);
+                  if (e.target.value !== 'all') setSelectedAlbum(null);
+                }}
+                className="pl-9 pr-9 py-2.5 w-full sm:w-52 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 appearance-none cursor-pointer transition-all"
+              >
+                <option value="all">All Albums</option>
+                {uniqueAlbums.map((album) => (
+                  <option key={album.name} value={album.name}>
+                    {album.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronRight size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] rotate-90 pointer-events-none" />
+            </div>
+
+            {/* Show all / less toggle */}
+            <button
+              onClick={() => setShowAllTracks(!showAllTracks)}
+              className="text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] flex items-center gap-1 transition-colors whitespace-nowrap py-2.5"
+            >
+              {showAllTracks ? 'Show less' : `All ${filteredTracks.length} tracks`}
+              <ChevronRight size={16} className={showAllTracks ? 'rotate-90' : ''} />
+            </button>
+          </div>
         </div>
 
+        {/* Active filters pills */}
+        {(searchQuery || albumFilter !== 'all' || selectedAlbum) && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-xs text-[var(--pf-orange)]">
+                "{searchQuery}"
+                <button onClick={() => setSearchQuery('')} className="hover:text-[var(--pf-orange)]/70">
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {selectedAlbum && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-xs text-[var(--pf-orange)]">
+                {selectedAlbum}
+                <button onClick={clearAlbumFilter} className="hover:text-[var(--pf-orange)]/70">
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {albumFilter !== 'all' && !selectedAlbum && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-xs text-[var(--pf-orange)]">
+                {albumFilter}
+                <button onClick={() => { setAlbumFilter('all'); }} className="hover:text-[var(--pf-orange)]/70">
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Track list */}
-        <div className="space-y-1">
-          {displayedTracks.map((track, i) => (
-            <TrackRow
-              key={track.id}
-              track={track}
-              index={i}
-              isActive={currentTrack?.id === track.id}
-              isPlaying={isPlaying && currentTrack?.id === track.id}
-              onPlay={() => handlePlayTrack(track)}
-              onTogglePlay={togglePlay}
-            />
-          ))}
-        </div>
+        {filteredTracks.length > 0 ? (
+          <div className="space-y-1">
+            {displayedTracks.map((track, i) => (
+              <TrackRow
+                key={track.id}
+                track={track}
+                index={i}
+                isActive={currentTrack?.id === track.id}
+                isPlaying={isPlaying && currentTrack?.id === track.id}
+                onPlay={() => handlePlayTrack(track)}
+                onTogglePlay={togglePlay}
+              />
+            ))}
+          </div>
+        ) : (
+          /* Empty state */
+          <div className="py-16 text-center">
+            <Music2 size={48} className="mx-auto mb-4 text-[var(--pf-text-muted)] opacity-50" />
+            <p className="text-lg font-medium mb-2">No tracks found</p>
+            <p className="text-sm text-[var(--pf-text-secondary)] mb-4">
+              Try adjusting your search or filters
+            </p>
+            <button
+              onClick={() => { setSearchQuery(''); setAlbumFilter('all'); setSelectedAlbum(null); }}
+              className="text-sm text-[var(--pf-orange)] hover:text-[var(--pf-orange)]/80 transition-colors"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
+
+        {/* Show all toggle at bottom if there are more than 10 tracks */}
+        {!showAllTracks && filteredTracks.length > 10 && (
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setShowAllTracks(true)}
+              className="text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] flex items-center gap-1 mx-auto transition-colors"
+            >
+              Show all {filteredTracks.length} tracks
+              <ChevronRight size={16} className="rotate-90" />
+            </button>
+          </div>
+        )}
       </section>
 
       {/* ABOUT SECTION */}

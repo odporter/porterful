@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Star, Users, TrendingUp, Gift, ArrowRight, Check, ChevronRight, Crown } from 'lucide-react'
+import { useSupabase } from '@/app/providers'
+import { ARTISTS } from '@/lib/artists'
+import { ArrowRight, Check, ChevronRight, Crown, Gift, Music, Wallet, Zap, ExternalLink, ShoppingCart, Link as Link2 } from 'lucide-react'
 
 const SUPERFAN_TIERS = [
   {
@@ -58,100 +60,227 @@ const SUPERFAN_TIERS = [
 const FAQS = [
   {
     q: 'How do I become a Superfan?',
-    a: 'Sign up through any artist\'s page, or join directly from the Superfan section. No purchase required — just share your link and start earning.',
+    a: 'Sign up through any artist\'s page or join directly. No purchase required — just share your link and start earning.',
   },
   {
     q: 'When do I get paid?',
-    a: 'Commissions are calculated monthly and paid out when your balance reaches $25. Payouts go directly to your wallet or Stripe.',
+    a: 'Commissions are calculated monthly and paid out when your balance reaches $25 via Stripe.',
   },
   {
     q: 'What counts as a successful referral?',
-    a: 'Anyone who clicks your link and makes a purchase within 30 days. They don\'t need to create an account — just buy.',
+    a: 'Anyone who clicks your link and makes a purchase within 30 days. No account required on their end.',
   },
   {
     q: 'Does it cost anything to join?',
-    a: 'Nothing. Superfan is free to join. We make money when your referrals buy, so we want you to succeed.',
+    a: 'No. Superfan is free. We earn when your referrals buy, so your success is our success.',
   },
   {
-    q: 'Can I be a Superfan for multiple artists?',
-    a: 'Yes. Your referral link is tied to your account — when someone buys from any artist through your link, you earn.',
+    q: 'Can I support multiple artists?',
+    a: 'Yes. Your referral link works across all artists — when anyone buys through your link, you earn.',
   },
 ]
 
+// Show first 3 artists from the ARTISTS array
+const FEATURED_ARTISTS = ARTISTS.slice(0, 3)
+
+// Placeholder values — replace with real data from your backend
+const PLACEHOLDER_STATS = {
+  referralsMade: 0,
+  totalEarned: 0.00,
+  currentTier: 'Listener',
+}
+
+const PAYOUT_THRESHOLD = 25.00
+
 export default function SuperfanPage() {
+  const { user, loading } = useSupabase()
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
 
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 pb-24">
+        <div className="pf-container max-w-5xl flex items-center justify-center py-32">
+          <div className="text-[var(--pf-text-secondary)]">Loading...</div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── LOGGED IN: Dashboard Mode ───
+  if (user) {
+    return (
+      <div className="min-h-screen pt-20 pb-24">
+        <div className="pf-container max-w-5xl">
+
+          {/* Dashboard Header */}
+          <section className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold">Your Superfan Dashboard</h1>
+              <p className="text-[var(--pf-text-secondary)] text-sm mt-1">
+                {user.email}
+              </p>
+            </div>
+            <Link href="/apply" className="pf-btn pf-btn-secondary text-sm">
+              Get Referral Link
+            </Link>
+          </section>
+
+          {/* Stats Card */}
+          <section className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] p-6 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <Crown size={20} className="text-[var(--pf-orange)]" />
+              <h2 className="text-lg font-bold">Your Superfan Stats</h2>
+            </div>
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <p className="text-sm text-[var(--pf-text-secondary)] mb-1">Referrals Made</p>
+                <p className="text-3xl font-bold">{PLACEHOLDER_STATS.referralsMade}</p>
+                <p className="text-xs text-[var(--pf-text-muted)] mt-1">All time</p>
+              </div>
+              <div>
+                <p className="text-sm text-[var(--pf-text-secondary)] mb-1">Total Earned</p>
+                <p className="text-3xl font-bold text-[var(--pf-orange)]">
+                  ${PLACEHOLDER_STATS.totalEarned.toFixed(2)}
+                </p>
+                <p className="text-xs text-[var(--pf-text-muted)] mt-1">Lifetime commissions</p>
+              </div>
+              <div>
+                <p className="text-sm text-[var(--pf-text-secondary)] mb-1">Current Tier</p>
+                <p className="text-3xl font-bold">{PLACEHOLDER_STATS.currentTier}</p>
+                <p className="text-xs text-[var(--pf-text-muted)] mt-1">3% per referral</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Commission Tracker */}
+          <section className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] p-6 mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Wallet size={20} className="text-[var(--pf-orange)]" />
+              <h2 className="text-lg font-bold">Commission Tracker</h2>
+            </div>
+            <div className="mb-3">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-[var(--pf-text-secondary)]">Earned</span>
+                <span className="font-medium">
+                  ${PLACEHOLDER_STATS.totalEarned.toFixed(2)} / ${PAYOUT_THRESHOLD.toFixed(2)}
+                </span>
+              </div>
+              <div className="w-full bg-[var(--pf-border)] rounded-full h-2">
+                <div
+                  className="bg-[var(--pf-orange)] h-2 rounded-full transition-all"
+                  style={{
+                    width: `${Math.min((PLACEHOLDER_STATS.totalEarned / PAYOUT_THRESHOLD) * 100, 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+            <p className="text-xs text-[var(--pf-text-muted)]">
+              Reach ${PAYOUT_THRESHOLD.toFixed(2)} to receive your first payout via Stripe.
+            </p>
+          </section>
+
+          {/* Favorite Artists */}
+          <section className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Music size={20} className="text-[var(--pf-orange)]" />
+              <h2 className="text-lg font-bold">Support These Artists</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              {FEATURED_ARTISTS.map((artist) => (
+                <Link
+                  key={artist.id}
+                  href={`/artist/${artist.slug}`}
+                  className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] p-4 hover:border-[var(--pf-orange)]/40 transition-colors flex items-center gap-4"
+                >
+                  <div
+                    className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 shrink-0"
+                    style={{ background: `linear-gradient(135deg, ${artist.coverGradient.replace('from-', '').replace(' to-', ', ')})` }}
+                  />
+                  <div className="min-w-0">
+                    <p className="font-bold truncate">{artist.name}</p>
+                    <p className="text-xs text-[var(--pf-text-secondary)] truncate">{artist.genre}</p>
+                    <p className="text-xs text-[var(--pf-text-muted)]">{artist.location}</p>
+                  </div>
+                  <ArrowRight size={16} className="text-[var(--pf-text-muted)] shrink-0 ml-auto" />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Support Artists Quick Links */}
+          <section className="mb-8">
+            <h2 className="text-lg font-bold mb-4">Support Artists</h2>
+            <div className="flex flex-wrap gap-3">
+              {ARTISTS.map((artist) => (
+                <Link
+                  key={artist.id}
+                  href={`/artist/${artist.slug}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-surface)] border border-[var(--pf-border)] text-sm hover:border-[var(--pf-orange)]/40 transition-colors"
+                >
+                  {artist.name}
+                  <ExternalLink size={12} className="text-[var(--pf-text-muted)]" />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* How to Earn More */}
+          <section className="bg-gradient-to-br from-[var(--pf-orange)]/5 to-purple-600/5 rounded-2xl border border-[var(--pf-orange)]/20 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Zap size={20} className="text-[var(--pf-orange)]" />
+              <h2 className="text-lg font-bold">How to Earn More</h2>
+            </div>
+            <ul className="space-y-3">
+              {[
+                'Share your referral link on social media and stories',
+                'Post after buying something — your link auto-attaches',
+                'Help artists you love grow their audience',
+                'Hit 5 referrals to unlock Advocate tier (5% commission)',
+              ].map((tip, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm">
+                  <Check size={16} className="text-[var(--pf-orange)] shrink-0 mt-0.5" />
+                  <span className="text-[var(--pf-text-secondary)]">{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+        </div>
+      </div>
+    )
+  }
+
+  // ─── LOGGED OUT: Landing Mode ───
   return (
     <div className="min-h-screen pt-20 pb-24">
       <div className="pf-container max-w-5xl">
 
         {/* Hero */}
         <section className="text-center py-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/20 text-[var(--pf-orange)] text-sm font-medium mb-6">
-            <Crown size={14} />
-            Earn while you support
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
-            Become a <span className="text-[var(--pf-orange)]">Superfan</span>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            Earn 3%–8% supporting artists you love
           </h1>
-          <p className="text-xl text-[var(--pf-text-secondary)] max-w-2xl mx-auto mb-8">
-            Not just a fan. A partner. Share music you love, earn commissions on every purchase your referrals make — 80% always goes to the artist.
+          <p className="text-lg text-[var(--pf-text-secondary)] max-w-xl mx-auto mb-8">
+            Share music. Track referrals. Earn commissions — automatically.
           </p>
-          <div className="flex items-center justify-center gap-4">
-            <Link href="/apply" className="pf-btn pf-btn-primary inline-flex items-center gap-2">
-              Start Earning <ArrowRight size={18} />
-            </Link>
-            <Link href="/music" className="pf-btn pf-btn-secondary inline-flex items-center gap-2">
-              Listen First <ChevronRight size={18} />
-            </Link>
-          </div>
+          <Link href="/apply" className="pf-btn pf-btn-primary inline-flex items-center gap-2">
+            Join Free <ArrowRight size={18} />
+          </Link>
         </section>
 
-        {/* Stats */}
-        <section className="grid grid-cols-3 gap-4 mb-16">
-          {[
-            { label: 'Active Superfans', value: '340+', icon: Users },
-            { label: 'Paid to Superfans', value: '$12,400', icon: Gift },
-            { label: 'Avg. Commission', value: '4.2%', icon: TrendingUp },
-          ].map(({ label, value, icon: Icon }) => (
-            <div key={label} className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)] text-center">
-              <Icon size={24} className="text-[var(--pf-orange)] mx-auto mb-3" />
-              <p className="text-3xl font-bold mb-1">{value}</p>
-              <p className="text-sm text-[var(--pf-text-secondary)]">{label}</p>
-            </div>
-          ))}
-        </section>
-
-        {/* How It Works */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold text-center mb-8">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+        {/* Short Explainer */}
+        <section className="max-w-2xl mx-auto mb-16">
+          <div className="grid md:grid-cols-3 gap-6 text-center">
             {[
-              {
-                step: '01',
-                title: 'Get Your Link',
-                desc: 'Sign up and get a unique referral link tied to your account. Share it with anyone who loves music.',
-                color: 'from-orange-500 to-red-600',
-              },
-              {
-                step: '02',
-                title: 'They Buy Through You',
-                desc: 'When someone clicks your link and purchases music, merch, or any product — it\'s tracked to you.',
-                color: 'from-purple-500 to-pink-600',
-              },
-              {
-                step: '03',
-                title: 'You Earn Automatically',
-                desc: 'Commissions are calculated in real time. Cash out monthly when you hit $25. Artist always gets 80%.',
-                color: 'from-green-500 to-emerald-600',
-              },
-            ].map(({ step, title, desc, color }) => (
-              <div key={step} className="relative bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)]">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${color} text-white font-bold text-sm mb-4`}>
-                  {step}
-                </div>
-                <h3 className="text-lg font-bold mb-2">{title}</h3>
-                <p className="text-sm text-[var(--pf-text-secondary)]">{desc}</p>
+              { icon: Link2, title: 'Get your link', desc: 'Unique to your account' },
+              { icon: ShoppingCart, title: 'Referrals buy', desc: 'Tracked for 30 days' },
+              { icon: Gift, title: 'You earn', desc: '3%–8% automatically' },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div key={title}>
+                <Icon size={24} className="text-[var(--pf-orange)] mx-auto mb-2" />
+                <p className="font-semibold text-sm">{title}</p>
+                <p className="text-xs text-[var(--pf-text-secondary)] mt-1">{desc}</p>
               </div>
             ))}
           </div>
@@ -159,8 +288,7 @@ export default function SuperfanPage() {
 
         {/* Tiers */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-center mb-2">Superfan Tiers</h2>
-          <p className="text-[var(--pf-text-secondary)] text-center mb-8">Climb the ranks. Earn more. The more you refer, the higher your tier.</p>
+          <h2 className="text-2xl font-bold text-center mb-8">Superfan Tiers</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {SUPERFAN_TIERS.map((tier) => (
               <div key={tier.name} className={`rounded-2xl border ${tier.border} bg-[var(--pf-surface)] overflow-hidden`}>
@@ -212,18 +340,6 @@ export default function SuperfanPage() {
               </div>
             ))}
           </div>
-        </section>
-
-        {/* CTA */}
-        <section className="text-center bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-2xl p-12 border border-[var(--pf-orange)]/20">
-          <Star size={48} className="text-[var(--pf-orange)] mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-3">Ready to become a Superfan?</h2>
-          <p className="text-[var(--pf-text-secondary)] mb-8 max-w-lg mx-auto">
-            Free to join. No purchase required. Start sharing music you love and earning automatically.
-          </p>
-          <Link href="/apply" className="pf-btn pf-btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
-            Get Your Referral Link <ArrowRight size={20} />
-          </Link>
         </section>
 
       </div>

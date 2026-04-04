@@ -1,484 +1,226 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { useSupabase } from '@/app/providers'
-import { useRouter } from 'next/navigation'
+import { ArrowRight, Check, Music, DollarSign, Users, Zap, Headphones, Globe, Shield } from 'lucide-react'
+
+const BENEFITS = [
+  {
+    icon: DollarSign,
+    title: '80% on every sale',
+    desc: 'More than any other platform. Your music, your price, your cut.',
+  },
+  {
+    icon: Users,
+    title: 'Direct fan relationships',
+    desc: 'No algorithm. Fans find you through identity, not recommendation engines.',
+  },
+  {
+    icon: Zap,
+    title: 'Superfan referrals',
+    desc: 'Your fans earn 3–8% bringing buyers to you. They become your promoters.',
+  },
+  {
+    icon: Music,
+    title: 'Merch + music together',
+    desc: 'Sell tracks, albums, books, and custom products from one artist page.',
+  },
+]
+
+const REVENUE_MODEL = [
+  { label: 'Track sale', artistGets: '80%', porterful: '10%', superfan: '10%' },
+  { label: 'Album sale', artistGets: '80%', porterful: '10%', superfan: '10%' },
+  { label: 'Merch sale', artistGets: '67%', porterful: '10%', superfan: '10%' },
+  { label: 'Book sale', artistGets: '80%', porterful: '10%', superfan: '10%' },
+]
+
+const PLATFORM_STATS = [
+  { value: '80%', label: 'Artist revenue share' },
+  { value: '100+', label: 'Tracks available' },
+  { value: '3–8%', label: 'Superfan commission' },
+  { value: '$0', label: 'To join' },
+]
 
 export default function ApplyPage() {
-  const { user } = useSupabase()
-  const router = useRouter()
-  const [step, setStep] = useState(1)
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-
-  const [form, setForm] = useState({
-    // Step 1: About you
-    stage_name: '',
-    genre: '',
-    city: '',
-    bio: '',
-    email: '',
-    phone: '',
-    // Step 2: Social handles
-    instagram: '',
-    twitter: '',
-    youtube: '',
-    tiktok: '',
-    // Step 3: Music
-    soundcloud: '',
-    spotify: '',
-    apple_music: '',
-    // Step 4: Assets
-    has_cover_image: false,
-    has_avatar: false,
-    cover_image_url: '',
-    avatar_url: '',
-    // Step 5: Agreement
-    agree_terms: false,
-    agree_exclusive: false,
-  })
-
-  const handleSubmit = async () => {
-    if (!user) {
-      router.push('/signup?role=artist')
-      return
-    }
-
-    setSubmitting(true)
-    try {
-      const res = await fetch('/api/artist-application', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, user_id: user.id }),
-      })
-
-      if (res.ok) {
-        setSubmitted(true)
-      } else {
-        alert('Something went wrong. Please try again.')
-      }
-    } catch {
-      alert('Connection error. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-[var(--pf-bg)] flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 mx-auto mb-6 bg-green-500/20 rounded-full flex items-center justify-center">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold mb-3">Application Submitted</h1>
-          <p className="text-[var(--pf-text-secondary)] mb-6">
-            We received your application. Our team will review it and get back to you within 24-48 hours.
-          </p>
-          <p className="text-sm text-[var(--pf-text-muted)] mb-8">
-            You'll be notified when your artist page goes live.
-          </p>
-          <Link href="/" className="pf-btn pf-btn-primary">
-            Back to Home
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  const inputClass = 'w-full px-4 py-3 bg-[var(--pf-bg-secondary)] border border-[var(--pf-border)] rounded-xl text-white placeholder:text-[var(--pf-text-muted)] focus:outline-none focus:border-[var(--pf-orange)] transition-colors'
-  const labelClass = 'block text-sm font-medium mb-2'
-
   return (
-    <div className="min-h-screen bg-[var(--pf-bg)]">
-      {/* Header */}
-      <div className="border-b border-[var(--pf-border)]">
-        <div className="pf-container py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-[var(--pf-orange)]">PORTERFUL</Link>
-          <div className="text-sm text-[var(--pf-text-muted)]">
-            {step}/5
+    <div className="min-h-screen pb-24">
+
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[var(--pf-orange)]/5 via-[var(--pf-bg)] to-[var(--pf-bg)]">
+        {/* Subtle background texture */}
+        <div className="absolute inset-0 opacity-3" style={{
+          backgroundImage: 'radial-gradient(circle at 30% 50%, var(--pf-orange) 0%, transparent 50%), radial-gradient(circle at 70% 50%, var(--pf-purple) 0%, transparent 50%)',
+        }} />
+
+        <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/20 text-[var(--pf-orange)] text-sm font-medium mb-8">
+            <Music size={14} />
+            Porterful Music — Artist Applications
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Your music.<br />
+            <span className="text-[var(--pf-orange)]">Your terms.</span>
+          </h1>
+
+          <p className="text-xl text-[var(--pf-text-secondary)] max-w-2xl mx-auto mb-10">
+            Porterful is not a platform that takes from artists. It is a platform that artists own. Keep 80% on every sale. Build with your fans. No label. No middleman.
+          </p>
+
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              href="/apply/form"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--pf-orange)] text-white font-bold rounded-full hover:bg-[var(--pf-orange-dark)] transition-colors text-lg"
+            >
+              Apply to Join <ArrowRight size={18} />
+            </Link>
+            <Link
+              href="/music"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text-secondary)] font-medium rounded-full hover:border-[var(--pf-orange)]/40 hover:text-[var(--pf-text)] transition-colors"
+            >
+              See the Platform <Headphones size={18} />
+            </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Progress bar */}
-      <div className="h-1 bg-[var(--pf-bg-secondary)]">
-        <div
-          className="h-full bg-[var(--pf-orange)] transition-all duration-300"
-          style={{ width: `${(step / 5) * 100}%` }}
-        />
-      </div>
-
-      <div className="pf-container py-8 max-w-xl mx-auto">
-        {/* Step 1: About You */}
-        {step === 1 && (
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Tell us about yourself</h1>
-            <p className="text-[var(--pf-text-secondary)] mb-6">Step 1 of 5 — Basic info</p>
-
-            {/* Subtle curation notice */}
-            <div className="bg-gradient-to-r from-[var(--pf-orange)]/5 to-purple-500/5 border border-[var(--pf-orange)]/10 rounded-xl p-4 mb-8">
-              <p className="text-sm text-[var(--pf-text-secondary)]">
-                <span className="text-[var(--pf-orange)] font-medium">This is a curated space.</span> We review every application personally. If this platform is for you — you'll know.
-              </p>
-            </div>
-
-            <div className="space-y-5">
-              <div>
-                <label className={labelClass}>Stage Name *</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="How fans will know you"
-                  value={form.stage_name}
-                  onChange={e => setForm({ ...form, stage_name: e.target.value })}
-                />
+      {/* PLATFORM STATS */}
+      <section className="border-y border-[var(--pf-border)]">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-4 gap-6 text-center">
+            {PLATFORM_STATS.map(({ value, label }) => (
+              <div key={label}>
+                <p className="text-3xl font-bold text-[var(--pf-orange)] mb-1">{value}</p>
+                <p className="text-sm text-[var(--pf-text-muted)]">{label}</p>
               </div>
-
-              <div>
-                <label className={labelClass}>Primary Genre *</label>
-                <select
-                  className={inputClass}
-                  value={form.genre}
-                  onChange={e => setForm({ ...form, genre: e.target.value })}
-                >
-                  <option value="">Select a genre</option>
-                  <option value="Hip-Hop">Hip-Hop / Rap</option>
-                  <option value="R&B">R&B / Soul</option>
-                  <option value="Pop">Pop</option>
-                  <option value="Rock">Rock</option>
-                  <option value="Jazz">Jazz</option>
-                  <option value="Gospel">Gospel / Christian</option>
-                  <option value="Latin">Latin</option>
-                  <option value="Afrobeats">Afrobeats</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className={labelClass}>City *</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Where you're based"
-                  value={form.city}
-                  onChange={e => setForm({ ...form, city: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Bio *</label>
-                <textarea
-                  className={inputClass + ' min-h-[120px] resize-none'}
-                  placeholder="Tell fans who you are. Where you're from. What makes your music unique."
-                  value={form.bio}
-                  onChange={e => setForm({ ...form, bio: e.target.value })}
-                  maxLength={500}
-                />
-                <div className="text-right text-xs text-[var(--pf-text-muted)] mt-1">
-                  {form.bio.length}/500
-                </div>
-              </div>
-
-              {/* Contact — required for business partnership */}
-              <div className="pt-4 border-t border-[var(--pf-border)]">
-                <div className="bg-gradient-to-r from-[var(--pf-orange)]/5 to-purple-500/5 border border-[var(--pf-orange)]/10 rounded-xl p-4 mb-5">
-                  <p className="text-sm text-[var(--pf-text-secondary)]">
-                    <span className="text-[var(--pf-orange)] font-medium">This is a partnership.</span> If approved, we'll need to reach you directly to set up your account and discuss your earnings.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>Email *</label>
-                    <input
-                      type="email"
-                      className={inputClass}
-                      placeholder="you@example.com"
-                      value={form.email || user?.email || ''}
-                      onChange={e => setForm({ ...form, email: e.target.value })}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Phone *</label>
-                    <input
-                      type="tel"
-                      className={inputClass}
-                      placeholder="(555) 555-5555"
-                      value={form.phone}
-                      onChange={e => setForm({ ...form, phone: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {!user && (
-                <div className="bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-xl p-4">
-                  <p className="text-sm">
-                    You'll need to create an account to continue.{" "}
-                    <Link href="/signup?role=artist" className="text-[var(--pf-orange)] font-medium hover:underline">
-                      Sign up free →
-                    </Link>
-                  </p>
-                </div>
-              )}
-            </div>
+            ))}
           </div>
-        )}
-
-        {/* Step 2: Social */}
-        {step === 2 && (
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Social media links</h1>
-            <p className="text-[var(--pf-text-secondary)] mb-8">Step 2 of 5 — Where fans can find you</p>
-
-            <div className="space-y-5">
-              <div>
-                <label className={labelClass}>Instagram</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="@yourusername"
-                  value={form.instagram}
-                  onChange={e => setForm({ ...form, instagram: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>YouTube</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="@yourchannel or channel URL"
-                  value={form.youtube}
-                  onChange={e => setForm({ ...form, youtube: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>TikTok</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="@yourusername"
-                  value={form.tiktok}
-                  onChange={e => setForm({ ...form, tiktok: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Twitter / X</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="@yourusername"
-                  value={form.twitter}
-                  onChange={e => setForm({ ...form, twitter: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Music Links */}
-        {step === 3 && (
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Music platforms</h1>
-            <p className="text-[var(--pf-text-secondary)] mb-8">Step 3 of 5 — Where your music lives</p>
-
-            <div className="space-y-5">
-              <div>
-                <label className={labelClass}>Spotify</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Artist profile URL or @username"
-                  value={form.spotify}
-                  onChange={e => setForm({ ...form, spotify: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Apple Music</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Artist profile URL"
-                  value={form.apple_music}
-                  onChange={e => setForm({ ...form, apple_music: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>SoundCloud</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Profile URL or @username"
-                  value={form.soundcloud}
-                  onChange={e => setForm({ ...form, soundcloud: e.target.value })}
-                />
-              </div>
-
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-4">
-                <p className="text-sm text-[var(--pf-text-secondary)]">
-                  Once approved, you'll be able to upload your tracks directly to Porterful and set your own prices.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Assets */}
-        {step === 4 && (
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Your images</h1>
-            <p className="text-[var(--pf-text-secondary)] mb-8">Step 4 of 5 — Help us set up your page</p>
-
-            <div className="space-y-5">
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-4">
-                <p className="text-sm text-[var(--pf-text-secondary)] mb-4">
-                  Our team will design your artist page. Upload your images below and we'll use them.
-                </p>
-              </div>
-
-              <div>
-                <label className={labelClass}>Profile Photo / Avatar</label>
-                <input
-                  type="url"
-                  className={inputClass}
-                  placeholder="Link to your photo (IMG, JPEG, PNG)"
-                  value={form.avatar_url}
-                  onChange={e => setForm({ ...form, avatar_url: e.target.value })}
-                />
-                <p className="text-xs text-[var(--pf-text-muted)] mt-1">Square image works best (1:1 ratio)</p>
-              </div>
-
-              <div>
-                <label className={labelClass}>Cover / Banner Image</label>
-                <input
-                  type="url"
-                  className={inputClass}
-                  placeholder="Link to your banner image"
-                  value={form.cover_image_url}
-                  onChange={e => setForm({ ...form, cover_image_url: e.target.value })}
-                />
-                <p className="text-xs text-[var(--pf-text-muted)] mt-1">Wide image works best (3:1 ratio or similar)</p>
-              </div>
-
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-4">
-                <p className="text-sm text-[var(--pf-text-secondary)]">
-                  Don't have images ready? No problem. We'll create a default page for you. You can update images once your page is live.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: Review & Submit */}
-        {step === 5 && (
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Review your application</h1>
-            <p className="text-[var(--pf-text-secondary)] mb-8">Step 5 of 5 — Submit when ready</p>
-
-            <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl divide-y divide-[var(--pf-border)] mb-6">
-              <div className="p-4">
-                <div className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">Stage Name</div>
-                <div className="font-medium">{form.stage_name || '—'}</div>
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">Genre</div>
-                <div className="font-medium">{form.genre || '—'}</div>
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">City</div>
-                <div className="font-medium">{form.city || '—'}</div>
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">Social</div>
-                <div className="text-sm">
-                  {form.instagram && <span>IG: @{form.instagram} </span>}
-                  {form.youtube && <span>YT: {form.youtube} </span>}
-                  {form.tiktok && <span>TT: @{form.tiktok} </span>}
-                  {form.twitter && <span>X: @{form.twitter}</span>}
-                  {!form.instagram && !form.youtube && !form.tiktok && !form.twitter && '—'}
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-[var(--pf-text-muted)] uppercase tracking-wider mb-1">Images</div>
-                <div className="text-sm">
-                  {form.avatar_url ? 'Avatar provided ' : 'No avatar '}
-                  {form.cover_image_url ? '· Banner provided' : '· No banner'}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="mt-1 w-5 h-5 rounded border-[var(--pf-border)] bg-[var(--pf-bg-secondary)] accent-[var(--pf-orange)]"
-                  checked={form.agree_terms}
-                  onChange={e => setForm({ ...form, agree_terms: e.target.checked })}
-                />
-                <span className="text-sm text-[var(--pf-text-secondary)]">
-                  I agree to Porterful's{" "}
-                  <Link href="/terms" className="text-[var(--pf-orange)]">Terms of Service</Link>
-                  {" "}and{" "}
-                  <Link href="/privacy" className="text-[var(--pf-orange)]">Privacy Policy</Link>
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="mt-1 w-5 h-5 rounded border-[var(--pf-border)] bg-[var(--pf-bg-secondary)] accent-[var(--pf-orange)]"
-                  checked={form.agree_exclusive}
-                  onChange={e => setForm({ ...form, agree_exclusive: e.target.checked })}
-                />
-                <span className="text-sm text-[var(--pf-text-secondary)]">
-                  My music on Porterful will be exclusive to this platform.
-                </span>
-              </label>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className="flex gap-4 mt-10">
-          {step > 1 && (
-            <button
-              onClick={() => setStep(s => s - 1)}
-              className="flex-1 py-3.5 bg-[var(--pf-surface)] border border-[var(--pf-border)] text-white font-medium rounded-xl hover:border-[var(--pf-orange)] transition-colors"
-            >
-              Back
-            </button>
-          )}
-
-          {step < 5 ? (
-            <button
-              onClick={() => setStep(s => s + 1)}
-              disabled={step === 1 && !form.stage_name}
-              className="flex-1 py-3.5 bg-[var(--pf-orange)] text-white font-bold rounded-xl hover:bg-[var(--pf-orange-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={!form.agree_terms || !form.agree_exclusive || submitting}
-              className="flex-1 py-3.5 bg-[var(--pf-orange)] text-white font-bold rounded-xl hover:bg-[var(--pf-orange-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {submitting ? 'Submitting...' : 'Submit Application'}
-            </button>
-          )}
         </div>
-      </div>
+      </section>
+
+      {/* WHAT YOU GET */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <div className="text-center mb-12">
+          <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-2">What artists get</p>
+          <h2 className="text-3xl font-bold">Built for artists who build</h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {BENEFITS.map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="flex items-start gap-4 p-6 rounded-2xl bg-[var(--pf-surface)] border border-[var(--pf-border)]">
+              <div className="w-12 h-12 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
+                <Icon size={22} className="text-[var(--pf-orange)]" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-1">{title}</h3>
+                <p className="text-sm text-[var(--pf-text-secondary)]">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* REVENUE MODEL */}
+      <section className="border-t border-[var(--pf-border)]">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-2">How revenue works</p>
+            <h2 className="text-3xl font-bold mb-3">The math is simple</h2>
+            <p className="text-[var(--pf-text-secondary)] max-w-lg mx-auto">
+              Every sale is split three ways: artist, platform, and the superfan who brought the buyer. Here is exactly how it breaks down.
+            </p>
+          </div>
+
+          {/* Revenue table */}
+          <div className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] overflow-hidden mb-8">
+            <div className="grid grid-cols-4 gap-4 p-4 bg-[var(--pf-bg)] border-b border-[var(--pf-border)]">
+              <div className="text-sm font-medium text-[var(--pf-text-muted)]">Product</div>
+              <div className="text-sm font-medium text-[var(--pf-orange)]">Artist</div>
+              <div className="text-sm font-medium text-[var(--pf-text-muted)]">Porterful</div>
+              <div className="text-sm font-medium text-[var(--pf-text-muted)]">Superfan</div>
+            </div>
+            {REVENUE_MODEL.map(({ label, artistGets, porterful, superfan }) => (
+              <div key={label} className="grid grid-cols-4 gap-4 p-4 border-b border-[var(--pf-border)] last:border-0">
+                <div className="text-sm font-medium">{label}</div>
+                <div className="text-sm font-bold text-[var(--pf-orange)]">{artistGets}</div>
+                <div className="text-sm text-[var(--pf-text-secondary)]">{porterful}</div>
+                <div className="text-sm text-[var(--pf-text-secondary)]">{superfan}</div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-sm text-[var(--pf-text-muted)] text-center">
+            Superfan cut applies only when a purchase comes through a referral link. If there is no superfan referral, the artist keeps 90% and Porterful takes 10%.
+          </p>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="border-t border-[var(--pf-border)]">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3">What happens after you apply</h2>
+            <p className="text-[var(--pf-text-secondary)]">We review every application personally. Here's the process.</p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              { step: '01', title: 'Apply', desc: 'Fill out the application. Takes about 5 minutes.' },
+              { step: '02', title: 'Review', desc: 'Our team reviews within 24–48 hours.' },
+              { step: '03', title: 'Onboard', desc: 'We set up your artist page and configure your account.' },
+              { step: '04', title: 'Launch', desc: 'Your page goes live. You start earning.' },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="relative text-center p-6">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 text-white font-bold text-xl flex items-center justify-center mx-auto mb-4">
+                  {step}
+                </div>
+                <h3 className="font-bold text-lg mb-2">{title}</h3>
+                <p className="text-sm text-[var(--pf-text-secondary)]">{desc}</p>
+                {step !== '04' && (
+                  <div className="hidden md:block absolute top-[calc(50%-12px)] right-0 translate-x-1/2 w-8 border-t border-dashed border-[var(--pf-border)]" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-[var(--pf-border)]">
+        <div className="max-w-5xl mx-auto px-6 py-20 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/20 text-[var(--pf-orange)] text-sm font-medium mb-6">
+            <Shield size={14} />
+            Selective but open
+          </div>
+
+          <h2 className="text-4xl font-bold mb-4">Ready to own your revenue?</h2>
+          <p className="text-xl text-[var(--pf-text-secondary)] max-w-xl mx-auto mb-10">
+            Join artists who are building on Porterful. No upfront cost. No label. Just your music and your terms.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/apply/form"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--pf-orange)] text-white font-bold rounded-full hover:bg-[var(--pf-orange-dark)] transition-colors text-lg"
+            >
+              Start Application <ArrowRight size={18} />
+            </Link>
+            <Link
+              href="/music"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
+            >
+              Listen to O D Porter first <Globe size={16} />
+            </Link>
+          </div>
+
+          <p className="text-sm text-[var(--pf-text-muted)] mt-8">
+            Questions?{" "}
+            <Link href="/contact" className="text-[var(--pf-orange)] hover:underline">
+              Contact us
+            </Link>
+          </p>
+        </div>
+      </section>
+
     </div>
   )
 }

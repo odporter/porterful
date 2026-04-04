@@ -415,7 +415,13 @@ export default function HomePage() {
                 transition: 'opacity 400ms ease-out',
                 zIndex: isVisible ? 20 : 1,
               }}
-              onClick={() => router.push(system.route)}
+              onClick={() => {
+                if (system.route.startsWith('http')) {
+                  window.location.href = system.route
+                } else {
+                  router.push(system.route)
+                }
+              }}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseLeave={() => setHoveredIndex(null)}
             >

@@ -61,7 +61,7 @@ export default async function ArtistPage({ params }: PageProps) {
 
       {/* Content Grid */}
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid lg:grid-cols-3 gap-12">
+        <div className="grid lg:grid-cols-3 gap-10">
 
           {/* Main Column — Tracks */}
           <div className="lg:col-span-2 space-y-8">
@@ -143,33 +143,33 @@ export default async function ArtistPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar Column */}
-          <div className="space-y-6">
+          <div className="space-y-5 flex flex-col">
 
             {/* Support Card */}
             <ArtistSupportCard artist={artist} />
 
             {/* Products */}
-            {products.length > 0 && (
-              <ArtistProducts products={products} artistName={artist.name} />
-            )}
+            <ArtistProducts products={products} artistName={artist.name} />
 
             {/* Superfan CTA */}
-            <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-2xl p-6 border border-[var(--pf-orange)]/20">
-              <div className="text-2xl mb-2">⭐</div>
-              <h3 className="font-bold text-lg mb-1">Become a Superfan</h3>
-              <p className="text-sm text-[var(--pf-text-secondary)] mb-4">
+            <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-600/10 rounded-2xl p-5 border border-[var(--pf-orange)]/20 flex flex-col min-h-[140px]">
+              <div className="flex items-start justify-between mb-2">
+                <div className="text-2xl">⭐</div>
+              </div>
+              <h3 className="font-bold text-base mb-1">Become a Superfan</h3>
+              <p className="text-sm text-[var(--pf-text-secondary)] flex-1">
                 Earn 3% on everything your referrals buy. Help {artist.name.split(' ')[0]} grow without spending a dime.
               </p>
               <Link
                 href="/superfan"
-                className="block w-full py-2.5 rounded-xl text-center text-sm font-semibold bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors"
+                className="mt-4 block w-full py-2.5 rounded-xl text-center text-sm font-semibold bg-[var(--pf-orange)] text-white hover:bg-[var(--pf-orange-dark)] transition-colors"
               >
                 Learn More
               </Link>
             </div>
 
             {/* Platform Stats */}
-            <div className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)]">
+            <div className="bg-[var(--pf-surface)] rounded-2xl p-5 border border-[var(--pf-border)] min-h-[160px]">
               <p className="text-sm uppercase tracking-widest text-[var(--pf-text-muted)] mb-4">Platform</p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

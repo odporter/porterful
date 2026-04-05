@@ -1,29 +1,19 @@
-# Site Improvements Batch 1 - April 4, 2026
+# Site Improvements — April 4, 2026
 
-## Status: Already Implemented (No Changes Needed)
+## Task: Porterful Site Improvements Batch 1 - Rob Soule fix + social buttons
 
-### 1. Rob Soule Artist Data Fix ✅
-Location: `src/lib/artists.ts`
-- **Genre**: Already set to `'Hip-Hop / R&B / Blues'`
-- **Bio**: Already correctly describes Rob Soule as "a St. Louis hip-hop and R&B artist who blends the blues into a soulful sound you won't find anywhere else."
-- No changes required.
+Reviewed three requested changes and found them **already implemented**:
 
-### 2. Social Media Buttons on Artist Profile ✅
-Location: `src/components/artist/ArtistHero.tsx` (used by `/artist/[slug]/page.tsx`)  
-Location: `src/app/(app)/artist/artist/[id]/page.tsx` (dashboard profile page)
+1. ✅ **Rob Soule artist data** (`src/lib/artists.ts`)
+   - Genre: `'Hip-Hop / R&B / Blues'` — correct
+   - Bio: "Rob Soule is a St. Louis hip-hop and R&B artist who blends the blues into a soulful sound..." — correct
 
-Both artist pages already have social media buttons:
-- Instagram, Twitter/X, YouTube, TikTok icons
-- Placed near artist name in profile header
-- Only shown when social fields are filled in
-- Styled with platform brand colors on hover
+2. ✅ **Social media buttons** (`src/components/artist/ArtistHero.tsx`)
+   - Instagram, Twitter/X, YouTube, TikTok icons already rendered in hero section
+   - Brand-colored hover effects (Instagram pink, X black, YouTube red, TikTok black)
+   - Positioned below stats in the artist profile header
 
-### 3. Featured Singles Before Albums ✅
-Location: `src/app/(app)/artist/[slug]/page.tsx`
-Location: `src/app/(app)/artist/artist/[id]/page.tsx`
+3. ✅ **Singles BEFORE Albums** (`src/app/(app)/artist/[slug]/page.tsx`)
+   - Featured Singles section already appears before Albums section (lines ~93-101 vs ~106-114)
 
-Both pages already render the Featured Singles section BEFORE the Albums section.
-
----
-
-**Conclusion**: All requested changes were already in place. Code verified and saved — no modifications made.
+**No code changes were necessary** — all requested improvements were already in place.

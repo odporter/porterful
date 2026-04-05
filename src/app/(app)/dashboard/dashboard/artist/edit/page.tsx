@@ -44,7 +44,7 @@ export default function EditArtistPage() {
       }
 
       try {
-        const res = await fetch(`/api/artists/${user.id}`)
+        const res = await fetch(`/api/media/${user.id}`)
         const data = await res.json()
         
         if (data.profile) {
@@ -155,7 +155,7 @@ export default function EditArtistPage() {
     setSuccess(false)
 
     try {
-      const res = await fetch(`/api/artists/${user.id}`, {
+      const res = await fetch(`/api/media/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

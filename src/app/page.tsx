@@ -337,30 +337,6 @@ export default function HomePage() {
     }
   }, [motionOffset])
 
-  // Intersection observer — cleaner, no sticky
-  useEffect(() => {
-    const observers: IntersectionObserver[] = []
-
-    itemRefs.current.forEach((el, i) => {
-      if (!el) return
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5 && !isScrollingRef.current) {
-            if (i !== activeIndex) {
-              targetIndexRef.current = i
-              setActiveIndex(i)
-            }
-          }
-        },
-        { threshold: 0.5 }
-      )
-      observer.observe(el)
-      observers.push(observer)
-    })
-
-    return () => observers.forEach(o => o.disconnect())
-  }, [activeIndex])
-
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
 

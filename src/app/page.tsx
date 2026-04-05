@@ -148,81 +148,42 @@ export default function HomePage() {
     return base * pulse
   }, [activeIndex, hoveredIndex, time])
 
-  // Unified scroll handler — wheel AND touch in one system
+  // Passive scroll tracking — browser handles snapping via CSS scroll-snap
+  // This only tracks which section is visible, does NOT block or preventDefault
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
 
-    let accumulatedDelta = 0
-    let touchStartY = 0
-    const snapThreshold = 60
-    let rafId: number | null = null
-    let lastWheelTime = 0
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null
 
-    // Single snap function
-    const trySnap = (delta: number) => {
-      if (Math.abs(delta) < snapThreshold) return
-      const direction = delta > 0 ? 1 : -1
-      const nextIndex = Math.max(0, Math.min(SYSTEMS.length - 1, activeIndex + direction))
-      if (nextIndex !== activeIndex) {
-        targetIndexRef.current = nextIndex
-        setActiveIndex(nextIndex)
-        isScrollingRef.current = true
-        const targetEl = itemRefs.current[nextIndex]
-        if (targetEl) {
-          targetEl.scrollIntoView({ block: 'start' })
-        }
-        scrollTimeoutRef.current = setTimeout(() => {
-          isScrollingRef.current = false
-          accumulatedDelta = 0
-        }, 1000)
-      }
+    const handleScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(() => {
+        const scrollTop = container.scrollTop
+        const viewHeight = container.clientHeight
+        const buffer = viewHeight * 0.4
+
+        itemRefs.current.forEach((el, i) => {
+          if (!el) return
+          const rect = el.getBoundingClientRect()
+          const containerRect = container.getBoundingClientRect()
+          const sectionTop = rect.top - containerRect.top
+          const sectionCenter = sectionTop + rect.height / 2
+          const relativeCenter = sectionCenter - scrollTop
+
+          if (relativeCenter > -buffer && relativeCenter < buffer + viewHeight) {
+            if (i !== activeIndex) {
+              setActiveIndex(i)
+            }
+          }
+        })
+      }, 50)
     }
 
-    // Wheel handler — passive, no preventDefault
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault()
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-      accumulatedDelta += e.deltaY * 0.8
-      lastWheelTime = Date.now()
-
-      if (rafId) cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(() => {
-        trySnap(accumulatedDelta)
-      })
-    }
-
-    // Touch handler — accumulates, fires on end
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY
-      accumulatedDelta = 0
-    }
-
-    const handleTouchMove = (e: TouchEvent) => {
-      const delta = touchStartY - e.touches[0].clientY
-      accumulatedDelta = delta
-    }
-
-    const handleTouchEnd = () => {
-      // Only snap if we haven't recently wheeled (avoid double-fire)
-      if (Date.now() - lastWheelTime > 200) {
-        trySnap(accumulatedDelta)
-      }
-      accumulatedDelta = 0
-    }
-
-    container.addEventListener('wheel', handleWheel, { passive: false })
-    container.addEventListener('touchstart', handleTouchStart, { passive: true })
-    container.addEventListener('touchmove', handleTouchMove, { passive: true })
-    container.addEventListener('touchend', handleTouchEnd, { passive: true })
-
+    container.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
-      container.removeEventListener('wheel', handleWheel)
-      container.removeEventListener('touchstart', handleTouchStart)
-      container.removeEventListener('touchmove', handleTouchMove)
-      container.removeEventListener('touchend', handleTouchEnd)
-      if (rafId) cancelAnimationFrame(rafId)
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+      container.removeEventListener('scroll', handleScroll)
+      if (scrollTimeout) clearTimeout(scrollTimeout)
     }
   }, [activeIndex])
 

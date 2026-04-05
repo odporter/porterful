@@ -204,49 +204,34 @@ export default function HomePage() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  // Passive scroll tracking — browser handles snap, we just detect
+  // Active section tracking via IntersectionObserver
   useEffect(() => {
     const container = scrollRef.current
     if (!container) return
 
-    let scrollTimeout: ReturnType<typeof setTimeout> | null = null
+    const observers: IntersectionObserver[] = []
 
-    const handleScroll = () => {
-      if (scrollTimeout) clearTimeout(scrollTimeout)
-      scrollTimeout = setTimeout(() => {
-        const scrollTop = container.scrollTop
-        const viewHeight = container.clientHeight
-        const viewportCenter = scrollTop + viewHeight / 2
-
-        let closestIndex = 0
-        let closestDistance = Infinity
-
-        itemRefs.current.forEach((el, i) => {
-          if (!el) return
-          const rect = el.getBoundingClientRect()
-          const containerRect = container.getBoundingClientRect()
-          const sectionTop = rect.top - containerRect.top
-          const sectionCenter = sectionTop + rect.height / 2
-          const distance = Math.abs(sectionCenter - viewportCenter)
-
-          if (distance < closestDistance) {
-            closestDistance = distance
-            closestIndex = i
-          }
-        })
-
-        if (closestIndex !== activeIndex) {
-          setActiveIndex(closestIndex)
+    itemRefs.current.forEach((el, i) => {
+      if (!el) return
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+              setActiveIndex(i)
+            }
+          })
+        },
+        {
+          root: container,
+          threshold: [0.3, 0.5, 0.7],
         }
-      }, 80)
-    }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      container.removeEventListener('scroll', handleScroll)
-      if (scrollTimeout) clearTimeout(scrollTimeout)
-    }
-  }, [activeIndex])
+    return () => observers.forEach(obs => obs.disconnect())
+  }, [])
 
   const handlePortalClick = useCallback((system: typeof SYSTEMS[0]) => {
     if (system.isExternal) {

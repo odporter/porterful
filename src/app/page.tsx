@@ -33,9 +33,8 @@ const SYSTEMS = [
     id: 'land',
     label: 'LAND',
     subtitle: 'Acquire. Control. Build.',
-    route: 'https://national-land-data-system.vercel.app',
+    route: '/systems',
     glowColor: '#22c55e',
-    isExternal: true,
     icon: (
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -151,49 +150,16 @@ export default function HomePage() {
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
+  const activeIndexRef = useRef(0)
   const [activeIndex, setActiveIndex] = useState(0)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const [introDone, setIntroDone] = useState(false)
-  const [spotlightX, setSpotlightX] = useState(-100)
   const [time, setTime] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  // Lightweight particles
+  // Lightweight particles - only if performant
   useParticles(canvasRef)
 
-  // Intro animation sequence
-  useEffect(() => {
-    // Start spotlight after brief delay
-    const spotlightTimer = setTimeout(() => {
-      // Animate spotlight left to right
-      const start = -100
-      const end = window.innerWidth + 100
-      const duration = 2000
-      const startTime = Date.now()
-
-      const animate = () => {
-        const elapsed = Date.now() - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const eased = 1 - Math.pow(1 - progress, 3) // ease-out cubic
-        setSpotlightX(start + (end - start) * eased)
-
-        if (progress < 1) {
-          requestAnimationFrame(animate)
-        } else {
-          // Fade out spotlight and show portals
-          setTimeout(() => {
-            setIntroDone(true)
-            setSpotlightX(-1000)
-          }, 300)
-        }
-      }
-      requestAnimationFrame(animate)
-    }, 600)
-
-    return () => clearTimeout(spotlightTimer)
-  }, [])
-
-  // Time for subtle animations
+  // Time for subtle glow animations
   useEffect(() => {
     let raf: number
     const updateTime = (ts: number) => {
@@ -203,9 +169,6 @@ export default function HomePage() {
     raf = requestAnimationFrame(updateTime)
     return () => cancelAnimationFrame(raf)
   }, [])
-
-  const activeIndexRef = useRef(activeIndex)
-  activeIndexRef.current = activeIndex
 
   // Track which section is at the TOP of the viewport (snap point)
   useEffect(() => {
@@ -266,52 +229,6 @@ export default function HomePage() {
         }}
       />
 
-      {/* INTRO: Porterful with spotlight */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#000',
-          opacity: introDone ? 0 : 1,
-          transition: 'opacity 800ms ease-out',
-          pointerEvents: introDone ? 'none' : 'none',
-        }}
-      >
-        <div style={{ position: 'relative' }}>
-          <h1
-            style={{
-              fontSize: 'clamp(2rem, 8vw, 5rem)',
-              fontWeight: 800,
-              letterSpacing: '0.3em',
-              color: '#e0e0e0',
-              textShadow: '0 0 60px rgba(255,255,255,0.15)',
-              transition: 'opacity 300ms ease-out',
-              opacity: spotlightX > -500 ? 1 : 0.6,
-            }}
-          >
-            PORTERFUL
-          </h1>
-          {/* Spotlight shine */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
-              transform: `translateX(${spotlightX}px)`,
-              width: '200px',
-              pointerEvents: 'none',
-            }}
-          />
-        </div>
-      </div>
-
       {/* HEADER */}
       <header
         style={{
@@ -323,8 +240,6 @@ export default function HomePage() {
           padding: '1.5rem 2rem',
           display: 'flex',
           justifyContent: 'center',
-          opacity: introDone ? 1 : 0,
-          transition: 'opacity 600ms ease-out',
         }}
       >
         <button
@@ -357,7 +272,7 @@ export default function HomePage() {
           scrollBehavior: 'auto',
           position: 'relative',
           zIndex: 10,
-          opacity: introDone ? 1 : 0,
+          opacity: 1,
           transition: 'opacity 600ms ease-out',
         }}
       >
@@ -493,7 +408,7 @@ export default function HomePage() {
           display: 'flex',
           flexDirection: 'column',
           gap: '0.75rem',
-          opacity: introDone ? 1 : 0,
+          opacity: 1,
           transition: 'opacity 600ms ease-out',
         }}
       >
@@ -536,7 +451,7 @@ export default function HomePage() {
             flexDirection: 'column',
             alignItems: 'center',
             gap: '0.5rem',
-            opacity: introDone ? 0.5 : 0,
+            opacity: 0.5,
             animation: 'fadeInUp 1s ease-out 3s forwards',
           }}
         >
@@ -561,7 +476,7 @@ export default function HomePage() {
           color: 'rgba(80,80,80,0.4)',
           textTransform: 'uppercase',
           zIndex: 50,
-          opacity: introDone ? 1 : 0,
+          opacity: 1,
           transition: 'opacity 600ms ease-out',
         }}
       >

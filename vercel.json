@@ -30,5 +30,10 @@
       "source": "/api/(.*)",
       "destination": "/api/$1"
     }
-  ]
+  ],
+  "functions": {
+    "src/app/(app)/media/[...path]/route.ts": {
+      "includeFiles": "public/**"
+    }
+  }
 }

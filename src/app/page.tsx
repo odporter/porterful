@@ -204,13 +204,13 @@ export default function HomePage() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
+  const activeIndexRef = useRef(activeIndex)
+  activeIndexRef.current = activeIndex
+
   // Track which section is at the TOP of the viewport (snap point)
   useEffect(() => {
     const container = scrollRef.current
     if (!container) return
-
-    const activeIndexRef = useRef(activeIndex)
-    activeIndexRef.current = activeIndex
 
     const findActiveSection = () => {
       const scrollTop = container.scrollTop

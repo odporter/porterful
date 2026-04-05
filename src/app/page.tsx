@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
-const SYSTEMS = [
+const SYSTEMS = [ // fixed: external link handling for LAND section
+
   {
     id: 'music',
     label: 'MUSIC',

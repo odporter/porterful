@@ -148,97 +148,79 @@ export default function HomePage() {
     return base * pulse
   }, [activeIndex, hoveredIndex, time])
 
-  // Touch swipe support
+  // Unified scroll handler — wheel AND touch in one system
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
 
-    let touchStartY = 0
     let accumulatedDelta = 0
-    const snapThreshold = 50
+    let touchStartY = 0
+    const snapThreshold = 60
+    let rafId: number | null = null
+    let lastWheelTime = 0
 
+    // Single snap function
+    const trySnap = (delta: number) => {
+      if (Math.abs(delta) < snapThreshold) return
+      const direction = delta > 0 ? 1 : -1
+      const nextIndex = Math.max(0, Math.min(SYSTEMS.length - 1, activeIndex + direction))
+      if (nextIndex !== activeIndex) {
+        targetIndexRef.current = nextIndex
+        setActiveIndex(nextIndex)
+        isScrollingRef.current = true
+        const targetEl = itemRefs.current[nextIndex]
+        if (targetEl) {
+          targetEl.scrollIntoView({ block: 'start' })
+        }
+        scrollTimeoutRef.current = setTimeout(() => {
+          isScrollingRef.current = false
+          accumulatedDelta = 0
+        }, 1000)
+      }
+    }
+
+    // Wheel handler — passive, no preventDefault
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+      accumulatedDelta += e.deltaY * 0.8
+      lastWheelTime = Date.now()
+
+      if (rafId) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        trySnap(accumulatedDelta)
+      })
+    }
+
+    // Touch handler — accumulates, fires on end
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY
       accumulatedDelta = 0
     }
 
     const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault()
       const delta = touchStartY - e.touches[0].clientY
       accumulatedDelta = delta
     }
 
     const handleTouchEnd = () => {
-      if (Math.abs(accumulatedDelta) > snapThreshold && !isScrollingRef.current) {
-        const direction = accumulatedDelta > 0 ? 1 : -1
-        const nextIndex = Math.max(0, Math.min(SYSTEMS.length - 1, activeIndex + direction))
-        if (nextIndex !== activeIndex) {
-          targetIndexRef.current = nextIndex
-          setActiveIndex(nextIndex)
-          isScrollingRef.current = true
-          const targetEl = itemRefs.current[nextIndex]
-          if (targetEl) {
-            targetEl.scrollIntoView({ block: "start" })
-          }
-          scrollTimeoutRef.current = setTimeout(() => {
-            isScrollingRef.current = false
-          }, 1000)
-        }
+      // Only snap if we haven't recently wheeled (avoid double-fire)
+      if (Date.now() - lastWheelTime > 200) {
+        trySnap(accumulatedDelta)
       }
-    }
-
-    container.addEventListener('touchstart', handleTouchStart, { passive: true })
-    container.addEventListener('touchmove', handleTouchMove, { passive: false })
-    container.addEventListener('touchend', handleTouchEnd, { passive: true })
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart)
-      container.removeEventListener('touchmove', handleTouchMove)
-      container.removeEventListener('touchend', handleTouchEnd)
-    }
-  }, [activeIndex])
-
-  // Wheel scroll — smooth, spring-like
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
-    let accumulatedDelta = 0
-    const snapThreshold = 60
-    let rafId: number | null = null
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault()
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-
-      accumulatedDelta += e.deltaY * 0.8
-
-      if (rafId) cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(() => {
-        if (Math.abs(accumulatedDelta) > snapThreshold && !isScrollingRef.current) {
-          const direction = accumulatedDelta > 0 ? 1 : -1
-          const nextIndex = Math.max(0, Math.min(SYSTEMS.length - 1, activeIndex + direction))
-          if (nextIndex !== activeIndex) {
-            targetIndexRef.current = nextIndex
-            setActiveIndex(nextIndex)
-            isScrollingRef.current = true
-            const targetEl = itemRefs.current[nextIndex]
-            if (targetEl) {
-              targetEl.scrollIntoView({ block: "start" })
-            }
-            scrollTimeoutRef.current = setTimeout(() => {
-              isScrollingRef.current = false
-              accumulatedDelta = 0
-            }, 1000)
-          } else {
-            accumulatedDelta = 0
-          }
-        }
-      })
+      accumulatedDelta = 0
     }
 
     container.addEventListener('wheel', handleWheel, { passive: false })
+    container.addEventListener('touchstart', handleTouchStart, { passive: true })
+    container.addEventListener('touchmove', handleTouchMove, { passive: true })
+    container.addEventListener('touchend', handleTouchEnd, { passive: true })
+
     return () => {
       container.removeEventListener('wheel', handleWheel)
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
       if (rafId) cancelAnimationFrame(rafId)
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
     }

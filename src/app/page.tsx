@@ -204,33 +204,43 @@ export default function HomePage() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  // Active section tracking via IntersectionObserver
+  // Track which section is at the TOP of the viewport (snap point)
   useEffect(() => {
     const container = scrollRef.current
     if (!container) return
 
-    const observers: IntersectionObserver[] = []
+    const activeIndexRef = useRef(activeIndex)
+    activeIndexRef.current = activeIndex
 
-    itemRefs.current.forEach((el, i) => {
-      if (!el) return
-      const obs = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
-              setActiveIndex(i)
-            }
-          })
-        },
-        {
-          root: container,
-          threshold: [0.3, 0.5, 0.7],
+    const findActiveSection = () => {
+      const scrollTop = container.scrollTop
+      const viewHeight = container.clientHeight
+      const viewportCenter = scrollTop + viewHeight / 2
+      let closest = 0
+      let closestDist = Infinity
+
+      itemRefs.current.forEach((el, i) => {
+        if (!el) return
+        const rect = el.getBoundingClientRect()
+        const containerRect = container.getBoundingClientRect()
+        const sectionTop = rect.top - containerRect.top + scrollTop
+        const sectionCenter = sectionTop + rect.height / 2
+        const dist = Math.abs(sectionCenter - viewportCenter)
+        if (dist < closestDist) {
+          closestDist = dist
+          closest = i
         }
-      )
-      obs.observe(el)
-      observers.push(obs)
-    })
+      })
 
-    return () => observers.forEach(obs => obs.disconnect())
+      // Only update if changed (guards against rapid-fire from forEach)
+      if (closest !== activeIndexRef.current) {
+        activeIndexRef.current = closest
+        setActiveIndex(closest)
+      }
+    }
+
+    container.addEventListener('scroll', findActiveSection, { passive: true })
+    return () => container.removeEventListener('scroll', findActiveSection)
   }, [])
 
   const handlePortalClick = useCallback((system: typeof SYSTEMS[0]) => {

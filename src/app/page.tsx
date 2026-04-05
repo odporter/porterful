@@ -163,6 +163,11 @@ export default function HomePage() {
         const viewHeight = container.clientHeight
         const buffer = viewHeight * 0.4
 
+        // Find which section's center is closest to viewport center
+        let closestIndex = activeIndex
+        let closestDistance = Infinity
+        const viewportCenter = scrollTop + viewHeight / 2
+
         itemRefs.current.forEach((el, i) => {
           if (!el) return
           const rect = el.getBoundingClientRect()
@@ -170,13 +175,19 @@ export default function HomePage() {
           const sectionTop = rect.top - containerRect.top
           const sectionCenter = sectionTop + rect.height / 2
           const relativeCenter = sectionCenter - scrollTop
+          const distance = Math.abs(relativeCenter - viewHeight / 2)
 
           if (relativeCenter > -buffer && relativeCenter < buffer + viewHeight) {
-            if (i !== activeIndex) {
-              setActiveIndex(i)
+            if (distance < closestDistance) {
+              closestDistance = distance
+              closestIndex = i
             }
           }
         })
+
+        if (closestIndex !== activeIndex) {
+          setActiveIndex(closestIndex)
+        }
       }, 50)
     }
 

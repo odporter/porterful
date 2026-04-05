@@ -1,25 +1,33 @@
-# Porterful Site Improvements - Site improvements batch 1 - Rob Soule fix + social buttons
+# Porterful Site Improvements — Batch 1 (Site Soule fix + social buttons)
 
-**Date:** 2026-04-04
-**Status:** Already complete (no changes needed)
+**Date:** 2026-04-05  
+**Status:** Reviewed — all items already implemented
 
-## Tasks Reviewed
+## Changes Reviewed
 
-### 1. Rob Soule artist data (artists.ts) ✅
-- **Genre:** Already set to `'Hip-Hop / R&B / Blues'` ✓
-- **Bio:** Already correctly reflects St. Louis hip-hop and R&B artist blending blues into a soulful sound ✓
+### 1. Rob Soule artist data (`src/lib/artists.ts`)
+✅ **Already correct.** Rob Soule's entry has:
+- `genre: 'Hip-Hop / R&B / Blues'`
+- Bio correctly describes him as "a St. Louis hip-hop and R&B artist who blends the blues into a soulful sound you won't find anywhere else"
 
-### 2. Social media buttons (ArtistHero.tsx) ✅
-- Instagram, Twitter/X, YouTube, TikTok icon buttons already present in the artist profile header
-- Icons render as circular buttons with brand hover colors (Instagram pink, X black, YouTube red, TikTok black)
-- Links are conditional — only show if artist has the social field filled
-- Placed in the profile header, below the featured track button, near the artist name/info
+### 2. Social media buttons on artist profile (`src/app/(app)/artist/[slug]/page.tsx`)
+✅ **Already implemented.** The artist profile hero section includes:
+- Instagram, Twitter/X, YouTube, TikTok icons next to the artist name (in the header row)
+- Additional social icon buttons in the right-side hero area
+- All icons only render when the artist has those social fields filled in
+- Links open in new tab with proper `rel="noopener"`
 
-### 3. Featured Singles before Albums ✅
-- In `src/app/(app)/artist/[slug]/page.tsx`, Singles section already appears before Albums section
-- Singles section shows first with `singles.length > 0` check
-- Albums section follows after
+### 3. Featured Singles appears BEFORE Albums
+✅ **Already implemented.** Both artist page routes show:
+1. Featured Singles section first
+2. Albums section second
 
-## Conclusion
+## Files Reviewed
+- `/src/lib/artists.ts` — Rob Soule data
+- `/src/app/(app)/artist/[slug]/page.tsx` — Primary artist profile (slug-based routing)
+- `/src/app/(app)/artist/artist/[id]/page.tsx` — Secondary artist profile (id-based routing, legacy)
 
-All requested changes appear to already be in place. No code modifications were necessary.
+## Notes
+- The task referenced `src/app/artist/[id]/page.tsx` but the actual codebase uses slug-based routing at `src/app/(app)/artist/[slug]/page.tsx`
+- No code changes were needed — everything requested was already in place
+- Changes NOT committed or deployed per instructions

@@ -1,12 +1,22 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { useSupabase } from '@/app/providers'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Lazy client — never instantiated at module level
+let _supabase: SupabaseClient | null = null
+
+function getWalletClient(): SupabaseClient {
+  if (_supabase) return _supabase
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) {
+    return createClient('https://placeholder.supabase.co', 'placeholder')
+  }
+  _supabase = createClient(url, key)
+  return _supabase
+}
 
 interface WalletContextType {
   balance: number
@@ -30,14 +40,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const targetId = uid || userId
     if (!targetId) return 0
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getWalletClient()
         .from('wallets')
         .select('balance')
         .eq('user_id', targetId)
         .single()
       
       if (error && error.code === 'PGRST116') {
-        const { data: newWallet } = await supabase
+        const { data: newWallet } = await getWalletClient()
           .from('wallets')
           .insert({ user_id: targetId, balance: 0 })
           .select('balance')
@@ -61,7 +71,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const targetId = uid || userId
     if (!targetId) return
     try {
-      await supabase
+      await getWalletClient()
         .from('wallets')
         .update({ balance: 0, updated_at: new Date().toISOString() })
         .eq('user_id', targetId)
@@ -94,7 +104,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const newBalance = balance + amount
     setBalance(newBalance)
     
-    await supabase
+    await getWalletClient()
       .from('wallets')
       .upsert({ 
         user_id: userId, 
@@ -112,7 +122,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const newBalance = balance - amount
     setBalance(newBalance)
     
-    await supabase
+    await getWalletClient()
       .from('wallets')
       .upsert({ 
         user_id: userId, 

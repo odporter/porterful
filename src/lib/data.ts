@@ -128,7 +128,7 @@ export const TRACKS = [
   // GUNE TRACKS
   { id: 'gune-01', title: 'Call Back', artist: 'Gune', album: 'Singles', duration: '2:30', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gune - Call Back.mp3', featured: true },
   { id: 'gune-02', title: 'Sorry in Advance', artist: 'Gune', album: 'Singles', duration: '3:12', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gune - Sorry in advance.mp3' },
-  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gunebugtheplug - One more time .mp3' },
+  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 999999, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gunebugtheplug - One more time .mp3', featured: true },
   // O D PORTER SINGLES
   { id: 'od-tlf', title: 'TLF', artist: 'O D Porter', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/od-porter/avatar.jpg', audio_url: '/artist-images/od-porter/TLF.mp3' },
   // NIKEE TURBO TRACKS

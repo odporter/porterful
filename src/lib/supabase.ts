@@ -1,16 +1,38 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Lazy singleton — created on first use, never at module load time
+let _supabase: SupabaseClient | null = null
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+function getClient(): SupabaseClient {
+  if (_supabase) return _supabase
+  
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!url || !key) {
+    // Return a dummy client for build-time to avoid crashes
+    // All real calls will fail gracefully
+    console.warn('Supabase env vars missing — using fallback')
+    return createClient('https://placeholder.supabase.co', 'placeholder')
+  }
+  
+  _supabase = createClient(url, key)
+  return _supabase
+}
+
+// Proxy that lazy-loads the real client on first property access
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_, prop) {
+    return getClient()[prop as keyof SupabaseClient]
+  }
+})
 
 // Server-side Supabase client — only created at request time, never at module load
 export function createServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !key) {
-    return null // Graceful fallback for build-time
+    return null
   }
   return createClient(url, key, {
     auth: { persistSession: false }

@@ -1,22 +1,19 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-// Lazy singleton — created on first use, never at module load time
-let _supabase: SupabaseClient | null = null
-
+// Always-fresh client — env vars read at call time, not at module load
 function getClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
   if (!url || !key) {
     // Return a dummy client for build-time to avoid crashes
-    // All real calls will fail gracefully — this is intentional
     return createClient('https://placeholder.supabase.co', 'placeholder-key')
   }
   
   return createClient(url, key)
 }
 
-// Proxy that lazy-loads the real client on first property access
+// Proxy that delegates to a fresh client each time
 export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
   get(_, prop) {
     return getClient()[prop as keyof SupabaseClient]

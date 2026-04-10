@@ -4,6 +4,7 @@ import { useAudio, Track } from '@/lib/audio-context'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Play, Pause, Disc, Verified, ChevronLeft } from 'lucide-react'
+import { LikenessBadge } from '@/components/likeness/LikenessGate'
 
 // Social platform icons as inline SVG components
 function InstagramIcon({ size = 18 }: { size?: number }) {
@@ -45,6 +46,7 @@ interface ArtistHeroProps {
     genre: string
     location: string
     verified: boolean
+    likeness_verified?: boolean
     image: string
     coverGradient: string
     followers: number
@@ -62,7 +64,7 @@ function formatFollowers(n: number): string {
 }
 
 export function ArtistHero({ artist, featuredTrack, totalPlays }: ArtistHeroProps) {
-  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
+  const { currentTrack, isPlaying, playTrack, togglePlay, setMode } = useAudio()
   const isActive = currentTrack?.id === featuredTrack?.id
 
   return (
@@ -107,12 +109,13 @@ export function ArtistHero({ artist, featuredTrack, totalPlays }: ArtistHeroProp
               {artist.verified && (
                 <Verified size={18} className="text-[var(--pf-orange)]" />
               )}
+              {artist.likeness_verified && <LikenessBadge compact />}
               <span className="text-sm text-[var(--pf-text-muted)] uppercase tracking-widest">
                 Artist
               </span>
             </div>
 
-            <h1 className="text-5xl lg:text-6xl font-bold mb-2">{artist.name}</h1>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-2 break-words">{artist.name}</h1>
 
             <p className="text-[var(--pf-text-secondary)] mb-6">
               {artist.genre} · {artist.location}
@@ -121,7 +124,14 @@ export function ArtistHero({ artist, featuredTrack, totalPlays }: ArtistHeroProp
             {/* Featured Track */}
             {featuredTrack && (
               <button
-                onClick={() => isActive ? togglePlay() : playTrack(featuredTrack)}
+                onClick={() => {
+                  if (isActive) {
+                    togglePlay()
+                  } else {
+                    setMode('artist')
+                    playTrack(featuredTrack)
+                  }
+                }}
                 aria-label={isActive && isPlaying ? `Pause "${featuredTrack.title}" by ${artist.name}` : `Play "${featuredTrack.title}" by ${artist.name}`}
                 title={isActive && isPlaying ? `Pause "${featuredTrack.title}"` : `Play "${featuredTrack.title}" — listen, then explore merch in the sidebar`}
                 className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 rounded-full bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white font-semibold transition-all shadow-lg shadow-[var(--pf-orange)]/20 mb-6 sm:mb-8 whitespace-nowrap"

@@ -10,7 +10,7 @@ import { TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
 import { FEATURED_PRODUCTS } from '@/lib/products'
 
-const featuredArtist = ARTISTS.find((artist) => artist.slug === 'od-porter') ?? ARTISTS[0]
+const featuredArtist = ARTISTS.find((artist) => artist.slug === 'gune') ?? ARTISTS[0]
 
 const featuredTracks = TRACKS
   .filter((track) => track.artist === featuredArtist.name)
@@ -32,11 +32,12 @@ function formatPlays(plays: number) {
 }
 
 export default function HomePage() {
-  const { currentTrack, isPlaying, playTrack, togglePlay, setQueue } = useAudio()
+  const { currentTrack, isPlaying, playTrack, togglePlay, setQueue, setMode } = useAudio()
 
   const isFeaturedTrackActive = currentTrack?.id === featuredTrack?.id
 
   const startFeaturedPlayback = (track: Track) => {
+    setMode('track')
     setQueue(featuredTracks)
 
     if (currentTrack?.id === track.id) {
@@ -136,11 +137,39 @@ export default function HomePage() {
                     <span>${featuredTrack?.price || 1} track</span>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <Link href={`/artist/${featuredArtist.slug}`} className="text-sm font-medium text-[var(--pf-orange)] hover:underline">
-                      Visit artist page
-                    </Link>
-                    <Link href="/music" className="text-sm font-medium text-[var(--pf-orange)] hover:underline">
-                      Hear more tracks
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!featuredTrack) return
+                        try {
+                          const res = await fetch('/api/checkout', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              items: [{
+                                id: featuredTrack.id,
+                                name: featuredTrack.title,
+                                artist: featuredTrack.artist,
+                                price: featuredTrack.price || 1,
+                                type: 'digital',
+                                quantity: 1,
+                                image: featuredTrack.image,
+                                audioUrl: featuredTrack.audio_url,
+                              }],
+                            }),
+                          })
+                          const data = await res.json()
+                          if (data.url) window.location.href = data.url
+                        } catch (err) {
+                          console.error('Checkout error:', err)
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[var(--pf-orange)] text-white text-sm font-bold hover:bg-[var(--pf-orange-dark)] transition-colors"
+                    >
+                      Buy Track — ${featuredTrack?.price || 1}
+                    </button>
+                    <Link href={`/artist/${featuredArtist.slug}`} className="px-4 py-2 rounded-xl border border-[var(--pf-border)] text-sm font-medium hover:border-[var(--pf-orange)] hover:text-[var(--pf-orange)] transition-colors">
+                      Artist Page
                     </Link>
                   </div>
                 </div>

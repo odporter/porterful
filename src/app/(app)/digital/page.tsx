@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function DigitalPage() {
-  redirect('/digital/digital')
+  redirect('/radio')
 }

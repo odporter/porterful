@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@/lib/supabase'
+import {
+  LIKENESS_REGISTRATION_URL,
+  getLikenessVerificationState,
+  getMonetizationGateMessage,
+} from '@/lib/likeness-verification'
 
 // Sanitize filename to comply with Supabase Storage filename rules
 function sanitizeFilename(name: string): string {
@@ -22,6 +28,32 @@ function sanitizeFilename(name: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check
+    const supabase = createServerClient()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Server not configured' }, { status: 500 })
+    }
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Likeness monetization gate
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single()
+
+    const likenessState = getLikenessVerificationState(profile)
+    if (!likenessState.verified) {
+      return NextResponse.json({
+        error: getMonetizationGateMessage(),
+        code: 'LIKENESS_VERIFICATION_REQUIRED',
+        registrationUrl: LIKENESS_REGISTRATION_URL,
+      }, { status: 403 })
+    }
+
     const formData = await request.formData()
     const file = formData.get('file') as File
     const folder = formData.get('folder') as string || 'audio'

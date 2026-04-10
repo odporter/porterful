@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { TRACKS } from '@/lib/data'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAudio } from '@/lib/audio-context'
 import { Play, Pause, SkipForward, Radio, Heart, ShoppingBag } from 'lucide-react'
+import { getArtistSlugByName } from '@/lib/artists'
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array]
@@ -16,11 +17,22 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled
 }
 
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
 export default function RadioPage() {
-  const { currentTrack, isPlaying, togglePlay, playNext, setQueue, currentIndex, setIsRadio } = useAudio()
-  const [shuffledTracks] = useState(() => shuffleArray(TRACKS))
+  const { currentTrack, isPlaying, togglePlay, playNext, setQueue, currentIndex, setMode } = useAudio()
+  const [shuffledTracks, setShuffledTracks] = useState<typeof TRACKS>([])
 
   useEffect(() => {
+    setShuffledTracks(shuffleArray(TRACKS))
+  }, [])
+
+  useEffect(() => {
+    if (shuffledTracks.length === 0) return
     setQueue(shuffledTracks.map(t => ({
       ...t,
       duration: typeof t.duration === 'string'
@@ -30,11 +42,13 @@ export default function RadioPage() {
   }, [shuffledTracks, setQueue])
 
   useEffect(() => {
-    setIsRadio(true)
-    return () => setIsRadio(false)
-  }, [setIsRadio])
+    setMode('radio')
+    return () => setMode('track')
+  }, [setMode])
 
   const nextTrack = shuffledTracks[(currentIndex + 1) % shuffledTracks.length]
+  const currentArtistHref = currentTrack ? `/artist/${getArtistSlugByName(currentTrack.artist) || 'artists'}` : '/artists'
+  const nextArtistHref = nextTrack ? `/artist/${getArtistSlugByName(nextTrack.artist) || 'artists'}` : '/artists'
 
   return (
     <div className="min-h-screen pt-20 pb-32">
@@ -46,7 +60,7 @@ export default function RadioPage() {
           </div>
           <h1 className="text-3xl font-bold mb-2">Porterful Radio</h1>
           <p className="text-[var(--pf-text-secondary)]">
-            Shuffle through all tracks • Click play to start
+            Shuffle through all tracks · Click play to start
           </p>
         </div>
 
@@ -77,12 +91,12 @@ export default function RadioPage() {
               {currentTrack && (
                 <>
                   <Link
-                    href={`/artists`}
+                    href={currentArtistHref}
                     className="text-white/90 drop-shadow hover:text-[var(--pf-orange)] transition-colors"
                   >
                     {currentTrack.artist}
                   </Link>
-                  <span className="text-white/70"> • {currentTrack.album}</span>
+                  <span className="text-white/70"> · {currentTrack.album}</span>
                 </>
               )}
             </div>
@@ -125,7 +139,7 @@ export default function RadioPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{nextTrack?.title}</p>
                 <Link
-                  href="/artists"
+                  href={nextArtistHref}
                   className="text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors"
                 >
                   {nextTrack?.artist}

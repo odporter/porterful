@@ -70,7 +70,7 @@ export default async function ArtistPage({ params }: PageProps) {
             <section>
               <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-3">About</p>
               <div className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)]">
-                <p className="text-[var(--pf-text-secondary)] leading-relaxed whitespace-pre-line">
+                <p className="text-[var(--pf-text-secondary)] leading-relaxed whitespace-pre-line break-words max-w-full">
                   {artist.bio}
                 </p>
                 {artist.social && (

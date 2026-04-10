@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import '../globals.css'
-import { Providers } from '@/app/providers'
 import { Navbar } from '@/components/Navbar'
-import { GlobalPlayer } from '@/components/GlobalPlayer'
 import { Footer } from '@/components/Footer'
 import { InstallPrompt, IOSInstallInstructions } from '@/components/InstallPrompt'
 import { ArtistModal } from '@/components/ArtistModal'
@@ -95,18 +93,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           strategy="afterInteractive"
         />
         <Script src="/pwa.js" strategy="afterInteractive" />
-        <Providers>
-          <KeyboardShortcuts />
-          <Navbar />
-          <main className="min-h-screen pb-24 pt-16 md:pt-20">
-            {children}
-          </main>
-          <Footer />
-          <ArtistModal />
-          <TrackLockedToast />
-          <InstallPrompt />
-          <IOSInstallInstructions />
-        </Providers>
+        <KeyboardShortcuts />
+        <Navbar />
+        <main className="min-h-screen pb-24 pt-16 md:pt-20">
+          {children}
+        </main>
+        <Footer />
+        <ArtistModal />
+        <TrackLockedToast />
+        <InstallPrompt />
+        <IOSInstallInstructions />
       </body>
     </html>
   )

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { PRODUCTS } from '@/lib/products'
+import {
+  ARTIST_LIVE_LIMITS,
+  LIKENESS_REGISTRATION_URL,
+  getLikenessVerificationState,
+  getMonetizationGateMessage,
+} from '@/lib/likeness-verification'
 
 // Artist margin based on tier
 const ARTIST_MARGINS = {
@@ -77,7 +83,35 @@ export async function POST(request: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single()
+
+    const likenessState = getLikenessVerificationState(profile)
+    if (!likenessState.verified) {
+      return NextResponse.json({
+        error: getMonetizationGateMessage(),
+        code: 'LIKENESS_VERIFICATION_REQUIRED',
+        registrationUrl: LIKENESS_REGISTRATION_URL,
+      }, { status: 403 })
+    }
+
+    const { count: liveProductsCount } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('seller_id', session.user.id)
+      .eq('is_active', true)
+
+    if ((liveProductsCount || 0) >= ARTIST_LIVE_LIMITS.products) {
+      return NextResponse.json({
+        error: `You have reached the live product limit (${ARTIST_LIVE_LIMITS.products}). Archive or swap a product before publishing a new one.`,
+        code: 'LIVE_PRODUCT_LIMIT_REACHED',
+      }, { status: 400 })
+    }
+
     const body = await request.json()
     const { 
       name, description, category, price, cost = 0, images = [], 

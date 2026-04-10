@@ -26,8 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ margin: 0, padding: 0, background: 'var(--pf-bg)', overflow: 'visible' }}>
         <Providers>
           {children}
+          <GlobalPlayer />
         </Providers>
-        <GlobalPlayer />
       </body>
     </html>
   )

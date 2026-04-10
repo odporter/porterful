@@ -2,6 +2,11 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  LIKENESS_REGISTRATION_URL,
+  getLikenessVerificationState,
+  getMonetizationGateMessage,
+} from '@/lib/likeness-verification'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -49,6 +54,23 @@ export async function POST(request: NextRequest) {
     // user_id now comes from the SERVER session, not the client
     const userId = authenticatedUser.id
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    if (action !== 'get') {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      const likenessState = getLikenessVerificationState(profile)
+      if (!likenessState.verified) {
+        return NextResponse.json({
+          error: getMonetizationGateMessage(),
+          code: 'LIKENESS_VERIFICATION_REQUIRED',
+          registrationUrl: LIKENESS_REGISTRATION_URL,
+        }, { status: 403 })
+      }
+    }
     
     if (action === 'reset') {
       const { error } = await supabase

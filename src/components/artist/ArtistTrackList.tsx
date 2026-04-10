@@ -16,7 +16,7 @@ function formatPlays(n: number): string {
 }
 
 export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
-  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
+  const { currentTrack, isPlaying, playTrack, togglePlay, setMode } = useAudio()
   const router = useRouter()
   const [purchasing, setPurchasing] = useState<string | null>(null)
 
@@ -24,9 +24,10 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
     if (currentTrack?.id === track.id) {
       togglePlay()
     } else {
+      setMode('artist')
       playTrack(track)
     }
-  }, [currentTrack, playTrack, togglePlay])
+  }, [currentTrack, playTrack, togglePlay, setMode])
 
   const handleBuy = useCallback(async (e: React.MouseEvent, track: Track) => {
     e.stopPropagation()
@@ -78,12 +79,12 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
               <div
                 key={track.id}
                 onClick={() => handlePlay(track)}
-                className={`group flex items-center gap-4 px-5 py-4 cursor-pointer transition-all hover:bg-[var(--pf-bg)] border border-transparent hover:border-[var(--pf-border-subtle)] rounded-lg mx-1 ${
+                className={`group flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 cursor-pointer transition-all hover:bg-[var(--pf-bg)] border border-transparent hover:border-[var(--pf-border-subtle)] rounded-lg mx-1 overflow-hidden ${
                   isActive ? 'bg-[var(--pf-orange)]/5' : ''
                 }`}
               >
                 {/* Track number / play indicator */}
-                <div className="w-8 flex items-center justify-center">
+                <div className="w-7 sm:w-8 flex items-center justify-center flex-shrink-0">
                   {isActive && isPlaying ? (
                     <div className="flex items-center gap-0.5" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
                       <div className="w-1 h-3.5 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -98,15 +99,15 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
                 </div>
 
                 {/* Track info */}
-                <div className="flex-1 min-w-0">
-                  <p className={`font-medium truncate ${isActive ? 'text-[var(--pf-orange)]' : ''}`}>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p className={`font-medium text-sm sm:text-base truncate ${isActive ? 'text-[var(--pf-orange)]' : ''}`}>
                     {track.title}
                   </p>
-                  <p className="text-sm text-[var(--pf-text-muted)] truncate">{track.album}</p>
+                  <p className="text-xs sm:text-sm text-[var(--pf-text-muted)] truncate">{track.album}</p>
                 </div>
 
                 {/* Right side */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                   <span className="text-sm text-[var(--pf-text-muted)] font-mono w-12 text-right">
                     {track.duration}
                   </span>
@@ -116,14 +117,11 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
                     onClick={(e) => handleBuy(e, track)}
                     disabled={purchasing === track.id}
                     title={purchasing === track.id ? 'Processing purchase...' : `Buy "${track.title}" — $${track.price || 1}`}
-                    aria-label={purchasing === track.id ? 'Processing purchase' : `Buy "${track.title}" for $${track.price || 1}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+                    aria-label={purchasing === track.id ? 'Processing purchase' : `Buy for $${track.price || 1}`}
+                    className="flex items-center gap-1 px-2 sm:px-3 py-1.5 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors flex-shrink-0"
                   >
                     {purchasing === track.id ? (
-                      <>
-                        <Loader2 size={12} className="animate-spin" />
-                        <span>Buying...</span>
-                      </>
+                      <Loader2 size={11} className="animate-spin" />
                     ) : (
                       <span>${track.price || 1}</span>
                     )}
@@ -132,15 +130,15 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
                   {/* Play button */}
                   <button
                     onClick={(e) => { e.stopPropagation(); handlePlay(track); }}
-                    title={currentTrack?.id === track.id && isPlaying ? `Pause "${track.title}"` : `Play "${track.title}" — then explore merch below`}
-                    aria-label={currentTrack?.id === track.id && isPlaying ? `Pause "${track.title}" by ${track.artist}` : `Play "${track.title}" by ${track.artist}`}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                    title={currentTrack?.id === track.id && isPlaying ? `Pause "${track.title}"` : `Play "${track.title}"`}
+                    aria-label={currentTrack?.id === track.id && isPlaying ? `Pause` : `Play`}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                       isActive
                         ? 'bg-[var(--pf-orange)] text-white'
-                        : 'bg-[var(--pf-bg)] text-[var(--pf-text-muted)] group-hover:bg-[var(--pf-orange)] group-hover:text-white opacity-0 group-hover:opacity-100'
+                        : 'bg-[var(--pf-bg)] border border-[var(--pf-border)] text-[var(--pf-text-muted)] hover:bg-[var(--pf-orange)] hover:text-white hover:border-[var(--pf-orange)]'
                     }`}
                   >
-                    {isActive && isPlaying ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
+                    {isActive && isPlaying ? <Pause size={13} /> : <Play size={13} className="ml-0.5" />}
                   </button>
                 </div>
               </div>

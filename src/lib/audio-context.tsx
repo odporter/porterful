@@ -21,6 +21,8 @@ interface AudioContext {
   volume: number;
   progress: number;
   duration: number;
+  mode: 'track' | 'radio' | 'artist';
+  setMode: (mode: 'track' | 'radio' | 'artist') => void;
   playTrack: (track: Track) => void;
   loadTrack: (track: Track) => void;
   togglePlay: () => void;
@@ -32,8 +34,6 @@ interface AudioContext {
   queue: Track[];
   setQueue: (tracks: Track[]) => void;
   currentIndex: number;
-  isRadio: boolean;
-  setIsRadio: (v: boolean) => void;
   purchasedTracks: Set<string>;
   addPurchased: (trackId: string) => void;
   hasPurchased: (trackId: string) => boolean;
@@ -49,7 +49,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [queue, setQueue] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  const [isRadio, setIsRadio] = useState(false);
+  const [mode, setMode] = useState<'track' | 'radio' | 'artist'>('track');
   const [purchasedTracks, setPurchasedTracks] = useState<Set<string>>(new Set());
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -153,7 +153,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       const startPreviewTimer = (trackDuration: number) => {
         clearPreviewTimer();
         // Radio mode: stop after 60 seconds and skip to next
-        if (isRadio) {
+        if (mode === 'radio') {
           previewTimer = setTimeout(() => {
             const currentQueue = queueRef.current;
             const currentIdx = currentIndexRef.current;
@@ -209,7 +209,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         audioRef.current = null;
       };
     }
-  }, [isRadio]);
+  }, [mode]);
 
   // Update volume when it changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -395,8 +395,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       queue,
       setQueue,
       currentIndex,
-      isRadio,
-      setIsRadio,
+      mode,
+      setMode,
       purchasedTracks,
       addPurchased,
       hasPurchased,
@@ -430,6 +430,8 @@ export function useAudio() {
       volume: 1,
       progress: 0,
       duration: 0,
+      mode: 'track' as const,
+      setMode: () => {},
       playTrack: () => {},
       loadTrack: () => {},
       togglePlay: () => {},
@@ -441,13 +443,6 @@ export function useAudio() {
       queue: [],
       setQueue: () => {},
       currentIndex: 0,
-      isRadio: false,
-      setIsRadio: () => {},
-      addToQueue: () => {},
-      clearQueue: () => {},
-      playAlbum: () => {},
-      albums: {},
-      currentAlbum: null,
       purchasedTracks: new Set(),
       addPurchased: () => {},
       hasPurchased: () => false,

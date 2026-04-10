@@ -71,16 +71,25 @@ const SYSTEM_COUNT = SYSTEMS.length;
 const NUM_STARS = 80;
 
 function StarField() {
-  const stars = useMemo(() =>
-    Array.from({ length: NUM_STARS }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 2 + 0.5,
-      duration: Math.random() * 4 + 3,
-      delay: Math.random() * 5,
-      opacity: Math.random() * 0.6 + 0.2,
-    })), []);
+  // Use state + effect to avoid SSR/hydration mismatch from Math.random()
+  const [stars, setStars] = useState<Array<{
+    id: number; x: number; y: number; size: number;
+    duration: number; delay: number; opacity: number;
+  }>>([])
+
+  useEffect(() => {
+    setStars(
+      Array.from({ length: NUM_STARS }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 2 + 0.5,
+        duration: Math.random() * 4 + 3,
+        delay: Math.random() * 5,
+        opacity: Math.random() * 0.6 + 0.2,
+      }))
+    )
+  }, [])
 
   return (
     <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>

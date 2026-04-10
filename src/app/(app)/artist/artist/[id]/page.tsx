@@ -46,7 +46,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
   useEffect(() => {
     async function loadArtistData() {
       try {
-        const res = await fetch(`/api/media/${params.id}`);
+        const res = await fetch(`/api/artists/${params.id}`);
         const data = await res.json();
         if (data.profile) {
           // Clean up bad DB data — prefer staticArtist data when DB is incomplete/wrong

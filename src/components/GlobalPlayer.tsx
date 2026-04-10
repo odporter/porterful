@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { 
+import {
   Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
   ChevronUp, ChevronDown, X, Maximize2
 } from 'lucide-react'
 import { useAudio } from '@/lib/audio-context'
+import { getArtistSlugByName } from '@/lib/artists'
 
 function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60)
@@ -16,7 +17,7 @@ function formatTime(seconds: number) {
 }
 
 export function GlobalPlayer() {
-  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setVolume, seek, progress, duration } = useAudio()
+  const { currentTrack, isPlaying, togglePlay, playNext, playPrev, setVolume, seek, progress, duration, mode } = useAudio()
   const [volume, setVolumeState] = useState(80)
   const [isMuted, setIsMuted] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -46,6 +47,9 @@ export function GlobalPlayer() {
 
   if (!currentTrack) return null
 
+  const artistSlug = getArtistSlugByName(currentTrack.artist) || 'artists'
+  const artistHref = `/artist/${artistSlug}`
+
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0
 
   return (
@@ -70,11 +74,20 @@ export function GlobalPlayer() {
 
             {/* Track Info */}
             <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(true)}>
-              <p className={`font-medium truncate ${isPlaying ? 'text-[var(--pf-orange)]' : ''}`}>
-                {currentTrack.title}
-              </p>
-              <Link 
-                href={`/artist/${currentTrack.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
+              <div className="flex items-center gap-2">
+                <p className={`font-medium truncate ${isPlaying ? 'text-[var(--pf-orange)]' : ''}`}>
+                  {currentTrack.title}
+                </p>
+                {mode !== 'track' && (
+                  <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${
+                    mode === 'radio' ? 'bg-red-500/20 text-red-400' : 'bg-[var(--pf-orange)]/20 text-[var(--pf-orange)]'
+                  }`}>
+                    {mode}
+                  </span>
+                )}
+              </div>
+              <Link
+                href={artistHref}
                 className="text-sm text-[var(--pf-text-muted)] truncate hover:text-[var(--pf-orange)] transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -187,7 +200,7 @@ export function GlobalPlayer() {
           <div className="px-8 text-center">
             <h2 className="text-2xl font-bold truncate">{currentTrack.title}</h2>
             <Link 
-              href={`/artist/${currentTrack.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
+              href={artistHref}
               className="text-lg text-[var(--pf-text-secondary)] truncate hover:text-[var(--pf-orange)] transition-colors block"
             >
               {currentTrack.artist}
@@ -299,7 +312,7 @@ export function GlobalPlayer() {
               <div className="flex-1 min-w-0">
                 <h2 className="text-2xl font-bold text-white truncate">{currentTrack.title}</h2>
                 <Link 
-                  href={`/artist/${currentTrack.artist?.toLowerCase().replace(/\s+/g, '-') || 'unknown'}`}
+                  href={artistHref}
                   className="text-lg text-white/80 truncate hover:text-[var(--pf-orange)] transition-colors block"
                   onClick={() => setShowVisualizer(false)}
                 >

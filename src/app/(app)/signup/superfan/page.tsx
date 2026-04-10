@@ -30,6 +30,7 @@ export default function SuperfanSignupPage() {
     agreeTerms: false,
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleArtistToggle = (artistId: string) => {
     setFormData(prev => ({
@@ -42,10 +43,47 @@ export default function SuperfanSignupPage() {
 
   const handleSubmit = async () => {
     setLoading(true)
-    // TODO: Implement Supabase auth
-    setTimeout(() => {
+    setError(null)
+    try {
+      const signupRes = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          role: 'supporter',
+        }),
+      })
+
+      const signupData = await signupRes.json()
+      if (!signupRes.ok) {
+        setError(signupData.error || 'Could not create your superfan account.')
+        setLoading(false)
+        return
+      }
+
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
+
+      const loginData = await loginRes.json()
+      if (!loginRes.ok) {
+        setError(loginData.error || 'Account created, but sign-in was not completed. Please sign in manually.')
+        setLoading(false)
+        return
+      }
+
       router.push('/dashboard')
-    }, 1500)
+    } catch (err: any) {
+      setError(err.message || 'Connection error. Please check your internet and try again.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -98,6 +136,11 @@ export default function SuperfanSignupPage() {
 
         {/* Signup Form */}
         <div className="pf-card p-8">
+          {error && (
+            <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+              {error}
+            </div>
+          )}
           <div className="flex items-center justify-center gap-4 mb-8">
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center">
@@ -195,6 +238,11 @@ export default function SuperfanSignupPage() {
           {/* Step 3: Terms */}
           {step === 3 && (
             <div className="space-y-6">
+              {error && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                  {error}
+                </div>
+              )}
               <div className="text-center mb-4">
                 <h3 className="text-lg font-semibold">Almost there!</h3>
                 <p className="text-sm text-[var(--pf-text-secondary)]">Your referral code will be generated</p>
@@ -210,7 +258,7 @@ export default function SuperfanSignupPage() {
                   <div className="text-sm">
                     <p className="font-medium">I agree to the Superfan Terms</p>
                     <p className="text-[var(--pf-text-muted)]">
-                      I understand that I earn commissions on referrals and will promote artists authentically.
+                      I understand that referral earnings are tracked inside my Porterful account as activity is recorded.
                     </p>
                   </div>
                 </label>

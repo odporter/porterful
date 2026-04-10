@@ -136,7 +136,7 @@ export const TRACKS = [
   { id: 'nikee-02', title: 'Harder', artist: 'Nikee Turbo', album: 'Singles', duration: '3:20', price: 1, plays: 0, image: '/artist-images/nikee-turbo/avatar.jpg', audio_url: '/artist-images/nikee-turbo/Harder.mp3' },
   { id: 'nikee-03', title: 'Hide The Pain', artist: 'Nikee Turbo', album: 'Singles', duration: '2:55', price: 1, plays: 0, image: '/artist-images/nikee-turbo/avatar.jpg', audio_url: '/artist-images/nikee-turbo/Hide The pain (Unreleased Version).mp3' },
   // ATM TRAP TRACKS
-  { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/audio/Thought-We-Was-Bruddaz.m4a', featured: true },
+  { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/audio/Thought-We-Was-Bruddaz-mobile.m4a', featured: true },
   { id: 'atm-02', title: 'Coming Home', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/audio/Coming-Home.mp3' },
   { id: 'atm-03', title: 'Heart of a Lion', artist: 'ATM Trap', album: 'Singles', duration: '3:15', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/audio/Heart-of-a-Lion.mp3' },
   { id: 'atm-04', title: 'Wacked Out Master', artist: 'ATM Trap', album: 'Singles', duration: '2:58', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/audio/Wacked-Out-Master.mp3' },

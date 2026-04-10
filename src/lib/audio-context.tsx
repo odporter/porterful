@@ -187,12 +187,26 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         if (!audioRef.current) return;
         const current = currentTrackRef.current;
         if (!current || !current.audio_url) return;
+
+        // Resolve current audio_url to an absolute URL for comparison
+        const expectedAudioUrl = current.audio_url.startsWith('http')
+          ? current.audio_url
+          : `${window.location.origin}${current.audio_url}`;
+
+        // Normalize: when browser sets src from a relative URL, it becomes absolute
+        // We need to compare after normalizing both sides
+        const currentSrc = audioRef.current.src;
+        const currentSrcNormalized = currentSrc.startsWith('http')
+          ? currentSrc
+          : `${window.location.origin}${currentSrc}`;
+
         // Only play if src matches current track (guards against stale canplay events)
-        if (audioRef.current.src !== window.location.origin + current.audio_url &&
-            audioRef.current.src !== current.audio_url &&
-            !audioRef.current.src.endsWith(current.audio_url)) {
-          return;
-        }
+        const srcMatches = currentSrcNormalized === expectedAudioUrl
+          || currentSrcNormalized.endsWith(current.audio_url)
+          || current.audio_url.endsWith(currentSrcNormalized.split('/').pop() || '');
+
+        if (!srcMatches) return;
+
         clearPreviewTimer();
         audioRef.current.play().catch(() => {});
         startPreviewTimer(audioRef.current.duration);

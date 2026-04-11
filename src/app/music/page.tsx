@@ -105,7 +105,8 @@ export default function MusicPage() {
   const [albumFilter, setAlbumFilter] = useState<string>('all');
   const [selectedAlbum, setSelectedAlbum] = useState<string | null>(null);
 
-  // Hero auto-advance
+  // Hero auto-advance — only runs when no track is loaded
+  // Clears on unmount or when currentTrack becomes available
   useEffect(() => {
     if (!currentTrack) {
       heroIntervalRef.current = setInterval(() => {
@@ -113,16 +114,20 @@ export default function MusicPage() {
       }, 12000);
     }
     return () => {
-      if (heroIntervalRef.current) clearInterval(heroIntervalRef.current);
+      if (heroIntervalRef.current) {
+        clearInterval(heroIntervalRef.current);
+        heroIntervalRef.current = null;
+      }
     };
   }, [currentTrack]);
 
-  // When hero track changes, play it
+  // When hero track changes, play it only if audio context has no current track
   useEffect(() => {
     if (!currentTrack && TOP_TRACKS[heroTrackIndex]) {
       playTrack(TOP_TRACKS[heroTrackIndex] as unknown as Track);
     }
   }, [heroTrackIndex, currentTrack, playTrack]);
+
 
   const handlePlayTrack = useCallback((track: Track) => {
     if (currentTrack?.id === track.id) {

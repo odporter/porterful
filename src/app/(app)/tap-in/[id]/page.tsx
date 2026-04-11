@@ -113,11 +113,34 @@ export default function TapInProductPage() {
   }
 
   if (!product) {
+    // Special-case: gune → artist page redirect
+    // All other unknown IDs show branded fallback
+    if (productId === 'gune') {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/artist/gune'
+      }
+      return (
+        <div className="min-h-screen pt-24 pb-24 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-[var(--pf-text-muted)]">Redirecting to Gune artist page…</p>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="min-h-screen pt-24 pb-24 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-md px-6">
           <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <Link href="/tap-in" className="pf-btn pf-btn-primary">Back to Tap In</Link>
+          <p className="text-[var(--pf-text-secondary)] mb-6">
+            This Tap In product link is invalid or no longer active.
+          </p>
+          <Link
+            href="/tap-in"
+            className="px-6 py-3 bg-[var(--pf-orange)] text-white rounded-lg font-medium hover:bg-[var(--pf-orange-dark)] transition-colors inline-block"
+          >
+            View All Tap In Products
+          </Link>
         </div>
       </div>
     )

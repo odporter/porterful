@@ -8,13 +8,26 @@ const urlsToCache = [
   '/logo.svg',
 ];
 
-// Install event
+// Install event — resilient to individual URL failures
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
+      .then(async (cache) => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // Add URLs one by one so one failure doesn't break the whole install
+        const failures = [];
+        for (const url of urlsToCache) {
+          try {
+            await cache.add(url);
+          } catch (err) {
+            // Non-200 and redirects are silently skipped
+            failures.push(url);
+          }
+        }
+        if (failures.length > 0) {
+          console.log('SW: Some URLs could not be cached (may be redirects or unavailable):', failures.length);
+        }
+        return;
       })
   );
 });

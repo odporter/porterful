@@ -23,6 +23,7 @@ interface CartContextType {
   subtotal: number;
   artistCut: number;
   itemCount: number;
+  mounted: boolean;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -30,6 +31,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -42,6 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     }
     setIsLoaded(true);
+    setMounted(true);
   }, []);
 
   // Save to localStorage on change
@@ -98,6 +101,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal,
       artistCut,
       itemCount,
+      mounted,
     }}>
       {children}
     </CartContext.Provider>

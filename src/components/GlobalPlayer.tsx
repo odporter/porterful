@@ -22,7 +22,16 @@ export function GlobalPlayer() {
   const [isMuted, setIsMuted] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [showVisualizer, setShowVisualizer] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const progressRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Don't render anything until mounted (audio context differs server vs client)
+  if (!mounted) return null
+  if (!currentTrack) return null
 
   // Volume control
   useEffect(() => {

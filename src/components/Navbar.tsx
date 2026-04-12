@@ -13,7 +13,12 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -85,7 +90,7 @@ export function Navbar() {
                 <ShoppingCart size={20} />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-[var(--pf-orange)] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    {cartCount > 9 ? '9+' : cartCount}
+                    {mounted ? (cartCount > 9 ? '9+' : cartCount) : '0'}
                   </span>
                 )}
               </Link>

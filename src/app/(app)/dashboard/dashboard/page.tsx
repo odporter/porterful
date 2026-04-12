@@ -6,7 +6,7 @@ import { useSupabase } from '@/app/providers'
 import { useWallet } from '@/lib/wallet-context'
 import { 
   Package, Users, DollarSign, TrendingUp, Plus, Settings, 
-  Store, Music, BarChart3, Upload, ChevronRight, Gift, Heart
+  Store, Music, BarChart3, Upload, ChevronRight, Gift, Heart, ShieldCheck
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -383,6 +383,23 @@ export default function DashboardPage() {
         </div>
 
         {/* Keep the rest of the existing dashboard content below */}
+
+
+        {/* LIKENESS VERIFICATION BANNER */}
+        {!profile?.likeness_verified && (
+          <div className="mb-6 p-4 rounded-2xl bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <ShieldCheck size={24} className="text-[var(--pf-orange)] shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Verify your Likeness to unlock payouts</p>
+                <p className="text-xs text-[var(--pf-text-muted)]">Required to sell products or receive earnings on Porterful.</p>
+              </div>
+            </div>
+            <Link href="/dashboard/likeness" className="px-4 py-2 bg-[var(--pf-orange)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--pf-orange-dark)] transition-colors shrink-0">
+              Verify Likeness →
+            </Link>
+          </div>
+        )}
 
         {/* Share Your Page Prompt */}
         {profile?.artist_slug && (

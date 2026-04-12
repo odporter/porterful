@@ -5,14 +5,12 @@ export async function GET() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
   try {
-    const url = new URL(`${supabaseUrl}/auth/v1/admin/users`)
-    
-    const response = await fetch(url.toString(), {
+    // Try with apikey ONLY (service role key in header)
+    // Supabase GoTrue service role auth uses apikey header
+    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${serviceKey}`,
         'apikey': serviceKey,
-        'Content-Type': 'application/json',
       },
     })
 
@@ -20,16 +18,12 @@ export async function GET() {
     const text = await response.text()
     
     return NextResponse.json({
-      fetchStatus: status,
-      responseLength: text.length,
-      canParse: !!JSON.parse(text).users,
-      userCount: JSON.parse(text).users?.length || 0,
-      error: null,
+      status,
+      text: text.substring(0, 300),
     })
   } catch (err: any) {
     return NextResponse.json({
       error: err.message,
-      stack: err.stack?.substring(0, 300),
     }, { status: 500 })
   }
 }

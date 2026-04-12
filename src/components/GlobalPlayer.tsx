@@ -29,22 +29,24 @@ export function GlobalPlayer() {
     setMounted(true)
   }, [])
 
-  // Don't render anything until mounted (audio context differs server vs client)
-  if (!mounted) return null
-  if (!currentTrack) return null
-
-  // Volume control
+  // Volume control — guard with mounted check (audio context differs server vs client)
   useEffect(() => {
+    if (!mounted) return
     setVolume(volume)
-  }, [volume, setVolume])
+  }, [volume, setVolume, mounted])
 
   useEffect(() => {
+    if (!mounted) return
     if (isMuted) {
       setVolume(0)
     } else {
       setVolume(volume)
     }
-  }, [isMuted, volume, setVolume])
+  }, [isMuted, volume, setVolume, mounted])
+
+  // Don't render player shell until mounted
+  if (!mounted) return null
+  if (!currentTrack) return null
 
   // Seek on progress bar click
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -18,12 +18,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" style={{ background: '#0a0a0a' }}>
+    <html lang="en" className="dark" suppressHydrationWarning style={{ background: '#0a0a0a' }}>
       <head>
         <meta name="theme-color" content="#0a0a0a" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg?v=2" />
       </head>
-      <body style={{ margin: 0, padding: 0, background: 'var(--pf-bg)', overflow: 'visible' }}>
+      <body suppressHydrationWarning style={{ margin: 0, padding: 0, background: 'var(--pf-bg)', overflow: 'visible' }}>
         <Providers>
           {children}
           <GlobalPlayer />

@@ -71,44 +71,27 @@ const jsonLd = {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="icon" type="image/svg+xml" href="/icon.svg?v=2" />
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Porterful" />
-        <meta name="application-name" content="Porterful" />
-        <meta name="msapplication-TileColor" content="#ff6b00" />
-        <meta name="msapplication-config" content="/browserconfig.xml" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ff6b00" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#ff6b00" />
-      </head>
-      <body className="antialiased">
-        <Script
-          id="organization-jsonld"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          strategy="afterInteractive"
-        />
-        <Script src="/pwa.js" strategy="afterInteractive" />
-        <KeyboardShortcuts />
-        <Navbar />
-        <main className="min-h-screen pb-24 pt-16 md:pt-20">
-          {children}
-        </main>
-        <Footer />
-        <ArtistModal />
-        <TrackLockedToast />
-        <AudioErrorBoundary>
-          <GlobalPlayer />
-        </AudioErrorBoundary>
-        <InstallPrompt />
-        <IOSInstallInstructions />
-      </body>
-    </html>
+    <>
+      <Script
+        id="organization-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        strategy="afterInteractive"
+      />
+      <Script src="/pwa.js" strategy="afterInteractive" />
+      <KeyboardShortcuts />
+      <Navbar />
+      <main className="min-h-screen pb-24 pt-16 md:pt-20">
+        {children}
+      </main>
+      <Footer />
+      <ArtistModal />
+      <TrackLockedToast />
+      <AudioErrorBoundary>
+        <GlobalPlayer />
+      </AudioErrorBoundary>
+      <InstallPrompt />
+      <IOSInstallInstructions />
+    </>
   )
 }

@@ -60,11 +60,19 @@ export async function POST(req: Request) {
 
     const registration = registrations[0]
 
-    // Optional: verify email matches (if registration has email)
-    // Uncomment if you want strict email matching:
-    // if (registration.email && registration.email.toLowerCase() !== userEmail?.toLowerCase()) {
-    //   return NextResponse.json({ verified: false, message: 'That Likeness ID belongs to a different account.' }, { status: 403 })
-    // }
+    // SECURITY: Verify the Likeness ID belongs to THIS user.
+    // The registration email must match the authenticated user's email.
+    // This prevents User A from claiming User B's Likeness ID.
+    if (!registration.email) {
+      return NextResponse.json({ verified: false, message: 'Likeness record is incomplete. Please re-register at likenessverified.com.' }, { status: 400 })
+    }
+
+    if (registration.email.toLowerCase() !== userEmail?.toLowerCase()) {
+      return NextResponse.json(
+        { verified: false, message: 'That Likeness ID belongs to a different email address. Link your own Likeness ID that matches your Porterful account email.' },
+        { status: 403 }
+      )
+    }
 
     // Update Porterful profile with the Likeness linkage
     const { error } = await supabase

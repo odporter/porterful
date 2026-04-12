@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// Direct admin password reset — use service role to bypass RLS
+// Direct admin password reset — use Supabase REST API directly
 // POST /api/admin/reset-password
 // Body: { email: string, newPassword: string }
 
 export async function POST(request: Request) {
   try {
+    // Simple auth check for admin route
+    const authHeader = request.headers.get('authorization')
+    const adminKey = process.env.ADMIN_API_SECRET
+    if (!adminKey || authHeader !== `Bearer ${adminKey}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { email, newPassword } = await request.json()
 
     if (!email || !newPassword) {
@@ -17,35 +24,46 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
     }
 
-    // Use service role key for admin operations
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-    // Find user by email
-    const { data: users, error: listError } = await supabase.auth.admin.listUsers()
+    // Use fetch directly against Supabase Admin REST API
+    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${serviceKey}`,
+        'apikey': serviceKey,
+      },
+    })
 
-    if (listError) {
-      console.error('List users error:', listError)
-      return NextResponse.json({ error: listError.message }, { status: 500 })
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error('Admin users fetch error:', response.status, errText)
+      return NextResponse.json({ error: 'Admin API error: ' + response.status }, { status: 500 })
     }
 
-    const user = users?.users.find(u => u.email === email)
+    const usersData = await response.json()
+    const user = usersData.users?.find((u: any) => u.email === email)
 
     if (!user) {
       return NextResponse.json({ error: 'No user found with that email' }, { status: 404 })
     }
 
-    // Update password — use updateUserById for Supabase v2
-    const { error: updateError } = await supabase.auth.admin.updateUserById(
-      user.id,
-      { password: newPassword }
-    )
+    // Update password via admin API
+    const updateResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users/${user.id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${serviceKey}`,
+        'apikey': serviceKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: newPassword }),
+    })
 
-    if (updateError) {
-      console.error('Password update error:', updateError)
-      return NextResponse.json({ error: updateError.message }, { status: 500 })
+    if (!updateResponse.ok) {
+      const errText = await updateResponse.text()
+      console.error('Password update error:', updateResponse.status, errText)
+      return NextResponse.json({ error: 'Update failed: ' + updateResponse.status }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, message: 'Password updated for ' + email })

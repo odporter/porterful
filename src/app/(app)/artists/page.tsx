@@ -16,7 +16,10 @@ interface ArtistProfile {
   genre?: string
   location?: string
   verified?: boolean
+  // likeness_verified: DB-backed boolean — only true when DB columns exist AND profile has it set
   likeness_verified?: boolean
+  // data_source: 'db' = from Supabase, 'static' = from PLATFORM_ARTISTS fallback
+  data_source?: 'db' | 'static'
   tracks?: number
   status?: string
   youtube_url?: string
@@ -24,7 +27,11 @@ interface ArtistProfile {
   twitter_url?: string
 }
 
-// Hardcoded artists with full profiles (for artists with complete info)
+// STATIC FALLBACK DATA — transitional only, NOT the durable truth source.
+// These exist to provide artist content when DB queries fail.
+// IMPORTANT: likeness_verified here is NOT DB-backed verification.
+// When DB columns exist, O D Porter's profile must be updated in Supabase directly.
+// Static likeness_verified flags are placeholders until real DB records exist.
 const PLATFORM_ARTISTS: ArtistProfile[] = [
   {
     id: 'od-porter',
@@ -36,6 +43,8 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     genre: 'Hip-Hop / R&B / Soul',
     location: 'St. Louis, MO',
     verified: true,
+    likeness_verified: true, // NOTE: placeholder — needs DB confirmation when columns exist
+    data_source: 'static',
     tracks: 21,
     status: 'live',
     youtube_url: 'https://youtube.com/@odporter',
@@ -52,6 +61,8 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     genre: 'Hip-Hop',
     location: 'St. Louis, MO',
     verified: true,
+    likeness_verified: false, // no account linked — James Chapple needs auth account first
+    data_source: 'static',
     tracks: 3,
     status: 'live',
   },
@@ -65,6 +76,8 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     genre: 'Hip-Hop / Trap',
     location: 'St. Louis, MO',
     verified: true,
+    likeness_verified: false, // no account linked — Douglas Robert needs auth account first
+    data_source: 'static',
     tracks: 3,
     status: 'live',
   },
@@ -78,6 +91,8 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     genre: 'Hip-Hop',
     location: 'St. Louis, MO',
     verified: true,
+    likeness_verified: false, // no account linked — needs auth account first
+    data_source: 'static',
     tracks: 0,
     status: 'live',
   },
@@ -91,6 +106,8 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     genre: 'Rock / Alternative',
     location: 'St. Louis, MO',
     verified: true,
+    likeness_verified: false, // no account linked
+    data_source: 'static',
     tracks: 3,
     status: 'live',
   },
@@ -99,6 +116,7 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
 export default function ArtistsPage() {
   const [dbArtists, setDbArtists] = useState<ArtistProfile[]>([])
   const [loading, setLoading] = useState(true)
+  const [dbColumnsExist, setDbColumnsExist] = useState(false)
 
   // Fetch artists from database
   useEffect(() => {
@@ -108,6 +126,10 @@ export default function ArtistsPage() {
         if (res.ok) {
           const data = await res.json()
           setDbArtists(data.artists || [])
+          // Check if DB returned likeness_verified field (indicates columns exist)
+          if (data.artists && data.artists.length > 0) {
+            setDbColumnsExist('likeness_verified' in data.artists[0])
+          }
         }
       } catch (e) {
         console.error('Failed to fetch artists:', e)
@@ -140,6 +162,8 @@ export default function ArtistsPage() {
         genre: dbArtist.genre || 'Coming Soon',
         location: dbArtist.location || 'TBA',
         verified: dbArtist.verified || false,
+        likeness_verified: dbArtist.likeness_verified || false,
+        data_source: 'db',
         tracks: dbArtist.tracks || 0,
         status: 'coming-soon',
       })
@@ -172,6 +196,15 @@ export default function ArtistsPage() {
           </div>
         </div>
       </section>
+
+      {/* Data source indicator — dev/transition only */}
+      {!dbColumnsExist && !loading && (
+        <div className="pf-container py-2">
+          <p className="text-xs text-[var(--pf-text-muted)]">
+            Artist verification display is transitional — DB-backed verification pending migration
+          </p>
+        </div>
+      )}
 
       {/* Live Artists */}
       {liveArtists.length > 0 && (
@@ -257,10 +290,19 @@ export default function ArtistsPage() {
   )
 }
 
+// ArtistCard — verified mark uses data_source to determine display authority
 function ArtistCard({ artist, isComingSoon = false }: { artist: any; isComingSoon?: boolean }) {
   const initials = artist.full_name
     ? artist.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : (artist.username || 'AR').slice(0, 2).toUpperCase()
+
+  // Badge display: only show if likeness_verified is true AND data_source is 'db'
+  // OR if static with explicit true (transitional — only O D Porter should qualify)
+  // Real production: badge should only come from DB-backed truth
+  const showLikenessBadge = artist.likeness_verified === true && (
+    artist.data_source === 'db' || 
+    (artist.data_source === 'static' && artist.email === 'iamodmusic@gmail.com')
+  )
 
   return (
     <>
@@ -285,7 +327,7 @@ function ArtistCard({ artist, isComingSoon = false }: { artist: any; isComingSoo
                 ✓
               </span>
             )}
-            {artist.likeness_verified && (
+            {showLikenessBadge && (
               <LikenessVerifiedBadge size={16} />
             )}
           </div>

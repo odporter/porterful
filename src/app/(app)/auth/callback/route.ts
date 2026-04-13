@@ -25,12 +25,18 @@ export async function GET(request: Request) {
           return cookieStore.getAll()
         },
         setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, { ...options, path: '/' })
-            })
-          } catch (err) {
-            console.error('[Auth Callback] Cookie set error:', err)
+          for (const { name, value, options } of cookiesToSet) {
+            try {
+              cookieStore.set(name, value, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: options?.maxAge,
+              })
+            } catch (err) {
+              console.error('[Auth Callback] Cookie set failed:', name, err)
+            }
           }
         },
       },
@@ -40,23 +46,13 @@ export async function GET(request: Request) {
   if (code) {
     const { data: { user, session }, error } = await supabase.auth.exchangeCodeForSession(code)
 
-    console.log('[Auth Callback] Exchange result:', {
-      hasUser: !!user,
-      hasSession: !!session,
-      sessionToken: session?.access_token ? 'present' : 'missing',
-      error: error?.message,
-    })
-
     if (error || !session) {
-      console.error('[Auth Callback] Session exchange error:', error?.message)
+      console.error('[Auth Callback] Exchange failed:', error?.message)
       return NextResponse.redirect(new URL('/login?error=exchange_failed', requestUrl.origin))
     }
 
-    const cookiesNow = cookieStore.getAll()
-    console.log('[Auth Callback] Cookies after exchange:', cookiesNow.map(c => c.name).join(', '))
-
-    const redirectUrl = new URL(next, requestUrl.origin)
-    return NextResponse.redirect(redirectUrl)
+    // Success — redirect to dashboard
+    return NextResponse.redirect(new URL(next, requestUrl.origin))
   }
 
   if (type === 'recovery' && token && email) {
@@ -67,12 +63,10 @@ export async function GET(request: Request) {
     })
 
     if (error || !session) {
-      console.error('[Auth Callback] Recovery error:', error?.message)
       return NextResponse.redirect(new URL('/login?error=recovery_failed', requestUrl.origin))
     }
 
-    const redirectUrl = new URL(next, requestUrl.origin)
-    return NextResponse.redirect(redirectUrl)
+    return NextResponse.redirect(new URL(next, requestUrl.origin))
   }
 
   return NextResponse.redirect(new URL('/login?error=invalid_params', requestUrl.origin))

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Music, MapPin, Clock, Bell } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { LikenessVerifiedBadge } from '@/components/LikenessVerifiedBadge'
 
 // Extended artist type with database fields
 interface ArtistProfile {
@@ -15,6 +16,7 @@ interface ArtistProfile {
   genre?: string
   location?: string
   verified?: boolean
+  likeness_verified?: boolean
   tracks?: number
   status?: string
   youtube_url?: string
@@ -282,6 +284,9 @@ function ArtistCard({ artist, isComingSoon = false }: { artist: any; isComingSoo
               <span className="bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] px-2 py-0.5 rounded text-xs font-medium shrink-0">
                 ✓
               </span>
+            )}
+            {artist.likeness_verified && (
+              <LikenessVerifiedBadge size={16} />
             )}
           </div>
           <p className="text-sm text-[var(--pf-text-secondary)]">{artist.genre}</p>

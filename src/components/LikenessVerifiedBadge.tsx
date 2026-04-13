@@ -1,32 +1,56 @@
-'use client'
+/**
+ * LikenessVerifiedBadge
+ * 
+ * A subtle, premium trust indicator for verified artists.
+ * Only shows when artist.likeness_verified === true.
+ * 
+ * Style: light grey, understated, looks like "quiet authority"
+ * Not flashy, not loud — just a quiet signal of trust.
+ */
 
-interface LikenessVerifiedBadgeProps {
-  compact?: boolean
-  showLabel?: boolean
-}
-
-function LikenessMark({ className = 'h-5 w-5' }: { className?: string }) {
+export function LikenessVerifiedBadge({ size = 16 }: { size?: number }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
-      <circle cx="16" cy="16" r="10.5" fill="none" stroke="currentColor" strokeWidth="3" />
-      <circle cx="10.25" cy="8.75" r="3.25" fill="currentColor" />
-    </svg>
-  )
-}
-
-export function LikenessVerifiedBadge({
-  compact = false,
-  showLabel = true,
-}: LikenessVerifiedBadgeProps) {
-  return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full border border-[#c6a85a]/35 bg-[#c6a85a]/10 text-[#d8bd78] ${
-        compact ? 'px-2.5 py-1 text-xs' : 'px-3 py-1.5 text-sm'
-      }`}
-      title="Identity and likeness ownership verified through the Likeness registry"
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ opacity: 0.5, flexShrink: 0 }}
+      aria-label="Likeness Verified"
     >
-      <LikenessMark className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
-      {showLabel && <span className="font-medium">Likeness Verified</span>}
-    </span>
+      {/* Outer ring */}
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="#9ca3af"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      {/* Inner solid circle */}
+      <circle
+        cx="12"
+        cy="12"
+        r="6"
+        fill="#9ca3af"
+        fillOpacity="0.2"
+      />
+      {/* Center dot */}
+      <circle
+        cx="12"
+        cy="12"
+        r="3"
+        fill="#9ca3af"
+      />
+      {/* Small check at bottom */}
+      <path
+        d="M8.5 12.5L11 15L15.5 10"
+        stroke="#9ca3af"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }

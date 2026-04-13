@@ -1,155 +1,87 @@
-/**
- * Porterful Auth Middleware
- * Protects dashboard routes by validating session cookies
- * 
- * LEGACY: referral_records — DO NOT USE
- * Ledger reads/writes now go through signal_actions
- * 
- * @see src/lib/auth-utils.ts — server-side auth utilities
- */
-
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-const DASHBOARD_PATHS = [
-  '/dashboard',
-  '/dashboard/',
-  '/dashboard/artist',
-  '/dashboard/products',
-  '/dashboard/orders',
-  '/dashboard/analytics',
-  '/dashboard/add-product',
-  '/dashboard/upload',
-  '/dashboard/submissions',
-  '/dashboard/collaborations',
-  '/dashboard/earnings',
-  '/dashboard/settings',
-]
-
-const AUTH_PATHS = [
-  '/login',
-  '/signup',
-  '/superfan',
-]
+const DASHBOARD_PATHS = ['/dashboard']
+const AUTH_PATHS = ['/login', '/signup', '/superfan']
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const response = NextResponse.next()
 
   // ──────────────────────────────────────────────
-  // 1. Redirect unauthenticated users from dashboard
+  // 1. Protect dashboard routes — use SSR client only, no manual cookie check
   // ──────────────────────────────────────────────
   const isDashboardPath = DASHBOARD_PATHS.some(p => pathname.startsWith(p))
-  const isAuthPath = AUTH_PATHS.some(p => pathname.startsWith(p))
 
   if (isDashboardPath) {
-    const accessToken = request.cookies.get('sb-access-token')?.value
-    const refreshToken = request.cookies.get('sb-refresh-token')?.value
-
-    if (!accessToken) {
-      // No session — redirect to login
-      const redirectUrl = new URL('/login', request.url)
-      redirectUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    // Validate session with Supabase
-    try {
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          cookies: {
-            getAll() {
-              return request.cookies.getAll()
-            },
-            setAll() {
-              // Cookie setting not needed here — just reading
-            },
+    // Create SSR client — reads cookies via request adapter, not manual name
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
           },
-        }
-      )
-
-      const { data: { user }, error } = await supabase.auth.getUser()
-
-      if (error || !user) {
-        // Invalid session — redirect to login
-        const redirectUrl = new URL('/login', request.url)
-        redirectUrl.searchParams.set('redirect', pathname)
-        return NextResponse.redirect(redirectUrl)
+          setAll() {
+            // Middleware only reads — sets handled in route handlers
+          },
+        },
       }
+    )
 
-      // User is valid — add user ID to response headers for client access
-      response.headers.set('x-user-id', user.id)
-    } catch (err) {
-      console.error('[Auth Middleware] Session validation error:', err)
-      // On error, redirect to login for safety
+    // getUser() reads cookies through adapter, calls Supabase /auth/v1/reveal
+    // This also handles token refresh automatically
+    const { data: { user }, error } = await supabase.auth.getUser()
+
+    if (error || !user) {
+      // No valid server session — redirect to login
       const redirectUrl = new URL('/login', request.url)
       redirectUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(redirectUrl)
     }
+
+    // Server auth confirmed — pass user ID to route
+    response.headers.set('x-user-id', user.id)
   }
 
   // ──────────────────────────────────────────────
   // 2. Redirect authenticated users away from auth pages
   // ──────────────────────────────────────────────
+  const isAuthPath = AUTH_PATHS.some(p => pathname.startsWith(p))
   if (isAuthPath && !pathname.includes('/api/')) {
-    const accessToken = request.cookies.get('sb-access-token')?.value
-
-    if (accessToken) {
-      try {
-        const supabase = createServerClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          {
-            cookies: {
-              getAll() {
-                return request.cookies.getAll()
-              },
-              setAll() {},
-            },
-          }
-        )
-
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (user) {
-          // Already logged in — redirect to dashboard, not login
-          const dashboardUrl = new URL('/dashboard/dashboard', request.url)
-          return NextResponse.redirect(dashboardUrl)
-        }
-      } catch {
-        // Ignore errors on auth pages — let them through to login
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll() {},
+        },
       }
+    )
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+      // Already has server-valid session — send to dashboard
+      return NextResponse.redirect(new URL('/dashboard/dashboard', request.url))
     }
   }
 
   // ──────────────────────────────────────────────
-  // 3. Referral param capture (existing behavior)
+  // 3. Referral param capture
   // ──────────────────────────────────────────────
-  const refParam = request.nextUrl.searchParams.get('ref') || request.nextUrl.searchParams.get('referral')
+  const refParam = request.nextUrl.searchParams.get('ref')
   if (refParam) {
     const refCode = refParam.trim().toUpperCase()
-
-    response.cookies.set('porterful_referral', refCode, {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: '/',
-    })
-
-    response.cookies.set('porterful_referral_client', refCode, {
-      httpOnly: false,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30,
-      path: '/',
-    })
-
-    // Strip ref param from URL
+    response.cookies.set('porterful_referral', refCode, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 30, path: '/' })
+    response.cookies.set('porterful_referral_client', refCode, { httpOnly: false, sameSite: 'lax', maxAge: 60 * 60 * 24 * 30, path: '/' })
     const url = request.nextUrl.clone()
     url.searchParams.delete('ref')
-    url.searchParams.delete('referral')
     return NextResponse.redirect(url)
   }
 

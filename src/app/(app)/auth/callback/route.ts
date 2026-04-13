@@ -39,11 +39,21 @@ export async function GET(request: Request) {
 
   if (code) {
     const { data: { user, session }, error } = await supabase.auth.exchangeCodeForSession(code)
-    
+
+    console.log('[Auth Callback] Exchange result:', {
+      hasUser: !!user,
+      hasSession: !!session,
+      sessionToken: session?.access_token ? 'present' : 'missing',
+      error: error?.message,
+    })
+
     if (error || !session) {
       console.error('[Auth Callback] Session exchange error:', error?.message)
       return NextResponse.redirect(new URL('/login?error=exchange_failed', requestUrl.origin))
     }
+
+    const cookiesNow = cookieStore.getAll()
+    console.log('[Auth Callback] Cookies after exchange:', cookiesNow.map(c => c.name).join(', '))
 
     const redirectUrl = new URL(next, requestUrl.origin)
     return NextResponse.redirect(redirectUrl)

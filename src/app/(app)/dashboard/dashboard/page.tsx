@@ -147,11 +147,23 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold mb-2">My Dashboard</h1>
-              <p className="text-[var(--pf-text-secondary)]">
-                Welcome back, {profile?.full_name || profile?.username || 'Supporter'}!
+              <h1 className="text-3xl font-bold mb-2">
+                {profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'My'} Dashboard
+              </h1>
+              <p className="text-[var(--pf-text-secondary)] flex items-center gap-2">
+                <span>{user.email}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] border border-[var(--pf-orange)]/30">
+                  {profile?.role || 'member'}
+                </span>
               </p>
             </div>
+            <Link
+              href="/settings/settings"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors text-sm"
+            >
+              <Settings size={16} />
+              Account Settings
+            </Link>
           </div>
 
           {/* Wallet Card */}
@@ -356,16 +368,30 @@ export default function DashboardPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h1 className="text-3xl font-bold mb-1">Your Dashboard</h1>
-              <p className="text-[var(--pf-text-secondary)]">
-                {completionPct < 100 ? `${completionPct}% complete — ${nextAction}` : 'Your store is live and ready to earn'}
+              <h1 className="text-3xl font-bold mb-1">
+                {profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Creator'} Dashboard
+              </h1>
+              <p className="text-[var(--pf-text-secondary)] flex items-center gap-2 flex-wrap">
+                <span>{user.email}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] border border-[var(--pf-orange)]/30">
+                  {profile?.role || 'artist'}
+                </span>
+                {completionPct < 100 && (
+                  <span className="text-xs text-[var(--pf-text-muted)]">{completionPct}% complete</span>
+                )}
               </p>
             </div>
-            {completionPct < 100 && (
-              <Link href="/dashboard/artist" className="px-4 py-2 bg-[var(--pf-orange)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--pf-orange-dark)] transition-colors">
-                Complete Profile →
+            <div className="flex items-center gap-2">
+              {completionPct < 100 && (
+                <Link href="/dashboard/artist" className="px-4 py-2 bg-[var(--pf-orange)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--pf-orange-dark)] transition-colors">
+                  Complete Profile →
+                </Link>
+              )}
+              <Link href="/settings/settings" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors text-sm">
+                <Settings size={16} />
+                Settings
               </Link>
-            )}
+            </div>
           </div>
           {/* Completion bar */}
           <div className="w-full h-2 bg-[var(--pf-surface)] rounded-full overflow-hidden">

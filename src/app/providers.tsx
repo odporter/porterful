@@ -11,12 +11,12 @@ import { ToastProvider } from '@/components/Toast'
 import { createBrowserSupabaseClient } from '@/lib/create-browser-client'
 
 const SupabaseContext = createContext<{
-  supabase: ReturnType<typeof createBrowserClient> | null
+  supabase: ReturnType<typeof createBrowserSupabaseClient>
   user: User | null
   session: Session | null
   loading: boolean
 }>({
-  supabase: null,
+  supabase: null as unknown as ReturnType<typeof createBrowserSupabaseClient>,
   user: null,
   session: null,
   loading: true,
@@ -29,24 +29,13 @@ export function Providers({
   children: React.ReactNode
   initialUser?: User | null
 }) {
-  const [supabase] = useState(() => {
-    try {
-      return createBrowserSupabaseClient()
-    } catch {
-      return null
-    }
-  })
+  const [supabase] = useState(() => createBrowserSupabaseClient())
   const [user, setUser] = useState<User | null>(initialUser)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(!initialUser)
   const sessionRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
-
     const validateSession = async () => {
       try {
         const { data: { session: validSession }, error } = await supabase.auth.getSession()

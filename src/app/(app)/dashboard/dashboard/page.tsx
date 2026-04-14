@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getPorterfulSession } from '@/lib/porterful-session'
-import { createServiceClient } from '@/lib/supabase/service'
+import { createServerClient } from '@/lib/supabase'
 import DashboardClient from './DashboardClient'
 
 export const dynamic = 'force-dynamic'
@@ -13,7 +13,10 @@ export default async function DashboardPage() {
     redirect('/login/login')
   }
 
-  const supabase = createServiceClient()
+  const supabase = createServerClient()!
+  if (!session.profileId) {
+    redirect('/login/login')
+  }
 
   // Fetch full profile using profileId from session
   const { data: profile } = await supabase

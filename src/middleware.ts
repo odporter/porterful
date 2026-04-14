@@ -10,7 +10,7 @@ function isProtected(pathname: string): boolean {
 }
 
 function extractReturnUrl(req: NextRequest): string {
-  return encodeURIComponent(req.nextUrl.origin + req.nextUrl.pathname + req.search);
+  return encodeURIComponent(req.nextUrl.origin + req.nextUrl.pathname + (req.nextUrl.search || ''));
 }
 
 export async function middleware(req: NextRequest) {
@@ -46,7 +46,10 @@ export async function middleware(req: NextRequest) {
 
       if (bridgeRes.ok) {
         // Bridge succeeded — read Set-Cookie headers and forward them
-        const setCookieHeaders = bridgeRes.headers.getAll('set-cookie');
+        const setCookieHeaders: string[] = [];
+        bridgeRes.headers.forEach((value, key) => {
+          if (key.toLowerCase() === 'set-cookie') setCookieHeaders.push(value);
+        });
         const response = NextResponse.next();
         setCookieHeaders.forEach(cookie => {
           response.headers.append('set-cookie', cookie);

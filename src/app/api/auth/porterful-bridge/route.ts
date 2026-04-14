@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase/service';
+import { createServerClient } from '@/lib/supabase';
 import { createHash } from 'crypto';
 
 /**
@@ -123,7 +123,10 @@ async function completeBridge(
   referralCode: string | null
 ) {
   try {
-    const supabase = createServiceClient();
+    const supabase = createServerClient();
+    if (!supabase) {
+      return NextResponse.redirect(new URL('/login/login?error=server_error', req.nextUrl.origin));
+    }
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id, name, role')

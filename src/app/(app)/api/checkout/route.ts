@@ -69,6 +69,9 @@ export async function POST(request: NextRequest) {
       quantity: item.quantity || 1,
     }))
 
+    const profileId = req.headers.get('x-pf-profile-id') || null;
+    const lkId = req.headers.get('x-pf-lk-id') || null;
+
     const sessionParams: any = {
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -76,9 +79,14 @@ export async function POST(request: NextRequest) {
       success_url: 'https://porterful.com/checkout/checkout/success?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: 'https://porterful.com/',
       metadata: {
+        // Attribution — ties payment to Likeness™ identity
+        user_id: profileId || '',
+        lk_id: lkId || '',
+        email: req.headers.get('x-pf-email') || '',
+        source: 'porterful',
+        referral_code: effectiveReferralCode || '',
         artist_fund: artistFund.toString(),
         superfan_share: superfanShare.toString(),
-        referral_code: effectiveReferralCode || '',
         type: items[0]?.type || 'product',
         audio_url: items[0]?.audioUrl || '',
         track_name: items[0]?.name || '',

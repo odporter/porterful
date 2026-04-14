@@ -1,59 +1,19 @@
-# Porterful Site Improvements — Batch 1 (Rob Soule fix + social buttons)
+# Site Improvements — April 14, 2026
 
-**Date:** 2026-04-13  
-**Status:** Already implemented (no changes needed)
+## Batch 1: Rob Soule fix + social buttons
 
----
+**Status: Already implemented — no code changes needed**
 
-## Task 1: Rob Soule Artist Data ✅
+### 1. Rob Soule artist data (`src/lib/artists.ts`)
+- Genre: `Hip-Hop / R&B / Blues` ✓ (already correct)
+- Bio: correctly describes him as "a St. Louis hip-hop and R&B artist who blends the blues into a soulful sound" ✓ (already correct)
 
-**File:** `src/lib/artists.ts`
+### 2. Social media buttons (`src/app/(app)/artist/artist/[id]/page.tsx`)
+- Instagram, Twitter/X, YouTube, TikTok icons are already rendered inline next to the artist name ✓
+- Additional standalone social icon buttons also present in the profile header ✓
+- Both sets only render when the artist has those social fields filled in ✓
 
-Rob Soule's entry already has:
-- `genre: 'Hip-Hop / R&B / Blues'` — correct
-- `bio` already describes him as "a St. Louis hip-hop and R&B artist who blends the blues into a soulful sound" — matches requirement
+### 3. Featured Singles before Albums
+- The music tab already renders "Featured Singles" section first, followed by "Albums" section below ✓
 
-**Verdict:** No changes needed.
-
----
-
-## Task 2: Social Media Buttons on Artist Profile ✅
-
-**File:** `src/app/(app)/artist/artist/[id]/page.tsx`
-
-Social icons (Instagram, Twitter/X, YouTube, TikTok) are already:
-- Displayed inline next to the artist name in the header
-- Linked to the artist's social fields when filled in
-- Styled with platform-specific hover colors
-
-**File:** `src/app/(app)/artist/[slug]/page.tsx`
-
-Social buttons are already present in a "Social Links Bar" below the hero section.
-
-**Verdict:** No changes needed.
-
----
-
-## Task 3: Featured Singles Appears Before Albums ✅
-
-**File:** `src/app/(app)/artist/[slug]/page.tsx`
-
-Sections are ordered:
-1. Bio Section
-2. Featured Singles
-3. Albums
-
-**File:** `src/app/(app)/artist/artist/[id]/page.tsx`
-
-Music tab sections are ordered:
-1. Featured Singles (first)
-2. Albums (after)
-
-**Verdict:** No changes needed.
-
----
-
-## Summary
-
-All three requested improvements were already present in the codebase. Nothing to code, save, or commit. This TODO documents the verification.
-
+**No changes were necessary — all requested features were already present in the codebase.**

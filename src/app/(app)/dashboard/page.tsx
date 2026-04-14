@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 
-export default function DashboardAliasPage() {
+// Canonical dashboard — all /dashboard/* routes redirect here
+// Middleware protects /dashboard/* via SSR client (no client-side redirect)
+export default function DashboardRoot() {
   redirect('/dashboard/dashboard')
 }

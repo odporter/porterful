@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSupabase } from '@/app/providers'
 import { useWallet } from '@/lib/wallet-context'
-import { 
-  Package, Users, DollarSign, TrendingUp, Plus, Settings, 
+import {
+  Package, Users, DollarSign, TrendingUp, Plus, Settings,
   Store, Music, BarChart3, Upload, ChevronRight, Gift, Heart, ShieldCheck
 } from 'lucide-react'
 
@@ -34,25 +34,32 @@ const EMPTY_STATS: DashboardStats = {
 export default function DashboardPage() {
   const { user, supabase, loading: authLoading } = useSupabase()
   const { balance } = useWallet()
-  const [loading, setLoading] = useState(true)
+
+  // Stable mount guard — prevents hydration mismatch and SSR/client state split
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
+  // Auth-aware loading — don't render skeleton until auth state is resolved
+  const [dataLoading, setDataLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>(EMPTY_STATS)
   const [profile, setProfile] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'analytics'>('overview')
 
+  // Resolve auth state before rendering anything
   useEffect(() => {
+    if (!mounted) return
     if (authLoading) return
     if (!user) {
-      setLoading(false)
+      setDataLoading(false)
       return
     }
     loadDashboard()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, user, authLoading])
+  }, [mounted, authLoading, user, supabase])
 
   async function loadDashboard() {
     if (!supabase || !user) return
     try {
-      // Load profile
       const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
@@ -60,22 +67,18 @@ export default function DashboardPage() {
         .single()
       setProfile(profileData)
 
-      // If supporter role, show supporter dashboard (no creator stats)
-      if (profileData?.role === 'supporter') {
+      if (profileData?.role === 'supporter' || profileData?.role === 'superfan') {
         setStats(EMPTY_STATS)
-        setLoading(false)
+        setDataLoading(false)
         return
       }
 
-      // If artist, load real creator stats
       if (profileData?.role === 'artist') {
-        // Load orders where user is seller
         const { data: ordersData } = await supabase
           .from('orders')
           .select('*, order_items(count)')
           .eq('status', 'paid')
 
-        // Load products count
         const { count: productsCount } = await supabase
           .from('products')
           .select('*', { count: 'exact', head: true })
@@ -89,22 +92,19 @@ export default function DashboardPage() {
           total_orders: totalOrders,
           total_products: productsCount || 0,
           conversion_rate: 0,
-          artist_fund_generated: totalSales * 0.1, // 10% to artist fund
-          this_month: {
-            sales: totalSales,
-            orders: totalOrders,
-            growth: '0%',
-          },
+          artist_fund_generated: totalSales * 0.1,
+          this_month: { sales: totalSales, orders: totalOrders, growth: '0%' },
         })
       }
     } catch (error) {
       console.error('Failed to load dashboard:', error)
     } finally {
-      setLoading(false)
+      setDataLoading(false)
     }
   }
 
-  if (authLoading || loading) {
+  // Never render until mounted — eliminates hydration flicker
+  if (!mounted || authLoading || dataLoading) {
     return (
       <div className="min-h-screen pt-24 pb-12">
         <div className="pf-container">

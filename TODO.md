@@ -1,19 +1,24 @@
-# Site Improvements — April 14, 2026
+# TODO - Site Improvements Batch 1 (Rob Soule fix + social buttons)
 
-## Batch 1: Rob Soule fix + social buttons
+**Date:** 2026-04-14
+**Status:** Already implemented — no changes needed
 
-**Status: Already implemented — no code changes needed**
+## Items Reviewed
 
-### 1. Rob Soule artist data (`src/lib/artists.ts`)
-- Genre: `Hip-Hop / R&B / Blues` ✓ (already correct)
-- Bio: correctly describes him as "a St. Louis hip-hop and R&B artist who blends the blues into a soulful sound" ✓ (already correct)
+### 1. Rob Soule artist data (src/lib/artists.ts)
+- ✅ `genre` is already `'Hip-Hop / R&B / Blues'`
+- ✅ `bio` already reflects St. Louis hip-hop and R&B artist blending blues into a soulful sound
 
-### 2. Social media buttons (`src/app/(app)/artist/artist/[id]/page.tsx`)
-- Instagram, Twitter/X, YouTube, TikTok icons are already rendered inline next to the artist name ✓
-- Additional standalone social icon buttons also present in the profile header ✓
-- Both sets only render when the artist has those social fields filled in ✓
+### 2. Social media buttons (src/app/(app)/artist/artist/[id]/page.tsx)
+- ✅ Instagram, Twitter/X, YouTube, TikTok icons already present
+- ✅ Small icons in header next to artist name/verified badge
+- ✅ Larger icons in artist info card section
+- ✅ All conditional on artist having those social fields filled
 
-### 3. Featured Singles before Albums
-- The music tab already renders "Featured Singles" section first, followed by "Albums" section below ✓
+### 3. Featured Singles BEFORE Albums
+- ✅ Featured Singles section already renders before Albums section in the music tab
+- ✅ Singles use `displayTracks.filter(t => t.album === 'Singles')`
+- ✅ Albums use `albumNames.filter(n => n !== 'Singles')`
 
-**No changes were necessary — all requested features were already present in the codebase.**
+## Conclusion
+All requested improvements were already in place. No code changes required.

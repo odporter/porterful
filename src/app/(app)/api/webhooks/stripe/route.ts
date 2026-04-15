@@ -61,6 +61,23 @@ export async function POST(request: NextRequest) {
         const buyerEmail = session.customer_email || session.customer_details?.email
         const buyerUserId = session.metadata?.user_id || null
 
+        // Resolve lk_id → profiles.id for referrer attribution
+        let resolvedReferrerId: string | null = null
+        const lkId = session.metadata?.lk_id
+        if (lkId) {
+          const { data: referrerProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('lk_id', lkId)
+            .single()
+          resolvedReferrerId = referrerProfile?.id || null
+          if (resolvedReferrerId) {
+            console.log('✅ Referrer resolved:', lkId, '→', resolvedReferrerId)
+          } else {
+            console.log('⚠️ lk_id not found in profiles:', lkId)
+          }
+        }
+
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
@@ -72,7 +89,7 @@ export async function POST(request: NextRequest) {
             user_id: buyerUserId,
             stripe_checkout_session_id: session.id,
             stripe_payment_intent_id: session.payment_intent as string,
-            referrer_id: session.metadata?.lk_id || null,
+            referrer_id: resolvedReferrerId,
             seller_total: sellerCents / 100,
             artist_fund_total: artistFundCents / 100,
             superfan_total: superfanCents / 100,
@@ -113,7 +130,7 @@ export async function POST(request: NextRequest) {
                     buyer_user_id: buyerUserId,
                     product_id: session.metadata.product_id,
                     offer_id: session.metadata?.offer_id || null,
-                    referrer_id: session.metadata?.lk_id || null,
+                    referrer_id: resolvedReferrerId,
                     order_id: session.id,
                     status: 'active',
                   })
@@ -134,50 +151,52 @@ export async function POST(request: NextRequest) {
           }
 
           // ── Credit Referral Earnings ─────────────────────────────────────────
+          // Prefer lk_id resolution; fall back to referral_code
+          const lkId = session.metadata?.lk_id
           const referralCode = session.metadata?.referral_code
-        if (referralCode && superfanCents > 0) {
-          try {
-            // Look up referrer by referral code
-            const { data: referrer } = await supabase
+          
+          let resolvedReferrerId2: string | null = null
+          if (lkId) {
+            const { data } = await supabase
               .from('profiles')
               .select('id')
-              .eq('referral_code', referralCode)
+              .eq('lk_id', lkId)
               .single()
+            resolvedReferrerId2 = data?.id || null
+          }
+          
+          const referralProfileId = resolvedReferrerId2
+            || (referralCode
+              ? (await supabase.from('profiles').select('id').eq('referral_code', referralCode).single().then(r => r.data?.id))
+              : null)
 
-            if (referrer) {
-              // Credit the referral earnings
+          if (referralProfileId && superfanCents > 0) {
+            try {
               await supabase.from('referral_earnings').insert({
-                superfan_id: referrer.id,
+                superfan_id: referralProfileId,
                 order_id: session.id,
                 amount: superfanCents / 100,
                 status: 'pending',
               })
 
-              // Increment referrer's total_referrals count
-              const { data: referrerProfile } = await supabase
+              const { data: refProfile } = await supabase
                 .from('profiles')
                 .select('total_referrals')
-                .eq('id', referrer.id)
+                .eq('id', referralProfileId)
                 .single()
-              if (referrerProfile) {
+              
+              if (refProfile) {
                 await supabase
                   .from('profiles')
-                  .update({ total_referrals: (referrerProfile.total_referrals || 0) + 1 })
-                  .eq('id', referrer.id)
+                  .update({ total_referrals: (refProfile.total_referrals || 0) + 1 })
+                  .eq('id', referralProfileId)
               }
 
-              // Update the order with referrer_id
-              await supabase
-                .from('orders')
-                .update({ referrer_id: referrer.id })
-                .eq('id', session.id)
-
-              console.log(`✅ Referral earnings credited: ${(superfanCents / 100).toFixed(2)} → user ${referrer.id}`)
+              console.log(`✅ Referral earnings: ${(superfanCents / 100).toFixed(2)} → user ${referralProfileId}`)
+            } catch (refErr) {
+              console.error('❌ Referral earnings error:', refErr)
             }
-          } catch (refErr) {
-            console.error('❌ Failed to credit referral earnings:', refErr)
           }
-        }
 
         // ── Dropship Order Forwarding ────────────────────────────────────
           const dropshipItems = items.filter((item: any) => item.dropship === true)
@@ -269,9 +288,9 @@ export async function POST(request: NextRequest) {
           }
 
           // ── Send Confirmation Email ───────────────────────────────────────
-          const buyerEmail = session.customer_email || session.customer_details?.email
-          if (buyerEmail) {
-            sendOrderConfirmation(buyerEmail, session, items, {
+          const receiptEmail = session.customer_email || session.customer_details?.email
+          if (receiptEmail) {
+            sendOrderConfirmation(receiptEmail, session, items, {
               username: session.metadata?.username || 'the seller',
               offer_id: session.metadata?.offer_id || null,
             }).catch(err =>

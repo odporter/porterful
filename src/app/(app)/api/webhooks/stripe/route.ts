@@ -58,23 +58,25 @@ export async function POST(request: NextRequest) {
         const platformCents = Math.round(subtotalCents * 0.10)
         const sellerCents = subtotalCents - artistFundCents - superfanCents - platformCents
 
+        const buyerEmail = session.customer_email || session.customer_details?.email
+        const buyerUserId = session.metadata?.user_id || null
+
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
             id: session.id,
-            user_id: null,
-            status: 'paid',
-            subtotal: subtotalCents / 100,
-            total: amountCents / 100,
-            shipping: 0,
-            tax: 0,
+            status: 'completed',
+            buyer_email: buyerEmail,
+            product_id: session.metadata?.product_id || null,
+            amount: amountCents / 100,
+            user_id: buyerUserId,
+            stripe_checkout_session_id: session.id,
+            stripe_payment_intent_id: session.payment_intent as string,
+            referrer_id: session.metadata?.lk_id || null,
             seller_total: sellerCents / 100,
             artist_fund_total: artistFundCents / 100,
             superfan_total: superfanCents / 100,
             platform_total: platformCents / 100,
-            referrer_id: null,
-            stripe_payment_intent_id: session.payment_intent as string,
-            stripe_checkout_session_id: session.id,
             shipping_address: (session as any).shipping_details ? JSON.stringify({
               name: (session as any).shipping_details?.name || '',
               line1: (session as any).shipping_details?.address?.line1 || '',
@@ -92,8 +94,47 @@ export async function POST(request: NextRequest) {
         } else {
           console.log('✅ Order saved:', order.id)
 
+          // ── Create Entitlement ────────────────────────────────────────────
+          if (buyerEmail && session.metadata?.product_id) {
+            try {
+              const { data: existing } = await supabase
+                .from('entitlements')
+                .select('id')
+                .eq('buyer_email', buyerEmail)
+                .eq('product_id', session.metadata.product_id)
+                .eq('status', 'active')
+                .maybeSingle()
+              
+              if (!existing) {
+                const { data: entitlement, error: entError } = await supabase
+                  .from('entitlements')
+                  .insert({
+                    buyer_email: buyerEmail,
+                    buyer_user_id: buyerUserId,
+                    product_id: session.metadata.product_id,
+                    offer_id: session.metadata?.offer_id || null,
+                    referrer_id: session.metadata?.lk_id || null,
+                    order_id: session.id,
+                    status: 'active',
+                  })
+                  .select()
+                  .single()
+                
+                if (entError) {
+                  console.error('❌ Failed to create entitlement:', entError.message)
+                } else {
+                  console.log('✅ Entitlement created:', entitlement.id)
+                }
+              } else {
+                console.log('ℹ️ Active entitlement already exists for', buyerEmail)
+              }
+            } catch (entErr) {
+              console.error('❌ Entitlement error:', entErr)
+            }
+          }
+
           // ── Credit Referral Earnings ─────────────────────────────────────────
-        const referralCode = session.metadata?.referral_code
+          const referralCode = session.metadata?.referral_code
         if (referralCode && superfanCents > 0) {
           try {
             // Look up referrer by referral code
@@ -228,9 +269,12 @@ export async function POST(request: NextRequest) {
           }
 
           // ── Send Confirmation Email ───────────────────────────────────────
-          const email = session.customer_email || session.customer_details?.email
-          if (email) {
-            sendOrderConfirmation(email, session, items).catch(err =>
+          const buyerEmail = session.customer_email || session.customer_details?.email
+          if (buyerEmail) {
+            sendOrderConfirmation(buyerEmail, session, items, {
+              username: session.metadata?.username || 'the seller',
+              offer_id: session.metadata?.offer_id || null,
+            }).catch(err =>
               console.error('[porterful-webhook] Confirmation email failed:', err)
             )
           }
@@ -277,7 +321,8 @@ export async function POST(request: NextRequest) {
 async function sendOrderConfirmation(
   email: string,
   session: Stripe.Checkout.Session,
-  items: any[]
+  items: any[],
+  options: { username: string; offer_id: string | null } = { username: 'the seller', offer_id: null }
 ) {
   const resendApiKey = process.env.RESEND_API_KEY
   if (!resendApiKey) {
@@ -289,10 +334,11 @@ async function sendOrderConfirmation(
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://porterful.com'
 
   const total = (session.amount_total || 0) / 100
-  const itemList = items.map((item: any) => `${item.quantity || 1}x ${item.name || item.title}`).join(', ')
+  const productName = items.length > 0 ? (items[0].name || items[0].title || 'your purchase') : 'your purchase'
+  const sellerUsername = options.username
+  const claimUrl = `${baseUrl}/claim?email=${encodeURIComponent(email)}&product=${encodeURIComponent(session.metadata?.product_id || '')}&offer=${encodeURIComponent(options.offer_id || '')}&session=${encodeURIComponent(session.id)}`
 
-  const html = `
-<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -313,7 +359,9 @@ async function sendOrderConfirmation(
     .item-row:last-child { border-bottom: none; }
     .footer { text-align: center; color: #4b5563; font-size: 12px; margin-top: 40px; border-top: 1px solid #1f2937; padding-top: 24px; }
     .cta { display: inline-block; background: #f97316; color: #000; font-weight: 700; font-size: 15px; padding: 14px 28px; border-radius: 8px; text-decoration: none; margin: 8px 0; }
+    .cta-secondary { display: inline-block; background: transparent; color: #9ca3af; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 8px 0; border: 1px solid #1f2937; }
     .cta-block { text-align: center; margin: 32px 0; }
+    .ref { color: #4b5563; font-size: 11px; font-family: monospace; }
   </style>
 </head>
 <body>
@@ -322,11 +370,11 @@ async function sendOrderConfirmation(
       <div class="logo">PORTERFUL</div>
     </div>
 
-    <h1>Order Confirmed ✅</h1>
-    <p>Your payment of <strong style="color:#fff">$${total.toFixed(2)}</strong> has been received. Your order is on its way.</p>
+    <h1>Payment Received ✅</h1>
+    <p>Your payment of <strong style="color:#fff">$${total.toFixed(2)}</strong> has been confirmed. Access via <strong style="color:#fff">@${sellerUsername}</strong>.</p>
 
     <div class="card">
-      <div class="card-title">Order Summary</div>
+      <div class="card-title">Order Confirmation</div>
       ${items.map((item: any) => `
         <div class="item-row">
           <span class="detail-label">${item.name || item.title}</span>
@@ -334,20 +382,30 @@ async function sendOrderConfirmation(
         </div>
       `).join('')}
       <div class="item-row" style="margin-top:12px;padding-top:12px;border-top:1px solid #1f2937">
-        <span class="detail-label" style="font-weight:700;color:#fff">Total</span>
+        <span class="detail-label" style="font-weight:700;color:#fff">Total Paid</span>
         <span class="detail-value" style="color:#f97316">$${total.toFixed(2)}</span>
+      </div>
+      <div class="item-row">
+        <span class="detail-label">Seller</span>
+        <span class="detail-value">@${sellerUsername}</span>
+      </div>
+      <div class="item-row">
+        <span class="detail-label">Reference</span>
+        <span class="detail-value ref">${session.id}</span>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">Next Steps</div>
-      <p style="margin:0;color:#9ca3af;font-size:13px;">
-        You'll receive a shipping confirmation email shortly. Track your order in your dashboard.
+      <div class="card-title">Claim Your Access</div>
+      <p style="margin:0 0 16px;color:#9ca3af;font-size:13px;">
+        Click below to claim access to your purchase. Use the same email you used at checkout.
       </p>
-    </div>
-
-    <div class="cta-block">
-      <a href="${baseUrl}/dashboard" class="cta">View My Orders →</a>
+      <div class="cta-block" style="margin:16px 0;">
+        <a href="${claimUrl}" class="cta">Claim Your Access →</a>
+      </div>
+      <p style="margin:0;color:#4b5563;font-size:12px;">
+        Having trouble? Visit <a href="${baseUrl}/claim" style="color:#6b7280">porterful.com/claim</a> and enter your email.
+      </p>
     </div>
 
     <div class="footer">
@@ -356,8 +414,7 @@ async function sendOrderConfirmation(
     </div>
   </div>
 </body>
-</html>
-`
+</html>`
 
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',

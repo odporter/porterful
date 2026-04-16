@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerSupabaseClient } from '@/lib/supabase-auth'
 
-export async function POST(request: Request) {
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
 
@@ -10,47 +11,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    const cookieStore = await cookies()
-    const response = NextResponse.json({
-      success: true,
-      user: null,
-      role: 'supporter',
-      redirectTo: '/dashboard',
-    })
-    const supabase = createRouteHandlerSupabaseClient(cookieStore, response)
+    // Build response — success redirect to /dashboard
+    const response = NextResponse.redirect(new URL('/dashboard', request.nextUrl.origin), 307)
+
+    // Pass request cookies (mutable, for reading) and response (for setting session cookies).
+    // createRouteHandlerSupabaseClient reads existing cookies from request.cookies
+    // and writes new session cookies (access_token, refresh_token) to response.cookies.
+    const supabase = createRouteHandlerSupabaseClient(request.cookies, response)
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 401 })
+    if (error || !data.session) {
+      return NextResponse.json({ error: error?.message || 'Login failed' }, { status: 401 })
     }
 
-    if (!data.user) {
-      return NextResponse.json({ error: 'Login failed' }, { status: 401 })
-    }
-
-    // Get user profile to check role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single()
-
-    response.headers.set('content-type', 'application/json')
-    response.headers.delete('content-length')
-    response.body?.cancel()
-
-    return NextResponse.json({
-      success: true,
-      user: data.user,
-      role: profile?.role || 'supporter',
-      redirectTo: '/dashboard',
-    }, {
-      headers: response.headers,
-    })
+    // Session cookies are now on the response object.
+    // The 307 redirect will carry them to the browser.
+    return response
   } catch (err: any) {
     console.error('Login error:', err)
     return NextResponse.json({ error: err.message || 'Login failed' }, { status: 500 })

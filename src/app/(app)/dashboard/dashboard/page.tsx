@@ -1,34 +1,38 @@
 import { redirect } from 'next/navigation'
-import { getPorterfulSession } from '@/lib/porterful-session'
-import { createServerClient } from '@/lib/supabase'
+import { createServerComponentSupabaseClient } from '@/lib/supabase-auth'
+import { cookies } from 'next/headers'
 import DashboardClient from './DashboardClient'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
+/**
+ * Dashboard — single auth truth: Supabase SSR session cookies.
+ * middleware handles redirect if unauthenticated; this is the final guard.
+ * getUser() (not getSession) — avoids extra network round-trip.
+ */
 export default async function DashboardPage() {
-  const session = await getPorterfulSession()
+  // Single auth source: Supabase SSR cookies set by login/callback routes
+  const cookieStore = await cookies()
+  const supabase = createServerComponentSupabaseClient(cookieStore)
 
-  if (!session) {
-    redirect('/login/login')
+  const { data: { user }, error } = await supabase.auth.getUser()
+
+  if (error || !user) {
+    redirect('/login')
   }
 
-  const supabase = createServerClient()!
-  if (!session.profileId) {
-    redirect('/login/login')
-  }
-
-  // Fetch full profile using profileId from session
+  // Fetch profile for the authenticated user
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', session.profileId)
+    .eq('id', user.id)
     .limit(1)
     .single()
 
   if (!profile) {
-    redirect('/login/login')
+    redirect('/login')
   }
 
-  return <DashboardClient serverProfileId={session.profileId} lkId={session.lkId} />
+  return <DashboardClient serverProfileId={user.id} lkId={profile.lk_id} />
 }

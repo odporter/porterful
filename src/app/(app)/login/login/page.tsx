@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FaGoogle } from 'react-icons/fa'
@@ -14,6 +14,19 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  // Double protection: redirect authenticated users immediately on mount
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace('/dashboard')
+      }
+    })
+  }, [])
+
   const getSupabaseClient = () => createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -23,10 +36,8 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
-      // Check if likeness_session cookie exists
       const likenSession = document.cookie.match(/likeness_session=([^;]+)/)?.[1]
       if (likenSession) {
-        // Try bridge — this will validate session and create porterful_session
         const res = await fetch('/api/auth/porterful-bridge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -36,9 +47,6 @@ export default function LoginPage() {
           return
         }
       }
-      // No valid session — redirect to LikenessVerified magic link
-      // After login, LikenessVerified redirects to our bridge endpoint
-      // which sets the cookie and redirects to /dashboard
       const bridgeUrl = encodeURIComponent(window.location.origin + '/api/auth/porterful-bridge')
       window.location.href = `https://likenessverified.com/login?return=${bridgeUrl}`
     } catch {
@@ -59,6 +67,14 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
+      // 307 redirect with session cookies means success — follow it client-side
+      // 401 or error means failed credentials
+      if (res.redirected) {
+        // Response was a redirect — follow to dashboard
+        router.push(res.url)
+        return
+      }
+
       const data = await res.json()
 
       if (!res.ok) {
@@ -67,6 +83,7 @@ export default function LoginPage() {
         return
       }
 
+      // Fallback: if API returned JSON with role (old behavior), navigate directly
       if (data.role === 'artist') {
         router.push('/dashboard/artist')
       } else {
@@ -104,7 +121,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* ─── LIKENESS™ UNIFIED SIGN-IN ─── */}
         <div className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 border border-[var(--pf-orange)]/30">
           <div className="text-center mb-3">
             <span className="text-2xl mb-2 block">🔔</span>

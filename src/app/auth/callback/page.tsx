@@ -3,9 +3,8 @@
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-// This client component handles any fallback when the route handler doesn't execute.
-// In practice, the route.ts (server route handler) handles all /auth/callback GET requests.
-// This component is a safety net in case something reaches the client-side page.
+// Fallback page component — route.ts handles HTTP GET at /auth/callback server-side.
+// This client component exists in case client-side navigation needs a page component.
 export default function CallbackPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -21,8 +20,6 @@ export default function CallbackPage() {
       router.replace('/login?error=no_code')
       return
     }
-    // If we reach here with a code but the server didn't handle it,
-    // redirect to login — the server route should handle the exchange.
     router.replace('/login')
   }, [searchParams])
 
@@ -31,9 +28,7 @@ export default function CallbackPage() {
       <div className="max-w-md w-full text-center">
         <div className="text-5xl mb-6 animate-pulse">🔑</div>
         <h1 className="text-2xl font-bold mb-2">Signing you in…</h1>
-        <p className="text-[var(--pf-text-secondary)]">
-          Completing your sign-in — one moment.
-        </p>
+        <p className="text-[var(--pf-text-secondary)]">Completing your sign-in — one moment.</p>
       </div>
     </div>
   )

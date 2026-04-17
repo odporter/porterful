@@ -1,57 +1,3 @@
-/* ════════════════════════════════════════════════════════════════
-   BACKEND STUB — Printful & Referral Wiring Guide
-   ════════════════════════════════════════════════════════════════
-   
-   ┌─────────────────────────────────────────────────────────────┐
-   │  PRINTFUL — Print-on-Demand Fulfillment                    │
-   ├─────────────────────────────────────────────────────────────┤
-   │  Required env vars:                                        │
-   │    PRINTFUL_ACCESS_TOKEN, PRINTFUL_WEBHOOK_SECRET           │
-   │                                                             │
-   │  Connect flow:                                             │
-   │    Artist dashboard → /dashboard/settings/printful          │
-   │    → Enter Printful API token → store in profiles           │
-   │                                                             │
-   │  Sync flow:                                                │
-   │    1. POST /api/printful/products (create sync product)   │
-   │    2. GET /api/printful/products/:id/variants (get sizes)  │
-   │    3. Map Printful variant IDs to product size options     │
-   │                                                             │
-   │  Order flow:                                               │
-   │    1. Order placed → POST /api/printful/orders            │
-   │    2. Printful fulfills & ships to customer               │
-   │    3. Webhook 'order_updated' → update orders.status      │
-   │                                                             │
-   │  Tables: products.printful_product_id,                    │
-   │         products.printful_variant_ids (JSONB),            │
-   │         orders.printful_order_id, orders.tracking_number   │
-   │  Docs: https://www.printful.com/docs/api                   │
-   └─────────────────────────────────────────────────────────────┘
-   
-   ┌─────────────────────────────────────────────────────────────┐
-   │  REFERRAL TRACKING — Superfan Commission System             │
-   ├─────────────────────────────────────────────────────────────┤
-   │  Required env vars: (none — uses existing Supabase)         │
-   │                                                             │
-   │  How it works:                                             │
-   │    1. Each supporter gets a unique referral code            │
-   │    2. Share link: porterful.com/?ref=CODE                  │
-   │    3. New user signs up → referred_by = code owner         │
-   │    4. When referred user buys → commission credited         │
-   │                                                             │
-   │  Commission tracking:                                      │
-   │    1. On order completion, check referred_by in buyer prof │
-   │    2. Calculate commission (e.g. 5% of order total)        │
-   │    3. Credit to referrer's wallet balance                  │
-   │    4. Store in referrals table for history                 │
-   │                                                             │
-   │  Tables: profiles.referral_code, profiles.referred_by,     │
-   │         referrals.referrer_id, referrals.referee_id,       │
-   │         referrals.commission_amount, referrals.paid_out     │
-   │  Commission rate: configurable (default 5%)                 │
-   └─────────────────────────────────────────────────────────────┘
-   ════════════════════════════════════════════════════════════════ */
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -329,8 +275,8 @@ export default function ArtistDashboardPage() {
                     </button>
                   </div>
 
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-orange-500/30 to-purple-600/30 flex items-center justify-center shrink-0">
-                    {album.image ? <Image src={album.image} alt={album.name} fill sizes="64px" className="object-cover" /> : <Icon.Music />}
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-orange-500/30 to-purple-600/30 flex items-center justify-center shrink-0" data-testid="album-thumbnail">
+                    {album.image ? <Image src={album.image} alt={album.name} fill sizes="64px" className="object-cover" data-contained="true" /> : <Icon.Music />}
                   </div>
 
                   <div className="flex-1">
@@ -373,8 +319,8 @@ export default function ArtistDashboardPage() {
                 <div className="divide-y divide-[var(--pf-border)]">
                   {tracks.slice(0, 5).map(track => (
                     <div key={track.id} className="flex items-center gap-3 p-3 hover:bg-[var(--pf-surface-hover)]">
-                      <div className="relative w-10 h-10 rounded overflow-hidden bg-[var(--pf-surface)] shrink-0">
-                        <Image src={track.image} alt={track.title} fill sizes="40px" className="object-cover" />
+                      <div className="relative w-10 h-10 rounded overflow-hidden bg-[var(--pf-surface)] shrink-0" data-testid="track-thumbnail">
+                        <Image src={track.image} alt={track.title} fill sizes="40px" className="object-cover" data-contained="true" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{track.title}</p>
@@ -474,8 +420,8 @@ export default function ArtistDashboardPage() {
             </div>
             {PRODUCTS.map(product => (
               <div key={product.id} className="pf-card p-4 flex items-center gap-4">
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[var(--pf-surface)] shrink-0">
-                  <Image src={product.image} alt={product.name} fill sizes="64px" className="object-cover" />
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[var(--pf-surface)] shrink-0" data-testid="product-thumbnail">
+                  <Image src={product.image} alt={product.name} fill sizes="64px" className="object-cover" data-contained="true" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold">{product.name}</h3>

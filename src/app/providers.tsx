@@ -9,6 +9,12 @@ import { PayoutProvider } from '@/lib/payout-context'
 import { CartProvider } from '@/lib/cart-context'
 import { ToastProvider } from '@/components/Toast'
 import { createBrowserSupabaseClient } from '@/lib/create-browser-client'
+import { initSentry, captureAuthError } from '@/lib/sentry'
+
+// Initialize Sentry on client
+if (typeof window !== 'undefined') {
+  initSentry()
+}
 
 const SupabaseContext = createContext<{
   supabase: ReturnType<typeof createBrowserSupabaseClient>
@@ -58,6 +64,7 @@ export function Providers({
         // Client cookies may not be fully synced yet
       } catch (err) {
         console.error('Session validation failed:', err)
+        captureAuthError(err, { step: 'session-validation' })
         // Don't clear SSR-confirmed user on transient errors
         if (!initialUser) {
           setSession(null)
@@ -103,7 +110,8 @@ export function Providers({
     })
 
     return () => subscription.unsubscribe()
-  }, [initialUser, supabase])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const handleVisibilityChange = async () => {

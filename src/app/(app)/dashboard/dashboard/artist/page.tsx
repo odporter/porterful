@@ -329,8 +329,8 @@ export default function ArtistDashboardPage() {
                     </button>
                   </div>
 
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-orange-500/30 to-purple-600/30 flex items-center justify-center shrink-0">
-                    {album.image ? <Image src={album.image} alt={album.name} fill sizes="100%" className="object-cover" /> : <Icon.Music />}
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-orange-500/30 to-purple-600/30 flex items-center justify-center shrink-0">
+                    {album.image ? <Image src={album.image} alt={album.name} fill sizes="64px" className="object-cover" /> : <Icon.Music />}
                   </div>
 
                   <div className="flex-1">
@@ -373,8 +373,8 @@ export default function ArtistDashboardPage() {
                 <div className="divide-y divide-[var(--pf-border)]">
                   {tracks.slice(0, 5).map(track => (
                     <div key={track.id} className="flex items-center gap-3 p-3 hover:bg-[var(--pf-surface-hover)]">
-                      <div className="w-10 h-10 rounded overflow-hidden bg-[var(--pf-surface)]">
-                        <Image src={track.image} alt={track.title} fill sizes="48px" className="object-cover" />
+                      <div className="relative w-10 h-10 rounded overflow-hidden bg-[var(--pf-surface)] shrink-0">
+                        <Image src={track.image} alt={track.title} fill sizes="40px" className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{track.title}</p>
@@ -474,8 +474,8 @@ export default function ArtistDashboardPage() {
             </div>
             {PRODUCTS.map(product => (
               <div key={product.id} className="pf-card p-4 flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-[var(--pf-surface)]">
-                  <Image src={product.image} alt={product.name} fill sizes="100%" className="object-cover" />
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[var(--pf-surface)] shrink-0">
+                  <Image src={product.image} alt={product.name} fill sizes="64px" className="object-cover" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold">{product.name}</h3>

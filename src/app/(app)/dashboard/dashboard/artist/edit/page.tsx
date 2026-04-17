@@ -236,11 +236,11 @@ export default function EditArtistPage() {
           <div>
             <label className="block text-sm font-medium mb-2">Cover Image</label>
             <div 
-              className="relative h-40 rounded-xl overflow-hidden bg-[var(--pf-surface)] border border-[var(--pf-border)] cursor-pointer group"
+              className="relative w-full h-40 max-h-40 rounded-xl overflow-hidden bg-[var(--pf-surface)] border border-[var(--pf-border)] cursor-pointer group shrink-0"
               onClick={() => coverInputRef.current?.click()}
             >
               {coverPreview ? (
-                <Image src={coverPreview} alt="Cover" fill className="object-cover" />
+                <Image src={coverPreview} alt="Cover" fill sizes="(max-width: 768px) 100vw, 720px" className="object-cover w-full h-full" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
@@ -268,11 +268,11 @@ export default function EditArtistPage() {
             <label className="block text-sm font-medium mb-2">Profile Photo</label>
             <div className="flex items-center gap-4">
               <div 
-                className="relative w-24 h-24 rounded-xl overflow-hidden bg-[var(--pf-surface)] border border-[var(--pf-border)] cursor-pointer group"
+                className="relative w-24 h-24 max-w-24 max-h-24 rounded-xl overflow-hidden bg-[var(--pf-surface)] border border-[var(--pf-border)] cursor-pointer group shrink-0"
                 onClick={() => avatarInputRef.current?.click()}
               >
                 {avatarPreview ? (
-                  <Image src={avatarPreview} alt="Avatar" fill className="object-cover" />
+                  <Image src={avatarPreview} alt="Avatar" fill sizes="96px" className="object-cover w-full h-full" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Camera className="text-[var(--pf-text-muted)]" size={32} />

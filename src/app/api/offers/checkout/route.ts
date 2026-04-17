@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createServerClient } from '@/lib/supabase';
+import { decodePorterfulSession } from '@/lib/porterful-session';
 
-const OFFER_SECRET = process.env.OFFER_SECRET || process.env.INTERNAL_API_KEY || 'likeness_offer_secret_2026';
+function getOfferSecret() {
+  const secret = process.env.OFFER_SECRET;
+  if (!secret) {
+    throw new Error('OFFER_SECRET is required');
+  }
+  return secret;
+}
 
 function verifyOffer(token: string): { valid: true; data: any } | { valid: false; error: string } {
   try {
     const [tokenPart, sigPart] = token.split('.');
     if (!tokenPart || !sigPart) return { valid: false, error: 'Malformed token' };
     const data = JSON.parse(Buffer.from(tokenPart, 'base64url').toString('utf8'));
-    const sig = crypto.createHmac('sha256', OFFER_SECRET).update(JSON.stringify(data)).digest('base64url');
+    const sig = crypto.createHmac('sha256', getOfferSecret()).update(JSON.stringify(data)).digest('base64url');
     if (sigPart !== sig) return { valid: false, error: 'Invalid signature' };
     if (data.exp && data.exp < Math.floor(Date.now() / 1000)) return { valid: false, error: 'Expired' };
     return { valid: true, data };
@@ -17,9 +25,6 @@ function verifyOffer(token: string): { valid: true; data: any } | { valid: false
   }
 }
 
-const PRODUCT_PRICES: Record<string, number> = {
-  'credit-klimb': 4900, 'nlds-membership': 2500, 'teachyoung': 1900, 'family-os': 3900,
-};
 const PRODUCT_NAMES: Record<string, string> = {
   'credit-klimb': 'Credit Klimb', 'nlds-membership': 'NLDS Deal Access',
   'teachyoung': 'TeachYoung', 'family-os': 'Family Legacy OS',
@@ -33,7 +38,20 @@ export async function POST(req: NextRequest) {
   if (token) {
     const result = verifyOffer(token);
     if (!result.valid) return NextResponse.json({ error: result.error }, { status: 404 });
-    offer = result.data;
+    const supabase = createServerClient();
+    const { data: dbOffer } = await supabase
+      .from('offers')
+      .select('offer_id, lk_id, username, product_id, product_name, price_cents, status')
+      .eq('offer_id', result.data.offer_id)
+      .eq('status', 'active')
+      .limit(1)
+      .single();
+
+    if (!dbOffer || dbOffer.lk_id !== result.data.lk_id || dbOffer.product_id !== result.data.product_id) {
+      return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
+    }
+
+    offer = dbOffer;
   } else if (offerId) {
     return NextResponse.json({ error: 'offerId requires token' }, { status: 400 });
   } else {
@@ -43,7 +61,10 @@ export async function POST(req: NextRequest) {
   const sessionToken = req.cookies.get('porterful_session')?.value;
   let session: { email: string; lkId: string | null; profileId: string } = { email: '', lkId: null, profileId: '' };
   if (sessionToken) {
-    try { session = JSON.parse(Buffer.from(sessionToken, 'base64url').toString('utf8')); } catch {}
+    const decoded = decodePorterfulSession(sessionToken);
+    if (decoded) {
+      session = decoded;
+    }
   }
 
   const price = offer.price_cents;

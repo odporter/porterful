@@ -74,38 +74,13 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
 
-    // Step 3: Try to create/update entitlement (safe to fail silently)
-    try {
-      const { data: existingEntitlement } = await supabase
-        .from('entitlements')
-        .select('id')
-        .eq('buyer_email', normalizedEmail)
-        .eq('product_id', product || 'unknown')
-        .eq('status', 'active')
-        .maybeSingle()
-
-      if (!existingEntitlement) {
-        await supabase
-          .from('entitlements')
-          .insert({
-            buyer_email: normalizedEmail,
-            product_id: product || 'unknown',
-            offer_id: offer || null,
-            order_id: order?.id || null,
-            status: 'active',
-          })
-      }
-    } catch {
-      // Entitlements table may not exist yet — skip silently
-    }
-
-    // Step 4: Determine redirect URL
+    // Step 3: Determine redirect URL
     let redirectUrl = '/dashboard'
     if (product && PRODUCT_REDIRECTS[product]) {
       redirectUrl = PRODUCT_REDIRECTS[product]
     }
 
-    // Step 5: Set claim session cookie
+    // Step 4: Set claim session cookie
     const response = NextResponse.json({
       success: true,
       message: 'Access verified. Redirecting to your product...',

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import { decodePorterfulSession } from '@/lib/porterful-session';
 
 export async function GET(req: NextRequest) {
   const sessionToken = req.cookies.get('porterful_session')?.value;
@@ -7,10 +8,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let sessionData: { email: string; lkId: string | null };
-  try {
-    sessionData = JSON.parse(Buffer.from(sessionToken, 'base64url').toString('utf8'));
-  } catch {
+  const sessionData = decodePorterfulSession(sessionToken);
+  if (!sessionData) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
   }
 

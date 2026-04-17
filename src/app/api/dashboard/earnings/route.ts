@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import { decodePorterfulSession } from '@/lib/porterful-session';
 
 // GET /api/dashboard/earnings — read real earnings from existing ledger
 export async function GET(req: NextRequest) {
@@ -8,10 +9,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let session: { email: string; lkId: string | null; profileId: string };
-  try {
-    session = JSON.parse(Buffer.from(sessionToken, 'base64url').toString('utf8'));
-  } catch {
+  const session = decodePorterfulSession(sessionToken);
+  if (!session) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
   }
 

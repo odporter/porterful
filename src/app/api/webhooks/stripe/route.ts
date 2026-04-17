@@ -22,13 +22,16 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     const metadata = session.metadata || {};
     const { lk_id, user_id, username, product_id, source, offer_id } = metadata;
+    const supabase = createServerClient();
+
+    if (session.payment_status !== 'paid') {
+      return NextResponse.json({ received: true });
+    }
 
     // Resolve referrer_id from Likeness™ identity (lk_id)
     // The profiles table links Likeness™ identity to Porterful profile
     let referrerId: string | null = null;
     let profileId: string | null = null;
-
-    const supabase = createServerClient();
 
     if (lk_id) {
       // Find profile(s) that have this Likeness™ identity
@@ -78,31 +81,74 @@ export async function POST(req: NextRequest) {
     const superfanTotal = Math.round(amount * 0.03);
     const platformTotal = Math.round(amount * 0.10);
 
-    // Write to existing orders table
-    const { data: order, error: orderError } = await supabase
+    // Write to existing orders table once
+    let order: any = null;
+    const { data: existingOrder } = await supabase
       .from('orders')
-      .insert({
-        buyer_id: buyerId,
-        product_id: product_id || null,
-        amount,
-        status: 'completed',
-        referrer_id: referrerId,
-        seller_total: sellerTotal,
-        artist_fund_total: artistFundTotal,
-        superfan_total: superfanTotal,
-        platform_total: platformTotal,
-        stripe_checkout_session_id: session.id,
-        buyer_email: session.customer_email || null,
-        // Store Likeness™ identity in metadata fields
-        user_id: profileId || user_id || null,
-      })
-      .select()
-      .single();
+      .select('id')
+      .eq('stripe_checkout_session_id', session.id)
+      .limit(1)
+      .maybeSingle();
 
-    if (orderError) {
-      console.error('[stripe-webhook] Order insert failed:', orderError.message);
+    if (existingOrder) {
+      order = existingOrder;
     } else {
-      console.log('[stripe-webhook] Order created:', order.id, 'referrer:', referrerId);
+      const { data: createdOrder, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          buyer_id: buyerId,
+          product_id: product_id || null,
+          amount,
+          status: 'completed',
+          referrer_id: referrerId,
+          seller_total: sellerTotal,
+          artist_fund_total: artistFundTotal,
+          superfan_total: superfanTotal,
+          platform_total: platformTotal,
+          stripe_checkout_session_id: session.id,
+          buyer_email: session.customer_email || null,
+          // Store Likeness™ identity in metadata fields
+          user_id: profileId || user_id || null,
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error('[stripe-webhook] Order insert failed:', orderError.message);
+      } else {
+        order = createdOrder;
+        console.log('[stripe-webhook] Order created:', order.id, 'referrer:', referrerId);
+      }
+    }
+
+    if (session.customer_email && product_id) {
+      const normalizedEmail = session.customer_email.toLowerCase();
+      const { data: existingEntitlement } = await supabase
+        .from('entitlements')
+        .select('id')
+        .eq('buyer_email', normalizedEmail)
+        .eq('product_id', product_id)
+        .eq('status', 'active')
+        .limit(1)
+        .maybeSingle();
+
+      if (!existingEntitlement) {
+        const { error: entitlementError } = await supabase
+          .from('entitlements')
+          .insert({
+            buyer_email: normalizedEmail,
+            buyer_user_id: buyerId,
+            product_id,
+            offer_id: offer_id || null,
+            referrer_id: referrerId,
+            order_id: order?.id || null,
+            status: 'active',
+          });
+
+        if (entitlementError) {
+          console.error('[stripe-webhook] Entitlement insert failed:', entitlementError.message);
+        }
+      }
     }
 
     // Also record in payments table if tier-based

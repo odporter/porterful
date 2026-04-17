@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { decodePorterfulSession } from '@/lib/porterful-session'
 
 // Dynamic Stripe import
 async function getStripe() {
@@ -77,7 +78,8 @@ export async function POST(request: NextRequest) {
 
     if (sessionToken) {
       try {
-        const sessionData = JSON.parse(Buffer.from(sessionToken, 'base64url').toString('utf8'));
+        const sessionData = decodePorterfulSession(sessionToken);
+        if (!sessionData) throw new Error('invalid_session');
         profileId = sessionData.profileId || null;
         lkId = sessionData.lkId || null;
         sessionEmail = sessionData.email || null;

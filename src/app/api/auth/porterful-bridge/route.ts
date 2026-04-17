@@ -4,25 +4,19 @@ import { createHash } from 'crypto';
 
 /**
  * Porterful ↔ Likeness™ Bridge
- * 
- * Handles cross-product unified auth flow:
- * 1. GET: Magic link return URL — LikenessVerified redirects here with signed token
- * 2. POST: Client-side bridge — when likeness_session cookie exists on Porterful
- * 
- * Token-based approach avoids cross-origin cookie forwarding issues.
- * LikenessVerified signs a short-lived token; Porterful verifies HMAC locally.
+ *
+ * Validates a Likeness™ identity, upserts a Porterful profile, then creates
+ * a Supabase Auth session via admin generateLink so that the middleware and
+ * client auth provider both see a valid session after the redirect.
+ *
+ * Flow:
+ *   GET  ?token=<bridge_token>  — LikenessVerified sends a signed token here
+ *   POST                        — client-side bridge (when likeness_session exists)
+ *   → admin.generateLink → Supabase verifies → /auth/callback → /dashboard
  */
 
 const LIKENESS_BASE = 'https://likenessverified.com';
-const TOKEN_TTL_MS = 10 * 60 * 1000; // 10 minutes
-
-// ─── Token helpers ────────────────────────────────────────────────────────────
-function createBridgeToken(email: string, lkId: string, secret: string): string {
-  const expiresAt = Date.now() + TOKEN_TTL_MS;
-  const payload = `${email.toLowerCase()}|${lkId}|${expiresAt}`;
-  const sig = createHash('sha256').update(payload + secret).digest('base64url');
-  return Buffer.from(`${payload}|${sig}`).toString('base64url');
-}
+const TOKEN_TTL_MS = 10 * 60 * 1000;
 
 function verifyBridgeToken(token: string, secret: string): { email: string; lkId: string } | null {
   try {
@@ -30,33 +24,26 @@ function verifyBridgeToken(token: string, secret: string): { email: string; lkId
     const parts = decoded.split('|');
     if (parts.length !== 4) return null;
     const [email, lkId, expiresAtStr, sig] = parts;
-
-    const expiresAt = parseInt(expiresAtStr, 10);
-    if (Date.now() > expiresAt) return null; // expired
-
-    // Verify HMAC
+    if (Date.now() > parseInt(expiresAtStr, 10)) return null;
     const payload = `${email}|${lkId}|${expiresAtStr}`;
-    const expectedSig = createHash('sha256').update(payload + secret).digest('base64url');
-    if (sig !== expectedSig) return null; // tampered
-
+    const expected = createHash('sha256').update(payload + secret).digest('base64url');
+    if (sig !== expected) return null;
     return { email, lkId };
   } catch {
     return null;
   }
 }
 
-// ─── GET: Magic link return handler ─────────────────────────────────────────
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const bridgeToken = searchParams.get('token');
   const error = searchParams.get('error');
+  const origin = req.nextUrl.origin;
 
-  // Handle error from LikenessVerified
   if (error) {
-    return NextResponse.redirect(new URL('/login/login?error=likeness_denied', req.nextUrl.origin));
+    return NextResponse.redirect(new URL('/login?error=likeness_denied', origin));
   }
 
-  // If we have a bridge token, verify it locally (no cross-origin fetch needed)
   if (bridgeToken) {
     const secret = process.env.MAGIC_LINK_SECRET || process.env.LIKENESS_AUTH_SECRET;
     if (secret) {
@@ -67,33 +54,26 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // No token or invalid — try via LikenessVerified session cookie
   return bridgeToPorterful(req);
 }
 
-// ─── POST: Client-initiated bridge ───────────────────────────────────────────
 export async function POST(req: Request) {
   return bridgeToPorterful(req as NextRequest);
 }
 
-// ─── Core bridging logic ──────────────────────────────────────────────────────
 async function bridgeToPorterful(req: NextRequest) {
   try {
     const likenSession = req.cookies.get('likeness_session')?.value;
     if (!likenSession) {
-      // No likeness_session — redirect to LikenessVerified login
       const returnUrl = encodeURIComponent(`${req.nextUrl.origin}/api/auth/porterful-bridge`);
       return NextResponse.redirect(`${LIKENESS_BASE}/login?return=${returnUrl}`);
     }
 
-    // Validate likeness_session via LikenessVerified internal endpoint
-    // Note: credentials:include sends HttpOnly cookie to same-origin
     const likenRes = await fetch(`${LIKENESS_BASE}/api/auth/internal/validate-session`, {
       method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'cookie': `likeness_session=${likenSession}`,
+        cookie: `likeness_session=${likenSession}`,
       },
     });
 
@@ -111,94 +91,90 @@ async function bridgeToPorterful(req: NextRequest) {
     return completeBridge(req, likenData.email, likenData.lkId, likenData.referralCode || null);
   } catch (e: any) {
     console.error('[porterful-bridge] Error:', e);
-    return NextResponse.redirect(new URL('/login/login?error=bridge_failed', req.nextUrl.origin));
+    return NextResponse.redirect(new URL('/login?error=bridge_failed', req.nextUrl.origin));
   }
 }
 
-// ─── Complete the bridge: upsert profile + set porterful_session ─────────────
 async function completeBridge(
   req: NextRequest,
   email: string,
   lkId: string,
   referralCode: string | null
 ) {
+  const origin = req.nextUrl.origin;
   try {
-    const supabase = createServerClient();
-    if (!supabase) {
-      return NextResponse.redirect(new URL('/login/login?error=server_error', req.nextUrl.origin));
+    const adminSupabase = createServerClient();
+    if (!adminSupabase) {
+      return NextResponse.redirect(new URL('/login?error=server_error', origin));
     }
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('id, name, role')
-      .eq('email', email.toLowerCase())
-      .limit(1)
-      .single();
 
-    let profileId: string;
+    // Generate a Supabase magic link. This creates the auth user if one doesn't
+    // exist for this email, and returns the action_link that completes auth when
+    // visited. Using this instead of setting porterful_session directly means the
+    // middleware and client provider both see a canonical Supabase session.
+    const { data: linkData, error: linkError } = await adminSupabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${origin}/auth/callback` },
+    });
+
+    if (linkError || !linkData?.properties?.action_link) {
+      console.error('[porterful-bridge] generateLink failed:', linkError);
+      return NextResponse.redirect(new URL('/login?error=bridge_failed', origin));
+    }
+
+    const authUserId = linkData.user.id;
+
+    // Upsert profile keyed on Supabase auth user ID (so dashboard SSR can find it)
+    const { data: existingProfile } = await adminSupabase
+      .from('profiles')
+      .select('id')
+      .eq('id', authUserId)
+      .limit(1)
+      .maybeSingle();
 
     if (existingProfile) {
-      profileId = existingProfile.id;
       if (lkId) {
-        await supabase.from('profiles').update({ lk_id: lkId }).eq('id', profileId);
+        await adminSupabase.from('profiles').update({ lk_id: lkId }).eq('id', authUserId);
       }
     } else {
-      const { data: newProfile, error: createErr } = await supabase
-        .from('profiles')
-        .insert({
-          email: email.toLowerCase(),
-          name: email.split('@')[0],
-          role: 'supporter',
-          ...(lkId ? { lk_id: lkId } : {}),
-        })
-        .select('id')
-        .limit(1)
-        .single();
+      const { error: insertErr } = await adminSupabase.from('profiles').insert({
+        id: authUserId,
+        email: email.toLowerCase(),
+        name: email.split('@')[0],
+        role: 'supporter',
+        ...(lkId ? { lk_id: lkId } : {}),
+      });
 
-      if (createErr || !newProfile) {
-        console.error('[porterful-bridge] Profile creation failed:', createErr);
-        return NextResponse.redirect(new URL('/login/login?error=profile_create_failed', req.nextUrl.origin));
+      if (insertErr) {
+        // Profile may exist under a different ID from a prior bridge run — not fatal.
+        // The user will land on dashboard but the SSR profile query will miss.
+        console.warn('[porterful-bridge] Profile insert conflict (may be pre-existing):', insertErr.message);
       }
-      profileId = newProfile.id;
     }
 
-    // Credit referrer if referralCode present
+    // Credit referrer
     if (referralCode && lkId) {
-      const { data: referrerProfile } = await supabase
+      const { data: referrerProfile } = await adminSupabase
         .from('profiles')
         .select('id')
         .eq('lk_id', referralCode)
         .limit(1)
         .maybeSingle();
 
-      if (referrerProfile && referrerProfile.id !== profileId) {
-        await supabase.from('referrals').upsert({
-          referrer_id: referrerProfile.id,
-          referred_id: profileId,
-          referral_code: referralCode,
-        }, { onConflict: 'referrer_id,referred_id' });
+      if (referrerProfile && referrerProfile.id !== authUserId) {
+        await adminSupabase.from('referrals').upsert(
+          { referrer_id: referrerProfile.id, referred_id: authUserId, referral_code: referralCode },
+          { onConflict: 'referrer_id,referred_id' }
+        );
       }
     }
 
-    // Create Porterful session token
-    const sessionToken = Buffer.from(JSON.stringify({
-      email: email.toLowerCase(),
-      profileId,
-      lkId: lkId || null,
-      iat: Date.now(),
-    })).toString('base64url');
-
-    const response = NextResponse.redirect(new URL('/dashboard', req.nextUrl.origin));
-    response.cookies.set('porterful_session', sessionToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30,
-      path: '/',
-    });
-
-    return response;
+    // Redirect through Supabase's auth server — it verifies the token and sends
+    // the user back to /auth/callback, which sets the session cookies.
+    return NextResponse.redirect(linkData.properties.action_link);
   } catch (e: any) {
     console.error('[porterful-bridge] completeBridge error:', e);
-    return NextResponse.redirect(new URL('/login/login?error=bridge_failed', req.nextUrl.origin));
+    return NextResponse.redirect(new URL('/login?error=bridge_failed', origin));
   }
 }

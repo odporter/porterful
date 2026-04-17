@@ -2,51 +2,40 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { FaGoogle } from 'react-icons/fa'
-import { createBrowserClient } from '@supabase/ssr'
+import { useSupabase } from '@/app/providers'
+
+function getSafeNextPath(next: string | null) {
+  if (!next || !next.startsWith('/') || next.startsWith('//')) {
+    return '/dashboard'
+  }
+
+  return next
+}
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { supabase, user, loading: authLoading } = useSupabase()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const nextPath = getSafeNextPath(searchParams.get('return') || searchParams.get('next'))
 
-  // Double protection: redirect authenticated users immediately on mount
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        router.replace('/dashboard')
-      }
-    })
-  }, [])
-
-  const getSupabaseClient = () => createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+    if (!authLoading && user) {
+      router.replace(nextPath)
+      router.refresh()
+    }
+  }, [authLoading, user, nextPath, router])
 
   const handleLikenessSignIn = async () => {
     setLoading(true)
     setError('')
     try {
-      const likenSession = document.cookie.match(/likeness_session=([^;]+)/)?.[1]
-      if (likenSession) {
-        const res = await fetch('/api/auth/porterful-bridge', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        })
-        if (res.ok) {
-          router.push('/dashboard')
-          return
-        }
-      }
       const bridgeUrl = encodeURIComponent(window.location.origin + '/api/auth/porterful-bridge')
       window.location.href = `https://likenessverified.com/login?return=${bridgeUrl}`
     } catch {
@@ -61,34 +50,24 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-
-      // 307 redirect with session cookies means success — follow it client-side
-      // 401 or error means failed credentials
-      if (res.redirected) {
-        // Response was a redirect — follow to dashboard
-        router.push(res.url)
+      if (!supabase) {
+        setError('Login is temporarily unavailable.')
         return
       }
 
-      const data = await res.json()
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-      if (!res.ok) {
-        setError(data.error || 'Failed to sign in')
+      if (signInError) {
+        setError(signInError.message || 'Failed to sign in')
         setLoading(false)
         return
       }
 
-      // Fallback: if API returned JSON with role (old behavior), navigate directly
-      if (data.role === 'artist') {
-        router.push('/dashboard/artist')
-      } else {
-        router.push('/dashboard')
-      }
+      router.refresh()
+      router.replace(nextPath)
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
     } finally {
@@ -97,14 +76,31 @@ export default function LoginPage() {
   }
 
   const handleOAuthSignIn = async () => {
-    const supabase = getSupabaseClient()
+    if (!supabase) {
+      setError('Login is temporarily unavailable.')
+      return
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
       },
     })
     if (error) setError(error.message)
+  }
+
+  if (authLoading || user) {
+    return (
+      <div className="min-h-screen pt-20 pb-12 px-4">
+        <div className="max-w-md mx-auto">
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 rounded-lg bg-[var(--pf-surface)]" />
+            <div className="h-64 rounded-2xl bg-[var(--pf-surface)]" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -223,10 +219,14 @@ export default function LoginPage() {
               }
               setLoading(true)
               setError('')
-              const supabase = getSupabaseClient()
+              if (!supabase) {
+                setError('Login is temporarily unavailable.')
+                setLoading(false)
+                return
+              }
               const { error } = await supabase.auth.signInWithOtp({
                 email,
-                options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+                options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}` },
               })
               if (error) setError(error.message)
               else setSuccess(true)

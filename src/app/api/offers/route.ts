@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createServerClient } from '@/lib/supabase';
+import { decodePorterfulSession } from '@/lib/porterful-session';
 
-const OFFER_SECRET = process.env.OFFER_SECRET || process.env.INTERNAL_API_KEY || 'likeness_offer_secret_2026';
-const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
-  'credit-klimb': { name: 'Credit Klimb', price: 4900 },
-  'nlds-membership': { name: 'NLDS Deal Access', price: 2500 },
-  'teachyoung': { name: 'TeachYoung', price: 1900 },
-  'family-os': { name: 'Family Legacy OS', price: 3900 },
-};
+function getOfferSecret() {
+  const secret = process.env.OFFER_SECRET;
+  if (!secret) {
+    throw new Error('OFFER_SECRET is required');
+  }
+  return secret;
+}
 
 // Sign an offer token — self-contained, no DB needed
 function signOffer(payload: object): string {
   const data = JSON.stringify(payload);
-  const sig = crypto.createHmac('sha256', OFFER_SECRET).update(data).digest('base64url');
+  const sig = crypto.createHmac('sha256', getOfferSecret()).update(data).digest('base64url');
   const token = Buffer.from(data).toString('base64url');
   return `${token}.${sig}`;
 }
@@ -23,7 +25,7 @@ function verifyOffer(token: string): { valid: true; data: any } | { valid: false
     const [tokenPart, sigPart] = token.split('.');
     if (!tokenPart || !sigPart) return { valid: false, error: 'Malformed token' };
     const data = JSON.parse(Buffer.from(tokenPart, 'base64url').toString('utf8'));
-    const expectedSig = crypto.createHmac('sha256', OFFER_SECRET).update(JSON.stringify(data)).digest('base64url');
+    const expectedSig = crypto.createHmac('sha256', getOfferSecret()).update(JSON.stringify(data)).digest('base64url');
     if (sigPart !== expectedSig) return { valid: false, error: 'Invalid signature' };
     return { valid: true, data };
   } catch {
@@ -36,22 +38,26 @@ export async function POST(req: NextRequest) {
   const sessionToken = req.cookies.get('porterful_session')?.value;
   if (!sessionToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  let session: { email: string; lkId: string | null; profileId: string };
-  try {
-    session = JSON.parse(Buffer.from(sessionToken, 'base64url').toString('utf8'));
-  } catch {
+  const session = decodePorterfulSession(sessionToken);
+  if (!session) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
   }
 
   if (!session.lkId) return NextResponse.json({ error: 'Likeness™ identity required' }, { status: 403 });
 
-  const { productId, price } = await req.json();
-  const product = PRODUCT_CATALOG[productId];
-  if (!product) return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
+  const { productId } = await req.json();
+  if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
 
-  const priceOverride = typeof price === 'number' ? Math.round(price * 100) : product.price;
-  if (priceOverride < product.price * 0.5 || priceOverride > product.price * 1.5) {
-    return NextResponse.json({ error: 'Price outside reasonable range' }, { status: 400 });
+  const supabase = createServerClient();
+  const { data: product, error: productError } = await supabase
+    .from('products')
+    .select('id, name, base_price')
+    .eq('id', productId)
+    .limit(1)
+    .single();
+
+  if (productError || !product) {
+    return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
   }
 
   // Generate offer_id and self-contained token
@@ -62,10 +68,25 @@ export async function POST(req: NextRequest) {
     username: session.email.split('@')[0],
     product_id: productId,
     product_name: product.name,
-    price_cents: priceOverride,
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days
   };
+
+  const { error: offerInsertError } = await supabase
+    .from('offers')
+    .insert({
+      offer_id: offerId,
+      lk_id: session.lkId,
+      username: session.email.split('@')[0],
+      product_id: productId,
+      product_name: product.name,
+      price_cents: Math.round(Number(product.base_price) * 100),
+      status: 'active',
+    });
+
+  if (offerInsertError) {
+    return NextResponse.json({ error: 'Failed to create offer' }, { status: 500 });
+  }
 
   const token = signOffer(payload);
   const offerUrl = `${req.nextUrl.origin}/offer/${offerId}?token=${token}`;
@@ -78,10 +99,8 @@ export async function GET(req: NextRequest) {
   const sessionToken = req.cookies.get('porterful_session')?.value;
   if (!sessionToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  let session: { email: string; lkId: string | null };
-  try {
-    session = JSON.parse(Buffer.from(sessionToken, 'base64url').toString('utf8'));
-  } catch {
+  const session = decodePorterfulSession(sessionToken);
+  if (!session) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
   }
 

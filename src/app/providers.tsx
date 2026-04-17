@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { AudioProvider } from '@/lib/audio-context'
 import { ThemeProvider } from '@/lib/theme-context'
@@ -71,35 +71,39 @@ export function Providers({
     validateSession()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event as string) === 'SESSION_EXPIRED') {
+      if (event === 'SIGNED_OUT') {
+        setSession(null)
+        setUser(null)
+        sessionRef.current = null
+      } else if ((event as string) === 'SESSION_EXPIRED') {
         try {
           const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession()
-          if (error || !refreshedSession) {
-            console.warn('Session refresh failed, clearing session')
+          if (!error && refreshedSession) {
+            setSession(refreshedSession)
+            setUser(refreshedSession.user)
+            sessionRef.current = refreshedSession.access_token
+          } else {
             setSession(null)
             setUser(null)
             sessionRef.current = null
-          } else {
-            setSession(refreshedSession)
-            setUser(refreshedSession?.user ?? null)
-            sessionRef.current = refreshedSession.access_token
           }
-        } catch (err) {
-          console.error('Session refresh error:', err)
+        } catch {
           setSession(null)
           setUser(null)
           sessionRef.current = null
         }
-      } else {
+      } else if (session) {
+        // SIGNED_IN, TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION with real session
         setSession(session)
-        setUser(session?.user ?? null)
-        sessionRef.current = session?.access_token ?? null
+        setUser(session.user)
+        sessionRef.current = session.access_token
       }
+      // INITIAL_SESSION with null session: don't overwrite server-confirmed initialUser
       setLoading(false)
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [initialUser, supabase])
 
   useEffect(() => {
     const handleVisibilityChange = async () => {
@@ -107,12 +111,14 @@ export function Providers({
         try {
           const { data: { session: currentSession } } = await supabase.auth.getSession()
           
-          // If session changed unexpectedly, update state
+          // If session changed while tab was hidden, sync state
           if (currentSession?.access_token !== sessionRef.current) {
-            console.log('Session changed while away, updating state')
-            setSession(currentSession)
-            setUser(currentSession?.user ?? null)
-            sessionRef.current = currentSession?.access_token ?? null
+            if (currentSession) {
+              setSession(currentSession)
+              setUser(currentSession.user)
+              sessionRef.current = currentSession.access_token
+            }
+            // If null and token changed: SIGNED_OUT event will clear — don't race it
           }
         } catch (err) {
           console.error('Session re-validation failed:', err)

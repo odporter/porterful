@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createServerClient } from '@/lib/supabase';
 
-const OFFER_SECRET = process.env.OFFER_SECRET || process.env.INTERNAL_API_KEY || 'likeness_offer_secret_2026';
+function getOfferSecret() {
+  const secret = process.env.OFFER_SECRET;
+  if (!secret) {
+    throw new Error('OFFER_SECRET is required');
+  }
+  return secret;
+}
 
 function verifyOffer(token: string): { valid: true; data: any } | { valid: false; error: string } {
   try {
     const [tokenPart, sigPart] = token.split('.');
     if (!tokenPart || !sigPart) return { valid: false, error: 'Malformed token' };
     const data = JSON.parse(Buffer.from(tokenPart, 'base64url').toString('utf8'));
-    const sig = crypto.createHmac('sha256', OFFER_SECRET).update(JSON.stringify(data)).digest('base64url');
+    const sig = crypto.createHmac('sha256', getOfferSecret()).update(JSON.stringify(data)).digest('base64url');
     if (sigPart !== sig) return { valid: false, error: 'Invalid signature' };
     if (data.exp && data.exp < Math.floor(Date.now() / 1000)) return { valid: false, error: 'Expired' };
     return { valid: true, data };
@@ -30,7 +37,21 @@ export async function GET(
     // Token-based: verify the self-contained token
     const result = verifyOffer(token);
     if (!result.valid) return NextResponse.json({ error: result.error }, { status: 404 });
-    return NextResponse.json({ ...result.data, offer_id: offerId });
+
+    const supabase = createServerClient();
+    const { data: offer } = await supabase
+      .from('offers')
+      .select('offer_id, product_id, product_name, price_cents, username, lk_id, status')
+      .eq('offer_id', offerId)
+      .eq('status', 'active')
+      .limit(1)
+      .single();
+
+    if (!offer || offer.lk_id !== result.data.lk_id || offer.product_id !== result.data.product_id) {
+      return NextResponse.json({ error: 'Offer not found or token expired' }, { status: 404 });
+    }
+
+    return NextResponse.json(offer);
   }
 
   // No token: try DB-based (legacy, won't exist)

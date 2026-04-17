@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import type { CookieOptions } from '@supabase/ssr'
+import type { EmailOtpType } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
+  const tokenHash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
   const next = searchParams.get('next')
   const errorParam = searchParams.get('error')
   const origin = request.nextUrl.origin
@@ -16,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (errorParam) {
     return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(errorParam)}`, origin))
   }
-  if (!code) {
+  if (!code && !(tokenHash && type)) {
     return NextResponse.redirect(new URL('/login?error=no_code', origin))
   }
 
@@ -39,10 +42,17 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
-  if (error || !data.session) {
-    return NextResponse.redirect(new URL('/login?error=exchange_failed', origin))
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error || !data.session) {
+      return NextResponse.redirect(new URL('/login?error=exchange_failed', origin))
+    }
+  } else if (tokenHash && type) {
+    // Admin-generated magic links (e.g. Likeness bridge) use token_hash instead of PKCE code
+    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
+    if (error) {
+      return NextResponse.redirect(new URL('/login?error=exchange_failed', origin))
+    }
   }
 
   return response

@@ -207,7 +207,7 @@ export default function DashboardClient({ serverProfileId, initialProfile }: Das
             </div>
             <div>
               <p className="text-xs text-[var(--pf-text-muted)] mb-1">Offers</p>
-              <p className="text-2xl font-bold text-purple-400">{stats.total_tracks} tracks • {displayOfferCount} offers</p>
+              <p className="text-2xl font-bold text-purple-400">{stats.total_tracks} tracks • {stats.total_offers} offers</p>
             </div>
             <div className="flex items-center justify-end">
               <Link 
@@ -304,7 +304,7 @@ function ContentOverview({ stats }: { stats: DashboardStats }) {
           <Music size={20} className="text-[var(--pf-text-muted)]" />
           <div className="text-left">
             <p className="font-semibold">Your Content</p>
-            <p className="text-sm text-[var(--pf-text-muted)]">{stats.total_tracks} tracks • {displayOfferCount} offers</p>
+            <p className="text-sm text-[var(--pf-text-muted)]">{stats.total_tracks} tracks • {stats.total_offers} offers</p>
           </div>
         </div>
         <ChevronRight size={20} className={`transition-transform ${expanded ? 'rotate-90' : ''}`} />

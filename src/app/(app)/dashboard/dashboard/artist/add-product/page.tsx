@@ -1,5 +1,14 @@
+'use client'
+import { useEffect } from 'react'
 import { redirect } from 'next/navigation'
 
 export default function AddProductPage() {
-  redirect('/dashboard/dashboard/catalog')
+  useEffect(() => {
+    window.location.href = '/dashboard/dashboard/catalog'
+  }, [])
+  return (
+    <div className="min-h-screen pt-20 pb-24 flex items-center justify-center">
+      <div className="text-[var(--pf-text-muted)]">Redirecting...</div>
+    </div>
+  )
 }

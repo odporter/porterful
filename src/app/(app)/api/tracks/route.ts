@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { getAuthenticatedClient } from '@/lib/auth-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,33 +18,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-            } catch {}
-          },
-        },
-      }
-    )
-
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
+    const auth = await getAuthenticatedClient()
+    if (!auth?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const { supabase, user } = auth
 
     const { data, error } = await supabase
       .from('tracks')
       .select('id, title, artist, album, duration, audio_url, cover_url, play_count, proud_to_pay_min, is_active, created_at')
-      .eq('artist_id', session.user.id)
+      .eq('artist_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -64,33 +46,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-            } catch {}
-          },
-        },
-      }
-    )
-
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
+    const auth = await getAuthenticatedClient()
+    if (!auth?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const { supabase, user } = auth
 
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name, username')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
 
     const body = await request.json()
@@ -110,7 +75,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('tracks')
       .insert({
-        artist_id: session.user.id,
+        artist_id: user.id,
         title,
         artist: artistName,
         album,

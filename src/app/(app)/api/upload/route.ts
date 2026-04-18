@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { getAuthenticatedClient } from '@/lib/auth-utils'
 
 // Strip all characters not allowed in Supabase Storage paths: [a-zA-Z0-9\-\_\.]
 function sanitizeFilename(name: string): string {
@@ -22,21 +22,10 @@ function sanitizeFilename(name: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return request.cookies.getAll() },
-          setAll() {},
-        },
-      }
-    )
+    const auth = await getAuthenticatedClient()
 
-    const { data: { session }, error } = await supabase.auth.getSession()
-
-    if (error || !session?.user) {
-      console.error('Upload auth failed:', error?.message || 'No session')
+    if (!auth?.user) {
+      console.error('Upload auth failed:', 'No valid Porterful session')
       return NextResponse.json({ error: 'Unauthorized - please log in' }, { status: 401 })
     }
 

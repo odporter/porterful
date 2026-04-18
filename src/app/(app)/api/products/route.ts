@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { PRODUCTS } from '@/lib/products'
+import { getAuthenticatedClient } from '@/lib/auth-utils'
 
 const LIVE_PRODUCT_LIMIT = 3
 
@@ -17,27 +16,16 @@ export async function GET(request: NextRequest) {
   // If mine=1, fetch from Supabase with auth
   if (mine) {
     try {
-      const cookieStore = await cookies()
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-        {
-          cookies: {
-            getAll() { return cookieStore.getAll() },
-            setAll(cookiesToSet) { try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {} },
-          },
-        }
-      )
-
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.user) {
+      const auth = await getAuthenticatedClient()
+      if (!auth?.user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
+      const { supabase, user } = auth
 
       const query = supabase
         .from('products')
         .select('id, name, description, category, base_price, images, status, printful_product_id, printful_sync_status, artist_name, seller_id, created_at')
-        .eq('seller_id', session.user.id)
+        .eq('seller_id', user.id)
         .order('created_at', { ascending: false })
 
       const { data, error } = await query
@@ -88,33 +76,22 @@ export async function GET(request: NextRequest) {
 // POST /api/products - Create a new product
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll() },
-          setAll(cookiesToSet) { try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {} },
-        },
-      }
-    )
-
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
+    const auth = await getAuthenticatedClient()
+    if (!auth?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const { supabase, user } = auth
 
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name, username')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
 
     const { count: liveProductsCount } = await supabase
       .from('products')
       .select('*', { count: 'exact', head: true })
-      .eq('seller_id', session.user.id)
+      .eq('seller_id', user.id)
       .eq('status', 'live')
 
     if ((liveProductsCount || 0) >= LIVE_PRODUCT_LIMIT) {
@@ -149,7 +126,7 @@ export async function POST(request: NextRequest) {
         printful_product_id,
         printful_sync_status: printful_product_id ? 'pending' : 'not_linked',
         inventory_count: 999,
-        seller_id: session.user.id,
+        seller_id: user.id,
         seller_type: 'artist',
         status,
         artist_name: artistName,

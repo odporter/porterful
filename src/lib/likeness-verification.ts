@@ -28,5 +28,5 @@ export function getLikenessVerificationState(profile: any): LikenessVerification
 }
 
 export function getMonetizationGateMessage() {
-  return 'Verify your identity to start earning'
+  return 'Verification required to withdraw funds'
 }

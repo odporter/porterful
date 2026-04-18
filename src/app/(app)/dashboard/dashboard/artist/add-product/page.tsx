@@ -9,7 +9,6 @@ import {
   Plus, Trash2, AlertCircle, Check, Eye, EyeOff
 } from 'lucide-react'
 import { useSupabase } from '@/app/providers'
-import { LIKENESS_REGISTRATION_URL } from '@/lib/likeness-verification'
 
 const CATEGORIES = [
   { value: 'apparel', label: 'Apparel (T-shirts, Hoodies)' },
@@ -30,12 +29,11 @@ interface Variant {
 
 export default function AddProductPage() {
   const router = useRouter()
-  const { user, supabase, loading: authLoading } = useSupabase()
+  const { user, loading: authLoading } = useSupabase()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [likenessError, setLikenessError] = useState(false)
 
   // Form state
   const [name, setName] = useState('')
@@ -76,27 +74,24 @@ export default function AddProductPage() {
 
     setUploadingImage(true)
     try {
-      const ext = file.name.split('.').pop()
-      const path = `products/${user.id}/${Date.now()}.${ext}`
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'product-images')
 
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(path, file, { upsert: true })
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json()
 
-      if (uploadError) throw uploadError
+      if (!res.ok || data.error) throw new Error(data.error || 'Upload failed')
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(path)
-
-      setImages(prev => [...prev, publicUrl])
-    } catch (err) {
+      setImages(prev => [...prev, data.url])
+    } catch (err: any) {
       console.error('Upload error:', err)
-      alert('Image upload failed. Try again.')
+      setError(`Image upload failed: ${err.message}`)
     } finally {
       setUploadingImage(false)
+      e.target.value = ''
     }
-  }, [user, supabase])
+  }, [user])
 
   const removeImage = (url: string) => {
     setImages(prev => prev.filter(u => u !== url))
@@ -119,7 +114,6 @@ export default function AddProductPage() {
 
   const handleSubmit = async (status: 'draft' | 'live') => {
     setError('')
-    setLikenessError(false)
 
     if (!name.trim()) { setError('Product name is required.'); return }
     if (!category) { setError('Category is required.'); return }
@@ -143,12 +137,6 @@ export default function AddProductPage() {
       })
 
       const data = await res.json()
-
-      if (res.status === 403 && data.code === 'LIKENESS_VERIFICATION_REQUIRED') {
-        setLikenessError(true)
-        setError(data.error)
-        return
-      }
 
       if (!res.ok) {
         setError(data.error || 'Failed to create product.')
@@ -194,31 +182,16 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Likeness gate error */}
-        {likenessError && (
-          <div className="mb-6 p-4 bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-xl">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[var(--pf-orange)] shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-[var(--pf-orange)] mb-1">Likeness verification required</p>
-                <p className="text-sm text-[var(--pf-text-secondary)] mb-3">
-                  You must verify ownership of your likeness before selling products through Porterful.
-                </p>
-                <a
-                  href={LIKENESS_REGISTRATION_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium text-sm hover:bg-[var(--pf-orange-dark)] transition-colors"
-                >
-                  Verify at LikenessVerified.com →
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Earnings info banner */}
+        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-start gap-3">
+          <Check className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-[var(--pf-text-muted)]">
+            You can sell now. Likeness verification is only required to withdraw earnings.
+          </p>
+        </div>
 
         {/* Error */}
-        {error && !likenessError && (
+        {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
             <p className="text-sm text-red-400">{error}</p>

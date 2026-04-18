@@ -1,74 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import {
-  LIKENESS_REGISTRATION_URL,
-  getLikenessVerificationState,
-  getMonetizationGateMessage,
-} from '@/lib/likeness-verification'
+import { createServerClient } from '@supabase/ssr'
 
-// Sanitize filename to comply with Supabase Storage filename rules
+// Strip all characters not allowed in Supabase Storage paths: [a-zA-Z0-9\-\_\.]
 function sanitizeFilename(name: string): string {
-  const ext = name.split('.').pop() || ''
-  const nameWithoutExt = name.slice(0, -(ext.length + 1))
-  const sanitized = nameWithoutExt
-    .replace(/[<>:"/\\|?*()[\]]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/\.\.+/g, '.')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 100)
+  const lastDot = name.lastIndexOf('.')
+  const hasExt = lastDot > 0 && lastDot < name.length - 1
+  const base = hasExt ? name.slice(0, lastDot) : name
+  const ext = hasExt ? name.slice(lastDot + 1) : ''
+
+  const cleanBase = base
+    .normalize('NFD')                    // decompose accented chars
+    .replace(/[\u0300-\u036f]/g, '')     // strip accent marks
+    .replace(/[^a-zA-Z0-9\-_]/g, '-')   // replace anything unsafe with hyphen
+    .replace(/-{2,}/g, '-')              // collapse consecutive hyphens
+    .replace(/^-+|-+$/g, '')            // trim leading/trailing hyphens
+    .substring(0, 80)
+
   const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
-  return `${sanitized || 'file'}.${cleanExt || 'bin'}`
+  return `${cleanBase || 'file'}${cleanExt ? '.' + cleanExt : '.bin'}`
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Auth check - properly read cookies from request
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll() {
-            // We don't need to set cookies in this route
-          },
+          getAll() { return request.cookies.getAll() },
+          setAll() {},
         },
       }
     )
-    
+
     const { data: { session }, error } = await supabase.auth.getSession()
-    
+
     if (error || !session?.user) {
       console.error('Upload auth failed:', error?.message || 'No session')
       return NextResponse.json({ error: 'Unauthorized - please log in' }, { status: 401 })
     }
 
-    // Likeness monetization gate
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single()
-
     const formData = await request.formData()
     const file = formData.get('file') as File
     const folder = formData.get('folder') as string || 'audio'
 
-    // Likeness gate only applies to monetized uploads (audio), not profile images
-    const isProfileImage = folder === 'artist-images'
-    if (!isProfileImage) {
-      const likenessState = getLikenessVerificationState(profile)
-      if (!likenessState.verified) {
-        return NextResponse.json({
-          error: getMonetizationGateMessage(),
-          code: 'LIKENESS_VERIFICATION_REQUIRED',
-          registrationUrl: LIKENESS_REGISTRATION_URL,
-        }, { status: 403 })
-      }
-    }
-    
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }

@@ -2,12 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { PRODUCTS } from '@/lib/products'
-import {
-  ARTIST_LIVE_LIMITS,
-  LIKENESS_REGISTRATION_URL,
-  getLikenessVerificationState,
-  getMonetizationGateMessage,
-} from '@/lib/likeness-verification'
+import { ARTIST_LIVE_LIMITS } from '@/lib/likeness-verification'
 
 // GET /api/products - List all products
 // Query params: category, search, mine (1=current user only), limit
@@ -111,18 +106,9 @@ export async function POST(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('*')
+      .select('full_name, username')
       .eq('id', session.user.id)
       .single()
-
-    const likenessState = getLikenessVerificationState(profile)
-    if (!likenessState.verified) {
-      return NextResponse.json({
-        error: getMonetizationGateMessage(),
-        code: 'LIKENESS_VERIFICATION_REQUIRED',
-        registrationUrl: LIKENESS_REGISTRATION_URL,
-      }, { status: 403 })
-    }
 
     const { count: liveProductsCount } = await supabase
       .from('products')

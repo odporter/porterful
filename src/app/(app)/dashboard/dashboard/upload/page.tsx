@@ -87,7 +87,7 @@ export default function UploadPage() {
 
       let coverUrl = ''
       if (coverFile) {
-        coverUrl = await uploadFile(coverFile, 'track-covers')
+        coverUrl = await uploadFile(coverFile, 'artist-images')
       }
 
       const res = await fetch('/api/tracks', {

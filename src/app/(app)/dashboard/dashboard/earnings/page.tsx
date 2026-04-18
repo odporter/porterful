@@ -200,11 +200,11 @@ export default function EarningsDashboard() {
                   <span className="text-sm text-gray-400 flex items-center gap-1">
                     <Clock className="w-3 h-3" /> {timeAgo(entry.created_at)}
                   </span>
-                  <span className="text-sm font-bold text-green-400">+{formatCents(entry.commission_cents)}</span>
+                  <span className="text-sm font-bold text-green-400">+{formatCents(entry.amount_cents)}</span>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
                     entry.status === 'pending' || entry.status === 'credited'
                       ? 'bg-yellow-500/20 text-yellow-400'
-                      : entry.status === 'paid'
+                      : entry.status === 'withdrawn'
                         ? 'bg-green-500/20 text-green-400'
                         : 'bg-gray-500/20 text-gray-400'
                   }`}>{entry.status}</span>

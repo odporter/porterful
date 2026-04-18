@@ -31,11 +31,9 @@ export async function POST(req: NextRequest) {
 
     // Resolve referrer_id from the referral handle carried through checkout.
     let referrerId: string | null = null;
-    const profileId: string | null = null;
-
-    const referrerHandle = normalizeReferralHandle(referral_code || username || lk_id || null)
+    const referrerHandle = normalizeReferralHandle(referral_code || username || lk_id || null);
     if (referrerHandle) {
-      referrerId = await resolveReferrerId(supabase, referrerHandle)
+      referrerId = await resolveReferrerId(supabase, referrerHandle);
     }
 
     // Also try to find buyer profile
@@ -57,7 +55,7 @@ export async function POST(req: NextRequest) {
     const platformTotal = Math.round(amount * 0.10);
 
     // Write to existing orders table once
-    let order: any = null;
+    let orderId: string | null = null;
     const { data: existingOrder } = await supabase
       .from('orders')
       .select('id')
@@ -66,7 +64,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (existingOrder) {
-      order = existingOrder;
+      orderId = existingOrder.id;
     } else {
       const { data: createdOrder, error: orderError } = await supabase
         .from('orders')
@@ -83,7 +81,7 @@ export async function POST(req: NextRequest) {
           stripe_checkout_session_id: session.id,
           buyer_email: session.customer_email || null,
           // Store Likeness™ identity in metadata fields
-          user_id: profileId || user_id || null,
+          user_id: user_id || null,
         })
         .select()
         .single();
@@ -91,8 +89,8 @@ export async function POST(req: NextRequest) {
       if (orderError) {
         console.error('[stripe-webhook] Order insert failed:', orderError.message);
       } else {
-        order = createdOrder;
-        console.log('[stripe-webhook] Order created:', order.id, 'referrer:', referrerId);
+        orderId = createdOrder.id;
+        console.log('[stripe-webhook] Order created:', orderId, 'referrer:', referrerId);
       }
     }
 
@@ -116,7 +114,7 @@ export async function POST(req: NextRequest) {
             product_id,
             offer_id: offer_id || null,
             referrer_id: referrerId,
-            order_id: order?.id || null,
+            order_id: orderId || null,
             status: 'active',
           });
 
@@ -140,6 +138,44 @@ export async function POST(req: NextRequest) {
         });
     }
 
+    if (referrerId && orderId) {
+      await supabase
+        .from('orders')
+        .update({ referrer_id: referrerId })
+        .eq('id', orderId);
+
+      const { data: existingReferral } = await supabase
+        .from('referral_earnings')
+        .select('id')
+        .eq('order_id', orderId)
+        .limit(1)
+        .maybeSingle();
+
+      if (existingReferral?.id) {
+        await supabase
+          .from('referral_earnings')
+          .update({
+            referrer_id: referrerId,
+            commission_cents: superfanTotal,
+            status: 'pending',
+          })
+          .eq('id', existingReferral.id);
+      } else {
+        const { error: referralError } = await supabase
+          .from('referral_earnings')
+          .insert({
+            referrer_id: referrerId,
+            order_id: orderId,
+            commission_cents: superfanTotal,
+            status: 'pending',
+          });
+
+        if (referralError) {
+          console.error('[stripe-webhook] Referral earnings insert failed:', referralError.message);
+        }
+      }
+    }
+
     // Update superfans earnings if referrer is a superfan
     if (referrerId && superfanTotal > 0) {
       const { data: superfan } = await supabase
@@ -154,21 +190,9 @@ export async function POST(req: NextRequest) {
           .from('superfans')
           .update({
             total_earnings: (superfan.total_earnings || 0) + superfanTotal,
-            available_earnings: (superfan.available_earnings || 0) + superfanTotal,
+          available_earnings: (superfan.available_earnings || 0) + superfanTotal,
           })
           .eq('id', referrerId);
-      }
-
-      // Record in referral_earnings table (correct schema: superfan_id, order_id, amount DECIMAL, status)
-      if (order?.id) {
-        await supabase
-          .from('referral_earnings')
-          .insert({
-            superfan_id: referrerId,
-            order_id: order.id,
-            amount: superfanTotal / 100,
-            status: 'pending',
-          });
       }
     }
   }

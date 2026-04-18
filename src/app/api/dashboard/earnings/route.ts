@@ -56,23 +56,29 @@ export async function GET(req: NextRequest) {
     .limit(5);
 
   // 4. Get referral earnings breakdown from referral_earnings table
-  const { data: referralRows } = await supabase
+  const { data: referralRows, error: referralError } = await supabase
     .from('referral_earnings')
-    .select('id, commission_cents, status, created_at, order_id')
+    .select('id, referrer_id, order_id, commission_cents, status, created_at')
     .eq('referrer_id', sellerId)
     .order('created_at', { ascending: false })
     .limit(20);
 
-  const pendingReferral = (referralRows || [])
-    .filter(e => e.status === 'pending')
-    .reduce((sum: number, e: any) => sum + (e.commission_cents || 0), 0);
+  if (referralError) {
+    console.warn('[dashboard/earnings] referral_earnings unavailable:', referralError.message);
+  }
 
-  const totalReferralEarned = (referralRows || [])
-    .reduce((sum: number, e: any) => sum + (e.commission_cents || 0), 0);
+  const referralHistory = referralRows || [];
+  const pendingReferral = referralHistory
+    .filter((row: any) => row.status === 'pending' || row.status === 'credited')
+    .reduce((sum: number, row: any) => sum + Number(row.commission_cents || 0), 0);
 
-  const paidReferral = (referralRows || [])
-    .filter(e => e.status === 'paid')
-    .reduce((sum: number, e: any) => sum + (e.commission_cents || 0), 0);
+  const totalReferralEarned = referralHistory
+    .filter((row: any) => row.status !== 'refunded')
+    .reduce((sum: number, row: any) => sum + Number(row.commission_cents || 0), 0);
+
+  const paidReferral = referralHistory
+    .filter((row: any) => row.status === 'paid')
+    .reduce((sum: number, row: any) => sum + Number(row.commission_cents || 0), 0);
 
   return NextResponse.json({
     seller: {
@@ -90,7 +96,7 @@ export async function GET(req: NextRequest) {
       total_earned_cents: totalReferralEarned,
       pending_cents: pendingReferral,
       paid_cents: paidReferral,
-      history: referralRows || [],
+      history: referralHistory,
     },
   });
 }

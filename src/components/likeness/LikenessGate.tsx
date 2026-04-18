@@ -75,9 +75,9 @@ export function LikenessGateBlock({ action }: { action: 'sell' | 'upload' | 'pay
       <div className="w-14 h-14 rounded-full bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
         <ShieldCheck size={28} className="text-[var(--pf-orange)]" />
       </div>
-      <h3 className="text-lg font-bold mb-2">Likeness Verification Required</h3>
+      <h3 className="text-lg font-bold mb-2">Verification Required</h3>
       <p className="text-sm text-[var(--pf-text-secondary)] max-w-xs mb-5">
-        You must verify ownership of your likeness before you can {actionLabels[action]}. This protects your identity and brand on Porterful.
+        You can still create and sell on Porterful. Verification is only required before you can {actionLabels[action]}. This protects your identity when funds leave the platform.
       </p>
       <Link
         href="https://likenessverified.com/register"
@@ -85,7 +85,7 @@ export function LikenessGateBlock({ action }: { action: 'sell' | 'upload' | 'pay
         rel="noopener noreferrer"
         className="px-5 py-2.5 bg-[var(--pf-orange)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--pf-orange-dark)] transition-colors"
       >
-        Verify My Likeness
+        Verify to Withdraw
       </Link>
       <p className="text-xs text-[var(--pf-text-muted)] mt-3">
         Register at LikenessVerified.com — takes about 60 seconds

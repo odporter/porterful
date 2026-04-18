@@ -42,7 +42,8 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get('file') as File
-    const folder = formData.get('folder') as string || 'audio'
+    const requestedFolder = (formData.get('folder') as string) || 'audio'
+    const folder = requestedFolder === 'track-covers' ? 'artist-images' : requestedFolder
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${supabaseKey}`,
-          'Content-Type': folder === 'audio' ? 'audio/mpeg' : (file.type || 'application/octet-stream'),
+          'Content-Type': file.type || 'application/octet-stream',
           'x-upsert': 'true'
         },
         body: await file.arrayBuffer()

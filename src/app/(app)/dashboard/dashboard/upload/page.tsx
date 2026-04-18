@@ -156,6 +156,13 @@ export default function UploadPage() {
           </div>
         </div>
 
+        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-start gap-3">
+          <Check className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-[var(--pf-text-muted)]">
+            You can sell now. Likeness verification is only required to withdraw earnings.
+          </p>
+        </div>
+
         {error && (
           <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-400">
             <AlertCircle size={18} />

@@ -103,7 +103,7 @@ export default function LikenessPage() {
                 <div>
                   <h2 className="font-bold text-green-400 mb-1">Likeness Verified</h2>
                   <p className="text-sm text-[var(--pf-text-secondary)] mb-3">
-                    Your likeness is registered and protected. You can sell music, products, and receive payouts on Porterful.
+                    Your likeness is registered and protected. You can create, publish, and sell on Porterful. Verification is required only to withdraw earnings.
                   </p>
                   <div className="flex items-center gap-4 text-xs text-[var(--pf-text-muted)]">
                     <span>ID: <span className="font-mono text-[var(--pf-orange)]">{status.likeness_id}</span></span>
@@ -121,7 +121,7 @@ export default function LikenessPage() {
                 <div>
                   <h2 className="font-bold mb-1">Verification Required</h2>
                   <p className="text-sm text-[var(--pf-text-secondary)] mb-3">
-                    You must verify your likeness before you can sell music, list products, or receive payouts on Porterful. This protects your identity and brand.
+                    You can still create music, products, and profile updates. Verify your likeness only when you want to withdraw earnings from Porterful.
                   </p>
                   <Link
                     href="https://likenessverified.com/register"
@@ -178,11 +178,11 @@ export default function LikenessPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle size={16} className="text-green-400 shrink-0 mt-0.5" />
-                  <span>Required to receive payouts from music and product sales</span>
+                  <span>Required to withdraw earnings from music and product sales</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle size={16} className="text-green-400 shrink-0 mt-0.5" />
-                  <span>Required to list products for sale on Porterful</span>
+                  <span>Not required to upload tracks, images, or products</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle size={16} className="text-green-400 shrink-0 mt-0.5" />

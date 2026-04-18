@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 function sanitizeFilename(name: string): string {
-  const ext = name.split('.').pop() || ''
-  const nameWithoutExt = name.slice(0, -(ext.length + 1))
-  const sanitized = nameWithoutExt
-    .replace(/[<>:"/\\|?*()[\]]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/\.\.+/g, '.')
+  const lastDot = name.lastIndexOf('.')
+  const hasExt = lastDot > 0 && lastDot < name.length - 1
+  const base = hasExt ? name.slice(0, lastDot) : name
+  const ext = hasExt ? name.slice(lastDot + 1) : ''
+  const cleanBase = base
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9\-_]/g, '-')
+    .replace(/-{2,}/g, '-')
     .replace(/^-+|-+$/g, '')
-    .substring(0, 100)
+    .substring(0, 80)
   const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
-  return `${sanitized || 'audio'}.${cleanExt || 'mp3'}`
+  return `${cleanBase || 'audio'}${cleanExt ? '.' + cleanExt : '.mp3'}`
 }
 
 export async function POST(request: NextRequest) {

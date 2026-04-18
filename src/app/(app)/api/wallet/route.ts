@@ -55,7 +55,9 @@ export async function POST(request: NextRequest) {
     const userId = authenticatedUser.id
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    if (action !== 'get') {
+    const payoutActions = new Set(['withdraw', 'cashout', 'payout', 'payout_request', 'release'])
+
+    if (payoutActions.has(action)) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')

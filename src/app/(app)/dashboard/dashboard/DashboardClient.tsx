@@ -184,7 +184,7 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
 
         {/* MONEY BAR - Top Priority */}
         <div className="bg-gradient-to-r from-green-500/20 to-emerald-600/20 border border-green-500/30 rounded-xl p-6 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
               <p className="text-xs text-[var(--pf-text-muted)] mb-1">Total Earned</p>
               <p className="text-2xl font-bold text-green-400">${stats.total_earnings.toFixed(2)}</p>
@@ -196,6 +196,15 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
             <div>
               <p className="text-xs text-[var(--pf-text-muted)] mb-1">Catalog</p>
               <p className="text-2xl font-bold text-purple-400">{stats.total_tracks} tracks • {stats.total_products} products</p>
+            </div>
+            <div className="flex items-center justify-end">
+              <Link 
+                href="/dashboard/dashboard/payout"
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+              >
+                <DollarSign size={18} />
+                Cash Out
+              </Link>
             </div>
           </div>
         </div>
@@ -231,9 +240,9 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
             <Share2 size={24} className="text-blue-400" />
             <span className="text-sm font-medium">Share Store</span>
           </Link>
-          <Link href="/dashboard/dashboard/artist/edit" className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
-            <Edit size={24} className="text-green-400" />
-            <span className="text-sm font-medium">Edit Profile</span>
+          <Link href="/dashboard/dashboard/earnings" className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
+            <DollarSign size={24} className="text-green-400" />
+            <span className="text-sm font-medium">Earnings</span>
           </Link>
         </div>
 

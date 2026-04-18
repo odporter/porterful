@@ -221,7 +221,7 @@ export default function ArtistDashboardPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Products</h2>
-              <Link href="/dashboard/add-product" className="pf-btn pf-btn-primary flex items-center gap-2">
+              <Link href="/dashboard/dashboard/artist/add-product" className="pf-btn pf-btn-primary flex items-center gap-2">
                 <Icon.Plus /> Add Product
               </Link>
             </div>
@@ -230,7 +230,7 @@ export default function ArtistDashboardPage() {
                 <Icon.Package />
                 <p className="text-lg font-medium mt-4">No products yet</p>
                 <p className="text-sm text-[var(--pf-text-muted)] mb-4">Add your first product to start selling</p>
-                <Link href="/dashboard/add-product" className="pf-btn pf-btn-primary">
+                <Link href="/dashboard/dashboard/artist/add-product" className="pf-btn pf-btn-primary">
                   Add Product
                 </Link>
               </div>

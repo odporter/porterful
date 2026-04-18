@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { PRODUCTS } from '@/lib/products'
-import { ARTIST_LIVE_LIMITS } from '@/lib/likeness-verification'
+
+const LIVE_PRODUCT_LIMIT = 3
 
 // GET /api/products - List all products
 // Query params: category, search, mine (1=current user only), limit
@@ -116,9 +117,9 @@ export async function POST(request: NextRequest) {
       .eq('seller_id', session.user.id)
       .eq('status', 'live')
 
-    if ((liveProductsCount || 0) >= ARTIST_LIVE_LIMITS.products) {
+    if ((liveProductsCount || 0) >= LIVE_PRODUCT_LIMIT) {
       return NextResponse.json({
-        error: `You have reached the live product limit (${ARTIST_LIVE_LIMITS.products}). Archive a product before publishing a new one.`,
+        error: `You have reached the live product limit (${LIVE_PRODUCT_LIMIT}). Archive a product before publishing a new one.`,
         code: 'LIVE_PRODUCT_LIMIT_REACHED',
       }, { status: 400 })
     }

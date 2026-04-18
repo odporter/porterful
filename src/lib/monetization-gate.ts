@@ -1,9 +1,6 @@
 /**
- * Monetization Gate — ensures user is Likeness-verified before money operations
- * 
- * "NO LIKENESS = NO MONEY"
- * 
- * This is the server-side enforcement layer. Frontend redirects are UX only.
+ * Monetization Gate — only enforce likeness for payout / withdrawal.
+ * Creation flows stay open.
  */
 
 import { createServerClient } from '@/lib/supabase'
@@ -16,11 +13,8 @@ export interface MonetizationStatus {
 }
 
 /**
- * Check if user is allowed to perform monetization actions.
- * Queries both Porterful profile cache AND LikenessVerified.com live.
- * 
- * Cached likeness_verified is allowed for UX fast-paths.
- * Payout operations MUST do live verification.
+ * Check if user is allowed to perform payout actions.
+ * When `requireLiveVerification` is false, authentication alone is enough.
  */
 export async function checkMonetizationStatus(
   requireLiveVerification = false
@@ -46,36 +40,42 @@ export async function checkMonetizationStatus(
       .eq('id', userId)
       .single()
 
-    // If live verification required (payouts, withdrawals), check Likeness directly
-    if (requireLiveVerification && profile?.likeness_registry_id) {
+    if (!requireLiveVerification) {
+      return {
+        allowed: true,
+        reason: 'OK',
+        likeness_id: profile?.likeness_registry_id || null,
+      }
+    }
+
+    if (profile?.likeness_registry_id) {
       const liveCheck = await verifyLikenessLive(profile.likeness_registry_id, userEmail!)
       if (!liveCheck.valid) {
-        // Likeness record is gone or invalid — revoke access
         await supabase
           .from('profiles')
           .update({ likeness_verified: false })
           .eq('id', userId)
-        return { 
-          allowed: false, 
-          reason: 'LIKENESS_REQUIRED', 
-          message: 'Verify your identity to start earning. Your Likeness record could not be confirmed.'
+        return {
+          allowed: false,
+          reason: 'LIKENESS_REQUIRED',
+          message: 'Verify your identity to withdraw funds. Your Likeness record could not be confirmed.',
         }
       }
     }
 
     if (!profile?.likeness_verified || !profile?.likeness_registry_id) {
-      return { 
-        allowed: false, 
-        reason: 'LIKENESS_REQUIRED', 
-        message: 'Verify your identity to start earning',
-        likeness_id: profile?.likeness_registry_id
+      return {
+        allowed: false,
+        reason: 'LIKENESS_REQUIRED',
+        message: 'Verify your identity to withdraw funds',
+        likeness_id: profile?.likeness_registry_id || null,
       }
     }
 
-    return { 
-      allowed: true, 
+    return {
+      allowed: true,
       reason: 'OK',
-      likeness_id: profile.likeness_registry_id
+      likeness_id: profile.likeness_registry_id,
     }
 
   } catch (err) {
@@ -130,7 +130,7 @@ async function verifyLikenessLive(likenessId: string, expectedEmail: string): Pr
 /**
  * Gate response — returns the standard blocked response
  */
-export function blockedResponse(message = 'Verify your identity to start earning') {
+export function blockedResponse(message = 'Verify your identity to withdraw funds') {
   return new Response(JSON.stringify({
     status: 403,
     error: 'LIKENESS_REQUIRED',

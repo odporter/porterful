@@ -117,9 +117,6 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
     if (!hasTracks) {
       return { label: 'Upload First Track', href: '/dashboard/dashboard/upload', icon: Upload, color: 'bg-orange-500 hover:bg-orange-600' }
     }
-    if (!hasOffers) {
-      return { label: 'Choose Products to Sell', href: '/dashboard/dashboard/catalog', icon: Package, color: 'bg-orange-500 hover:bg-orange-600' }
-    }
     return { label: 'Share Your Store', href: '/store/' + (profile?.username || profile?.id), icon: Share2, color: 'bg-orange-500 hover:bg-orange-600' }
   }
 
@@ -232,10 +229,7 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
             <Upload size={24} className="text-purple-400" />
             <span className="text-sm font-medium">Upload Track</span>
           </Link>
-          <Link href="/dashboard/dashboard/catalog" className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
-            <Package size={24} className="text-orange-400" />
-            <span className="text-sm font-medium">Choose Products</span>
-          </Link>
+          
           <Link href={`/store/${profile?.username || profile?.id}`} className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
             <Share2 size={24} className="text-blue-400" />
             <span className="text-sm font-medium">Share Store</span>

@@ -98,6 +98,7 @@ export function Footer() {
               <li><Link href="/dashboard/dashboard/upload" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Upload Music</Link></li>
               <li><Link href="/signup?role=artist" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Become an Artist</Link></li>
               <li><Link href="/dashboard/dashboard/artist" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Artist Dashboard</Link></li>
+              <li><Link href="/dashboard/dashboard/catalog" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Choose Products</Link></li>
             </ul>
           </div>
 

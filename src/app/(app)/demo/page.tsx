@@ -58,7 +58,7 @@ const DEMO_TYPES = [
     tagline: 'Merch & music fulfillment done right',
     features: [
       { icon: ShoppingBag, text: 'Print-on-demand store' },
-      { icon: Upload, text: 'Add products in seconds' },
+      { icon: Upload, text: 'Choose products to sell in seconds' },
       { icon: DollarSign, text: 'No upfront inventory' },
       { icon: Truck, text: 'We handle shipping' },
     ],

@@ -3,6 +3,7 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 function getCookieAll() {
+  if (typeof document === 'undefined') return []
   return document.cookie.split(';').map(c => {
     const [name, ...rest] = c.trim().split('=')
     return { name, value: rest.join('=') }
@@ -10,6 +11,7 @@ function getCookieAll() {
 }
 
 function setCookieAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+  if (typeof document === 'undefined') return
   cookiesToSet.forEach(({ name, value, options }) => {
     let cookieStr = `${name}=${value}`
     if (options) {

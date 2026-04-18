@@ -96,8 +96,6 @@ export default function EarningsDashboard() {
 
   const { seller, superfan } = data;
   const hasSales = seller.order_count > 0;
-  const hasSuperfanEarnings = superfan && superfan.total_earned_cents > 0;
-
   return (
     <div className="space-y-8">
       {/* Summary Cards */}
@@ -221,28 +219,6 @@ export default function EarningsDashboard() {
         )}
       </div>
 
-      {/* How it works */}
-      <div className="bg-gradient-to-r from-[var(--pf-orange)]/5 to-purple-500/5 rounded-2xl p-6 border border-[var(--pf-border)]">
-        <h3 className="font-bold mb-3">How your earnings work</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-sm text-gray-400">
-          <div className="flex gap-3">
-            <span className="text-xl">1</span>
-            <p>Create an offer from your store page</p>
-          </div>
-          <div className="flex gap-3">
-            <span className="text-xl">2</span>
-            <p>Share the link with friends</p>
-          </div>
-          <div className="flex gap-3">
-            <span className="text-xl">3</span>
-            <p>They buy through your link</p>
-          </div>
-          <div className="flex gap-3">
-            <span className="text-xl">4</span>
-            <p>You earn 67% of every sale instantly</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

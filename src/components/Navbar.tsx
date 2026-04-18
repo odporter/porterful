@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useCart } from '@/lib/cart-context'
-import { Menu, X, ChevronDown, User, LogOut, ShoppingCart } from 'lucide-react'
+import { useTheme } from '@/lib/theme-context'
+import { Menu, X, ChevronDown, User, LogOut, ShoppingCart, Moon, SunMedium } from 'lucide-react'
 
 export function Navbar() {
   const { user, supabase, loading } = useSupabase()
+  const { theme, toggleTheme } = useTheme()
   const { items } = useCart()
   const cartCount = items.reduce((s, i) => s + i.quantity, 0)
   const [scrolled, setScrolled] = useState(false)
@@ -98,12 +100,21 @@ export function Navbar() {
                 aria-label={`Cart (${cartCount} items)`}
               >
                 <ShoppingCart size={20} />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[var(--pf-orange)] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    {mounted ? (cartCount > 9 ? '9+' : cartCount) : '0'}
-                  </span>
-                )}
-              </Link>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[var(--pf-orange)] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {mounted ? (cartCount > 9 ? '9+' : cartCount) : '0'}
+                </span>
+              )}
+            </Link>
+
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? <SunMedium size={20} /> : <Moon size={20} />}
+              </button>
 
               {/* User Menu — only renders once session is confirmed */}
               {showUser && (
@@ -213,6 +224,17 @@ export function Navbar() {
           <div className="border-t border-[var(--pf-border)] my-4" />
 
           {/* User Section */}
+          <button
+            onClick={() => {
+              toggleTheme()
+              setMobileOpen(false)
+            }}
+            className="flex items-center gap-3 py-3 w-full text-[var(--pf-text-secondary)] border-b border-[var(--pf-border)]"
+          >
+            {theme === 'dark' ? <SunMedium size={20} /> : <Moon size={20} />}
+            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
+
           {showUser && (
             <div className="space-y-1">
               <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 text-[var(--pf-text-secondary)]">

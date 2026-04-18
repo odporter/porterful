@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 type Theme = 'dark' | 'light';
+const THEME_STORAGE_KEY = 'theme';
 
 interface ThemeContext {
   theme: Theme;
@@ -18,45 +19,29 @@ export function useTheme() {
   return ctx;
 }
 
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+
+  const saved = localStorage.getItem(THEME_STORAGE_KEY);
+  if (saved === 'light' || saved === 'dark') return saved;
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
-    // Read saved theme from localStorage — only runs client-side
-    const saved = localStorage.getItem('theme') as Theme | null;
-    const initialTheme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
-
-    // Apply to DOM imperatively — NO state update if it matches SSR default
-    // This avoids triggering a re-render that would cause hydration mismatch
-    if (initialTheme === 'dark') {
-      // SSR already rendered with dark class — no DOM change needed
-      setMounted(true);
-    } else {
-      // Need to switch to light — apply class, then mark mounted
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-      document.documentElement.style.colorScheme = 'light';
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
-      localStorage.setItem('theme', 'light');
-    }
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
     document.documentElement.classList.remove('dark', 'light');
     document.documentElement.classList.add(theme);
     document.documentElement.style.colorScheme = theme;
-    localStorage.setItem('theme', theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
 
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', theme === 'dark' ? '#0a0a0a' : '#ffffff');
     }
-  }, [theme, mounted]);
+  }, [theme]);
 
   const toggleTheme = () => {
     setThemeState(prev => prev === 'dark' ? 'light' : 'dark');
@@ -66,9 +51,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setThemeState(newTheme);
   };
 
-  // During SSR and first client render: render children with dark theme (SSR default)
-  // After mount, if theme changed: DOM is updated imperatively in the useEffect above
-  // This prevents the tree re-render that causes hydration mismatch
   return (
     <ThemeCtx.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}

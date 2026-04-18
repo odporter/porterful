@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
       const query = supabase
         .from('products')
-        .select('id, name, description, category, base_price, images, status, printful_product_id, printful_sync_status, artist_name, seller_id, created_at')
+        .select('id, name, description, category, base_price, images, status, printful_product_id, printful_sync_status, seller_id, created_at')
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false })
 
@@ -129,7 +129,6 @@ export async function POST(request: NextRequest) {
         seller_id: user.id,
         seller_type: 'artist',
         status,
-        artist_name: artistName,
       })
       .select()
       .single()

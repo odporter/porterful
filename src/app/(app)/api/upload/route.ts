@@ -52,18 +52,22 @@ export async function POST(request: NextRequest) {
       .eq('id', session.user.id)
       .single()
 
-    const likenessState = getLikenessVerificationState(profile)
-    if (!likenessState.verified) {
-      return NextResponse.json({
-        error: getMonetizationGateMessage(),
-        code: 'LIKENESS_VERIFICATION_REQUIRED',
-        registrationUrl: LIKENESS_REGISTRATION_URL,
-      }, { status: 403 })
-    }
-
     const formData = await request.formData()
     const file = formData.get('file') as File
     const folder = formData.get('folder') as string || 'audio'
+
+    // Likeness gate only applies to monetized uploads (audio), not profile images
+    const isProfileImage = folder === 'artist-images'
+    if (!isProfileImage) {
+      const likenessState = getLikenessVerificationState(profile)
+      if (!likenessState.verified) {
+        return NextResponse.json({
+          error: getMonetizationGateMessage(),
+          code: 'LIKENESS_VERIFICATION_REQUIRED',
+          registrationUrl: LIKENESS_REGISTRATION_URL,
+        }, { status: 403 })
+      }
+    }
     
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })

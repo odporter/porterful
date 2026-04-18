@@ -4,22 +4,18 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSupabase } from '@/app/providers'
 import { useWallet } from '@/lib/wallet-context'
-import { Upload, Package, Share2, Edit, DollarSign, TrendingUp, Music, ChevronRight } from 'lucide-react'
+import { Upload, Package, Share2, Edit, DollarSign, Music, ChevronRight } from 'lucide-react'
 
 interface DashboardStats {
   total_earnings: number
-  pending_payout: number
-  paid_to_date: number
-  total_sales: number
+  sales_count: number
   total_products: number
   total_tracks: number
 }
 
 const EMPTY_STATS: DashboardStats = {
   total_earnings: 0,
-  pending_payout: 0,
-  paid_to_date: 0,
-  total_sales: 0,
+  sales_count: 0,
   total_products: 0,
   total_tracks: 0,
 }
@@ -79,11 +75,11 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
           0
         )
 
+        const uniqueOrders = new Set((orderItemsData || []).map((i: any) => i.order_id).filter(Boolean)).size
+
         setStats({
           total_earnings: totalSales,
-          pending_payout: totalSales * 0.1,
-          paid_to_date: 0,
-          total_sales: orderItemsData?.length || 0,
+          sales_count: uniqueOrders,
           total_products: productsCount || 0,
           total_tracks: tracksCount || 0,
         })
@@ -188,35 +184,19 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
 
         {/* MONEY BAR - Top Priority */}
         <div className="bg-gradient-to-r from-green-500/20 to-emerald-600/20 border border-green-500/30 rounded-xl p-6 mb-6">
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <p className="text-xs text-[var(--pf-text-muted)] mb-1">Total Earned</p>
               <p className="text-2xl font-bold text-green-400">${stats.total_earnings.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-xs text-[var(--pf-text-muted)] mb-1">Pending</p>
-              <p className="text-2xl font-bold text-yellow-400">${stats.pending_payout.toFixed(2)}</p>
+              <p className="text-xs text-[var(--pf-text-muted)] mb-1">Sales</p>
+              <p className="text-2xl font-bold text-blue-400">{stats.sales_count}</p>
             </div>
             <div>
-              <p className="text-xs text-[var(--pf-text-muted)] mb-1">Paid Out</p>
-              <p className="text-2xl font-bold text-blue-400">${stats.paid_to_date.toFixed(2)}</p>
+              <p className="text-xs text-[var(--pf-text-muted)] mb-1">Catalog</p>
+              <p className="text-2xl font-bold text-purple-400">{stats.total_tracks} tracks • {stats.total_products} products</p>
             </div>
-          </div>
-          <div className="flex items-center justify-between pt-4 border-t border-green-500/20">
-            <div className="flex items-center gap-2">
-              <TrendingUp size={16} className="text-green-400" />
-              <span className="text-sm text-green-400">{stats.total_sales} sales</span>
-            </div>
-            <Link 
-              href="/payout" 
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                balance >= 2500 
-                  ? 'bg-green-500 hover:bg-green-600 text-white' 
-                  : 'bg-gray-500/50 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              {balance >= 2500 ? 'Cash Out' : `Need $${((2500 - balance) / 100).toFixed(2)} to cash out`}
-            </Link>
           </div>
         </div>
 
@@ -243,9 +223,9 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
             <Upload size={24} className="text-purple-400" />
             <span className="text-sm font-medium">Upload Track</span>
           </Link>
-          <Link href="/dashboard/dashboard/add-product" className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
+          <Link href="/dashboard/add-product" className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
             <Package size={24} className="text-orange-400" />
-            <span className="text-sm font-medium">Sell Merch</span>
+            <span className="text-sm font-medium">Add Product</span>
           </Link>
           <Link href={`/store/${profile?.username || profile?.id}`} className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
             <Share2 size={24} className="text-blue-400" />
@@ -297,7 +277,7 @@ function ContentOverview({ stats }: { stats: DashboardStats }) {
               <ChevronRight size={16} className="text-[var(--pf-text-muted)]" />
             </div>
           </Link>
-          <Link href="/dashboard/dashboard/add-product" className="block p-3 rounded-lg hover:bg-[var(--pf-surface)] transition-colors">
+          <Link href="/dashboard/add-product" className="block p-3 rounded-lg hover:bg-[var(--pf-surface)] transition-colors">
             <div className="flex items-center justify-between">
               <span className="text-sm">Add Product</span>
               <ChevronRight size={16} className="text-[var(--pf-text-muted)]" />

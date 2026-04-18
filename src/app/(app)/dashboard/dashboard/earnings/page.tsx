@@ -37,7 +37,7 @@ interface EarningsData {
       referrer_id: string;
       order_id: string | null;
       commission_cents: number;
-      status: 'pending' | 'credited' | 'paid' | 'refunded';
+      status: 'pending' | 'available' | 'withdrawn' | 'refunded';
       created_at: string;
     }>;
   };

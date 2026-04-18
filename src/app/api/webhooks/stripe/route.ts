@@ -163,19 +163,19 @@ export async function POST(req: NextRequest) {
         await supabase
           .from('referral_earnings')
           .update({
-            superfan_id: referrerId,
-            amount: superfanTotal / 100,
-            status: 'available',
+            referrer_id: referrerId,
+            commission_cents: superfanTotal,
+            status: 'pending',
           })
           .eq('id', existingReferral.id);
       } else {
         const { error: referralError } = await supabase
           .from('referral_earnings')
           .insert({
-            superfan_id: referrerId,
+            referrer_id: referrerId,
             order_id: orderId,
-            amount: superfanTotal / 100,
-            status: 'available',
+            commission_cents: superfanTotal,
+            status: 'pending',
           });
 
         if (referralError) {

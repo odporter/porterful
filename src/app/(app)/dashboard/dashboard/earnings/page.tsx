@@ -34,10 +34,11 @@ interface EarningsData {
     paid_cents: number;
     history: Array<{
       id: string;
+      referrer_id: string;
+      order_id: string | null;
       commission_cents: number;
-      status: string;
+      status: 'pending' | 'credited' | 'paid' | 'refunded';
       created_at: string;
-      order_id: string;
     }>;
   };
 }
@@ -193,17 +194,19 @@ export default function EarningsDashboard() {
           </div>
           {data.referral.history.length > 0 && (
             <div className="mt-4 pt-4 border-t border-green-500/20">
-              <p className="text-xs text-gray-500 mb-2">{data.referral.recent.length} referral commission(s)</p>
-              {data.referral.recent.slice(0, 3).map((entry) => (
-                <div key={entry.id} className="flex items-center justify-between py-1">
+              <p className="text-xs text-gray-500 mb-2">{data.referral.history.length} referral commission(s)</p>
+              {data.referral.history.slice(0, 3).map((entry) => (
+                <div key={entry.id} className="flex items-center justify-between gap-3 py-1">
                   <span className="text-sm text-gray-400 flex items-center gap-1">
                     <Clock className="w-3 h-3" /> {timeAgo(entry.created_at)}
                   </span>
-                  <span className="text-sm font-bold text-green-400">+{formatCents(entry.amount_cents)}</span>
+                  <span className="text-sm font-bold text-green-400">+{formatCents(entry.commission_cents)}</span>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    entry.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                    entry.status === 'withdrawn' ? 'bg-green-500/20 text-green-400' :
-                    'bg-gray-500/20 text-gray-400'
+                    entry.status === 'pending' || entry.status === 'credited'
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : entry.status === 'paid'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-gray-500/20 text-gray-400'
                   }`}>{entry.status}</span>
                 </div>
               ))}

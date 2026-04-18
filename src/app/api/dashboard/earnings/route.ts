@@ -1,31 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
-import { decodePorterfulSession } from '@/lib/porterful-session';
+import { createServerClient as createSsrClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 // GET /api/dashboard/earnings — read real earnings from existing ledger
 export async function GET(req: NextRequest) {
-  const sessionToken = req.cookies.get('porterful_session')?.value;
-  if (!sessionToken) {
+  const cookieStore = await cookies();
+  const ssrSupabase = createSsrClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } catch {}
+        },
+      },
+    }
+  );
+  const { data: { session } } = await ssrSupabase.auth.getSession();
+  if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const session = decodePorterfulSession(sessionToken);
-  if (!session) {
-    return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
-  }
-
   const supabase = createServerClient();
-
-  // Find profile by email
-  let sellerId: string | null = null;
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id, username')
-    .eq('email', session.email.toLowerCase())
-    .limit(1)
-    .maybeSingle();
-
-  if (profile) sellerId = profile.id;
+  const sellerId: string = session.user.id;
 
   // 1. Get all orders where this user is the referrer (seller earnings)
   const { data: soldOrders } = await supabase
@@ -51,7 +50,7 @@ export async function GET(req: NextRequest) {
   const { data: purchases } = await supabase
     .from('orders')
     .select('id, amount, product_id, created_at')
-    .eq('buyer_email', session.email.toLowerCase())
+    .eq('buyer_id', sellerId)
     .order('created_at', { ascending: false })
     .limit(5);
 

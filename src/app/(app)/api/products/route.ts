@@ -102,6 +102,17 @@ export async function POST(request: NextRequest) {
     }
     const supabase = createAdminClient()
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, seller_type')
+      .eq('id', user.id)
+      .single()
+
+    const isAdmin = profile?.role === 'admin' || profile?.seller_type === 'porterful'
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Product creation is not available', code: 'NOT_AUTHORIZED' }, { status: 403 })
+    }
+
     const { count: liveProductsCount } = await supabase
       .from('products')
       .select('*', { count: 'exact', head: true })

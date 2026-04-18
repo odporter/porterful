@@ -7,6 +7,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { createServerClient as createSSRServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
@@ -16,20 +17,23 @@ import { NextResponse } from 'next/server'
  */
 export async function getAuthenticatedClient() {
   const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-  const refreshToken = cookieStore.get('sb-refresh-token')?.value
-
-  if (!accessToken) {
-    return null
-  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-  const supabase = createClient(supabaseUrl, supabaseKey, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+  const supabase = createSSRServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // Read-only contexts can ignore cookie writes.
+        }
       },
     },
   })

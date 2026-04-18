@@ -9,14 +9,14 @@ import { Upload, Package, Share2, Edit, DollarSign, Music, ChevronRight } from '
 interface DashboardStats {
   total_earnings: number
   sales_count: number
-  total_products: number
+  total_offers: number
   total_tracks: number
 }
 
 const EMPTY_STATS: DashboardStats = {
   total_earnings: 0,
   sales_count: 0,
-  total_products: 0,
+  total_offers: 0,
   total_tracks: 0,
 }
 
@@ -60,15 +60,15 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
           .select('order_id, price, quantity')
           .eq('seller_id', serverProfileId)
 
-        const { count: productsCount } = await supabase
-          .from('products')
-          .select('*', { count: 'exact', head: true })
-          .eq('seller_id', serverProfileId)
-
         const { count: tracksCount } = await supabase
           .from('tracks')
           .select('*', { count: 'exact', head: true })
           .eq('artist_id', serverProfileId)
+
+        const offersRes = await fetch('/api/offers', {
+          credentials: 'include',
+        })
+        const offersData = offersRes.ok ? await offersRes.json() : { offers: [] }
 
         const totalSales = (orderItemsData || []).reduce(
           (sum: number, item: any) => sum + Number(item.price || 0) * Number(item.quantity || 0),
@@ -80,7 +80,7 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
         setStats({
           total_earnings: totalSales,
           sales_count: uniqueOrders,
-          total_products: productsCount || 0,
+          total_offers: Array.isArray(offersData.offers) ? offersData.offers.length : 0,
           total_tracks: tracksCount || 0,
         })
       }
@@ -106,7 +106,7 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
 
   const isArtist = profile?.role === 'artist'
   const isProfileComplete = profile?.name && profile?.avatar_url
-  const hasProducts = stats.total_products > 0
+  const hasOffers = stats.total_offers > 0
   const hasTracks = stats.total_tracks > 0
 
   // Dynamic Primary CTA based on state
@@ -117,8 +117,8 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
     if (!hasTracks) {
       return { label: 'Upload First Track', href: '/dashboard/dashboard/upload', icon: Upload, color: 'bg-orange-500 hover:bg-orange-600' }
     }
-    if (!hasProducts) {
-      return { label: 'Sell Products', href: '/dashboard/dashboard/catalog', icon: Package, color: 'bg-orange-500 hover:bg-orange-600' }
+    if (!hasOffers) {
+      return { label: 'Choose Products to Sell', href: '/dashboard/dashboard/catalog', icon: Package, color: 'bg-orange-500 hover:bg-orange-600' }
     }
     return { label: 'Share Your Store', href: '/store/' + (profile?.username || profile?.id), icon: Share2, color: 'bg-orange-500 hover:bg-orange-600' }
   }
@@ -195,7 +195,7 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
             </div>
             <div>
               <p className="text-xs text-[var(--pf-text-muted)] mb-1">Catalog</p>
-              <p className="text-2xl font-bold text-purple-400">{stats.total_tracks} tracks • {stats.total_products} products</p>
+              <p className="text-2xl font-bold text-purple-400">{stats.total_tracks} tracks • {stats.total_offers} offers</p>
             </div>
             <div className="flex items-center justify-end">
               <Link 
@@ -234,7 +234,7 @@ export default function DashboardClient({ serverProfileId, lkId, initialProfile 
           </Link>
           <Link href="/dashboard/dashboard/catalog" className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
             <Package size={24} className="text-orange-400" />
-            <span className="text-sm font-medium">Sell Products</span>
+            <span className="text-sm font-medium">Choose Products</span>
           </Link>
           <Link href={`/store/${profile?.username || profile?.id}`} className="pf-card p-4 flex flex-col items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors">
             <Share2 size={24} className="text-blue-400" />
@@ -258,7 +258,7 @@ function ContentOverview({ stats }: { stats: DashboardStats }) {
 
   return (
     <div className="pf-card">
-      <button 
+      <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-4 hover:bg-[var(--pf-surface-hover)] transition-colors"
       >
@@ -266,7 +266,7 @@ function ContentOverview({ stats }: { stats: DashboardStats }) {
           <Music size={20} className="text-[var(--pf-text-muted)]" />
           <div className="text-left">
             <p className="font-semibold">Your Content</p>
-            <p className="text-sm text-[var(--pf-text-muted)]">{stats.total_tracks} tracks • {stats.total_products} products</p>
+            <p className="text-sm text-[var(--pf-text-muted)]">{stats.total_tracks} tracks • {stats.total_offers} offers</p>
           </div>
         </div>
         <ChevronRight size={20} className={`transition-transform ${expanded ? 'rotate-90' : ''}`} />

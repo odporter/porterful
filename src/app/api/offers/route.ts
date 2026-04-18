@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createServerClient as createAdminClient } from '@/lib/supabase';
 import { getAuthenticatedClient } from '@/lib/auth-utils';
+import { getPorterfulSession } from '@/lib/porterful-session';
+import { PRODUCTS } from '@/lib/products';
 
 // Static store products — IDs are string slugs, not DB UUIDs
 const STATIC_PRODUCTS: Record<string, { name: string; price_cents: number }> = {
@@ -25,14 +27,77 @@ function signOffer(payload: object): string {
 }
 
 async function getSupabaseUser() {
+  const porterfulSession = await getPorterfulSession();
+  if (porterfulSession) {
+    return {
+      id: porterfulSession.profileId,
+      email: porterfulSession.email,
+      lkId: porterfulSession.lkId,
+      profileId: porterfulSession.profileId,
+      source: 'porterful',
+    } as const;
+  }
+
   const auth = await getAuthenticatedClient();
-  return auth?.user ?? null;
+  if (!auth?.user) return null;
+
+  return {
+    id: auth.user.id,
+    email: auth.user.email || '',
+    lkId: null,
+    profileId: auth.user.id,
+    source: 'supabase',
+  } as const;
+}
+
+async function getOfferActor() {
+  const sessionUser = await getSupabaseUser();
+  if (!sessionUser) return null;
+
+  const supabase = createAdminClient();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, lk_id, username, email')
+    .eq('id', sessionUser.id)
+    .limit(1)
+    .maybeSingle();
+
+  const sellerIdentity =
+    sessionUser.lkId ||
+    profile?.lk_id ||
+    profile?.id ||
+    sessionUser.profileId ||
+    sessionUser.id;
+
+  const sellerUsername =
+    profile?.username ||
+    sessionUser.email?.split('@')[0] ||
+    profile?.email?.split('@')[0] ||
+    sessionUser.profileId.slice(0, 8);
+
+  return {
+    supabase,
+    sellerIdentity,
+    sellerUsername,
+  };
+}
+
+function resolveCatalogProduct(productId: string) {
+  const curated = PRODUCTS.find((product) => product.id === productId)
+  if (curated) {
+    return {
+      name: curated.name,
+      price_cents: Math.round(curated.price * 100),
+    }
+  }
+
+  return STATIC_PRODUCTS[productId] || null
 }
 
 // POST /api/offers — create a self-contained offer token
 export async function POST(req: NextRequest) {
-  const user = await getSupabaseUser();
-  if (!user) {
+  const actor = await getOfferActor();
+  if (!actor) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -41,49 +106,32 @@ export async function POST(req: NextRequest) {
   if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
 
   // Resolve product — check static products first, then DB
-  let productName = '';
-  let priceCents = 0;
-
-  const staticProduct = STATIC_PRODUCTS[productId];
-  if (staticProduct) {
-    productName = staticProduct.name;
-    priceCents = staticProduct.price_cents;
-  } else {
-    const supabase = createAdminClient();
-    const { data: product } = await supabase
-      .from('products')
-      .select('id, title, base_price')
-      .eq('id', productId)
-      .limit(1)
-      .single();
-    if (!product) return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
-    productName = product.title;
-    priceCents = Math.round(Number(product.base_price) * 100);
+  const resolvedProduct = resolveCatalogProduct(productId);
+  if (!resolvedProduct) {
+    return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
   }
 
   const offerId = `OFR-${Math.random().toString(36).slice(2, 6).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-  const username = user.email?.split('@')[0] || user.id.slice(0, 8);
 
   const payload = {
     offer_id: offerId,
-    user_id: user.id,
-    username,
+    lk_id: actor.sellerIdentity,
+    username: actor.sellerUsername,
     product_id: productId,
-    product_name: productName,
+    product_name: resolvedProduct.name,
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
   };
 
   // Try to persist offer record — non-fatal if DB insert fails
   try {
-    const supabase = createAdminClient();
-    await supabase.from('offers').insert({
+    await actor.supabase.from('offers').insert({
       offer_id: offerId,
-      user_id: user.id,
-      username,
+      lk_id: actor.sellerIdentity,
+      username: actor.sellerUsername,
       product_id: productId,
-      product_name: productName,
-      price_cents: priceCents,
+      product_name: resolvedProduct.name,
+      price_cents: resolvedProduct.price_cents,
       status: 'active',
     });
   } catch {
@@ -98,17 +146,16 @@ export async function POST(req: NextRequest) {
 
 // GET /api/offers — list user's active offers
 export async function GET(req: NextRequest) {
-  const user = await getSupabaseUser();
-  if (!user) {
+  const actor = await getOfferActor();
+  if (!actor) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const supabase = createAdminClient();
-    const { data: offers } = await supabase
+    const { data: offers } = await actor.supabase
       .from('offers')
       .select('offer_id, product_id, product_name, price_cents, status, created_at')
-      .eq('user_id', user.id)
+      .eq('lk_id', actor.sellerIdentity)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
 

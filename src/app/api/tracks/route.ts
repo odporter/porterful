@@ -1,28 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
-import { requireServerSession } from '@/lib/auth/session';
+import { getAuthenticatedClient } from '@/lib/auth-utils';
 
 // POST /api/tracks — Upload a new track
 export async function POST(request: NextRequest) {
   try {
-    const session = await requireServerSession();
-    const body = await request.json();
-    const { title, audio_url, cover_url, album, price, description } = body;
+    const supabase = await getAuthenticatedClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!title?.trim()) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
-    }
-    if (!audio_url?.trim()) {
-      return NextResponse.json({ error: 'Audio file is required' }, { status: 400 });
-    }
-
-    const supabase = createServerClient();
+    const profileId = user.id;
 
     // Verify user is an artist
     const { data: profile } = await supabase
       .from('profiles')
       .select('id, role')
-      .eq('id', session.profileId || session.userId)
+      .eq('id', profileId)
       .single();
 
     if (!profile || profile.role !== 'artist') {
@@ -46,7 +38,7 @@ export async function POST(request: NextRequest) {
       .insert({
         artist_id: profile.id,
         title: title.trim(),
-        artist: session.email?.split('@')[0] || 'Unknown Artist',
+        artist: user.email?.split('@')[0] || 'Unknown Artist',
         audio_url: audio_url.trim(),
         cover_url: cover_url?.trim() || null,
         album: album?.trim() || null,

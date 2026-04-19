@@ -49,7 +49,6 @@ export function Navbar() {
     { href: '/music', label: 'Music' },
     { href: '/artists', label: 'Artists' },
     { href: '/store', label: 'Store' },
-    { href: '/systems', label: 'Systems' },
   ]
 
   // Never render auth-dependent state until both:
@@ -176,7 +175,7 @@ export function Navbar() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-2"
+                className="p-2 md:hidden"
                 aria-label="Menu"
               >
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}

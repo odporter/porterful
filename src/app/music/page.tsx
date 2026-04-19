@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Play, Pause, SkipForward, Volume2, VolumeX, Clock, Headphones, Heart, Share2, Verified, ChevronRight, Disc, Music2, Users, Star, Search, X, SlidersHorizontal, LayoutGrid } from 'lucide-react';
+import { Play, Pause, SkipForward, Volume2, VolumeX, Clock, Heart, Share2, Verified, ChevronRight, Disc, Music2, Users, Star, Search, X, SlidersHorizontal, LayoutGrid } from 'lucide-react';
 import { useAudio, Track } from '@/lib/audio-context';
 import { TRACKS } from '@/lib/data';
 import { ARTISTS } from '@/lib/artists';
@@ -17,17 +17,11 @@ const OD_TRACKS = TRACKS.filter(t => t.artist === 'O D Porter').sort((a, b) => {
   return 0;
 }) as unknown as Track[];
 
-// Top tracks by plays
-const TOP_TRACKS = [...OD_TRACKS].sort((a, b) => (b.plays || 0) - (a.plays || 0));
+// Top tracks by order
+const TOP_TRACKS = [...OD_TRACKS];
 
 // For display purposes we use the raw data type (duration is string)
 type DisplayTrack = typeof OD_TRACKS[number];
-
-function formatPlays(n: number): string {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
-  return n.toString();
-}
 
 function formatDuration(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -72,9 +66,6 @@ function TrackRow({ track, index, isActive, isPlaying, onPlay, onTogglePlay }: {
       </div>
 
       <div className="hidden sm:flex items-center gap-4">
-        <span className="text-sm text-[var(--pf-text-secondary)] font-mono">
-          {formatPlays(track.plays || 0)}
-        </span>
         <span className="text-sm text-[var(--pf-text-secondary)] font-mono w-12 text-right">
           {track.duration}
         </span>
@@ -121,12 +112,7 @@ export default function MusicPage() {
     };
   }, [currentTrack]);
 
-  // When hero track changes, play it only if audio context has no current track
-  useEffect(() => {
-    if (!currentTrack && TOP_TRACKS[heroTrackIndex]) {
-      playTrack(TOP_TRACKS[heroTrackIndex] as unknown as Track);
-    }
-  }, [heroTrackIndex, currentTrack, playTrack]);
+  // Hero track rotates but does NOT auto-play — user must click play
 
 
   const handlePlayTrack = useCallback((track: Track) => {
@@ -237,7 +223,7 @@ export default function MusicPage() {
               <h2 className="text-5xl lg:text-7xl font-bold mb-4 leading-none">
                 {heroTrack?.title}
               </h2>
-              <p className="text-xl text-[var(--pf-text-secondary)] mb-8">{heroTrack?.album} · {formatPlays(heroTrack?.plays || 0)} plays</p>
+              <p className="text-xl text-[var(--pf-text-secondary)] mb-8">{heroTrack?.album}</p>
 
               {/* Progress bar */}
               <div className="w-full max-w-md mx-auto lg:mx-0 h-1 bg-[var(--pf-surface)] rounded-full overflow-hidden mb-8">
@@ -274,10 +260,6 @@ export default function MusicPage() {
 
               {/* Stats row */}
               <div className="flex items-center justify-center lg:justify-start gap-8 mt-8">
-                <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
-                  <Headphones size={16} />
-                  <span className="text-sm">{formatPlays(OD_TRACKS.reduce((sum, t) => sum + (t.plays || 0), 0))}+ total plays</span>
-                </div>
                 <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
                   <Heart size={16} />
                   <span className="text-sm">{ARTISTS.length}+ artists supported</span>
@@ -643,14 +625,6 @@ export default function MusicPage() {
                   <ChevronRight size={20} className="text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-orange)]" />
                 </Link>
 
-                <Link href="/systems"
-                  className="flex items-center justify-between p-4 rounded-xl bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/10 border border-[var(--pf-border)] transition-colors group">
-                  <div>
-                    <p className="font-medium">The Ecosystem</p>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">More than music. A system.</p>
-                  </div>
-                  <ChevronRight size={20} className="text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-orange)]" />
-                </Link>
               </div>
             </div>
           </div>

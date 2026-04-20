@@ -50,15 +50,19 @@ export default function HomePage() {
         <section className="border-b border-[var(--pf-border)] bg-gradient-to-b from-[var(--pf-orange)]/10 via-[var(--pf-bg)] to-[var(--pf-bg)]">
           <div className="pf-container py-10 md:py-16">
             <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-              <div>
+              <div className="relative isolate">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -left-8 top-2 h-40 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(198,167,94,0.18),transparent_72%)] blur-3xl"
+                />
                 <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">
                   Likeness
                 </p>
                 <div className="flex flex-wrap items-start gap-3">
                   <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-6xl">
-                    Own your likeness.
+                    Your likeness is already in use.
                     <br />
-                    Make it official.
+                    This makes it yours.
                   </h1>
                   <button
                     type="button"
@@ -80,18 +84,26 @@ export default function HomePage() {
                   <p className="mt-2 text-sm text-[var(--pf-text-muted)]">Takes less than 2 minutes.</p>
                 </div>
 
-                <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                <div className="mt-8">
+                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">What you get</p>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <div className="rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4">
-                    <p className="text-sm text-[var(--pf-text-muted)]">Featured artist</p>
-                    <p className="mt-1 text-lg font-semibold">{featuredArtist.name}</p>
+                    <p className="text-base font-semibold">Your identity, recorded</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Time-stamped. Referenced. Yours.</p>
                   </div>
                   <div className="rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4">
-                    <p className="text-sm text-[var(--pf-text-muted)]">Top release</p>
-                    <p className="mt-1 text-lg font-semibold">{featuredTrack?.title}</p>
+                    <p className="text-base font-semibold">Proof of presence</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Show what’s connected to you clearly.</p>
                   </div>
                   <div className="rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4">
-                    <p className="text-sm text-[var(--pf-text-muted)]">Direct support</p>
-                    <p className="mt-1 text-lg font-semibold">Music + merch</p>
+                    <p className="text-base font-semibold">One access point</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Everything tied to you, in one place.</p>
+                  </div>
+                  <div className="rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4">
+                    <p className="text-base font-semibold">A signal others can verify</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Seen. Tap-ready. Real.</p>
                   </div>
                 </div>
               </div>

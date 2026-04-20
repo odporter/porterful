@@ -41,12 +41,17 @@ export function LikenessInfoModal({ open, onClose }: LikenessInfoModalProps) {
 
         <div className="mt-4 space-y-3 text-sm leading-6 text-[var(--pf-text-secondary)]">
           <p>
-            Likeness™ is a personal registry that lets you document your identity and access it
-            through a profile or tap-enabled signal like a shirt.
+            Likeness™ is a system that lets you document your identity and access it instantly.
           </p>
           <p>
-            It&apos;s built for recordkeeping and access — not employment, not a social platform,
-            and not legal enforcement.
+            It gives you a recorded reference for your presence — across platforms, profiles,
+            and real-world signals like tap-enabled products.
+          </p>
+          <p>
+            It is not a social app. It is not a job. It is not legal ownership.
+          </p>
+          <p>
+            It is something you have.
           </p>
         </div>
       </div>

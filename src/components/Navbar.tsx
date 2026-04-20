@@ -5,18 +5,21 @@ import { useState, useEffect, useRef } from 'react'
 import { useSupabase } from '@/app/providers'
 import { useCart } from '@/lib/cart-context'
 import { useTheme } from '@/lib/theme-context'
-import { Menu, X, ChevronDown, User, LogOut, ShoppingCart, Moon, SunMedium } from 'lucide-react'
+import { Menu, X, ChevronDown, User, LogOut, ShoppingCart, Moon, SunMedium, Palette } from 'lucide-react'
+import { Theme, THEMES } from '@/lib/theme'
 
 export function Navbar() {
   const { user, supabase, loading } = useSupabase()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const { items } = useCart()
   const cartCount = items.reduce((s, i) => s + i.quantity, 0)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const themeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -33,10 +36,13 @@ export function Navbar() {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setProfileOpen(false)
       }
+      if (themeRef.current && !themeRef.current.contains(e.target as Node)) {
+        setThemeOpen(false)
+      }
     }
-    if (profileOpen) document.addEventListener('mousedown', handleClickOutside)
+    if (profileOpen || themeOpen) document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [profileOpen])
+  }, [profileOpen, themeOpen])
 
   const handleSignOut = async () => {
     if (supabase) {
@@ -50,6 +56,12 @@ export function Navbar() {
     { href: '/artists', label: 'Artists' },
     { href: '/store', label: 'Store' },
   ]
+  const themeLabel = theme === 'creator' ? 'Creator' : theme === 'dark' ? 'Dark' : 'Light'
+  const ThemeIcon = theme === 'creator' ? Palette : theme === 'dark' ? Moon : SunMedium
+  const themeOptions: Array<{ value: Theme; label: string }> = THEMES.map((value) => ({
+    value,
+    label: value === 'creator' ? 'Creator' : value === 'dark' ? 'Dark' : 'Light',
+  }))
 
   // Never render auth-dependent state until both:
   // 1. mounted=true (no SSR mismatch)
@@ -106,14 +118,41 @@ export function Navbar() {
               )}
             </Link>
 
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
-                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              >
-                {theme === 'dark' ? <SunMedium size={20} /> : <Moon size={20} />}
-              </button>
+              <div className="relative hidden md:block" ref={themeRef}>
+                <button
+                  onClick={() => setThemeOpen(prev => !prev)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
+                  aria-label={`Theme: ${themeLabel}`}
+                  aria-haspopup="menu"
+                  aria-expanded={themeOpen}
+                >
+                  <ThemeIcon size={18} />
+                  <span className="hidden lg:inline text-sm font-medium">{themeLabel}</span>
+                  <ChevronDown size={14} />
+                </button>
+
+                {themeOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl shadow-xl overflow-hidden z-50">
+                    {themeOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setTheme(option.value)
+                          setThemeOpen(false)
+                        }}
+                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                          theme === option.value
+                            ? 'bg-[var(--pf-surface-hover)] text-[var(--pf-text)]'
+                            : 'text-[var(--pf-text-secondary)] hover:bg-[var(--pf-bg)] hover:text-[var(--pf-text)]'
+                        }`}
+                      >
+                        <span>{option.label}</span>
+                        {theme === option.value && <span className="text-[var(--pf-orange)]">•</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* User Menu — only renders once session is confirmed */}
               {showUser && (
@@ -223,16 +262,29 @@ export function Navbar() {
           <div className="border-t border-[var(--pf-border)] my-4" />
 
           {/* User Section */}
-          <button
-            onClick={() => {
-              toggleTheme()
-              setMobileOpen(false)
-            }}
-            className="flex items-center gap-3 py-3 w-full text-[var(--pf-text-secondary)] border-b border-[var(--pf-border)]"
-          >
-            {theme === 'dark' ? <SunMedium size={20} /> : <Moon size={20} />}
-            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
+          <div className="py-3 border-b border-[var(--pf-border)]">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--pf-text-muted)]">
+              Theme
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              {themeOptions.map(option => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setTheme(option.value)
+                    setMobileOpen(false)
+                  }}
+                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                    theme === option.value
+                      ? 'border-transparent bg-[var(--pf-orange)] text-white'
+                      : 'border-[var(--pf-border)] text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-text)]'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {showUser && (
             <div className="space-y-1">

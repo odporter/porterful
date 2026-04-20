@@ -1,9 +1,12 @@
-'use client';
+'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-
-type Theme = 'dark' | 'light';
-const THEME_STORAGE_KEY = 'theme';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import {
+  applyThemeToDocument,
+  resolveTheme,
+  THEME_STORAGE_KEY,
+  Theme,
+} from '@/lib/theme'
 
 interface ThemeContext {
   theme: Theme;
@@ -20,36 +23,29 @@ export function useTheme() {
 }
 
 function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'dark'
 
-  const saved = localStorage.getItem(THEME_STORAGE_KEY);
-  if (saved === 'light' || saved === 'dark') return saved;
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return resolveTheme(
+    localStorage.getItem(THEME_STORAGE_KEY),
+    window.matchMedia('(prefers-color-scheme: dark)').matches,
+  )
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme)
 
   useEffect(() => {
-    document.documentElement.classList.remove('dark', 'light');
-    document.documentElement.classList.add(theme);
-    document.documentElement.style.colorScheme = theme;
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', theme === 'dark' ? '#0a0a0a' : '#ffffff');
-    }
+    applyThemeToDocument(theme)
+    localStorage.setItem(THEME_STORAGE_KEY, theme)
   }, [theme]);
 
   const toggleTheme = () => {
-    setThemeState(prev => prev === 'dark' ? 'light' : 'dark');
-  };
+    setThemeState(prev => (prev === 'dark' ? 'light' : prev === 'light' ? 'dark' : 'light'))
+  }
 
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-  };
+    setThemeState(newTheme)
+  }
 
   return (
     <ThemeCtx.Provider value={{ theme, toggleTheme, setTheme }}>

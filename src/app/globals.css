@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  /* Porterful is dark-first — dark is the default theme */
-  /* Light theme is applied via .light class override */
+  /* Approved Porterful base theme tokens */
+  /* Light and dark remain the default identity */
   
-  /* Dark theme (default) */
+  /* Dark theme (default source of truth) */
   --pf-bg: #0a0a0a;
   --pf-bg-secondary: #111111;
   --pf-surface: #141414;
@@ -26,7 +26,7 @@
   --foreground: #ffffff;
 }
 
-/* Light theme override — rare, but supported */
+/* Light theme override — approved source of truth */
 .light {
   --pf-bg: #ffffff;
   --pf-bg-secondary: #f5f5f5;
@@ -47,7 +47,7 @@
   --foreground: #0a0a0a;
 }
 
-/* Ensure dark class also works (legacy) */
+/* Dark theme override — approved source of truth */
 .dark {
   --pf-bg: #0a0a0a;
   --pf-bg-secondary: #111111;
@@ -66,6 +66,27 @@
   
   --background: #0a0a0a;
   --foreground: #ffffff;
+}
+
+/* Optional Creator theme — manual opt-in only */
+.creator {
+  --pf-bg: #f8f3ea;
+  --pf-bg-secondary: #f2eadf;
+  --pf-surface: #fffaf3;
+  --pf-surface-hover: #f6efe4;
+  --pf-border: #e5d7c5;
+  --pf-border-subtle: #efe5d7;
+  --pf-border-hover: #d7c7b1;
+  --pf-text: #1f1915;
+  --pf-text-secondary: #5f554b;
+  --pf-text-muted: #87796d;
+  --pf-orange: #d9792b;
+  --pf-orange-dark: #b85e16;
+  --pf-orange-light: #ef9c58;
+  --pf-purple: #c9b08c;
+
+  --background: #f8f3ea;
+  --foreground: #1f1915;
 }
 
 /* Base styles */

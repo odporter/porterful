@@ -80,7 +80,7 @@ export default function HomePage() {
                   className="pointer-events-none absolute left-1/2 top-0 h-44 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(198,167,94,0.18),transparent_72%)] blur-3xl"
                 />
                 <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">
-                  Likeness
+                  Likeness™
                 </p>
                 <div className="flex flex-wrap items-start gap-3">
                   <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.04em] md:text-6xl">
@@ -109,7 +109,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-8">
-                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">What you get</p>
+                  <p className="text-sm font-semibold tracking-[0.3em] text-[var(--pf-orange)]">What this gives you</p>
                 </div>
 
                 <div className="pf-reveal-group mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -119,14 +119,14 @@ export default function HomePage() {
                   </div>
                   <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '60ms' }}>
                     <p className="text-base font-semibold">Proof of presence</p>
-                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Show what’s connected to you clearly.</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">What’s connected to you—clear and verifiable.</p>
                   </div>
                   <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '120ms' }}>
                     <p className="text-base font-semibold">One access point</p>
                     <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Everything tied to you, in one place.</p>
                   </div>
                   <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '180ms' }}>
-                    <p className="text-base font-semibold">A signal others can verify</p>
+                    <p className="text-base font-semibold">A signal others can use</p>
                     <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Seen. Tap-ready. Real.</p>
                   </div>
                 </div>

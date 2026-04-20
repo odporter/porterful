@@ -53,9 +53,10 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: '/music', label: 'Music' },
-    { href: '/artists', label: 'Artists' },
-    { href: '/store', label: 'Store' },
+    { href: '/verify', label: 'Register' },
+    { href: '/dashboard/dashboard/likeness', label: 'Verify' },
+    { href: '/tap-in', label: 'Signal' },
+    { href: '/dashboard/dashboard/access', label: 'Access' },
   ]
   const themeLabel = theme === 'creator' ? 'Creator' : theme === 'dark' ? 'Dark' : 'Light'
   const ThemeIcon = theme === 'creator' ? Palette : theme === 'dark' ? Moon : SunMedium
@@ -83,9 +84,9 @@ export function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-9 h-9 rounded-lg bg-[var(--pf-orange)] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                <span className="text-[#111111] font-bold text-sm">P</span>
+                <span className="text-[#111111] font-bold text-sm">L</span>
               </div>
-              <span className="font-bold text-lg tracking-tight hidden sm:block">PORTERFUL</span>
+              <span className="font-semibold text-lg tracking-tight hidden sm:block">Likeness™</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -193,14 +194,11 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Guest — Sign In + Shop Artists */}
+              {/* Guest — Sign In */}
               {showGuest && (
                 <div className="hidden md:flex items-center gap-2">
                   <Link href="/login" className="px-4 py-2 text-sm font-medium text-[var(--pf-text-secondary)] transition-colors duration-200 ease-out hover:text-[var(--pf-text)]">
                     Sign In
-                  </Link>
-                  <Link href="/store" className="rounded-lg bg-[var(--pf-orange)] px-4 py-2 text-sm font-semibold text-[#111111] transition-all duration-200 ease-out hover:scale-[1.03] hover:bg-[var(--pf-orange-light)]">
-                    Shop Artists
                   </Link>
                 </div>
               )}
@@ -307,9 +305,6 @@ export function Navbar() {
             <div className="space-y-3">
               <Link href="/login" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-medium border border-[var(--pf-border)] rounded-lg">
                 Sign In
-              </Link>
-              <Link href="/store" onClick={() => setMobileOpen(false)} className="block rounded-lg bg-[var(--pf-orange)] py-4 text-center font-semibold text-[#111111] transition-all duration-200 ease-out hover:scale-[1.02] hover:bg-[var(--pf-orange-light)]">
-                Shop Artists
               </Link>
             </div>
           )}

@@ -111,6 +111,14 @@ export default function TapInPage() {
           <p className="text-xl text-[var(--pf-text-secondary)] max-w-2xl mx-auto">
             Wear your signal. Let people tap in.
           </p>
+          <div className="mt-6">
+            <Link
+              href="/product/product/gune-shirt"
+              className="inline-flex items-center justify-center rounded-full bg-[var(--pf-orange)] px-6 py-3 text-sm font-semibold text-[#111111] transition-all duration-200 ease-out hover:scale-[1.03] hover:bg-[var(--pf-orange-light)]"
+            >
+              Get Your Shirt
+            </Link>
+          </div>
         </div>
 
         {/* Products */}

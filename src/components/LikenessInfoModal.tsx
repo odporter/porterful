@@ -57,14 +57,20 @@ export function LikenessInfoModal({ open, onClose }: LikenessInfoModalProps) {
 
         <div className="mt-4 space-y-3 text-sm leading-6 text-[var(--pf-text-secondary)]">
           <p>
-            Likeness™ is a system that lets you document your identity and access it instantly.
+            Likeness™ is a system for documenting and accessing your identity.
           </p>
           <p>
-            It gives you a recorded reference for your presence — across platforms, profiles,
-            and real-world signals like tap-enabled products.
+            It creates a timestamped reference for your presence — across platforms, profiles,
+            and real-world signals.
           </p>
           <p>
-            It is not a social app. It is not a job. It is not legal ownership.
+            It is not a social app.
+          </p>
+          <p>
+            It is not a job.
+          </p>
+          <p>
+            It is not legal ownership.
           </p>
           <p>
             It is something you have.

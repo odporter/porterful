@@ -106,6 +106,9 @@ export default function HomePage() {
                     Register Now
                   </Link>
                   <p className="mt-2 text-sm text-[var(--pf-text-muted)]">Takes less than 2 minutes.</p>
+                  <p className="mt-2 text-sm font-medium text-[var(--pf-text-secondary)]">
+                    One identity. Connected everywhere you are.
+                  </p>
                 </div>
 
                 <div className="mt-8">
@@ -160,6 +163,24 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="pf-reveal-group border-b border-[var(--pf-border)]">
+          <div className="pf-container py-10">
+            <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-6" style={{ transitionDelay: '0ms' }}>
+              <p className="text-sm font-semibold tracking-[0.3em] text-[var(--pf-orange)]">Connect your presence</p>
+              <h2 className="mt-2 text-3xl font-bold">Connect your presence</h2>
+              <p className="mt-3 max-w-2xl text-base text-[var(--pf-text-secondary)]">
+                Add your profiles and platforms to create a clear reference of what’s connected to you.
+              </p>
+              <p className="mt-2 text-sm text-[var(--pf-text-muted)]">
+                Instagram, TikTok, YouTube, and more.
+              </p>
+              <p className="mt-3 text-sm text-[var(--pf-text-muted)]">
+                Your information is recorded and stored securely, with a timestamped reference you control.
+              </p>
             </div>
           </div>
         </section>

@@ -75,6 +75,9 @@ export function LikenessInfoModal({ open, onClose }: LikenessInfoModalProps) {
           <p>
             It is something you have.
           </p>
+          <p>
+            Your information is recorded and stored securely, with a timestamped reference you control.
+          </p>
         </div>
       </div>
     </div>

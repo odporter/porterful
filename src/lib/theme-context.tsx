@@ -5,8 +5,8 @@ import {
   applyThemeToDocument,
   resolveTheme,
   THEME_STORAGE_KEY,
-  Theme,
 } from '@/lib/theme'
+import type { Theme } from '@/lib/theme'
 
 interface ThemeContext {
   theme: Theme;

@@ -6,7 +6,8 @@ import { useSupabase } from '@/app/providers'
 import { useCart } from '@/lib/cart-context'
 import { useTheme } from '@/lib/theme-context'
 import { Menu, X, ChevronDown, User, LogOut, ShoppingCart, Moon, SunMedium, Palette } from 'lucide-react'
-import { Theme, THEMES } from '@/lib/theme'
+import { THEMES } from '@/lib/theme'
+import type { Theme } from '@/lib/theme'
 
 export function Navbar() {
   const { user, supabase, loading } = useSupabase()

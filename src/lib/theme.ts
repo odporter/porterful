@@ -8,8 +8,8 @@ const THEME_CLASS_NAMES = [...THEMES] as const
 
 const THEME_COLOR_MAP: Record<Theme, string> = {
   light: '#ffffff',
-  dark: '#0a0a0a',
-  creator: '#f8f3ea',
+  dark: '#111111',
+  creator: '#fcfbf7',
 }
 
 const THEME_COLOR_SCHEME_MAP: Record<Theme, 'light' | 'dark'> = {
@@ -54,5 +54,5 @@ export function applyThemeToDocument(theme: Theme) {
 }
 
 export function getThemeBootstrapScript() {
-  return `(function(){try{var key='${THEME_STORAGE_KEY}';var saved=localStorage.getItem(key);var theme=(saved==='light'||saved==='dark'||saved==='creator')?saved:(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var root=document.documentElement;root.classList.remove('light','dark','creator');root.classList.add(theme);root.style.colorScheme=theme==='creator'?'light':theme;root.style.background=theme==='creator'?'#f8f3ea':theme==='dark'?'#0a0a0a':'#ffffff';var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='creator'?'#f8f3ea':theme==='dark'?'#0a0a0a':'#ffffff');}catch(e){}})();`
+  return `(function(){try{var key='${THEME_STORAGE_KEY}';var saved=localStorage.getItem(key);var theme=(saved==='light'||saved==='dark'||saved==='creator')?saved:(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var root=document.documentElement;root.classList.remove('light','dark','creator');root.classList.add(theme);root.style.colorScheme=theme==='creator'?'light':theme;root.style.background=theme==='creator'?'#fcfbf7':theme==='dark'?'#111111':'#ffffff';var meta=document.querySelector('meta[name=\"theme-color\"]');if(meta)meta.setAttribute('content',theme==='creator'?'#fcfbf7':theme==='dark'?'#111111':'#ffffff');}catch(e){}})();`
 }

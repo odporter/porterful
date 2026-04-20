@@ -61,28 +61,28 @@ export function ArtistHero({ artist }: ArtistHeroProps) {
       href: `https://instagram.com/${artist.social.instagram}`,
       label: 'Instagram',
       icon: InstagramIcon,
-      className: 'hover:text-[#E4405F] hover:border-[#E4405F]',
+      className: 'hover:text-[var(--pf-orange)] hover:border-[var(--pf-orange)]',
     },
     artist.social?.twitter && {
       key: 'twitter',
       href: `https://twitter.com/${artist.social.twitter}`,
       label: 'X (Twitter)',
       icon: XIcon,
-      className: 'hover:text-white hover:bg-black hover:border-black',
+      className: 'hover:text-[var(--pf-text)] hover:bg-[var(--pf-surface-hover)] hover:border-[var(--pf-border-hover)]',
     },
     artist.social?.youtube && {
       key: 'youtube',
       href: artist.social.youtube.startsWith('http') ? artist.social.youtube : `https://youtube.com/${artist.social.youtube}`,
       label: 'YouTube',
       icon: YouTubeIcon,
-      className: 'hover:text-[#FF0000] hover:border-[#FF0000]',
+      className: 'hover:text-[var(--pf-orange)] hover:border-[var(--pf-orange)]',
     },
     artist.social?.tiktok && {
       key: 'tiktok',
       href: `https://tiktok.com/@${artist.social.tiktok}`,
       label: 'TikTok',
       icon: TikTokIcon,
-      className: 'hover:text-white hover:bg-black hover:border-black',
+      className: 'hover:text-[var(--pf-text)] hover:bg-[var(--pf-surface-hover)] hover:border-[var(--pf-border-hover)]',
     },
   ]
     .filter(Boolean)
@@ -111,7 +111,7 @@ export function ArtistHero({ artist }: ArtistHeroProps) {
         <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
 
           {/* Avatar */}
-          <div className="relative w-48 h-48 flex-shrink-0 rounded-2xl overflow-hidden border-2 border-[var(--pf-orange)]/30 shadow-2xl shadow-[var(--pf-orange)]/10 bg-[var(--pf-surface)]">
+              <div className="relative w-48 h-48 flex-shrink-0 rounded-2xl overflow-hidden border-2 border-[var(--pf-orange)]/30 shadow-2xl shadow-[var(--pf-orange)]/10 bg-[var(--pf-surface)]">
             {artist.image ? (
               <Image
                 src={artist.image}
@@ -122,7 +122,7 @@ export function ArtistHero({ artist }: ArtistHeroProps) {
                 priority
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--pf-orange)]/20 to-purple-600/20">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--pf-orange)]/20 to-[var(--pf-bg-secondary)]/20">
                 <span className="text-5xl font-bold text-[var(--pf-orange)]">
                   {artist.name.charAt(0).toUpperCase()}
                 </span>

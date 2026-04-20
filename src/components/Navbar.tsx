@@ -82,8 +82,8 @@ export function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--pf-orange)] to-[var(--pf-purple)] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                <span className="text-white font-bold text-sm">P</span>
+              <div className="w-9 h-9 rounded-lg bg-[var(--pf-orange)] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                <span className="text-[#111111] font-bold text-sm">P</span>
               </div>
               <span className="font-bold text-lg tracking-tight hidden sm:block">PORTERFUL</span>
             </Link>
@@ -162,7 +162,7 @@ export function Navbar() {
                     onClick={() => setProfileOpen(!profileOpen)}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[var(--pf-surface)] transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                    <div className="w-8 h-8 rounded-full bg-[var(--pf-orange)] flex items-center justify-center text-[#111111] text-sm font-semibold">
                       {user.email?.[0].toUpperCase()}
                     </div>
                     <ChevronDown size={14} />
@@ -196,10 +196,10 @@ export function Navbar() {
               {/* Guest — Sign In + Shop Artists */}
               {showGuest && (
                 <div className="hidden md:flex items-center gap-2">
-                  <Link href="/login" className="px-4 py-2 text-sm font-medium text-[var(--pf-text-secondary)] hover:text-white transition-colors">
+                  <Link href="/login" className="px-4 py-2 text-sm font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors">
                     Sign In
                   </Link>
-                  <Link href="/store" className="px-4 py-2 text-sm font-semibold bg-[var(--pf-orange)] text-white rounded-lg hover:bg-[var(--pf-orange-dark)] transition-colors">
+                  <Link href="/store" className="px-4 py-2 text-sm font-semibold bg-[var(--pf-orange)] text-[#111111] rounded-lg hover:bg-[var(--pf-orange-light)] transition-colors">
                     Shop Artists
                   </Link>
                 </div>
@@ -248,8 +248,8 @@ export function Navbar() {
             <Link
               href="/cart"
               onClick={() => setMobileOpen(false)}
-              className="block py-4 text-lg font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] border-b border-[var(--pf-border)] flex items-center justify-between"
-            >
+                className="block py-4 text-lg font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] border-b border-[var(--pf-border)] flex items-center justify-between"
+              >
               Cart
               {cartCount > 0 && (
                 <span className="bg-[var(--pf-orange)] text-white text-sm font-bold px-2 py-0.5 rounded-full">
@@ -277,7 +277,7 @@ export function Navbar() {
                   }}
                   className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                     theme === option.value
-                      ? 'border-transparent bg-[var(--pf-orange)] text-white'
+                    ? 'border-transparent bg-[var(--pf-orange)] text-[#111111]'
                       : 'border-[var(--pf-border)] text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-text)]'
                   }`}
                 >
@@ -308,7 +308,7 @@ export function Navbar() {
               <Link href="/login" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-medium border border-[var(--pf-border)] rounded-lg">
                 Sign In
               </Link>
-              <Link href="/store" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-semibold bg-[var(--pf-orange)] text-white rounded-lg">
+              <Link href="/store" onClick={() => setMobileOpen(false)} className="block py-4 text-center font-semibold bg-[var(--pf-orange)] text-[#111111] rounded-lg">
                 Shop Artists
               </Link>
             </div>

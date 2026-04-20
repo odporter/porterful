@@ -59,7 +59,7 @@ export function ArtistSupportCard({ artist }: ArtistSupportCardProps) {
             onClick={() => setSelectedAmount(amount)}
             className={`flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
               selectedAmount === amount
-                ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)] text-white'
+                ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)] text-[#111111]'
                 : 'border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-text)]'
             }`}
           >
@@ -71,16 +71,16 @@ export function ArtistSupportCard({ artist }: ArtistSupportCardProps) {
       <button
         onClick={handleSupport}
         disabled={loading}
-        className="mb-3 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[var(--pf-orange)] to-orange-400 p-4 text-left text-white transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+        className="mb-3 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[var(--pf-orange)] to-[var(--pf-orange-light)] p-4 text-left text-[#111111] transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-          <Heart size={20} className="text-white" />
+        <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+          <Heart size={20} className="text-[#111111]" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-base">{loading ? 'Processing…' : `Support $${selectedAmount}`}</p>
-          <p className="text-sm text-white/80">Direct support for {artist.name.split(' ')[0]}</p>
+          <p className="text-sm text-[#111111]/70">Direct support for {artist.name.split(' ')[0]}</p>
         </div>
-        <Heart size={16} className="text-white/60 transition-colors shrink-0" />
+        <Heart size={16} className="text-[#111111]/60 transition-colors shrink-0" />
       </button>
 
       <div className="space-y-2.5">
@@ -111,8 +111,8 @@ export function ArtistSupportCard({ artist }: ArtistSupportCardProps) {
           title="Copy link or share to social media"
           className="w-full flex items-center gap-3 p-4 rounded-xl bg-[var(--pf-bg)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/50 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all text-left cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
-            <Share2 size={18} className="text-purple-500" />
+          <div className="w-9 h-9 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center shrink-0">
+            <Share2 size={18} className="text-[var(--pf-orange)]" />
           </div>
           <div className="flex-1">
             <p className="font-medium text-sm">Share Artist</p>

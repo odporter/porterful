@@ -62,7 +62,7 @@ export default function ProudToPayPage() {
       <div className="pf-container">
         {/* Hero */}
         <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400 text-sm font-medium mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-6">
             <Heart size={16} />
             Support
           </span>
@@ -93,7 +93,7 @@ export default function ProudToPayPage() {
           {selectedArtist && (
             <div className="bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-xl p-4 mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-xl">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-[var(--pf-orange-light)] flex items-center justify-center text-xl">
                   🎤
                 </div>
                 <div>
@@ -101,7 +101,7 @@ export default function ProudToPayPage() {
                   <p className="text-sm text-[var(--pf-text-secondary)]">{selectedArtist.genre}</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedArtist(null)} className="text-[var(--pf-text-muted)] hover:text-white">
+              <button onClick={() => setSelectedArtist(null)} className="text-[var(--pf-text-muted)] hover:text-[var(--pf-text)]">
                 Clear
               </button>
             </div>
@@ -148,7 +148,7 @@ export default function ProudToPayPage() {
                 <button 
                   onClick={() => handleSupport(amount)}
                   disabled={loading === amount || !selectedArtist}
-                  className="block w-full py-3 px-6 bg-[var(--pf-orange)] text-white rounded-xl font-medium text-center hover:bg-[var(--pf-orange-dark)] transition-colors disabled:opacity-50"
+                  className="block w-full py-3 px-6 bg-[var(--pf-orange)] text-[#111111] rounded-xl font-medium text-center hover:bg-[var(--pf-orange-light)] transition-colors disabled:opacity-50"
                 >
                   {loading === amount ? 'Processing...' : `Support $${amount}`}
                 </button>

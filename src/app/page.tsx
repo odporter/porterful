@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, Info, Pause, Play, ShoppingBag } from 'lucide-react'
+import { FaLinkedinIn } from 'react-icons/fa6'
+import { SiInstagram, SiTiktok, SiYoutube, SiX } from 'react-icons/si'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { LikenessInfoModal } from '@/components/LikenessInfoModal'
@@ -26,6 +28,14 @@ const supportProducts = FEATURED_PRODUCTS
   .slice(0, 3)
 
 const artistSpotlight = ARTISTS.slice(0, 4)
+
+const socialPlatforms = [
+  { name: 'Instagram', Icon: SiInstagram },
+  { name: 'TikTok', Icon: SiTiktok },
+  { name: 'YouTube', Icon: SiYoutube },
+  { name: 'X', Icon: SiX },
+  { name: 'LinkedIn', Icon: FaLinkedinIn },
+]
 
 export default function HomePage() {
   const { currentTrack, playTrack, togglePlay, setQueue, setMode } = useAudio()
@@ -181,6 +191,25 @@ export default function HomePage() {
               <p className="mt-3 text-sm text-[var(--pf-text-muted)]">
                 Your information is recorded and stored securely, with a timestamped reference you control.
               </p>
+
+              <div className="mt-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex w-max gap-3 pr-6">
+                  {socialPlatforms.map(({ name, Icon }) => (
+                    <div
+                      key={name}
+                      className="group flex min-w-40 items-center gap-3 rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-bg)] px-4 py-3 text-[var(--pf-text)] transition-opacity duration-200 ease-out hover:opacity-80"
+                    >
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text)]">
+                        <Icon size={18} />
+                      </span>
+                      <span className="text-sm font-medium text-[var(--pf-text-secondary)]">{name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-[var(--pf-text-muted)]">
+                Supports connections to commonly used platforms. Not affiliated with or endorsed by them.
+              </p>
             </div>
           </div>
         </section>
@@ -310,6 +339,24 @@ export default function HomePage() {
                   <p className="mt-3 text-sm text-[var(--pf-text-muted)]">{artist.shortBio}</p>
                 </Link>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="pf-reveal-group border-t border-[var(--pf-border)]">
+          <div className="pf-container py-10">
+            <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-6 md:p-8" style={{ transitionDelay: '0ms' }}>
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">Why this matters</p>
+              <h2 className="mt-2 text-3xl font-bold">Why this matters</h2>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-[var(--pf-text-secondary)]">
+                As identity and likeness become more important across platforms, systems are emerging to help detect, track, and manage digital presence.
+              </p>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-[var(--pf-text-secondary)]">
+                Likeness™ provides a simple way to create your own reference—one place that connects everything tied to you.
+              </p>
+              <p className="mt-4 text-sm text-[var(--pf-text-muted)]">
+                A single reference for who you are—independent of any platform.
+              </p>
             </div>
           </div>
         </section>

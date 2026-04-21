@@ -221,7 +221,9 @@ export default function StorePage() {
               Store — part of Porterful™
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Choose Products to Sell</h1>
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+                <span className="pf-brand-gradient-text">Choose Products</span> to Sell
+              </h1>
               <p className="max-w-2xl text-sm text-[var(--pf-text-secondary)] sm:text-base">
                 Curated Porterful inventory only. Pick a product, share the link, and keep the flow simple.
               </p>

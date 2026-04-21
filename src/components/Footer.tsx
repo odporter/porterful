@@ -57,7 +57,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 mb-8 md:mb-0">
-            <h3 className="font-bold text-xl mb-3 text-[var(--pf-text)]">PORTERFUL</h3>
+            <h3 className="font-bold text-xl mb-3 pf-brand-gradient-text">PORTERFUL</h3>
             <p className="text-[var(--pf-text-secondary)] text-sm mb-4">
               The artist marketplace.<br />
               Shop, stream, and support.

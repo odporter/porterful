@@ -17,8 +17,12 @@ const featuredTracks = TRACKS
   .sort((a, b) => (b.plays || 0) - (a.plays || 0))
   .slice(0, 4) as Track[]
 
-const featuredProduct = FEATURED_PRODUCTS.find((product) => product.featured) ?? FEATURED_PRODUCTS[0]
+const featuredProduct =
+  FEATURED_PRODUCTS.find((product) => product.featured && product.id !== 'signal-shirt') ??
+  FEATURED_PRODUCTS.find((product) => product.id !== 'signal-shirt') ??
+  FEATURED_PRODUCTS[0]
 const featuredProducts = FEATURED_PRODUCTS
+  .filter((product) => product.id !== 'signal-shirt')
   .filter((product) => product.artist !== 'Porterful' && product.artist !== 'Various Artists')
   .slice(0, 3)
 
@@ -79,7 +83,7 @@ export default function HomePage() {
                   aria-hidden="true"
                   className="pointer-events-none absolute left-1/2 top-0 h-44 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(198,167,94,0.18),transparent_72%)] blur-3xl"
                 />
-                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">
+                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] pf-brand-gradient-text">
                   Porterful™
                 </p>
                 <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.04em] md:text-6xl">
@@ -94,7 +98,7 @@ export default function HomePage() {
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/store" className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2">
+                  <Link href="/store" className="pf-brand-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-all duration-200 ease-out hover:scale-[1.03] active:scale-[0.98]">
                     Shop Products
                   </Link>
                   <Link href="/artists" className="pf-btn pf-btn-secondary inline-flex items-center justify-center gap-2">

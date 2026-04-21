@@ -106,10 +106,20 @@ export function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg bg-[var(--pf-orange)] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 ${
+                isLikenessSurface
+                  ? 'bg-[var(--pf-orange)]'
+                  : 'bg-gradient-to-br from-[var(--pf-orange)] via-[var(--pf-pink)] to-[var(--pf-purple)] shadow-[0_10px_24px_-14px_rgba(236,72,153,0.72)]'
+              }`}>
                 <span className="text-[#111111] font-bold text-sm">{brandLetter}</span>
               </div>
-              <span className="font-semibold text-lg tracking-tight hidden sm:block">{brandLabel}</span>
+              <span
+                className={`hidden text-lg font-semibold tracking-tight sm:block ${
+                  isLikenessSurface ? 'text-[var(--pf-text)]' : 'pf-brand-gradient-text'
+                }`}
+              >
+                {brandLabel}
+              </span>
             </Link>
 
             {/* Desktop Nav */}

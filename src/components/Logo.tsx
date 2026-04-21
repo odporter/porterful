@@ -23,7 +23,7 @@ export function LogoWithText({ className = '' }: { className?: string }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Logo Icon */}
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--pf-orange)] to-[var(--pf-orange-dark)] flex items-center justify-center">
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f97316] via-[#ec4899] to-[#a855f7] flex items-center justify-center">
         <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
           <rect x="55" y="45" width="15" height="110" rx="4" fill="white" />
           <rect x="78" y="60" width="55" height="12" rx="3" fill="white" />
@@ -33,7 +33,7 @@ export function LogoWithText({ className = '' }: { className?: string }) {
         </svg>
       </div>
       {/* Text */}
-      <span className="font-bold text-xl tracking-tight">PORTERFUL</span>
+      <span className="pf-brand-gradient-text font-bold text-xl tracking-tight">PORTERFUL</span>
     </div>
   )
 }

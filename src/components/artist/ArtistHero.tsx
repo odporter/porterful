@@ -85,8 +85,7 @@ export function ArtistHero({ artist }: ArtistHeroProps) {
       className: 'hover:text-[var(--pf-text)] hover:bg-[var(--pf-surface-hover)] hover:border-[var(--pf-border-hover)]',
     },
   ]
-    .filter(Boolean)
-    .slice(0, 3) as Array<{
+    .filter(Boolean) as Array<{
       key: string
       href: string
       label: string

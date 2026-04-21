@@ -27,7 +27,7 @@ export function ArtistProducts({ products, artistName }: ArtistProductsProps) {
           displayProducts.map((product) => (
             <Link
               key={product.id}
-              href={`/product/product/${product.id}`}
+              href={`/product/${product.id}`}
               className="flex items-center gap-3 p-3 rounded-xl bg-[var(--pf-bg)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40 transition-colors group"
             >
               <div className="relative w-11 h-11 rounded-lg overflow-hidden bg-black shrink-0">
@@ -67,7 +67,7 @@ export function ArtistProducts({ products, artistName }: ArtistProductsProps) {
               ].map((product) => (
                 <Link
                   key={product.id}
-                  href={`/product/product/${product.id}`}
+                  href={`/product/${product.id}`}
                   className="flex items-center gap-3 p-3 rounded-xl bg-[var(--pf-bg)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40 transition-colors group"
                 >
                   <div className="relative w-11 h-11 rounded-lg overflow-hidden bg-black shrink-0">

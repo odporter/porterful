@@ -513,7 +513,7 @@ export function SignalShirtViewer() {
                 href="/product/signal-shirt"
                 className="pf-btn pf-btn-primary w-full rounded-xl px-5 py-4 text-base font-semibold"
               >
-                Get Your Signal &rarr;
+                Buy on Porterful &rarr;
               </Link>
               <p className="mt-3 text-center text-sm text-white/70">Ships worldwide. Orders fulfilled in order received.</p>
               <p className="mt-2 text-center text-sm text-white/70">Each Signal links to your Likeness registry.</p>

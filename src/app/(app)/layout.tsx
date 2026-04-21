@@ -3,7 +3,6 @@ import Script from 'next/script'
 import '../globals.css'
 import { Footer } from '@/components/Footer'
 import { InstallPrompt, IOSInstallInstructions } from '@/components/InstallPrompt'
-import { ArtistModal } from '@/components/ArtistModal'
 import { TrackLockedToast } from '@/components/TrackLockedToast'
 import { KeyboardShortcuts } from '@/lib/keyboard-shortcuts'
 
@@ -81,7 +80,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
-      <ArtistModal />
       <TrackLockedToast />
       <InstallPrompt />
       <IOSInstallInstructions />

@@ -6,6 +6,8 @@ const PUBLIC_PATHS = [
   '/music',
   '/artists',
   '/store',
+  '/signal',
+  '/tap-in',
   '/systems',
   '/login',
   '/register',
@@ -33,10 +35,11 @@ export async function middleware(request: NextRequest) {
 
   // Protect dashboard and all sub-routes under (app)
   if (pathname.startsWith('/dashboard') || pathname.startsWith('/api/auth/signup') || pathname.startsWith('/checkout') || pathname.startsWith('/artist') || pathname.startsWith('/superfan') || pathname.startsWith('/settings')) {
-    // Single auth truth: Supabase SSR session cookies created by route handler.
-    // createMiddlewareSupabaseClient reads sb-* cookies from request and validates
-    // against Supabase. getSession() returns the session if valid, null if not.
-    const supabase = createMiddlewareSupabaseClient(request, NextResponse.next())
+    // Use a single response object so that Supabase SSR can write refreshed
+    // session cookies back to the browser. Passing a throwaway NextResponse.next()
+    // causes the refreshed tokens to be silently discarded.
+    const response = NextResponse.next({ request: { headers: request.headers } })
+    const supabase = createMiddlewareSupabaseClient(request, response)
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
@@ -45,6 +48,8 @@ export async function middleware(request: NextRequest) {
         new URL(`/login?return=${returnUrl}`, request.nextUrl.origin)
       )
     }
+
+    return response
   }
 
   return NextResponse.next()

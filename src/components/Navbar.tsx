@@ -53,10 +53,10 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: '/verify', label: 'Register' },
-    { href: '/dashboard/dashboard/likeness', label: 'Verify' },
-    { href: '/tap-in', label: 'Signal' },
-    { href: '/dashboard/dashboard/access', label: 'Access' },
+    { href: '/store', label: 'Shop' },
+    { href: '/artists', label: 'Artists' },
+    { href: '/music', label: 'Music' },
+    { href: '/signal', label: 'Signal' },
   ]
   const themeLabel = theme === 'creator' ? 'Creator' : theme === 'dark' ? 'Dark' : 'Light'
   const ThemeIcon = theme === 'creator' ? Palette : theme === 'dark' ? Moon : SunMedium

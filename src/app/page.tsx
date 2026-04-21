@@ -2,12 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, Info, Pause, Play, ShoppingBag } from 'lucide-react'
-import { FaLinkedinIn } from 'react-icons/fa6'
-import { SiInstagram, SiTiktok, SiYoutube, SiX } from 'react-icons/si'
+import { useEffect, useRef } from 'react'
+import { ArrowRight, Pause, Play, ShoppingBag } from 'lucide-react'
 import { Footer } from '@/components/Footer'
-import { LikenessInfoModal } from '@/components/LikenessInfoModal'
 import { useAudio, type Track } from '@/lib/audio-context'
 import { TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
@@ -28,17 +25,8 @@ const supportProducts = FEATURED_PRODUCTS
 
 const artistSpotlight = ARTISTS.slice(0, 4)
 
-const socialPlatforms = [
-  { name: 'Instagram', Icon: SiInstagram },
-  { name: 'TikTok', Icon: SiTiktok },
-  { name: 'YouTube', Icon: SiYoutube },
-  { name: 'X', Icon: SiX },
-  { name: 'LinkedIn', Icon: FaLinkedinIn },
-]
-
 export default function HomePage() {
   const { currentTrack, playTrack, togglePlay, setQueue, setMode } = useAudio()
-  const [showInfo, setShowInfo] = useState(false)
   const revealScopeRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
@@ -88,60 +76,39 @@ export default function HomePage() {
                   className="pointer-events-none absolute left-1/2 top-0 h-44 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(198,167,94,0.18),transparent_72%)] blur-3xl"
                 />
                 <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">
-                  Likeness™
+                  Support artists. Discover music.
                 </p>
-                <div className="flex flex-wrap items-start gap-3">
-                  <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.04em] md:text-6xl">
-                    Your likeness is already being used.
-                    <br />
-                    This puts it on record.
-                  </h1>
-                  <button
-                    type="button"
-                    onClick={() => setShowInfo(true)}
-                    className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] transition-colors hover:border-[var(--pf-orange)] hover:text-[var(--pf-text)]"
-                    aria-label="What is Likeness?"
-                  >
-                    <Info size={16} />
-                  </button>
-                </div>
+                <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.04em] md:text-6xl">
+                  Artists. Music. Merch.
+                  <br />
+                  Direct to you.
+                </h1>
                 <p className="mt-4 max-w-2xl text-lg text-[var(--pf-text-secondary)]">
-                  Register it. Link it. Tap into it anytime.
+                  Stream, buy, and support independent artists directly. No label. No middleman. 80% goes to the artist.
                 </p>
 
-                <div className="mt-8">
-                  <Link href="/verify" className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2">
-                    Register Now
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link href="/artists" className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2">
+                    Browse Artists
                   </Link>
-                  <Link href="/activate" className="pf-btn pf-btn-secondary mt-3 inline-flex items-center justify-center gap-2 sm:mt-0 sm:ml-3">
-                    Already have a code?
+                  <Link href="/store" className="pf-btn pf-btn-secondary inline-flex items-center justify-center gap-2">
+                    <ShoppingBag size={16} />
+                    Shop Now
                   </Link>
-                  <p className="mt-2 text-sm text-[var(--pf-text-muted)]">Takes less than 2 minutes.</p>
-                  <p className="mt-2 text-sm font-medium text-[var(--pf-text-secondary)]">
-                    One identity. Connected everywhere you are.
-                  </p>
                 </div>
 
-                <div className="mt-8">
-                  <p className="text-sm font-semibold tracking-[0.3em] text-[var(--pf-orange)]">What this gives you</p>
-                </div>
-
-                <div className="pf-reveal-group mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="pf-reveal-group mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '0ms' }}>
-                    <p className="text-base font-semibold">Your identity, recorded</p>
-                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Time-stamped. Referenced. Yours.</p>
+                    <p className="text-base font-semibold">Independent artists</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Real people. Real work.</p>
                   </div>
                   <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '60ms' }}>
-                    <p className="text-base font-semibold">Proof of presence</p>
-                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">What’s connected to you—clear and verifiable.</p>
+                    <p className="text-base font-semibold">80% to artists</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Every purchase goes direct.</p>
                   </div>
                   <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '120ms' }}>
-                    <p className="text-base font-semibold">One access point</p>
-                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Everything tied to you, in one place.</p>
-                  </div>
-                  <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4" style={{ transitionDelay: '180ms' }}>
-                    <p className="text-base font-semibold">A signal others can use</p>
-                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Seen. Tap-ready. Real.</p>
+                    <p className="text-base font-semibold">Music + merch</p>
+                    <p className="mt-1 text-sm text-[var(--pf-text-secondary)]">Tracks, vinyl, apparel, and more.</p>
                   </div>
                 </div>
               </div>
@@ -167,50 +134,18 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-[var(--pf-bg)] p-4">
-                  <div className="flex items-center justify-between text-sm text-[var(--pf-text-secondary)]">
-                    <span>Featured release</span>
-                    <span>${featuredTrack?.price || 1} track</span>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => featuredTrack && startFeaturedPlayback(featuredTrack)}
+                  className="mt-5 flex w-full items-center justify-center gap-3 rounded-2xl bg-[var(--pf-bg)] p-4 transition hover:border hover:border-[var(--pf-orange)]"
+                >
+                  {currentTrack?.id === featuredTrack?.id ? <Pause size={18} /> : <Play size={18} />}
+                  <span className="text-sm font-medium">
+                    {currentTrack?.id === featuredTrack?.id ? 'Pause' : 'Play Track'}
+                  </span>
+                  <span className="ml-auto text-sm text-[var(--pf-text-secondary)]">${featuredTrack?.price || 1}</span>
+                </button>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="pf-reveal-group border-b border-[var(--pf-border)]">
-          <div className="pf-container py-10">
-            <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-6" style={{ transitionDelay: '0ms' }}>
-              <p className="text-sm font-semibold tracking-[0.3em] text-[var(--pf-orange)]">Connect your presence</p>
-              <h2 className="mt-2 text-3xl font-bold">Connect your presence</h2>
-              <p className="mt-3 max-w-2xl text-base text-[var(--pf-text-secondary)]">
-                Add your profiles and platforms to create a clear reference of what’s connected to you.
-              </p>
-              <p className="mt-2 text-sm text-[var(--pf-text-muted)]">
-                Instagram, TikTok, YouTube, and more.
-              </p>
-              <p className="mt-3 text-sm text-[var(--pf-text-muted)]">
-                Your information is recorded and stored securely, with a timestamped reference you control.
-              </p>
-
-              <div className="mt-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="flex w-max gap-3 pr-6">
-                  {socialPlatforms.map(({ name, Icon }) => (
-                    <div
-                      key={name}
-                      className="group flex min-w-40 items-center gap-3 rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-bg)] px-4 py-3 text-[var(--pf-text)] transition-opacity duration-200 ease-out hover:opacity-80"
-                    >
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text)]">
-                        <Icon size={18} />
-                      </span>
-                      <span className="text-sm font-medium text-[var(--pf-text-secondary)]">{name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-[var(--pf-text-muted)]">
-                Supports connections to commonly used platforms. Not affiliated with or endorsed by them.
-              </p>
             </div>
           </div>
         </section>
@@ -344,26 +279,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="pf-reveal-group border-t border-[var(--pf-border)]">
-          <div className="pf-container py-10">
-            <div className="pf-reveal-child rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-6 md:p-8" style={{ transitionDelay: '0ms' }}>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">Why this matters</p>
-              <h2 className="mt-2 text-3xl font-bold">Why this matters</h2>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-[var(--pf-text-secondary)]">
-                As identity and likeness become more important across platforms, systems are emerging to help detect, track, and manage digital presence.
-              </p>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-[var(--pf-text-secondary)]">
-                Likeness™ provides a simple way to create your own reference—one place that connects everything tied to you.
-              </p>
-              <p className="mt-4 text-sm text-[var(--pf-text-muted)]">
-                A single reference for who you are—independent of any platform.
-              </p>
-            </div>
-          </div>
-        </section>
+
       </main>
       <Footer />
-      <LikenessInfoModal open={showInfo} onClose={() => setShowInfo(false)} />
     </>
   )
 }

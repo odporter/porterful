@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     if (affiliate_link_id) {
       const { data: affiliate } = await supabase
         .from('affiliates')
-        .select('id')
+        .select('id, referral_count')
         .eq('link_id', affiliate_link_id)
         .limit(1)
         .maybeSingle();

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 
@@ -16,7 +16,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
     }
 
-    const supabase = createClient()
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 
     // Check if already exists
     const { data: existing } = await supabase

@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
 export default function AffiliatePage() {
   const router = useRouter()
@@ -62,30 +60,31 @@ export default function AffiliatePage() {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
+              <input
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="text-center text-lg py-6"
+                className="w-full px-4 py-3 rounded-lg text-center text-lg"
                 style={{
                   background: 'var(--pf-surface)',
-                  borderColor: 'var(--pf-border)',
+                  border: '1px solid var(--pf-border)',
                   color: 'var(--pf-fg)',
+                  outline: 'none',
                 }}
               />
-              <Button
+              <button
                 type="submit"
                 disabled={loading}
-                className="w-full text-lg py-6"
+                className="w-full text-lg py-3 rounded-lg font-medium transition-opacity disabled:opacity-50"
                 style={{
                   background: 'var(--pf-accent)',
                   color: 'var(--pf-bg)',
                 }}
               >
                 {loading ? 'Creating your link...' : 'Get My Link'}
-              </Button>
+              </button>
             </form>
 
             {error && (
@@ -96,7 +95,7 @@ export default function AffiliatePage() {
           <>
             <div className="text-4xl mb-4">🔗</div>
             <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--pf-fg)' }}>
-              {result.already_exists ? 'Your Link is Ready' : 'Your Link is Ready'}
+              Your Link is Ready
             </h2>
             <p className="mb-6" style={{ color: 'var(--pf-muted)' }}>
               Share this link — when someone buys, you earn.
@@ -114,27 +113,26 @@ export default function AffiliatePage() {
             </div>
 
             <div className="flex gap-3 justify-center">
-              <Button
+              <button
                 onClick={copyLink}
-                className="flex-1"
+                className="flex-1 py-3 rounded-lg font-medium transition-opacity"
                 style={{
                   background: 'var(--pf-accent)',
                   color: 'var(--pf-bg)',
                 }}
               >
                 Copy Link
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => router.push('/')}
-                variant="outline"
-                className="flex-1"
+                className="flex-1 py-3 rounded-lg font-medium transition-opacity"
                 style={{
-                  borderColor: 'var(--pf-border)',
+                  border: '1px solid var(--pf-border)',
                   color: 'var(--pf-fg)',
                 }}
               >
                 Browse Porterful
-              </Button>
+              </button>
             </div>
 
             <p className="mt-6 text-sm" style={{ color: 'var(--pf-muted)' }}>

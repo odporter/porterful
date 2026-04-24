@@ -59,7 +59,7 @@ The plan: make Porterful the artist's retirement. Build it once, let it work for
     likeness_verified: true,
     image: '/artist-images/od-porter/avatar.jpg',
     coverGradient: 'from-[var(--pf-orange)] to-purple-600',
-    followers: 2847,
+    followers: 0,
     supporters: null,
     earnings: null,
     products: 12,
@@ -106,37 +106,6 @@ On Porterful, he's not competing with the algorithm. He's building something rea
     ],
   },
   {
-    id: 'nikee-turbo',
-    name: 'Nikee Turbo',
-    slug: 'nikee-turbo',
-    genre: 'Hip-Hop',
-    location: 'St. Louis, MO',
-    bio: `Nikee Turbo is the St. Louis rapper who turned rhythm into a movement. Featured in the Riverfront Times for his distinctive flow — the kind that inspired a dance craze before the algorithm caught on.
-
-He's proof that in the Lou, we don't wait for permission. We build our own thing and let the world catch up. His rhythm-first approach to hip-hop has earned him a following that's more like a movement.
-
-On Porterful, Nikee Turbo's fans are superfans — earning rewards every time they bring someone new to the platform. Because in St. Louis, we look out for our own.`,
-    shortBio: 'St. Louis rapper. Rhythm first. Flow second. The dance craze was just the beginning.',
-    verified: true,
-    likeness_verified: false,
-    image: '/artist-images/nikee-turbo/avatar.jpg',
-    coverGradient: 'from-yellow-500 to-orange-500',
-    followers: 0,
-    supporters: null,
-    earnings: null,
-    products: 1,
-    trackCount: TRACKS.filter(t => t.artist === 'Nikee Turbo').length,
-    social: {
-      instagram: 'nikeeturbo',
-      youtube: '@nikeeturbostl',
-    },
-    coverSlides: [
-      { src: '/artist-images/nikee-turbo/avatar.jpg', alt: 'Nikee Turbo' },
-      { src: '/artist-images/nikee-turbo/Cover Art.png', alt: 'Nikee Turbo' },
-      { src: '/artist-images/nikee-turbo/For Banner.jpg', alt: 'Nikee Turbo - METTLE' },
-    ],
-  },
-  {
     id: 'atm-trap',
     name: 'ATM Trap',
     slug: 'atm-trap',
@@ -159,40 +128,38 @@ On Porterful, Nikee Turbo's fans are superfans — earning rewards every time th
       { src: '/artist-images/atm-trap/avatar.jpg', alt: 'ATM Trap' },
     ],
   },
-  {
-    id: 'rob-soule',
-    name: 'Rob Soule',
-    slug: 'rob-soule',
-    genre: 'Hip-Hop / R&B / Blues',
-    location: 'St. Louis, MO',
-    bio: `Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound all his own. Rooted in the Lou's rich musical legacy — the soul, the struggle, the stories — he didn't just absorb it, he translated it into something new.
-
-His music sits at the intersection where hip-hop meets the blues. Where the 808 meets the guitar. Where the street meets the soul. It's St. Louis music because it could only come from here — from the blocks, the history, the people.
-
-Track by track, he's been building a sound that cuts through. Porterful is where he's planting his flag. This is STL music for STL people and everyone else who can feel it.`,
-    shortBio: 'St. Louis-based hip-hop & R&B artist weaving blues into a soulful sound. Rooted in the Lou, building something new.',
-    verified: true,
-    likeness_verified: false,
-    image: '/artist-images/rob-soule/avatar.jpg',
-    coverGradient: 'from-purple-600 to-blue-600',
-    followers: 412,
-    supporters: null,
-    earnings: null,
-    products: 0,
-    trackCount: TRACKS.filter(t => t.artist === 'Rob Soule').length,
-    social: {
-      youtube: '@RobSouleMusic',
-      instagram: 'RobSouleMusic',
-    },
-    coverSlides: [
-      { src: '/artist-images/rob-soule/avatar.jpg', alt: 'Rob Soule' },
-      { src: '/artist-images/rob-soule/hq720.jpg', alt: 'Rob Soule' },
-    ],
-    videos: [
-      { youtubeId: 'LC4l6_-IR8w', title: 'Believe In Me', album: 'Believe In Me' },
-    ],
-  },
 ]
+
+export const PUBLIC_ARTIST_SLUGS = ARTISTS.map((artist) => artist.slug)
+export const PUBLIC_ARTIST_NAMES = ARTISTS.map((artist) => artist.name)
+
+export function isPublicArtistSlug(value?: string | null) {
+  if (!value) return false
+  return PUBLIC_ARTIST_SLUGS.includes(value)
+}
+
+export function isPublicArtistName(value?: string | null) {
+  if (!value) return false
+  return PUBLIC_ARTIST_NAMES.some((name) => name.toLowerCase() === value.toLowerCase())
+}
+
+export function isPublicArtistRecord(artist: {
+  id?: string | null
+  slug?: string | null
+  username?: string | null
+  full_name?: string | null
+  name?: string | null
+}) {
+  return isPublicArtistSlug(artist.id)
+    || isPublicArtistSlug(artist.slug)
+    || isPublicArtistSlug(artist.username)
+    || isPublicArtistName(artist.full_name)
+    || isPublicArtistName(artist.name)
+}
+
+export function isPublicTrackArtist(trackArtist?: string | null) {
+  return isPublicArtistName(trackArtist)
+}
 
 // Get artist by ID, returns undefined if not found
 export function getArtistById(id: string): ArtistData | undefined {

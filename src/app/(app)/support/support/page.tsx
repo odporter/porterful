@@ -3,14 +3,9 @@
 import { useState } from 'react';
 import { Search, Heart, Check } from 'lucide-react';
 
-// Demo artists for search
+// Real artists only
 const DEMO_ARTISTS = [
-  { id: 'od-porter', name: 'O D Porter', genre: 'Hip-Hop / R&B', location: 'St. Louis, MO', supporters: 312, verified: true },
-  { id: 'artist-2', name: 'Midnight Echo', genre: 'Electronic', location: 'Los Angeles, CA', supporters: 847, verified: true },
-  { id: 'artist-3', name: 'The Velvet Sound', genre: 'Jazz / Soul', location: 'New York, NY', supporters: 1205, verified: true },
-  { id: 'artist-4', name: 'Neon Dreams', genre: 'Indie Pop', location: 'Austin, TX', supporters: 567, verified: false },
-  { id: 'artist-5', name: 'Cosmic Harmony', genre: 'Lo-Fi / Chill', location: 'Seattle, WA', supporters: 2341, verified: true },
-  { id: 'artist-6', name: 'Blue Notes', genre: 'Blues', location: 'Chicago, IL', supporters: 423, verified: false },
+  { id: 'od-porter', name: 'O D Porter', genre: 'Hip-Hop / R&B', location: 'St. Louis, MO', verified: true },
 ];
 
 type Artist = typeof DEMO_ARTISTS[number];

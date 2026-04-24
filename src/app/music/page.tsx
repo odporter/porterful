@@ -6,7 +6,11 @@ import Link from 'next/link';
 import { Play, Pause, SkipForward, Volume2, VolumeX, Clock, Heart, Share2, Verified, ChevronRight, Disc, Music2, Users, Star, Search, X, SlidersHorizontal, LayoutGrid } from 'lucide-react';
 import { useAudio, Track } from '@/lib/audio-context';
 import { TRACKS } from '@/lib/data';
-import { ARTISTS } from '@/lib/artists';
+import { ARTISTS } from '@/lib/artists'
+
+// Only show artists with confirmed music/catalog
+const VALID_SLUGS = ['od-porter', 'gune', 'atm-trap']
+const PUBLIC_ARTISTS = ARTISTS.filter(a => VALID_SLUGS.includes(a.slug))
 import { FEATURED_PRODUCTS } from '@/lib/products';
 
 // O D Porter's tracks only
@@ -283,7 +287,7 @@ export default function MusicPage() {
 
           {/* Horizontal scrollable artist cards */}
           <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide">
-            {ARTISTS.map((artist) => {
+            {PUBLIC_ARTISTS.map((artist) => {
               const artistTracks = TRACKS.filter(t => t.artist === artist.name || t.artist === artist.id);
               return (
                 <Link
@@ -589,30 +593,7 @@ export default function MusicPage() {
               </div>
             </div>
 
-            {/* Quick links */}
-            <div>
-              <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-4">Explore</p>
-              <div className="space-y-3">
-                <Link href="/store"
-                  className="flex items-center justify-between p-4 rounded-xl bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/10 border border-[var(--pf-border)] transition-colors group">
-                  <div>
-                    <p className="font-medium">Custom Name Chains</p>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">Your name. In metal.</p>
-                  </div>
-                  <ChevronRight size={20} className="text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-orange)]" />
-                </Link>
 
-                <Link href="/store"
-                  className="flex items-center justify-between p-4 rounded-xl bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/10 border border-[var(--pf-border)] transition-colors group">
-                  <div>
-                    <p className="font-medium">"There It Is, Here It Go"</p>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">The book — $25</p>
-                  </div>
-                  <ChevronRight size={20} className="text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-orange)]" />
-                </Link>
-
-              </div>
-            </div>
           </div>
         </div>
       </section>

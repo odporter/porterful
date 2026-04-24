@@ -14,10 +14,14 @@ All three requested improvements were already in place:
 
 2. **Social media buttons** (`src/app/(app)/artist/artist/[id]/page.tsx`):
    - Instagram, Twitter/X, YouTube, and TikTok icons already appear below the artist name in the profile header
-   - Only show when the artist has those social fields filled in
+   - Only shows when the artist has those social fields filled in
 
 3. **Featured Singles before Albums**:
    - The "Featured Singles" section already renders first in the music tab
    - "Albums" section renders after
 
 No code changes were necessary — everything was already correctly implemented.
+
+**Note:** Verified all three items were already correctly in place before any edits. File location:
+- Artists data: `/Users/sentinel/Documents/porterful/src/lib/artists.ts`
+- Artist profile page: `/Users/sentinel/Documents/porterful/src/app/(app)/artist/artist/[id]/page.tsx`

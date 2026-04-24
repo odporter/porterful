@@ -5,9 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { useSupabase } from '@/app/providers'
 import { useCart } from '@/lib/cart-context'
-import { useTheme } from '@/lib/theme-context'
-import { Menu, X, ChevronDown, User, LogOut, ShoppingCart, Sparkles, Moon, SunMedium } from 'lucide-react'
-import { Theme, THEMES } from '@/lib/theme'
+import { Menu, X, ChevronDown, User, LogOut, ShoppingCart } from 'lucide-react'
 
 export function Navbar() {
   const { user, supabase, loading } = useSupabase()
@@ -15,15 +13,12 @@ export function Navbar() {
   const hideOnTapRoute = pathname.startsWith('/tap')
 
   const { items } = useCart()
-  const { theme, setTheme } = useTheme()
   const cartCount = items.reduce((s, i) => s + i.quantity, 0)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [themeOpen, setThemeOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
-  const themeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -70,18 +65,11 @@ export function Navbar() {
         { href: '/dashboard/access', label: 'Access' },
       ]
     : [
-        { href: '/store', label: 'Shop' },
-        { href: '/artists', label: 'Artists' },
         { href: '/music', label: 'Music' },
-        { href: '/affiliate', label: 'Sell' },
-        { href: '/support', label: 'Support' },
+        { href: '/artists', label: 'Artists' },
+        { href: '/store', label: 'Store' },
+        { href: '/apply', label: 'Apply' },
       ]
-  const themeLabel = theme === 'creator' ? 'Creator' : theme === 'dark' ? 'Dark' : 'Light'
-  const ThemeIcon = theme === 'creator' ? Sparkles : theme === 'dark' ? Moon : SunMedium
-  const themeOptions: Array<{ value: Theme; label: string }> = THEMES.map((value) => ({
-    value,
-    label: value === 'creator' ? 'Creator' : value === 'dark' ? 'Dark' : 'Light',
-  }))
   const brandLabel = isLikenessSurface ? 'Likeness™' : 'Porterful'
   const brandLetter = isLikenessSurface ? 'L' : 'P'
   const dashboardHref = isLikenessSurface ? '/dashboard' : '/dashboard/artist'
@@ -157,42 +145,6 @@ export function Navbar() {
                   )}
                 </Link>
               )}
-
-              <div className="relative hidden md:block" ref={themeRef}>
-                <button
-                  onClick={() => setThemeOpen(prev => !prev)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-colors duration-200 ease-out hover:bg-[var(--pf-surface)]"
-                  aria-label={`Theme: ${themeLabel}`}
-                  aria-haspopup="menu"
-                  aria-expanded={themeOpen}
-                >
-                  <ThemeIcon size={18} />
-                  <span className="hidden lg:inline text-sm font-medium">{themeLabel}</span>
-                  <ChevronDown size={14} />
-                </button>
-
-                {themeOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl shadow-xl overflow-hidden z-50">
-                    {themeOptions.map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          setTheme(option.value)
-                          setThemeOpen(false)
-                        }}
-                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors ${
-                          theme === option.value
-                            ? 'bg-[var(--pf-surface-hover)] text-[var(--pf-text)]'
-                            : 'text-[var(--pf-text-secondary)] hover:bg-[var(--pf-bg)] hover:text-[var(--pf-text)]'
-                        }`}
-                      >
-                        <span>{option.label}</span>
-                        {theme === option.value && <span className="text-[var(--pf-orange)]">•</span>}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
 
               {/* User Menu — only renders once session is confirmed */}
               {showUser && (
@@ -297,31 +249,6 @@ export function Navbar() {
 
           {/* Divider */}
           <div className="border-t border-[var(--pf-border)] my-4" />
-
-          {/* User Section */}
-          <div className="py-3 border-b border-[var(--pf-border)]">
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--pf-text-muted)]">
-              Theme
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              {themeOptions.map(option => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    setTheme(option.value)
-                    setMobileOpen(false)
-                  }}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                    theme === option.value
-                    ? 'border-transparent bg-[var(--pf-orange)] text-[#111111]'
-                      : 'border-[var(--pf-border)] text-[var(--pf-text-secondary)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-text)]'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {showUser && (
             <div className="space-y-1">

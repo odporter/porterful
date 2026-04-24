@@ -8,26 +8,15 @@ import { Footer } from '@/components/Footer'
 import { useAudio, type Track } from '@/lib/audio-context'
 import { TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
-import { FEATURED_PRODUCTS } from '@/lib/products'
 
 const featuredArtist = ARTISTS.find((artist) => artist.slug === 'gune') ?? ARTISTS[0]
 
 const featuredTracks = TRACKS
   .filter((track) => track.artist === featuredArtist.name)
-  .sort((a, b) => (b.plays || 0) - (a.plays || 0))
   .slice(0, 4) as Track[]
 
-const featuredProduct =
-  FEATURED_PRODUCTS.find((product) => product.featured && product.id !== 'signal-shirt') ??
-  FEATURED_PRODUCTS.find((product) => product.id !== 'signal-shirt') ??
-  FEATURED_PRODUCTS[0]
-const featuredProducts = FEATURED_PRODUCTS
-  .filter((product) => product.id !== 'signal-shirt')
-  .filter((product) => product.artist !== 'Porterful' && product.artist !== 'Various Artists')
-  .slice(0, 3)
-
 // Filter to only show artists with real music on CDN
-const VALID_ARTIST_SLUGS = ['od-porter', 'gune', 'jay-jay', 'atm-trap']
+const VALID_ARTIST_SLUGS = ['od-porter', 'gune', 'atm-trap']
 const artistSpotlight = ARTISTS.filter(a => VALID_ARTIST_SLUGS.includes(a.slug)).slice(0, 4)
 
 export default function HomePage() {
@@ -79,7 +68,7 @@ export default function HomePage() {
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link href="/store" className="pf-brand-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-all duration-200 ease-out hover:scale-[1.03] active:scale-[0.98]">
-                    Shop Products
+                    Shop Apparel
                   </Link>
                   <Link href="/music" className="pf-btn pf-btn-secondary inline-flex items-center justify-center gap-2">
                     Listen Now
@@ -87,78 +76,12 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-[var(--pf-border)] bg-[var(--pf-surface)] p-5 shadow-2xl shadow-black/30">
-                <div className="relative mb-5 aspect-[4/5] overflow-hidden rounded-2xl">
-                  <Image
-                    src={featuredProduct.image}
-                    alt={featuredProduct.name}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.25em] text-[var(--pf-orange)]">Featured drop</p>
-                    <h2 className="mt-2 text-2xl font-bold">{featuredProduct.name}</h2>
-                    <p className="mt-1 text-[var(--pf-text-secondary)]">
-                      {featuredProduct.artist} • {featuredProduct.category}
-                    </p>
-                  </div>
-                  <span className="shrink-0 rounded-full border border-[var(--pf-border)] bg-[var(--pf-bg)] px-3 py-1 text-sm font-semibold">
-                    ${featuredProduct.price.toFixed(2)}
-                  </span>
-                </div>
-                <div className="mt-5 rounded-2xl bg-[var(--pf-bg)] p-4">
-                  <div className="flex items-center justify-between text-sm text-[var(--pf-text-secondary)]">
-                    <Link href="/store" className="text-[var(--pf-orange)] hover:underline">Shop now →</Link>
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
         </section>
 
-        <section className="pf-reveal-group border-b border-[var(--pf-border)]">
-          <div className="pf-container py-10">
-            <div className="pf-reveal-child mb-6 flex items-end justify-between gap-4" style={{ transitionDelay: '0ms' }}>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">Featured products</p>
-                <h2 className="mt-2 text-3xl font-bold">Shop the catalog</h2>
-              </div>
-              <Link href="/store" className="hidden text-sm font-medium text-[var(--pf-orange)] hover:underline md:block">
-                Open the store
-              </Link>
-            </div>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {featuredProducts.map((product, index) => (
-                <Link
-                  key={product.id}
-                  href="/store"
-                  className="pf-reveal-child group rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4 transition hover:border-[var(--pf-orange)]"
-                  style={{ transitionDelay: `${(index + 1) * 60}ms` }}
-                >
-                  <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      sizes="(max-width: 1280px) 50vw, 25vw"
-                      className="object-cover transition duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--pf-text-muted)]">{product.category}</p>
-                  <div className="mt-2 flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-semibold">{product.name}</h3>
-                    <span className="shrink-0 font-semibold text-[var(--pf-orange)]">${product.price.toFixed(2)}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-[var(--pf-text-secondary)]">{product.artist}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
 
         <section className="pf-reveal-group">
           <div className="pf-container py-10">

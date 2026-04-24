@@ -6,16 +6,13 @@ import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import {
   ArrowRight,
-  Check,
-  Copy,
+  Clock,
   Search,
-  Share2,
-  ShieldCheck,
   ShoppingBag,
   Sparkles,
   Tag,
 } from 'lucide-react'
-import { PRODUCTS, type Product } from '@/lib/products'
+import { PRODUCTS, isPurchasable, type Product } from '@/lib/products'
 
 const REFERRAL_COOKIE = 'porterful_referral'
 const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
@@ -214,46 +211,20 @@ export default function StorePage() {
   return (
     <main className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-16">
       <div className="pf-container max-w-6xl">
-        <div className="mb-8 grid gap-6 rounded-3xl border border-[var(--pf-border)] bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 p-6 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--pf-text-muted)]">
-              <ShoppingBag size={12} />
-              Store — part of Porterful™
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                <span className="pf-brand-gradient-text">Choose Products</span> to Sell
-              </h1>
-              <p className="max-w-2xl text-sm text-[var(--pf-text-secondary)] sm:text-base">
-                Curated Porterful inventory only. Pick a product, share the link, and keep the flow simple.
-              </p>
-            </div>
+        <div className="mb-8">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--pf-text-muted)]">
+            <ShoppingBag size={12} />
+            Porterful Store
           </div>
-
-          <div className="rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] px-4 py-3">
-            <p className="flex items-center gap-2 text-sm font-medium text-[var(--pf-text)]">
-              <ShieldCheck size={16} className="text-[var(--pf-orange)]" />
-              Payout verification is only required to withdraw earnings.
-            </p>
-          </div>
+          <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+            Shop Porterful
+          </h1>
+          <p className="mt-3 max-w-2xl text-base text-[var(--pf-text-secondary)]">
+            Music merch and access pieces connected to real artists.
+          </p>
         </div>
 
-        {referralHandle && (
-          <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[var(--pf-orange)]">Referral active</p>
-              <p className="text-sm text-[var(--pf-text-secondary)]">@{referralHandle} will get credit for this visit.</p>
-            </div>
-            <button
-              type="button"
-              onClick={copyStoreLink}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--pf-border)] px-4 py-2 text-sm font-semibold text-[var(--pf-text)] transition-colors hover:border-[var(--pf-orange)]/40"
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              {copied ? 'Copied' : 'Copy Store Link'}
-            </button>
-          </div>
-        )}
+
 
         <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="relative">
@@ -302,30 +273,7 @@ export default function StorePage() {
           </div>
         )}
 
-        <div className="mt-10 rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[var(--pf-text)]">Need your own link?</p>
-              <p className="text-sm text-[var(--pf-text-secondary)]">Grab your store link from the dashboard and share it anywhere.</p>
-            </div>
-            <div className="flex gap-2">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--pf-orange)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--pf-orange-dark)]"
-              >
-                Dashboard <ArrowRight size={14} />
-              </Link>
-              <button
-                type="button"
-                onClick={copyStoreLink}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--pf-border)] px-4 py-2 text-sm font-semibold text-[var(--pf-text)] transition-colors hover:border-[var(--pf-orange)]/40"
-              >
-                <Share2 size={14} />
-                Share
-              </button>
-            </div>
-          </div>
-        </div>
+
       </div>
     </main>
   )

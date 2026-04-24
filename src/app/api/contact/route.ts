@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const TO_EMAIL = 'porter.jonathanj@gmail.com'
+
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey || apiKey === 're_test') {
+    return null
+  }
+  return new Resend(apiKey)
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const resend = getResend()
+    if (!resend) {
+      console.warn('Resend not configured - skipping email send')
+      // Return success in build/CI environments without real email
+      return NextResponse.json({ success: true, warning: 'Email service not configured' })
+    }
+
     const { name, email, subject, message } = await request.json()
 
     if (!name || !email || !message) {

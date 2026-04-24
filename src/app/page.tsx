@@ -26,7 +26,9 @@ const featuredProducts = FEATURED_PRODUCTS
   .filter((product) => product.artist !== 'Porterful' && product.artist !== 'Various Artists')
   .slice(0, 3)
 
-const artistSpotlight = ARTISTS.slice(0, 4)
+// Filter to only show artists with real music on CDN
+const VALID_ARTIST_SLUGS = ['od-porter', 'gune', 'jay-jay', 'atm-trap']
+const artistSpotlight = ARTISTS.filter(a => VALID_ARTIST_SLUGS.includes(a.slug)).slice(0, 4)
 
 export default function HomePage() {
   const { currentTrack, playTrack, togglePlay, setQueue, setMode } = useAudio()

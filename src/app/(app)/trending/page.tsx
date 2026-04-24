@@ -214,17 +214,8 @@ export default function TrendingPage() {
               </div>
 
               <div className="p-4">
-                {/* Sales & Rating */}
-                <div className="flex items-center justify-between text-xs text-[var(--pf-text-muted)] mb-2">
-                  <span className="flex items-center gap-1">
-                    <Clock size={12} />
-                    {product.sales.toLocaleString()} sold
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Star size={12} className="text-yellow-500 fill-yellow-500" />
-                    {product.rating} ({product.reviews})
-                  </span>
-                </div>
+                {/* Category */}
+                <p className="text-xs text-[var(--pf-text-muted)] mb-1">{product.category}</p>
 
                 {/* Product Info */}
                 <p className="text-xs text-[var(--pf-text-muted)] mb-1">{product.category}</p>

@@ -41,6 +41,7 @@ function StoreProductCard({
   referralHandle: string | null
 }) {
   const [loading, setLoading] = useState(false)
+  const purchasable = isPurchasable(product)
 
   const handleBuy = async () => {
     setLoading(true)
@@ -88,14 +89,9 @@ function StoreProductCard({
     <article className="pf-card overflow-hidden border border-[var(--pf-border)] transition-colors hover:border-[var(--pf-orange)]/40">
       <div className="relative aspect-square bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-500/10">
         <Image src={product.image} alt={product.name} fill className="object-cover" />
-        {product.featured && (
-          <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur">
-            Featured
-          </div>
-        )}
-        {product.dropship && (
-          <div className="absolute right-3 top-3 rounded-full bg-emerald-500/20 px-2 py-1 text-xs font-medium text-emerald-300">
-            Partner
+        {!purchasable && (
+          <div className="absolute left-3 top-3 rounded-full bg-black/70 px-2 py-1 text-xs font-medium text-white backdrop-blur">
+            Coming Soon
           </div>
         )}
       </div>
@@ -116,31 +112,39 @@ function StoreProductCard({
 
         <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--pf-text-muted)]">
           <span className="inline-flex items-center gap-1">
-            <Tag size={12} /> Porterful inventory
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <ShieldCheck size={12} /> Verification only for payouts
+            <Tag size={12} /> {product.artist}
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={handleBuy}
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--pf-orange)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--pf-orange-dark)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? (
-            <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              Redirecting...
-            </>
-          ) : (
-            <>
-              Buy Now
-              <ArrowRight size={16} />
-            </>
-          )}
-        </button>
+        {purchasable ? (
+          <button
+            type="button"
+            onClick={handleBuy}
+            disabled={loading}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--pf-orange)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--pf-orange-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Redirecting...
+              </>
+            ) : (
+              <>
+                Buy Now
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] px-4 py-3 text-sm font-semibold text-[var(--pf-text-secondary)]"
+          >
+            <Clock size={16} />
+            Coming Soon
+          </button>
+        )}
       </div>
     </article>
   )
@@ -153,7 +157,6 @@ export default function StorePage() {
   const [referralHandle, setReferralHandle] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
-  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const ref = queryRef || readReferralCookie()
@@ -198,15 +201,6 @@ export default function StorePage() {
       return haystack.includes(term)
     })
   }, [activeCategory, searchTerm])
-
-  const copyStoreLink = async () => {
-    const url = referralHandle
-      ? `${window.location.origin}/store?ref=${encodeURIComponent(referralHandle)}`
-      : `${window.location.origin}/store`
-    await navigator.clipboard.writeText(url)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1500)
-  }
 
   return (
     <main className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-16">

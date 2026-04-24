@@ -73,7 +73,7 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     full_name: 'Jay Jay',
     email: null,
     avatar_url: '/artist-images/jay-jay/avatar.jpg',
-    bio: 'Jay Jay — O D Porter's catalog under a former name.',
+    bio: "Jay Jay — O D Porter's catalog under a former name.",
     genre: 'Hip-Hop / R&B',
     location: 'St. Louis, MO',
     verified: true,

@@ -98,3 +98,6 @@ const PLATFORM_ARTISTS: ArtistProfile[] = [
     tracks: 5,
     status: 'live',
   },
+];
+
+export default function ArtistsPage()

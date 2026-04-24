@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation'
 import { useSupabase } from '@/app/providers'
 import { useCart } from '@/lib/cart-context'
 import { useTheme } from '@/lib/theme-context'
-import { Menu, X, ChevronDown, User, LogOut, ShoppingCart } from 'lucide-react'
+import { Menu, X, ChevronDown, User, LogOut, ShoppingCart, Sparkles, Moon, SunMedium } from 'lucide-react'
+import { Theme, THEMES } from '@/lib/theme'
 
 export function Navbar() {
   const { user, supabase, loading } = useSupabase()
@@ -22,6 +23,7 @@ export function Navbar() {
   const [themeOpen, setThemeOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const themeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -75,7 +77,7 @@ export function Navbar() {
         { href: '/support', label: 'Support' },
       ]
   const themeLabel = theme === 'creator' ? 'Creator' : theme === 'dark' ? 'Dark' : 'Light'
-  const ThemeIcon = theme === 'creator' ? Palette : theme === 'dark' ? Moon : SunMedium
+  const ThemeIcon = theme === 'creator' ? Sparkles : theme === 'dark' ? Moon : SunMedium
   const themeOptions: Array<{ value: Theme; label: string }> = THEMES.map((value) => ({
     value,
     label: value === 'creator' ? 'Creator' : value === 'dark' ? 'Dark' : 'Light',

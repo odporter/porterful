@@ -126,25 +126,14 @@ export const TRACKS = [
   { id: 'lev-08', title: 'Pain', artist: 'O D Porter', album: 'Levi', duration: '3:28', price: 1, plays: 39000, image: ALBUM_ART.Levi, audio_url: '' },
   { id: 'lev-09', title: 'Struggle', artist: 'O D Porter', album: 'Levi', duration: '4:45', price: 1, plays: 55000, image: ALBUM_ART.Levi, audio_url: '' },
   // GUNE TRACKS
-  { id: 'gune-01', title: 'Call Back', artist: 'Gune', album: 'Singles', duration: '2:30', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '', featured: true },
-  { id: 'gune-02', title: 'Sorry in Advance', artist: 'Gune', album: 'Singles', duration: '3:12', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '' },
-  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 999999, image: '/artist-images/gune/avatar.jpg', audio_url: '', featured: true },
+  { id: 'gune-01', title: 'Call Back', artist: 'Gune', album: 'Singles', duration: '2:30', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gune - Call Back.mp3', featured: true },
+  { id: 'gune-02', title: 'Sorry in Advance', artist: 'Gune', album: 'Singles', duration: '3:12', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gune - Sorry in advance.mp3' },
+  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 999999, image: '/artist-images/gune/avatar.jpg', audio_url: '/artist-images/gune/Gunebugtheplug - One more time .mp3', featured: true },
   // O D PORTER SINGLES
-  { id: 'od-tlf', title: 'TLF', artist: 'O D Porter', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/od-porter/avatar.jpg', audio_url: '' },
-  // NIKEE TURBO TRACKS
-  { id: 'nikee-01', title: 'Dominique', artist: 'Nikee Turbo', album: 'Singles', duration: '2:45', price: 1, plays: 0, image: '/artist-images/nikee-turbo/avatar.jpg', audio_url: '', featured: true },
-  { id: 'nikee-02', title: 'Harder', artist: 'Nikee Turbo', album: 'Singles', duration: '3:20', price: 1, plays: 0, image: '/artist-images/nikee-turbo/avatar.jpg', audio_url: '' },
-  { id: 'nikee-03', title: 'Hide The Pain', artist: 'Nikee Turbo', album: 'Singles', duration: '2:55', price: 1, plays: 0, image: '/artist-images/nikee-turbo/avatar.jpg', audio_url: '' },
   // ATM TRAP TRACKS
-  { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '', featured: true },
-  { id: 'atm-02', title: 'Coming Home', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '' },
-  { id: 'atm-03', title: 'Heart of a Lion', artist: 'ATM Trap', album: 'Singles', duration: '3:15', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '' },
-  { id: 'atm-04', title: 'Wacked Out Master', artist: 'ATM Trap', album: 'Singles', duration: '2:58', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '' },
-
-  // ROB SOULE TRACKS
-  { id: 'rob-01', title: 'Believe In Me', artist: 'Rob Soule', album: 'Believe In Me', duration: '3:45', price: 1, plays: 0, image: '/artist-images/rob-soule/avatar.jpg', audio_url: '', featured: true },
-  { id: 'rob-02', title: 'Ride N Vibe', artist: 'Rob Soule', album: 'Ride N Vibe', duration: '4:10', price: 1, plays: 0, image: '/artist-images/rob-soule/avatar.jpg', audio_url: '' },
-  { id: 'rob-03', title: 'Roots', artist: 'Rob Soule', album: 'Roots', duration: '4:25', price: 1, plays: 0, image: '/artist-images/rob-soule/avatar.jpg', audio_url: '' },
+  { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/Trap-Thought We Was Bruddaz (FINAL).m4a', featured: true },
+  { id: 'atm-02', title: 'Coming Home', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/master-Coming Home (FINAL)mp3.mp3' },
+  { id: 'atm-03', title: 'Heart of a Lion', artist: 'ATM Trap', album: 'Singles', duration: '3:15', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/Heart of A Lion (Master)mp3.mp3' },
 ];
 
 // Album data

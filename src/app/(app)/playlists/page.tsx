@@ -5,6 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useAudio } from '@/lib/audio-context'
 import { TRACKS } from '@/lib/data'
+import { isPublicTrackArtist } from '@/lib/artists'
+
+const PUBLIC_TRACKS = TRACKS.filter((track) => isPublicTrackArtist(track.artist))
 
 // Custom Porterful Icons
 const Icon = {
@@ -119,7 +122,11 @@ export default function PlaylistPage() {
   useEffect(() => {
     const saved = localStorage.getItem('porterful-playlists')
     if (saved) {
-      setPlaylists(JSON.parse(saved))
+      const parsed = JSON.parse(saved) as Playlist[]
+      setPlaylists(parsed.map((playlist) => ({
+        ...playlist,
+        tracks: playlist.tracks.filter((track) => isPublicTrackArtist(track.artist)),
+      })))
     }
   }, [])
 
@@ -271,7 +278,7 @@ export default function PlaylistPage() {
                 </button>
               </div>
               <div className="space-y-2">
-                {TRACKS.map(track => (
+                {PUBLIC_TRACKS.map(track => (
                   <button 
                     key={track.id}
                     onClick={() => addTrackToPlaylist(track)}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TRACKS, ALBUMS } from '@/lib/data';
 import { PRODUCTS } from '@/lib/products';
+import { isPublicTrackArtist } from '@/lib/artists';
 
 // Static artist data derived from tracks/albums
 const STATIC_ARTISTS = [
@@ -50,9 +51,11 @@ export async function GET(request: NextRequest) {
 
     // Search static tracks
     const tracks = TRACKS.filter((track: any) =>
-      track.title.toLowerCase().includes(searchTerm) ||
-      track.artist.toLowerCase().includes(searchTerm) ||
-      (track.album && track.album.toLowerCase().includes(searchTerm))
+      isPublicTrackArtist(track.artist) && (
+        track.title.toLowerCase().includes(searchTerm) ||
+        track.artist.toLowerCase().includes(searchTerm) ||
+        (track.album && track.album.toLowerCase().includes(searchTerm))
+      )
     ).slice(0, 10).map((track: any) => ({
       id: track.id,
       title: track.title,

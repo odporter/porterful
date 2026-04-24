@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { TRACKS } from '@/lib/data'
+import { ARTISTS } from '@/lib/artists'
 
 export const metadata: Metadata = {
   title: 'About Porterful - The Artist Economy Platform',
@@ -48,16 +48,16 @@ export default function AboutPage() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
-              <div className="text-3xl md:text-4xl font-bold text-[var(--pf-orange)]">80%</div>
-              <div className="text-sm text-[var(--pf-text-muted)]">to Artists</div>
+              <div className="text-3xl md:text-4xl font-bold text-[var(--pf-orange)]">{ARTISTS.length}</div>
+              <div className="text-sm text-[var(--pf-text-muted)]">Public artists</div>
             </div>
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
-              <div className="text-3xl md:text-4xl font-bold">{TRACKS.length}+</div>
-              <div className="text-sm text-[var(--pf-text-muted)]">Tracks</div>
+              <div className="text-3xl md:text-4xl font-bold">2</div>
+              <div className="text-sm text-[var(--pf-text-muted)]">Store items</div>
             </div>
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
-              <div className="text-3xl md:text-4xl font-bold">94+</div>
-              <div className="text-sm text-[var(--pf-text-muted)]">Products</div>
+              <div className="text-3xl md:text-4xl font-bold">1</div>
+              <div className="text-sm text-[var(--pf-text-muted)]">Direct storefront</div>
             </div>
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
               <div className="text-3xl md:text-4xl font-bold text-[var(--pf-orange)]">$0</div>
@@ -155,7 +155,7 @@ export default function AboutPage() {
                 O D Porter was born in Miami, raised between New Orleans and St. Louis — and he claims the Lou like a birthright. He watched the music industry eat artists alive: streaming platforms paying pennies, labels taking everything, money leaking out of communities that needed it most.
               </p>
               <p className="text-[var(--pf-text-secondary)] mb-4">
-                He wrote his story down in <em>"There It Is, Here It Go"</em> — Tauruss stubborn, once his mind's set, it gets done. Loss in the family derailed his momentum, cost him about a thousand fans who'd been with him through it all. But he didn't quit.
+                He wrote his story down and kept going when momentum dropped. Loss in the family derailed his momentum and he still didn't quit.
               </p>
               <p className="text-[var(--pf-text-secondary)] mb-4">
                 Porterful is his answer. Infrastructure that keeps money in the community. A retirement plan for artists who never had one. On this platform, artists keep 80% of every sale. Direct to fan. No middleman.

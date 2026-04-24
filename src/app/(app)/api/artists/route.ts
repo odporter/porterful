@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { ARTISTS } from '@/lib/artists'
+import { ARTISTS, isPublicArtistRecord } from '@/lib/artists'
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function GET() {
 
       if (res.ok) {
         const artists = await res.json()
-        return NextResponse.json({ artists })
+        return NextResponse.json({ artists: Array.isArray(artists) ? artists.filter(isPublicArtistRecord) : [] })
       }
     }
 

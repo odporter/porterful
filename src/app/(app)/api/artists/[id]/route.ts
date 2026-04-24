@@ -11,6 +11,11 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const staticArtist = ARTISTS.find(a => a.id === params.id || a.slug === params.id)
+    if (!staticArtist) {
+      return NextResponse.json({ error: 'Artist not found' }, { status: 404 })
+    }
+
     const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -51,13 +56,6 @@ export async function GET(
           profileError = null
         }
       }
-    }
-
-    // Also check static artist data as fallback
-    const staticArtist = ARTISTS.find(a => a.id === params.id || a.slug === params.id)
-
-    if ((profileError || !profile) && !staticArtist) {
-      return NextResponse.json({ error: 'Artist not found' }, { status: 404 })
     }
 
     // Fetch artist-specific data (only if we have a profile)

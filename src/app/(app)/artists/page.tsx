@@ -3,7 +3,42 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Check, MapPin, Music } from 'lucide-react'
-import { ARTISTS } from '@/lib/artists'
+
+const PUBLIC_ARTISTS = [
+  {
+    id: 'od-porter',
+    name: 'O D Porter',
+    slug: 'od-porter',
+    genre: 'Hip-Hop, R&B, Soul',
+    location: 'St. Louis, MO',
+    shortBio: 'St. Louis artist. Born in Miami, raised in NOLA + the Lou. Founder of Porterful. Stubborn when he sets his mind to something.',
+    image: '/artist-images/od-porter/avatar.jpg',
+    verified: true,
+    trackCount: 84,
+  },
+  {
+    id: 'gune',
+    name: 'Gune',
+    slug: 'gune',
+    genre: 'Hip-Hop / R&B / Blues',
+    location: 'St. Louis, MO',
+    shortBio: "Raw St. Louis hip-hop. Gune doesn't make music for everyone — just for the ones who get it.",
+    image: '/artist-images/gune/avatar.jpg',
+    verified: true,
+    trackCount: 3,
+  },
+  {
+    id: 'atm-trap',
+    name: 'ATM Trap',
+    slug: 'atm-trap',
+    genre: 'Hip-Hop',
+    location: 'St. Louis, MO',
+    shortBio: 'St. Louis hip-hop artist. Real rap, real STL.',
+    image: '/artist-images/atm-trap/avatar.jpg',
+    verified: true,
+    trackCount: 4,
+  },
+] as const
 
 export default function ArtistsPage() {
   return (
@@ -34,7 +69,7 @@ export default function ArtistsPage() {
 
       <section className="pf-container py-12">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {ARTISTS.map((artist) => (
+          {PUBLIC_ARTISTS.map((artist) => (
             <Link
               key={artist.id}
               href={`/artist/${artist.slug}`}

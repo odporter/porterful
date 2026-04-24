@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/app/providers';
 import { useAudio } from '@/lib/audio-context';
 import { TRACKS } from '@/lib/data';
@@ -26,7 +25,6 @@ function groupTracksByAlbum(tracks: typeof TRACKS) {
 }
 
 export default function ArtistProfilePage({ params }: { params: { id: string } }) {
-  const router = useRouter();
   const { user, supabase } = useSupabase();
   const { currentTrack, isPlaying, playTrack, setQueue } = useAudio();
 
@@ -44,6 +42,11 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
   const staticArtist = getArtistById(params.id);
 
   useEffect(() => {
+    if (!staticArtist) {
+      setLoading(false)
+      return
+    }
+
     async function loadArtistData() {
       try {
         const res = await fetch(`/api/artists/${params.id}`);
@@ -110,7 +113,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
       }
     }
     loadArtistData();
-  }, [params.id, user]);
+  }, [params.id, user, staticArtist]);
 
   // Auto-advance cover slideshow every 5 seconds
   useEffect(() => {

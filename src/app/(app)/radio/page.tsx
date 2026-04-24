@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useAudio } from '@/lib/audio-context'
 import { Play, Pause, SkipForward, Radio, Heart, ShoppingBag } from 'lucide-react'
-import { getArtistSlugByName } from '@/lib/artists'
+import { getArtistSlugByName, isPublicTrackArtist } from '@/lib/artists'
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array]
@@ -28,7 +28,7 @@ export default function RadioPage() {
   const [shuffledTracks, setShuffledTracks] = useState<typeof TRACKS>([])
 
   useEffect(() => {
-    setShuffledTracks(shuffleArray(TRACKS))
+    setShuffledTracks(shuffleArray(TRACKS.filter((track) => isPublicTrackArtist(track.artist))))
   }, [])
 
   useEffect(() => {

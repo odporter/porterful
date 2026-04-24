@@ -8,7 +8,10 @@ import { getServerUser } from '@/lib/supabase-auth'
 import { getThemeBootstrapScript, getThemeColor } from '@/lib/theme'
 
 export const metadata: Metadata = {
-  title: 'Porterful',
+  title: {
+    default: 'Porterful',
+    template: '%s | Porterful'
+  },
   description: 'Music. Land. Mind. Law. Commerce. Credit.',
 }
 

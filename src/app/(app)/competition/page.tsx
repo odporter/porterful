@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function CompetitionPage() {
-  redirect('/competition/competition')
+  redirect('/apply')
 }

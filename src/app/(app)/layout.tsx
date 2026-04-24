@@ -2,15 +2,11 @@ import type { Metadata } from 'next'
 import Script from 'next/script'
 import '../globals.css'
 import { Footer } from '@/components/Footer'
-import { InstallPrompt, IOSInstallInstructions } from '@/components/InstallPrompt'
 import { TrackLockedToast } from '@/components/TrackLockedToast'
 import { KeyboardShortcuts } from '@/lib/keyboard-shortcuts'
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Porterful - Music + Merch for Independent Artists',
-    template: '%s | Porterful'
-  },
+  title: 'Porterful',
   description: 'Stream music, buy tracks, shop merch. 80% goes to artists. No label. No middleman. Where artists own everything.',
   keywords: [
     'independent music', 'artist merchandise', 'music marketplace', 'support artists',
@@ -81,8 +77,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <TrackLockedToast />
-      <InstallPrompt />
-      <IOSInstallInstructions />
     </>
   )
 }

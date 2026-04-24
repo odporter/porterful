@@ -58,7 +58,7 @@ const DEMO_TYPES = [
     tagline: 'Merch & music fulfillment done right',
     features: [
       { icon: ShoppingBag, text: 'Print-on-demand store' },
-      { icon: Upload, text: 'Choose products to sell in seconds' },
+      { icon: Upload, text: 'Browse products in seconds' },
       { icon: DollarSign, text: 'No upfront inventory' },
       { icon: Truck, text: 'We handle shipping' },
     ],
@@ -210,27 +210,27 @@ function DemoPreview({ type, onBack }: { type: typeof DEMO_TYPES[0]; onBack: () 
               <div className="flex gap-4">
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Earnings</p>
-                  <p className="text-3xl font-bold text-green-400">$48,291</p>
-                  <p className="text-xs text-green-400">↑ $2,847 this month</p>
+                  <p className="text-3xl font-bold text-green-400">Live data</p>
+                  <p className="text-xs text-green-400">Connect your account to see it</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Fans</p>
-                  <p className="text-3xl font-bold">3,241</p>
-                  <p className="text-xs text-green-400">↑ 8% this month</p>
+                  <p className="text-3xl font-bold">—</p>
+                  <p className="text-xs text-green-400">No public count shown</p>
                 </div>
               </div>
               <div className="p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                 <p className="text-sm font-medium mb-3">Recent Earnings</p>
                 <div className="space-y-2">
-                  <div className="flex justify-between"><span>Oddysee</span><span className="text-green-400">+$847.20</span></div>
-                  <div className="flex justify-between"><span>Ambiguous Vinyl</span><span className="text-green-400">+$1,340.80</span></div>
-                  <div className="flex justify-between"><span>Ambiguous Tee</span><span className="text-green-400">+$672.40</span></div>
+                  <div className="flex justify-between"><span>Track sale</span><span className="text-green-400">+$0.00</span></div>
+                  <div className="flex justify-between"><span>Merch drop</span><span className="text-green-400">+$0.00</span></div>
+                  <div className="flex justify-between"><span>Support purchase</span><span className="text-green-400">+$0.00</span></div>
                 </div>
               </div>
               <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/30">
                 <p className="text-sm font-medium text-green-400 mb-1">Total Withdrawn</p>
-                <p className="text-2xl font-bold text-green-400">$38,420</p>
-                <p className="text-xs text-[var(--pf-text-muted)]">$9,871 pending next payout</p>
+                <p className="text-2xl font-bold text-green-400">—</p>
+                <p className="text-xs text-[var(--pf-text-muted)]">Pending until live data is connected</p>
               </div>
             </div>
           )}
@@ -240,23 +240,23 @@ function DemoPreview({ type, onBack }: { type: typeof DEMO_TYPES[0]; onBack: () 
               <div className="flex gap-4">
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Artists Supported</p>
-                  <p className="text-2xl font-bold">12</p>
+                  <p className="text-2xl font-bold">—</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Referral Earnings</p>
-                  <p className="text-2xl font-bold text-green-400">$847</p>
+                  <p className="text-2xl font-bold text-green-400">—</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Impact Rank</p>
-                  <p className="text-2xl font-bold text-[var(--pf-orange)]">Top 5%</p>
+                  <p className="text-2xl font-bold text-[var(--pf-orange)]">—</p>
                 </div>
               </div>
               <div className="p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                 <p className="text-sm font-medium mb-3">Recent Notifications</p>
                 <div className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Bell size={14} className="text-[var(--pf-orange)]" /> O D Porter just dropped "New Track"</div>
-                  <div className="flex gap-2"><DollarSign size={14} className="text-green-400" /> You earned $12.40 from referrals</div>
-                  <div className="flex gap-2"><Heart size={14} className="text-pink-400" /> Jai Jai went live</div>
+                  <div className="flex gap-2"><Bell size={14} className="text-[var(--pf-orange)]" /> O D Porter just dropped a track</div>
+                  <div className="flex gap-2"><DollarSign size={14} className="text-green-400" /> Referral earnings show here when live</div>
+                  <div className="flex gap-2"><Heart size={14} className="text-pink-400" /> Gune is live on Porterful</div>
                 </div>
               </div>
             </div>
@@ -267,23 +267,23 @@ function DemoPreview({ type, onBack }: { type: typeof DEMO_TYPES[0]; onBack: () 
               <div className="flex gap-4">
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Artists</p>
-                  <p className="text-2xl font-bold">890+</p>
+                  <p className="text-2xl font-bold">3</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Total Reach</p>
-                  <p className="text-2xl font-bold">4.2M</p>
+                  <p className="text-2xl font-bold">Live only</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Campaigns</p>
-                  <p className="text-2xl font-bold">23</p>
+                  <p className="text-2xl font-bold">—</p>
                 </div>
               </div>
               <div className="p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                 <p className="text-sm font-medium mb-3">Featured Artists</p>
                 <div className="flex gap-4">
                   <div className="text-center"><div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white font-bold">OD</div><p className="text-xs mt-1">O D Porter</p></div>
-                  <div className="text-center"><div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white font-bold">JJ</div><p className="text-xs mt-1">Jai Jai</p></div>
-                  <div className="text-center"><div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold">ME</div><p className="text-xs mt-1">Midnight Echo</p></div>
+                  <div className="text-center"><div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white font-bold">GU</div><p className="text-xs mt-1">Gune</p></div>
+                  <div className="text-center"><div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold">AT</div><p className="text-xs mt-1">ATM Trap</p></div>
                 </div>
               </div>
             </div>
@@ -294,23 +294,23 @@ function DemoPreview({ type, onBack }: { type: typeof DEMO_TYPES[0]; onBack: () 
               <div className="flex gap-4">
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Products</p>
-                  <p className="text-2xl font-bold">48</p>
+                  <p className="text-2xl font-bold">2</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Orders</p>
-                  <p className="text-2xl font-bold">1,293</p>
+                  <p className="text-2xl font-bold">—</p>
                 </div>
                 <div className="flex-1 p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                   <p className="text-sm text-[var(--pf-text-muted)] mb-1">Profit</p>
-                  <p className="text-2xl font-bold text-green-400">$38,420</p>
+                  <p className="text-2xl font-bold text-green-400">—</p>
                 </div>
               </div>
               <div className="p-4 bg-[var(--pf-bg)] rounded-xl border border-[var(--pf-border)]">
                 <p className="text-sm font-medium mb-3">Top Products</p>
                 <div className="space-y-2">
-                  <div className="flex justify-between"><span>Artist Logo Tee</span><span className="text-green-400">842 sold</span></div>
-                  <div className="flex justify-between"><span>Album Cover Hoodie</span><span className="text-green-400">567 sold</span></div>
-                  <div className="flex justify-between"><span>Signed Poster</span><span className="text-green-400">234 sold</span></div>
+                  <div className="flex justify-between"><span>Store setup</span><span className="text-green-400">Ready</span></div>
+                  <div className="flex justify-between"><span>Product catalog</span><span className="text-green-400">Coming soon</span></div>
+                  <div className="flex justify-between"><span>Fulfillment</span><span className="text-green-400">Awaiting confirmation</span></div>
                 </div>
               </div>
             </div>

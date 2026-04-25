@@ -4,12 +4,151 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSupabase } from '@/app/providers';
 import { useRouter } from 'next/navigation';
-import { User, Code, CreditCard, Bell } from 'lucide-react';
+import { User, Code, CreditCard, Bell, Palette } from 'lucide-react';
+
+// Accent Selector Component (self-contained)
+const ACCENT_PRESETS = {
+  orange: { h: 24, name: 'Default Orange' },
+  gold: { h: 43, name: 'Gold' },
+  blue: { h: 217, name: 'Blue' },
+  forest: { h: 145, name: 'Forest' },
+  ember: { h: 350, name: 'Ember' },
+  void: { h: 260, name: 'Void' },
+} as const;
+
+type AccentPreset = keyof typeof ACCENT_PRESETS;
+
+const ACCENT_STORAGE_KEY = 'pf-accent-hue';
+const LOCKED_SATURATION = 95;
+const LOCKED_LIGHTNESS = 53;
+
+function clampHue(hue: number): number {
+  return Math.max(0, Math.min(360, Math.round(hue)));
+}
+
+function applyAccentToDocument(hue: number) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.style.setProperty('--accent-h', clampHue(hue).toString());
+}
+
+function AccentSelector() {
+  const [hue, setHueState] = useState(() => {
+    if (typeof window === 'undefined') return ACCENT_PRESETS.orange.h;
+    try {
+      const saved = localStorage.getItem(ACCENT_STORAGE_KEY);
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed)) return clampHue(parsed);
+      }
+    } catch (e) {}
+    return ACCENT_PRESETS.orange.h;
+  });
+
+  const setHue = (newHue: number) => {
+    const clamped = clampHue(newHue);
+    setHueState(clamped);
+    applyAccentToDocument(clamped);
+    try {
+      localStorage.setItem(ACCENT_STORAGE_KEY, clamped.toString());
+    } catch (e) {}
+  };
+
+  const handlePresetClick = (preset: AccentPreset) => {
+    setHue(ACCENT_PRESETS[preset].h);
+  };
+
+  const hueGradient = 'linear-gradient(to right, hsl(0,95%,53%), hsl(60,95%,53%), hsl(120,95%,53%), hsl(180,95%,53%), hsl(240,95%,53%), hsl(300,95%,53%), hsl(360,95%,53%))';
+
+  return (
+    <div className="space-y-6">
+      {/* Current Color Display */}
+      <div className="flex items-center gap-4">
+        <div 
+          className="w-12 h-12 rounded-full border-2 border-[var(--pf-border)]"
+          style={{ backgroundColor: `hsl(${hue},${LOCKED_SATURATION}%,${LOCKED_LIGHTNESS}%)` }}
+        />
+        <div>
+          <p className="font-mono text-sm">hsl({hue}, {LOCKED_SATURATION}%, {LOCKED_LIGHTNESS}%)</p>
+          <p className="text-xs text-[var(--pf-text-muted)]">Personalize your Porterful experience</p>
+        </div>
+      </div>
+
+      {/* Hue Slider */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-[var(--pf-text-secondary)]">Hue</label>
+        <input
+          type="range"
+          min="0"
+          max="360"
+          value={hue}
+          onChange={(e) => setHue(parseInt(e.target.value, 10))}
+          className="w-full h-3 rounded-full cursor-pointer"
+          style={{
+            background: hueGradient,
+            WebkitAppearance: 'none',
+            appearance: 'none',
+          }}
+        />
+        <div className="flex justify-between text-xs text-[var(--pf-text-muted)]">
+          <span>Red</span>
+          <span>Yellow</span>
+          <span>Green</span>
+          <span>Cyan</span>
+          <span>Blue</span>
+          <span>Purple</span>
+          <span>Red</span>
+        </div>
+      </div>
+
+      {/* Presets */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-[var(--pf-text-secondary)]">Presets</label>
+        <div className="grid grid-cols-3 gap-2">
+          {(Object.entries(ACCENT_PRESETS) as [AccentPreset, typeof ACCENT_PRESETS[AccentPreset]][]).map(([key, value]) => (
+            <button
+              key={key}
+              onClick={() => handlePresetClick(key)}
+              className="flex items-center gap-2 p-2 rounded-lg border border-[var(--pf-border)] hover:border-[var(--accent)] transition-colors"
+            >
+              <div 
+                className="w-6 h-6 rounded-full"
+                style={{ backgroundColor: `hsl(${value.h},${LOCKED_SATURATION}%,${LOCKED_LIGHTNESS}%)` }}
+              />
+              <span className="text-sm">{value.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Preview */}
+      <div className="p-4 rounded-lg bg-[var(--pf-bg-secondary)] border border-[var(--pf-border)]">
+        <p className="text-xs text-[var(--pf-text-muted)] mb-3">Preview</p>
+        <div className="space-y-2">
+          <button 
+            className="w-full px-4 py-2 rounded-lg font-medium text-sm text-[#111111]"
+            style={{ backgroundColor: `hsl(${hue},${LOCKED_SATURATION}%,${LOCKED_LIGHTNESS}%)` }}
+          >
+            Primary Button
+          </button>
+          <button 
+            className="w-full px-4 py-2 rounded-lg font-medium text-sm border"
+            style={{ 
+              borderColor: `hsla(${hue},${LOCKED_SATURATION}%,${LOCKED_LIGHTNESS}%,0.5)`,
+              color: `hsl(${hue},${LOCKED_SATURATION}%,${LOCKED_LIGHTNESS}%)`
+            }}
+          >
+            Secondary Button
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { supabase, user } = useSupabase();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'profile' | 'referrals' | 'payouts' | 'notifications'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'referrals' | 'payouts' | 'notifications' | 'appearance'>('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -158,6 +297,7 @@ export default function SettingsPage() {
                 { id: 'referrals', label: 'Referrals', icon: Code },
                 { id: 'payouts', label: 'Payouts', icon: CreditCard },
                 { id: 'notifications', label: 'Notifications', icon: Bell },
+                { id: 'appearance', label: 'Appearance', icon: Palette },
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -374,6 +514,15 @@ export default function SettingsPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+            {activeTab === 'appearance' && (
+              <div className="bg-[var(--pf-surface)] rounded-xl p-6 border border-[var(--pf-border)]">
+                <h2 className="text-xl font-bold mb-2">Appearance</h2>
+                <p className="text-[var(--pf-text-muted)] text-sm mb-6">
+                  Personalize your Porterful experience with custom accent colors.
+                </p>
+                <AccentSelector />
               </div>
             )}
           </div>

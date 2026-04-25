@@ -28,16 +28,16 @@
 
   /* ============================================
      ACCENT COLOR SYSTEM — Safe Implementation
-     Phase 1: CSS variables only, no runtime injection
-     Using space-separated HSL syntax for better compatibility
+     Phase 1: CSS variables only, static fallback values
      ============================================ */
   --accent-h: 24;
   --accent-s: 95%;
   --accent-l: 53%;
-  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
-  --accent-hover: hsl(var(--accent-h) var(--accent-s) 46%);
-  --accent-soft: hsl(var(--accent-h) 95% 53% / 0.12);
-  --accent-border: hsl(var(--accent-h) 95% 53% / 0.28);
+  /* Static fallbacks first to test build */
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --accent-soft: rgba(249, 115, 22, 0.12);
+  --accent-border: rgba(249, 115, 22, 0.28);
 }
 
 /* Light theme — Porterful default storefront */

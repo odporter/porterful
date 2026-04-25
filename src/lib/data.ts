@@ -133,9 +133,9 @@ export const TRACKS = [
   { id: 'lev-08', title: 'Outsider', artist: 'Jay Jay', album: 'Levi', duration: '3:28', price: 1, plays: 39000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai Jai - Outsider (LEVI 501 Vol.1).mp3') },
   { id: 'lev-09', title: 'Spoken Word', artist: 'Jay Jay', album: 'Levi', duration: '4:45', price: 1, plays: 55000, image: ALBUM_ART.Levi, audio_url: audio('Levi', 'Jai Jai - Spoken Word (LEVI 501 Vol.1).mp3') },
   // GUNE TRACKS
-  { id: 'gune-01', title: 'Call Back', artist: 'Gune', album: 'Singles', duration: '2:30', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: artistAudio('gune', 'Gune - Call Back.mp3'), featured: true },
-  { id: 'gune-02', title: 'Sorry in Advance', artist: 'Gune', album: 'Singles', duration: '3:12', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: artistAudio('gune', 'Gune - Sorry in advance.mp3') },
-  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 999999, image: '/artist-images/gune/avatar.jpg', audio_url: artistAudio('gune', 'Gunebugtheplug - One more time .mp3'), featured: true },
+  { id: 'gune-01', title: 'Call Back', artist: 'Gune', album: 'Singles', duration: '2:30', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: artistAudio('gune', 'call-back.mp3'), featured: true },
+  { id: 'gune-02', title: 'Sorry in Advance', artist: 'Gune', album: 'Singles', duration: '3:12', price: 1, plays: 0, image: '/artist-images/gune/avatar.jpg', audio_url: artistAudio('gune', 'sorry-in-advance.mp3') },
+  { id: 'gune-03', title: 'One More Time', artist: 'Gune', album: 'Singles', duration: '2:58', price: 1, plays: 999999, image: '/artist-images/gune/avatar.jpg', audio_url: artistAudio('gune', 'one-more-time.mp3'), featured: true },
   // O D PORTER SINGLES
   { id: 'od-s01', title: 'Too Stingy', artist: 'O D Porter', album: 'Singles', duration: '3:45', price: 1, plays: 89000, image: ALBUM_ART.Singles, audio_url: audio('Singles', '01 Too Stingy.mp3') },
   { id: 'od-s02', title: 'After Effects', artist: 'O D Porter', album: 'Singles', duration: '3:12', price: 1, plays: 67000, image: ALBUM_ART.Singles, audio_url: audio('Singles', 'After Effects.mp3') },
@@ -145,8 +145,8 @@ export const TRACKS = [
   { id: 'od-s06', title: '2BC BOUNCE', artist: 'O D Porter', album: 'Singles', duration: '3:28', price: 1, plays: 71000, image: ALBUM_ART.Singles, audio_url: audio('Singles', '2BC BOUNCE.mp3') },
   { id: 'od-s07', title: 'around 3', artist: 'O D Porter', album: 'Singles', duration: '4:31', price: 1, plays: 55000, image: ALBUM_ART.Singles, audio_url: audio('Singles', 'around 3 (Master 2.0).mp3') },
   // ATM TRAP TRACKS (only files that exist)
-  { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: artistAudio('atm-trap', 'Trap-Thought We Was Bruddaz (FINAL).m4a'), featured: true },
-  { id: 'atm-04', title: 'Wacked Out Master', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: artistAudio('atm-trap', 'ATM Trap - Wacked Out Master mp3.mp3') },
+  { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: artistAudio('atm-trap', 'thought-we-was-bruddaz.mp3'), featured: true },
+  { id: 'atm-04', title: 'Wacked Out', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: artistAudio('atm-trap', 'wacked-out.mp3') },
   // { id: 'atm-02', title: 'Coming Home', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/master-Coming Home (FINAL)mp3.mp3', comingSoon: true },
   // { id: 'atm-03', title: 'Heart of a Lion', artist: 'ATM Trap', album: 'Singles', duration: '3:15', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/Heart of A Lion (Master)mp3.mp3', comingSoon: true },
 ];

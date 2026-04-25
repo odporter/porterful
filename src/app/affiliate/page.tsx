@@ -136,7 +136,7 @@ export default function AffiliatePage() {
             </div>
 
             <p className="mt-6 text-sm" style={{ color: 'var(--pf-muted)' }}>
-              We&apos;ll email you details when you make your first sale.
+              We’ll email you details when you make your first sale.
             </p>
           </>
         )}

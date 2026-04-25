@@ -137,7 +137,7 @@ export default function OnboardPage() {
 
           {/* Footer note */}
           <p className="text-center text-xs text-[var(--pf-text-muted)] mt-6">
-            By continuing, you agree to Porterful&apos;s{" "}
+            By continuing, you agree to Porterful’s{" "}
             <Link href="/terms" className="text-[var(--pf-orange)] hover:underline">Terms</Link>
             {" "}and{" "}
             <Link href="/privacy" className="text-[var(--pf-orange)] hover:underline">Privacy Policy</Link>

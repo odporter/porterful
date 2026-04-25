@@ -75,7 +75,7 @@ export default function OrderSuccessPage() {
         {status === 'error' && (
           <>
             <h1 className="text-3xl font-black text-white mb-3">Something went wrong</h1>
-            <p className="text-[var(--pf-text-muted)] mb-6">We couldn&apos;t confirm your order. Please contact support.</p>
+            <p className="text-[var(--pf-text-muted)] mb-6">We couldn’t confirm your order. Please contact support.</p>
             <Link href="/kids-chains" className="text-amber-400 hover:text-amber-300 underline">
               Return to order page
             </Link>

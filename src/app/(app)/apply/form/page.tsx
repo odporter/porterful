@@ -82,7 +82,7 @@ export default function ApplyFormPage() {
                   <path d="M20 6L9 17l-5-5"/>
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold mb-3">You&apos;re Approved!</h1>
+              <h1 className="text-3xl font-bold mb-3">You’re Approved!</h1>
               <p className="text-[var(--pf-text-secondary)] mb-4">
                 {submitMessage || 'Your artist page has been created. Head to your dashboard to set up tracks, pricing, and your profile.'}
               </p>

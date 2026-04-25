@@ -24,7 +24,7 @@ export default function MaintenancePage() {
             Under <span className="text-[var(--pf-orange)]">Construction</span>
           </h1>
           <p className="text-[var(--pf-text-secondary)] text-lg mb-8">
-            We&apos;re building something better. The site will be back shortly —
+            We’re building something better. The site will be back shortly —
             bigger, cleaner, and more powerful than before.
           </p>
 

@@ -112,8 +112,8 @@ export default function LandPage() {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-green-900/30 rounded-full mb-4">
                 <CheckCircle className="text-green-400" size={24} />
               </div>
-              <p className="text-green-400 font-bold">You&apos;re on the list.</p>
-              <p className="text-gray-500 text-sm mt-2">We&apos;ll be in touch when opportunities match your criteria.</p>
+              <p className="text-green-400 font-bold">You’re on the list.</p>
+              <p className="text-gray-500 text-sm mt-2">We’ll be in touch when opportunities match your criteria.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

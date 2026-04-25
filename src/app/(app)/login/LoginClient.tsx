@@ -189,7 +189,7 @@ export default function LoginClient({ nextPath, initialError = null }: LoginClie
         </form>
 
         <div className="text-center text-sm text-[var(--pf-text-muted)] mt-6">
-          Don&apos;t have an account?{' '}
+          Don’t have an account?{' '}
           <Link href="/signup" className="text-[var(--pf-orange)] hover:underline">
             Create one
           </Link>

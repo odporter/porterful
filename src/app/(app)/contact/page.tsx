@@ -50,7 +50,7 @@ export default function ContactPage() {
             <div className="mb-4 text-6xl">✉️</div>
             <h2 className="mb-2 text-2xl font-bold">Message Sent</h2>
             <p className="mb-6 text-[var(--pf-text-secondary)]">
-              We&apos;ll get back to you within 24-48 hours.
+              We’ll get back to you within 24-48 hours.
             </p>
             <Link href="/" className="text-[var(--pf-orange)] hover:underline">
               ← Back to home
@@ -141,7 +141,7 @@ export default function ContactPage() {
           <div className="rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] p-6 text-center">
             <div className="mb-2 text-3xl">🛍️</div>
             <h3 className="mb-1 font-semibold">Store</h3>
-            <p className="text-sm text-[var(--pf-text-muted)]">Need help with a purchase? We&apos;ll handle it by email.</p>
+            <p className="text-sm text-[var(--pf-text-muted)]">Need help with a purchase? We’ll handle it by email.</p>
           </div>
         </div>
       </div>

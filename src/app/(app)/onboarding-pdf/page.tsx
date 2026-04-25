@@ -80,7 +80,7 @@ export default function PilotOnboardingPDFPage() {
       <section className="pdf-hero">
         <h1>Welcome to the<br />Porterful Pilot. 🚀</h1>
         <p className="hero-sub">
-          Three steps and you&apos;re in. Follow yours below. When you need help, post in the channel — we read everything.
+          Three steps and you’re in. Follow yours below. When you need help, post in the channel — we read everything.
         </p>
       </section>
 
@@ -143,7 +143,7 @@ export default function PilotOnboardingPDFPage() {
           </div>
           <div className="rule yellow">
             <p className="rule-title">⚠ Attention</p>
-            <p>12-month non-compete — don&apos;t build a competing platform</p>
+            <p>12-month non-compete — don’t build a competing platform</p>
           </div>
           <div className="rule red">
             <p className="rule-title">🚫 Private</p>

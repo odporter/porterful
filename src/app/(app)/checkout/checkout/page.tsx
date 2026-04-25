@@ -5,6 +5,9 @@ import { useSupabase } from '@/app/providers';
 import { CreditCard, Lock, Check, DollarSign, Users, Gift, Zap, ShoppingCart, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/lib/cart-context';
+import { useAudio } from '@/lib/audio-context';
+import { savePlaybackSnapshot } from '@/lib/playback-persistence';
+import { usePathname } from 'next/navigation';
 
 interface CartItem {
   productId: string;
@@ -21,6 +24,8 @@ interface CartItem {
 export default function CheckoutPage() {
   const { user } = useSupabase();
   const { items: cartContextItems, clearCart } = useCart();
+  const audio = useAudio();
+  const pathname = usePathname();
   const [step, setStep] = useState<'review' | 'complete'>('review');
   const [processing, setProcessing] = useState(false);
   const [showSupportTip, setShowSupportTip] = useState(true);
@@ -115,6 +120,33 @@ export default function CheckoutPage() {
           localStorage.removeItem('porterful-checkout-items');
           setStep('complete');
         } else {
+          // Real Stripe checkout — save playback state then redirect
+          if (audio.currentTrack) {
+            savePlaybackSnapshot({
+              currentTrackId: audio.currentTrack.id,
+              currentTrack: {
+                id: audio.currentTrack.id,
+                title: audio.currentTrack.title,
+                artist: audio.currentTrack.artist,
+                audioUrl: audio.currentTrack.audio_url || '',
+                image: audio.currentTrack.image || audio.currentTrack.cover_url,
+                album: audio.currentTrack.album,
+              },
+              queue: audio.queue.map(t => ({
+                id: t.id,
+                title: t.title,
+                artist: t.artist,
+                audioUrl: t.audio_url || '',
+                image: t.image || t.cover_url,
+              })),
+              currentTime: (audio.progress / 100) * (audio.duration || 0),
+              progress: audio.progress,
+              isPlaying: audio.isPlaying,
+              volume: audio.volume,
+              mode: audio.mode,
+              originatingRoute: pathname,
+            });
+          }
           // Real Stripe checkout — redirect
           window.location.href = data.url;
         }

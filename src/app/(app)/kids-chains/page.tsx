@@ -269,7 +269,7 @@ export default function KidsChainsPage() {
               </form>
 
               <p className="text-stone-500 text-xs text-center mt-4">
-                Orders go directly to our production team. You&apos;ll receive an order confirmation via email.
+                Orders go directly to our production team. You’ll receive an order confirmation via email.
               </p>
             </div>
           </div>

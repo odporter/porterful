@@ -279,6 +279,47 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
+    // Store music purchase for download access
+    const itemsJson = metadata.items;
+    if (itemsJson && session.customer_email) {
+      try {
+        const items = JSON.parse(itemsJson);
+        for (const item of items) {
+          // Only store music/track purchases
+          if (item.type === 'track' || item.audioUrl || item.audio_url) {
+            const storagePath = item.storagePath || item.storage_path || 
+              `tracks/${item.artist}/${item.name}.mp3`.replace(/[^a-zA-Z0-9/_-]/g, '_');
+            
+            const { error: musicError } = await supabase
+              .from('music_purchases')
+              .upsert({
+                buyer_email: session.customer_email.toLowerCase(),
+                buyer_user_id: buyerId,
+                track_id: item.id || `track-${Date.now()}`,
+                track_title: item.name || item.title || 'Unknown Track',
+                artist_name: item.artist || 'Unknown Artist',
+                stripe_session_id: session.id,
+                amount_paid: Math.round((item.price || 0) * 100),
+                storage_bucket: 'music',
+                storage_path: storagePath,
+                purchased_at: new Date().toISOString(),
+              }, {
+                onConflict: 'buyer_email,track_id',
+                ignoreDuplicates: false,
+              });
+
+            if (musicError) {
+              console.error('[stripe-webhook] Music purchase insert failed:', musicError.message);
+            } else {
+              console.log('[stripe-webhook] Music purchase recorded:', item.name);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('[stripe-webhook] Failed to parse items for music purchase:', e);
+      }
+    }
   }
 
   return NextResponse.json({ received: true });

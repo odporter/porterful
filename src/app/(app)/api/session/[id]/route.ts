@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@/lib/supabase'
 
 async function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
@@ -25,6 +26,8 @@ export async function GET(
       demo: true,
     })
   }
+
+  const supabase = createServerClient()
 
   try {
     const stripe = await getStripe()
@@ -58,9 +61,28 @@ export async function GET(
       }]
     }
 
+    // Enrich items with storage paths from database for music purchases
+    const enrichedItems = await Promise.all(
+      items.map(async (item: any) => {
+        if (item.type === 'track' || item.audioUrl) {
+          const { data: purchase } = await supabase
+            .from('music_purchases')
+            .select('storage_path')
+            .eq('stripe_session_id', sessionId)
+            .eq('track_id', item.id)
+            .maybeSingle();
+          
+          if (purchase?.storage_path) {
+            return { ...item, storagePath: purchase.storage_path };
+          }
+        }
+        return item;
+      })
+    );
+
     return NextResponse.json({
-      item: items[0] || null,
-      items,
+      item: enrichedItems[0] || null,
+      items: enrichedItems,
       customerEmail: session.customer_details?.email || session.customer_email || null,
       amount: session.amount_total ? (session.amount_total / 100) : null,
       sessionId: session.id,

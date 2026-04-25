@@ -1,78 +1,231 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Check, Download, Mail, Music, Package, ArrowRight } from 'lucide-react';
+import { Check, Download, Mail, Music, ArrowRight, Play, Loader2 } from 'lucide-react';
+import { useAudio } from '@/lib/audio-context';
+import { loadPlaybackSnapshot, clearPlaybackSnapshot } from '@/lib/playback-persistence';
+
+interface PurchasedTrack {
+  id: string;
+  name: string;
+  artist: string;
+  audioUrl: string;
+  downloadUrl?: string;
+  storagePath?: string;
+}
+
+interface OrderDetails {
+  orderId: string;
+  customerEmail: string;
+  paymentStatus: string;
+  tracks: PurchasedTrack[];
+}
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const audio = useAudio();
   const [loading, setLoading] = useState(true);
-  const [orderId, setOrderId] = useState<string | null>(null);
-  const [purchasedItems, setPurchasedItems] = useState<any[]>([]);
-  const [customerEmail, setCustomerEmail] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [order, setOrder] = useState<OrderDetails | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [restoredPlayback, setRestoredPlayback] = useState(false);
+  const [isResuming, setIsResuming] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
+  // Restore playback state on mount
+  useEffect(() => {
+    const snapshot = loadPlaybackSnapshot();
+    if (snapshot?.currentTrack && !restoredPlayback) {
+      // Restore queue first
+      if (snapshot.queue.length > 0) {
+        audio.setQueue(snapshot.queue.map(t => ({
+          id: t.id,
+          title: t.title,
+          artist: t.artist,
+          audio_url: t.audioUrl,
+          image: t.image,
+        })));
+      }
+      
+      // Restore current track without auto-playing
+      audio.loadTrack({
+        id: snapshot.currentTrack.id,
+        title: snapshot.currentTrack.title,
+        artist: snapshot.currentTrack.artist,
+        audio_url: snapshot.currentTrack.audioUrl,
+        image: snapshot.currentTrack.image,
+        album: snapshot.currentTrack.album,
+      });
+      
+      // Restore volume
+      audio.setVolume(snapshot.volume);
+      
+      // Seek to saved position
+      if (snapshot.currentTime > 0) {
+        setTimeout(() => {
+          audio.seek((snapshot.currentTime / (audio.duration || 1)) * 100);
+        }, 100);
+      }
+      
+      setRestoredPlayback(true);
+    }
+  }, [audio, restoredPlayback]);
+
+  // Fetch order details
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     const demo = searchParams.get('demo');
 
     if (demo) {
-      setOrderId(`ORD-${Date.now().toString(36).toUpperCase()}`);
-      setPurchasedItems([{
-        name: 'Demo Track',
-        artist: 'O D Porter',
-        audioUrl: null,
-        type: 'track'
-      }]);
+      setOrder({
+        orderId: `ORD-${Date.now().toString(36).toUpperCase().slice(0, 8)}`,
+        customerEmail: 'demo@porterful.com',
+        paymentStatus: 'paid',
+        tracks: [{
+          id: 'demo-track',
+          name: 'Demo Track',
+          artist: 'O D Porter',
+          audioUrl: '',
+        }],
+      });
       setLoading(false);
       return;
     }
 
-    if (sessionId) {
-      setOrderId(sessionId);
-
-      // Fetch session metadata from our API (which reads Stripe metadata)
-      fetch(`/api/session/${sessionId}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.customerEmail) {
-            setCustomerEmail(data.customerEmail);
-          }
-          if (data.paymentStatus) {
-            setPaymentStatus(data.paymentStatus);
-          }
-          if (Array.isArray(data.items) && data.items.length > 0) {
-            setPurchasedItems(data.items);
-          } else if (data.item?.name) {
-            setPurchasedItems([data.item]);
-          } else {
-            setLoadError('We confirmed your payment, but order details are still being collected.');
-            setPurchasedItems([]);
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoadError('We confirmed your payment, but we could not load the full order details yet.');
-          setPurchasedItems([]);
-          setLoading(false);
-        });
-    } else {
+    if (!sessionId) {
       router.push('/');
+      return;
     }
+
+    // Fetch session metadata from our API
+    fetch(`/api/session/${sessionId}`)
+      .then(r => r.json())
+      .then(data => {
+        const tracks: PurchasedTrack[] = [];
+        
+        if (Array.isArray(data.items) && data.items.length > 0) {
+          tracks.push(...data.items.map((item: any) => ({
+            id: item.id || `track-${Date.now()}`,
+            name: item.name || item.title || 'Unknown Track',
+            artist: item.artist || 'Unknown Artist',
+            audioUrl: item.audioUrl || item.audio_url || '',
+            downloadUrl: item.downloadUrl,
+            storagePath: item.storagePath,
+          })));
+        } else if (data.item?.name) {
+          tracks.push({
+            id: data.item.id || `track-${Date.now()}`,
+            name: data.item.name || data.item.title,
+            artist: data.item.artist || 'Unknown Artist',
+            audioUrl: data.item.audioUrl || data.item.audio_url || '',
+            downloadUrl: data.item.downloadUrl,
+            storagePath: data.item.storagePath,
+          });
+        }
+
+        setOrder({
+          orderId: sessionId.slice(-12).toUpperCase(), // Truncated for mobile
+          customerEmail: data.customerEmail || '',
+          paymentStatus: data.paymentStatus || 'paid',
+          tracks,
+        });
+        setLoading(false);
+        
+        // Clear playback snapshot after successful load
+        clearPlaybackSnapshot();
+      })
+      .catch(() => {
+        setLoadError('We confirmed your payment. Your music is ready.');
+        setLoading(false);
+      });
   }, [searchParams, router]);
+
+  const handlePlayTrack = useCallback((track: PurchasedTrack) => {
+    if (!track.audioUrl) return;
+    
+    audio.playTrack({
+      id: track.id,
+      title: track.name,
+      artist: track.artist,
+      audio_url: track.audioUrl,
+      image: '',
+    });
+    setIsResuming(true);
+    setTimeout(() => setIsResuming(false), 500);
+  }, [audio]);
+
+  const handleResumePlayback = useCallback(() => {
+    if (audio.currentTrack && !audio.isPlaying) {
+      audio.togglePlay();
+      setIsResuming(true);
+      setTimeout(() => setIsResuming(false), 500);
+    }
+  }, [audio]);
+
+  const handleDownload = useCallback(async (track: PurchasedTrack) => {
+    if (!track.storagePath && !track.downloadUrl) return;
+    
+    setDownloadingId(track.id);
+    try {
+      // If we have a storage path, fetch signed URL from API
+      if (track.storagePath) {
+        const res = await fetch(`/api/music/download?path=${encodeURIComponent(track.storagePath)}`);
+        const data = await res.json();
+        if (data.url) {
+          // Trigger download
+          const a = document.createElement('a');
+          a.href = data.url;
+          a.download = `${track.artist} - ${track.name}.mp3`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      } else if (track.downloadUrl) {
+        // Direct download URL
+        const a = document.createElement('a');
+        a.href = track.downloadUrl;
+        a.download = `${track.artist} - ${track.name}.mp3`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    } catch (e) {
+      console.error('Download failed:', e);
+    }
+    setDownloadingId(null);
+  }, []);
+
+  const handleEmailAccess = useCallback(async () => {
+    if (!order?.customerEmail) return;
+    
+    try {
+      await fetch('/api/music/email-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: order.customerEmail,
+          orderId: order.orderId,
+        }),
+      });
+      setEmailSent(true);
+    } catch (e) {
+      console.error('Failed to send email:', e);
+    }
+  }, [order]);
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12">
-        <div className="pf-container max-w-2xl">
-          <div className="bg-[var(--pf-surface)] rounded-2xl p-12 text-center border border-[var(--pf-border)]">
-            <div className="animate-pulse">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-bg)]" />
-              <div className="h-6 bg-[var(--pf-bg)] rounded w-1/2 mx-auto mb-4" />
-              <div className="h-4 bg-[var(--pf-bg)] rounded w-1/3 mx-auto" />
+      <div className="min-h-screen pt-20 pb-8 px-4">
+        <div className="max-w-md mx-auto">
+          <div className="bg-[var(--pf-surface)] rounded-2xl p-8 border border-[var(--pf-border)]">
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[var(--pf-bg)] mb-4" />
+              <div className="h-6 bg-[var(--pf-bg)] rounded w-3/4 mb-2" />
+              <div className="h-4 bg-[var(--pf-bg)] rounded w-1/2" />
             </div>
           </div>
         </div>
@@ -80,133 +233,145 @@ function SuccessContent() {
     );
   }
 
+  const truncatedOrderId = order?.orderId 
+    ? `${order.orderId.slice(0, 8)}...${order.orderId.slice(-4)}`
+    : '';
+
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      <div className="pf-container max-w-2xl">
-        <div className="bg-[var(--pf-surface)] rounded-2xl p-8 md:p-12 text-center border border-[var(--pf-border)]">
-          {/* Success Icon */}
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-            <Check className="text-green-400" size={40} />
-          </div>
-
-          <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
-          <p className="text-[var(--pf-text-secondary)] mb-2">
-            Thank you for supporting independent artists.
-          </p>
-          {orderId && (
-            <p className="text-sm text-[var(--pf-text-muted)] mb-8">
-              Order ID: <span className="font-mono">{orderId}</span>
-            </p>
-          )}
-          {paymentStatus && (
-            <p className="text-sm text-[var(--pf-text-secondary)] mb-8">
-              Payment status: <span className="font-medium capitalize">{paymentStatus}</span>
-            </p>
-          )}
-
-          {/* Artist Impact */}
-          <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 border border-[var(--pf-orange)]/30 rounded-xl p-6 mb-8">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <Package className="text-[var(--pf-orange)]" size={24} />
-              <span className="text-2xl font-bold text-[var(--pf-orange)]">80%</span>
+    <div className="min-h-screen pt-20 pb-8 px-4">
+      <div className="max-w-md mx-auto">
+        {/* Success Card */}
+        <div className="bg-[var(--pf-surface)] rounded-2xl p-6 border border-[var(--pf-border)]">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+              <Check className="text-green-400" size={32} />
             </div>
+            <h1 className="text-2xl font-bold mb-1">Payment Successful!</h1>
             <p className="text-sm text-[var(--pf-text-secondary)]">
-              of your purchase goes directly to artists
+              Thank you for supporting independent artists.
             </p>
+            {order?.orderId && (
+              <p className="text-xs text-[var(--pf-text-muted)] mt-2 font-mono">
+                Order: {truncatedOrderId}
+              </p>
+            )}
           </div>
 
-          {/* Downloads Section */}
-          <div className="bg-[var(--pf-bg)] rounded-xl p-6 mb-8 text-left">
-            <h2 className="font-semibold mb-4 flex items-center gap-2">
-              <Download size={20} className="text-[var(--pf-orange)]" />
-              Your Downloads
-            </h2>
-            
-            {purchasedItems.length > 0 ? (
+          {/* Purchased Tracks */}
+          {order?.tracks && order.tracks.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold text-[var(--pf-text-muted)] uppercase tracking-wider mb-3">
+                Your Music
+              </h2>
               <div className="space-y-3">
-                {purchasedItems.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-[var(--pf-surface)] rounded-lg border border-[var(--pf-border)]">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center">
-                        <Music size={20} className="text-white" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-[var(--pf-text-muted)]">
-                          {[item.artist, item.quantity ? `Qty ${item.quantity}` : null].filter(Boolean).join(' • ')}
-                        </p>
-                      </div>
+                {order.tracks.map((track) => (
+                  <div 
+                    key={track.id}
+                    className="bg-[var(--pf-bg)] rounded-xl p-3 flex items-center gap-3"
+                  >
+                    {/* Track Icon */}
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center shrink-0">
+                      <Music size={20} className="text-white" />
                     </div>
-                    {(() => {
-                      const dl = item.downloadUrl || item.audioUrl || item.audio_url;
-                      if (dl && dl !== '#') {
-                        return (
-                          <a href={dl} download target="_blank" rel="noopener noreferrer"
-                            className="px-4 py-2 bg-[var(--pf-orange)] text-white rounded-lg font-medium hover:bg-[var(--pf-orange-dark)] transition-colors flex items-center gap-2">
+                    
+                    {/* Track Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{track.name}</p>
+                      <p className="text-xs text-[var(--pf-text-muted)] truncate">{track.artist}</p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1">
+                      {/* Play Button */}
+                      <button
+                        onClick={() => handlePlayTrack(track)}
+                        className="p-2 rounded-lg bg-[var(--pf-orange)]/20 text-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/30 transition-colors"
+                        aria-label="Play track"
+                      >
+                        <Play size={16} fill="currentColor" />
+                      </button>
+
+                      {/* Download Button */}
+                      {(track.storagePath || track.downloadUrl) && (
+                        <button
+                          onClick={() => handleDownload(track)}
+                          disabled={downloadingId === track.id}
+                          className="p-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors disabled:opacity-50"
+                          aria-label="Download MP3"
+                        >
+                          {downloadingId === track.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
                             <Download size={16} />
-                            Download
-                          </a>
-                        );
-                      }
-                      return (
-                        <span className="px-4 py-2 bg-[var(--pf-bg)] text-[var(--pf-text-muted)] rounded-lg text-sm">
-                          No download available
-                        </span>
-                      );
-                    })()}
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="py-4 text-center">
-                <p className="text-[var(--pf-text-secondary)]">
-                  {loadError || 'We are still loading your order details.'}
-                </p>
-                <p className="mt-2 text-sm text-[var(--pf-text-muted)]">
-                  Your payment went through. Refresh in a moment if the purchased items do not appear yet.
-                </p>
-              </div>
-            )}
-            
-            <p className="text-xs text-[var(--pf-text-muted)] mt-4">
-              {customerEmail ? `Receipt and order details will be sent to ${customerEmail}.` : 'Receipt and order details will be sent to your email.'}
-            </p>
-          </div>
-
-          {/* What's Next */}
-          <div className="text-left mb-8">
-            <h2 className="font-semibold mb-4">What's Next?</h2>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-[var(--pf-bg)]">
-                <Mail className="text-[var(--pf-orange)] shrink-0" size={20} />
-                <div>
-                  <p className="font-medium">Check your email</p>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">
-                    {customerEmail
-                      ? `We've sent your receipt and order details to ${customerEmail}.`
-                      : 'We've sent your receipt and order details to your email address.'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-[var(--pf-bg)]">
-                <Music className="text-[var(--pf-orange)] shrink-0" size={20} />
-                <div>
-                  <p className="font-medium">Keep supporting artists</p>
-                  <p className="text-sm text-[var(--pf-text-secondary)]">
-                    Browse more music, merch, and artist pages while your order is being processed.
-                  </p>
-                </div>
-              </div>
             </div>
-          </div>
+          )}
+
+          {/* Resume Playback Button (if was playing) */}
+          {restoredPlayback && audio.currentTrack && !audio.isPlaying && (
+            <button
+              onClick={handleResumePlayback}
+              disabled={isResuming}
+              className="w-full mb-4 py-3 rounded-xl bg-[var(--pf-orange)] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[var(--pf-orange-dark)] transition-colors"
+            >
+              {isResuming ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <>
+                  <Play size={18} fill="currentColor" />
+                  Resume Playback
+                </>
+              )}
+            </button>
+          )}
+
+          {/* Email Access */}
+          {order?.customerEmail && (
+            <div className="mb-6">
+              <button
+                onClick={handleEmailAccess}
+                disabled={emailSent}
+                className="w-full py-3 rounded-xl border border-[var(--pf-border)] font-medium flex items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors disabled:opacity-50"
+              >
+                <Mail size={18} />
+                {emailSent ? 'Access Link Sent!' : 'Access by Email'}
+              </button>
+              <p className="text-xs text-[var(--pf-text-muted)] text-center mt-2">
+                {order.customerEmail}
+              </p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {loadError && (
+            <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
+              <p className="text-sm text-yellow-400">{loadError}</p>
+              <p className="text-xs text-[var(--pf-text-muted)] mt-1">
+                Your purchase is confirmed. Check your email for download links.
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/music" className="pf-btn pf-btn-primary inline-flex items-center justify-center gap-2">
+          <div className="space-y-2">
+            <Link 
+              href="/music" 
+              className="w-full py-3 rounded-xl bg-[var(--pf-orange)] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[var(--pf-orange-dark)] transition-colors"
+            >
               <Music size={18} />
               Browse More Music
             </Link>
-            <Link href="/store" className="pf-btn pf-btn-secondary inline-flex items-center justify-center gap-2">
+            <Link 
+              href="/store" 
+              className="w-full py-3 rounded-xl border border-[var(--pf-border)] font-medium flex items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors"
+            >
               Shop Artists
               <ArrowRight size={18} />
             </Link>
@@ -220,13 +385,13 @@ function SuccessContent() {
 export default function SuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen pt-24 pb-12">
-        <div className="pf-container max-w-2xl">
-          <div className="bg-[var(--pf-surface)] rounded-2xl p-12 text-center border border-[var(--pf-border)]">
-            <div className="animate-pulse">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--pf-bg)]" />
-              <div className="h-6 bg-[var(--pf-bg)] rounded w-1/2 mx-auto mb-4" />
-              <div className="h-4 bg-[var(--pf-bg)] rounded w-1/3 mx-auto" />
+      <div className="min-h-screen pt-20 pb-8 px-4">
+        <div className="max-w-md mx-auto">
+          <div className="bg-[var(--pf-surface)] rounded-2xl p-8 border border-[var(--pf-border)]">
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[var(--pf-bg)] mb-4" />
+              <div className="h-6 bg-[var(--pf-bg)] rounded w-3/4 mb-2" />
+              <div className="h-4 bg-[var(--pf-bg)] rounded w-1/2" />
             </div>
           </div>
         </div>
@@ -234,5 +399,5 @@ export default function SuccessPage() {
     }>
       <SuccessContent />
     </Suspense>
-  )
+  );
 }

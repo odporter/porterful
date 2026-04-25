@@ -45,10 +45,10 @@ export function EmailCapture({
     return (
       <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
         <div className="flex items-center justify-center gap-2 text-green-400 font-bold mb-1">
-          <Check size={16} /> You&apos;re on the list!
+          <Check size={16} /> You’re on the list!
         </div>
         <p className="text-sm text-[var(--pf-text-muted)]">
-          We&apos;ll send updates to {email}. Check your inbox soon.
+          We’ll send updates to {email}. Check your inbox soon.
         </p>
       </div>
     )

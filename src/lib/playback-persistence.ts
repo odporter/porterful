@@ -25,7 +25,6 @@ export interface PlaybackSnapshot {
   progress: number; // percentage 0-100
   isPlaying: boolean;
   volume: number; // 0-100
-  mode: 'track' | 'radio' | 'artist';
   originatingRoute: string;
   checkoutTimestamp: number;
 }

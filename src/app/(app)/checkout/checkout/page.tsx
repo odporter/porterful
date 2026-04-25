@@ -143,7 +143,6 @@ export default function CheckoutPage() {
               progress: audio.progress,
               isPlaying: audio.isPlaying,
               volume: audio.volume,
-              mode: audio.mode,
               originatingRoute: pathname,
             });
           }

@@ -10,7 +10,7 @@ import { useAudio } from '@/lib/audio-context'
 import { getCheckoutState, clearCheckoutState, shouldResumePlayback } from '@/lib/checkout-state'
 
 export function usePlaybackResume() {
-  const { playTrack, setVolume, currentTrack } = useAudio()
+  const { playTrack, setVolume, currentTrack, seek } = useAudio()
 
   const resumePlayback = useCallback(() => {
     const state = getCheckoutState()
@@ -18,16 +18,24 @@ export function usePlaybackResume() {
 
     // Only resume if we have a track ID and user was playing
     if (state.trackId && shouldResumePlayback()) {
-      // Resume the track from saved position
+      // Resume the track
       playTrack({
         id: state.trackId,
         title: state.trackTitle,
         artist: state.artistName,
-      }, state.currentTime)
+        audio_url: state.audioUrl || '',
+      })
+      
+      // Seek to saved position after a short delay
+      setTimeout(() => {
+        if (state.currentTime > 0) {
+          seek((state.currentTime / (state.duration || 1)) * 100)
+        }
+      }, 500)
       
       // Restore volume
       if (state.volume >= 0 && state.volume <= 1) {
-        setVolume(state.volume)
+        setVolume(state.volume * 100)
       }
       
       // Clear the saved state
@@ -37,7 +45,7 @@ export function usePlaybackResume() {
     
     clearCheckoutState()
     return false
-  }, [playTrack, setVolume])
+  }, [playTrack, setVolume, seek])
 
   return { resumePlayback, shouldResume: shouldResumePlayback }
 }

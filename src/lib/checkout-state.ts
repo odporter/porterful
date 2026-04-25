@@ -10,6 +10,7 @@ export interface CheckoutState {
   trackId: string | null
   trackTitle: string
   artistName: string
+  audioUrl?: string
   currentTime: number
   duration: number
   isPlaying: boolean

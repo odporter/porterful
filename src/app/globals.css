@@ -29,14 +29,15 @@
   /* ============================================
      ACCENT COLOR SYSTEM — Safe Implementation
      Phase 1: CSS variables only, no runtime injection
+     Using space-separated HSL syntax for better compatibility
      ============================================ */
-  --accent-h: 24;           /* Default orange hue */
-  --accent-s: 95%;          /* Locked saturation */
-  --accent-l: 53%;          /* Locked lightness */
-  --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
-  --accent-hover: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 8%));
-  --accent-soft: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.12);
-  --accent-border: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.5);
+  --accent-h: 24;
+  --accent-s: 95%;
+  --accent-l: 53%;
+  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+  --accent-hover: hsl(var(--accent-h) var(--accent-s) 46%);
+  --accent-soft: hsl(var(--accent-h) 95% 53% / 0.12);
+  --accent-border: hsl(var(--accent-h) 95% 53% / 0.28);
 }
 
 /* Light theme — Porterful default storefront */

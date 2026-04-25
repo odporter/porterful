@@ -25,6 +25,18 @@
   --pf-purple: #a855f7;     /* Porterful vivid purple */
   --background: #111111;
   --foreground: #ffffff;
+
+  /* ============================================
+     ACCENT COLOR SYSTEM — Safe Implementation
+     Phase 1: CSS variables only, no runtime injection
+     ============================================ */
+  --accent-h: 24;           /* Default orange hue */
+  --accent-s: 95%;          /* Locked saturation */
+  --accent-l: 53%;          /* Locked lightness */
+  --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+  --accent-hover: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 8%));
+  --accent-soft: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.12);
+  --accent-border: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.5);
 }
 
 /* Light theme — Porterful default storefront */

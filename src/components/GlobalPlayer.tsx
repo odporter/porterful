@@ -158,10 +158,10 @@ export function GlobalPlayer() {
                 const step = duration * 0.05 // 5% step
                 if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
                   e.preventDefault()
-                  seek(Math.min(progress + step, duration))
+                  seekTo(Math.min(currentTime + step, duration))
                 } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
                   e.preventDefault()
-                  seek(Math.max(progress - step, 0))
+                  seekTo(Math.max(currentTime - step, 0))
                 }
               }}
               role="slider"
@@ -237,28 +237,28 @@ export function GlobalPlayer() {
                 const step = duration * 0.05
                 if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
                   e.preventDefault()
-                  seek(Math.min(progress + step, duration))
+                  seekTo(Math.min(currentTime + step, duration))
                 } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
                   e.preventDefault()
-                  seek(Math.max(progress - step, 0))
+                  seekTo(Math.max(currentTime - step, 0))
                 }
               }}
               role="slider"
               aria-label="Seek"
               aria-valuemin={0}
               aria-valuemax={duration || 0}
-              aria-valuenow={progress}
+              aria-valuenow={currentTime}
               tabIndex={0}
             >
               <div 
-                className="h-full bg-[var(--pf-orange)] transition-all relative"
-                style={{ width: `${progressPercent}%` }}
+                className="h-full transition-all relative"
+                style={{ width: `${progressPercent}%`, backgroundColor: 'var(--accent)' }}
               >
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
               </div>
             </div>
             <div className="flex justify-between mt-2 text-sm text-[var(--pf-text-muted)]">
-              <span>{formatTime(progress)}</span>
+              <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>
           </div>

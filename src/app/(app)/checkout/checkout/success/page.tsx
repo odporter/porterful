@@ -66,7 +66,7 @@ function SuccessContent() {
       // Seek to saved position
       if (snapshot.currentTime > 0) {
         setTimeout(() => {
-          audio.seek((snapshot.currentTime / (audio.duration || 1)) * 100);
+          audio.seekTo(snapshot.currentTime);
         }, 100);
       }
       

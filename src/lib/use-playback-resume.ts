@@ -10,7 +10,7 @@ import { useAudio } from '@/lib/audio-context'
 import { getCheckoutState, clearCheckoutState, shouldResumePlayback } from '@/lib/checkout-state'
 
 export function usePlaybackResume() {
-  const { playTrack, setVolume, currentTrack, seek } = useAudio()
+  const { playTrack, setVolume, currentTrack, seekTo } = useAudio()
 
   const resumePlayback = useCallback(() => {
     const state = getCheckoutState()
@@ -29,7 +29,7 @@ export function usePlaybackResume() {
       // Seek to saved position after a short delay
       setTimeout(() => {
         if (state.currentTime > 0) {
-          seek((state.currentTime / (state.duration || 1)) * 100)
+          seekTo(state.currentTime)
         }
       }, 500)
       
@@ -45,7 +45,7 @@ export function usePlaybackResume() {
     
     clearCheckoutState()
     return false
-  }, [playTrack, setVolume, seek])
+  }, [playTrack, setVolume, seekTo])
 
   return { resumePlayback, shouldResume: shouldResumePlayback }
 }

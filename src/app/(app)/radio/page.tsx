@@ -24,7 +24,7 @@ function formatDuration(seconds: number): string {
 }
 
 export default function RadioPage() {
-  const { currentTrack, isPlaying, togglePlay, playNext, setQueue, currentIndex, setMode } = useAudio()
+  const { currentTrack, isPlaying, togglePlay, playNext, setQueue, currentIndex } = useAudio()
   const [shuffledTracks, setShuffledTracks] = useState<typeof TRACKS>([])
 
   useEffect(() => {
@@ -33,18 +33,8 @@ export default function RadioPage() {
 
   useEffect(() => {
     if (shuffledTracks.length === 0) return
-    setQueue(shuffledTracks.map(t => ({
-      ...t,
-      duration: typeof t.duration === 'string'
-        ? t.duration.split(':').reduce((acc: number, part: string) => (60 * acc) + parseInt(part), 0)
-        : t.duration || 180
-    })))
+    setQueue(shuffledTracks)
   }, [shuffledTracks, setQueue])
-
-  useEffect(() => {
-    setMode('radio')
-    return () => setMode('track')
-  }, [setMode])
 
   const nextTrack = shuffledTracks[(currentIndex + 1) % shuffledTracks.length]
   const currentArtistHref = currentTrack ? `/artist/${getArtistSlugByName(currentTrack.artist) || 'artists'}` : '/artists'

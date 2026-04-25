@@ -16,7 +16,7 @@ function formatPlays(n: number): string {
 }
 
 export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
-  const { currentTrack, isPlaying, playTrack, togglePlay, setMode } = useAudio()
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
   const router = useRouter()
   const [purchasing, setPurchasing] = useState<string | null>(null)
 
@@ -24,10 +24,9 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
     if (currentTrack?.id === track.id) {
       togglePlay()
     } else {
-      setMode('artist')
       playTrack(track)
     }
-  }, [currentTrack, playTrack, togglePlay, setMode])
+  }, [currentTrack, playTrack, togglePlay])
 
   const handleBuy = useCallback(async (e: React.MouseEvent, track: Track) => {
     e.stopPropagation()

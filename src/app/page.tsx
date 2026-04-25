@@ -20,7 +20,7 @@ const VALID_ARTIST_SLUGS = ['od-porter', 'gune', 'atm-trap']
 const artistSpotlight = ARTISTS.filter(a => VALID_ARTIST_SLUGS.includes(a.slug)).slice(0, 4)
 
 export default function HomePage() {
-  const { currentTrack, playTrack, togglePlay, setQueue, setMode } = useAudio()
+  const { currentTrack, playTrack, togglePlay, setQueue } = useAudio()
   const revealScopeRef = useRef<HTMLElement | null>(null)
   const [mounted, setMounted] = useState(false)
 
@@ -141,7 +141,6 @@ export default function HomePage() {
                     key={track.id}
                     type="button"
                     onClick={() => {
-                      setMode('track')
                       setQueue(featuredTracks)
                       if (isActive) {
                         togglePlay()

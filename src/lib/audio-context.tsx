@@ -56,6 +56,7 @@ interface AudioContextType {
   
   // Actions
   playTrack: (track: Track, artist?: Artist, album?: Album, queue?: Track[], index?: number) => void;
+  loadTrack: (track: Track, artist?: Artist, album?: Album) => void;
   togglePlay: () => void;
   pause: () => void;
   playNext: () => void;
@@ -184,7 +185,34 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
   }, [volume]);
 
-  // ─── PLAY TRACK ────────────────────────────────────────────────────────────
+  // ─── LOAD TRACK (without playing) ───────────────────────────────────────────
+  const loadTrack = useCallback((track: Track, artist?: Artist, album?: Album) => {
+    log('loadTrack', track.id);
+    
+    if (!audioRef.current) return;
+    
+    const audio = audioRef.current;
+    
+    // Stop current playback but don't reset time yet
+    audio.pause();
+    
+    // Set track info
+    setCurrentTrack(track);
+    setCurrentArtist(artist || null);
+    setCurrentAlbum(album || null);
+    
+    // Reset timing
+    setCurrentTime(0);
+    setProgress(0);
+    setDuration(0);
+    setIsPlaying(false);
+    
+    // Load audio if URL exists
+    if (track.audio_url) {
+      audio.src = track.audio_url;
+      audio.load();
+    }
+  }, []);
   const playTrack = useCallback((
     track: Track, 
     artist?: Artist, 
@@ -332,6 +360,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       currentIndex,
       volume,
       playTrack,
+      loadTrack,
       togglePlay,
       pause,
       playNext,

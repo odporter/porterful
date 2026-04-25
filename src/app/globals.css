@@ -30,10 +30,10 @@
   --accent-h: 24;
   --accent-s: 95%;
   --accent-l: 53%;
-  --accent: #f97316;
-  --accent-hover: #ea580c;
-  --accent-soft: rgba(249, 115, 22, 0.12);
-  --accent-border: rgba(249, 115, 22, 0.28);
+  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+  --accent-hover: hsl(var(--accent-h) var(--accent-s) 46%);
+  --accent-soft: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.12);
+  --accent-border: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.28);
 }
 
 /* Light theme — Porterful default storefront */

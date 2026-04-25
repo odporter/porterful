@@ -25,6 +25,15 @@
   --pf-purple: #a855f7;     /* Porterful vivid purple */
   --background: #111111;
   --foreground: #ffffff;
+
+  /* Accent Color System - Safe Implementation */
+  --accent-h: 24;
+  --accent-s: 95%;
+  --accent-l: 53%;
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --accent-soft: rgba(249, 115, 22, 0.12);
+  --accent-border: rgba(249, 115, 22, 0.28);
 }
 
 /* Light theme — Porterful default storefront */

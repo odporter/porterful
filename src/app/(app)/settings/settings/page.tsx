@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSupabase } from '@/app/providers';
 import { useRouter } from 'next/navigation';
-import { User, Code, CreditCard, Bell } from 'lucide-react';
+import { User, Code, CreditCard, Bell, Palette } from 'lucide-react';
+import { AccentSelector, AccentPreview } from '@/components/AccentSelector';
 
 export default function SettingsPage() {
   const { supabase, user } = useSupabase();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'profile' | 'referrals' | 'payouts' | 'notifications'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'referrals' | 'payouts' | 'notifications' | 'appearance'>('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -158,6 +159,7 @@ export default function SettingsPage() {
                 { id: 'referrals', label: 'Referrals', icon: Code },
                 { id: 'payouts', label: 'Payouts', icon: CreditCard },
                 { id: 'notifications', label: 'Notifications', icon: Bell },
+                { id: 'appearance', label: 'Appearance', icon: Palette },
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -369,11 +371,22 @@ export default function SettingsPage() {
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" defaultChecked className="sr-only peer" />
-                        <div className="w-11 h-6 bg-[var(--pf-surface)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--pf-orange)]"></div>
+                        <div className="w-11 h-6 bg-[var(--pf-surface)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
                       </label>
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'appearance' && (
+              <div className="bg-[var(--pf-surface)] rounded-xl p-6 border border-[var(--pf-border)]">
+                <h2 className="text-xl font-bold mb-2">Appearance</h2>
+                <p className="text-[var(--pf-text-muted)] text-sm mb-6">
+                  Personalize your Porterful experience with custom accent colors.
+                </p>
+
+                <AccentSelector />
               </div>
             )}
           </div>

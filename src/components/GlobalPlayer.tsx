@@ -90,7 +90,7 @@ export function GlobalPlayer() {
             {/* Track Info */}
             <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(true)}>
               <div className="flex items-center gap-2">
-                <p className={`font-medium truncate ${isPlaying ? 'text-[var(--pf-orange)]' : ''}`}>
+                <p className={`font-medium truncate ${isPlaying ? 'text-[var(--accent)]' : ''}`}>
                   {currentTrack.title}
                 </p>
                 {mode !== 'track' && (

@@ -47,26 +47,26 @@ function TrackRow({ track, index, isActive, isPlaying, onPlay, onTogglePlay }: {
       onClick={onPlay}
       className={`group flex items-center gap-4 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-200 ${
         isActive
-          ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30'
+          ? 'bg-[var(--accent-soft)] border border-[var(--accent-border)]'
           : 'hover:bg-[var(--pf-surface)] border border-transparent hover:border-[var(--pf-border-subtle)]'
       }`}
     >
       <div className="w-8 flex items-center justify-center">
         {isActive && isPlaying ? (
           <div className="flex items-center gap-0.5" onClick={(e) => { e.stopPropagation(); onTogglePlay(); }}>
-            <div className="w-1 h-4 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-1 h-3 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-1 h-5 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="w-1 h-4 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-1 h-3 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-1 h-5 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
         ) : (
-          <span className={`text-sm font-mono ${isActive ? 'text-[var(--pf-orange)]' : 'text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-text)]'}`}>
+          <span className={`text-sm font-mono ${isActive ? 'text-[var(--accent)]' : 'text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-text)]'}`}>
             {index + 1}
           </span>
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className={`font-medium truncate ${isActive ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
+        <p className={`font-medium truncate ${isActive ? 'text-[var(--accent)]' : ''}`}>{track.title}</p>
         <p className="text-sm text-[var(--pf-text-secondary)]">{track.album}</p>
       </div>
 
@@ -80,8 +80,8 @@ function TrackRow({ track, index, isActive, isPlaying, onPlay, onTogglePlay }: {
         onClick={(e) => { e.stopPropagation(); onPlay(); }}
         className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
           isActive
-            ? 'bg-[var(--pf-orange)] text-black'
-            : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] group-hover:bg-[var(--pf-orange)] group-hover:text-black opacity-0 group-hover:opacity-100'
+            ? 'bg-[var(--accent)] text-black'
+            : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] group-hover:bg-[var(--accent)] group-hover:text-black opacity-0 group-hover:opacity-100'
         }`}
       >
         {isActive && isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}

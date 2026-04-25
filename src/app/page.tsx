@@ -54,13 +54,13 @@ export default function HomePage() {
   return (
     <>
       <main ref={revealScopeRef} className="min-h-screen bg-[var(--pf-bg)] pt-16 md:pt-20">
-        <section className="border-b border-[var(--pf-border)] bg-gradient-to-b from-[var(--pf-orange)]/10 via-[var(--pf-bg)] to-[var(--pf-bg)]">
+        <section className="border-b border-[var(--pf-border)] bg-gradient-to-b from-[var(--accent-soft)] via-[var(--pf-bg)] to-[var(--pf-bg)]">
           <div className="pf-container py-10 md:py-16">
             <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
               <div className="relative isolate">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-0 h-44 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.18),transparent_72%)] blur-3xl"
+                  className="pointer-events-none absolute left-1/2 top-0 h-44 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,var(--accent),transparent_72%)] blur-3xl"
                 />
                 <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.04em] md:text-6xl">
                   Music. Directly from the artists.
@@ -87,7 +87,7 @@ export default function HomePage() {
           <div className="pf-container py-10">
             <div className="pf-reveal-child mb-6 flex items-end justify-between gap-4" style={{ transitionDelay: '0ms' }}>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--pf-orange)]">Artists</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">Artists</p>
                 <h2 className="mt-2 text-3xl font-bold">Browse artists</h2>
               </div>
               <Link href="/artists" className="hidden text-sm font-medium text-[var(--pf-orange)] hover:underline md:block">

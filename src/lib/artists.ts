@@ -145,7 +145,11 @@ On Porterful, he's not competing with the algorithm. He's building something rea
     earnings: null,
     products: 1,
     trackCount: 0,
-    social: {},
+    social: {
+      instagram: 'robsoulemusic',
+      twitter: 'robsoule',
+      youtube: '@robsoule',
+    },
     coverSlides: [
       { src: '/artist-images/rob-soule/avatar.jpg', alt: 'Rob Soule' },
     ],

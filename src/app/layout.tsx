@@ -6,7 +6,7 @@ import { AudioErrorBoundary } from '@/components/AudioErrorBoundary'
 import { GlobalPlayer } from '@/components/GlobalPlayer'
 import { getServerUser } from '@/lib/supabase-auth'
 import { getThemeBootstrapScript } from '@/lib/theme'
-import { getAccentBootstrapScript } from '@/lib/accent-context'
+import { getAccentBootstrapScript } from '@/lib/accent-server'
 
 export const metadata: Metadata = {
   title: {

@@ -1,3 +1,5 @@
+// Client-side accent context
+// Separate file from accent-server.ts to avoid mixing server/client code
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
@@ -23,9 +25,6 @@ export type AccentPreset = keyof typeof ACCENT_PRESETS
 // Constraints for accessibility
 const MIN_HUE = 0
 const MAX_HUE = 360
-const LOCKED_SATURATION = 95
-const LOCKED_LIGHTNESS = 53
-
 const ACCENT_STORAGE_KEY = 'pf-accent-hue'
 
 interface AccentContextType {
@@ -71,22 +70,7 @@ function applyAccentToDocument(hue: number) {
   if (typeof document === 'undefined') return
   
   const clamped = clampHue(hue)
-  const root = document.documentElement
-  
-  root.style.setProperty('--accent-h', clamped.toString())
-  // Note: --accent-s and --accent-l remain at their locked CSS values
-}
-
-// Bootstrap script for instant application before React hydration
-export function getAccentBootstrapScript(): string {
-  return `(function(){
-    try {
-      var saved = localStorage.getItem('${ACCENT_STORAGE_KEY}');
-      var hue = saved ? parseInt(saved, 10) : ${ACCENT_PRESETS.orange.h};
-      if (isNaN(hue)) hue = ${ACCENT_PRESETS.orange.h};
-      document.documentElement.style.setProperty('--accent-h', Math.max(${MIN_HUE}, Math.min(${MAX_HUE}, hue)).toString());
-    } catch (e) {}
-  })();`
+  document.documentElement.style.setProperty('--accent-h', clamped.toString())
 }
 
 interface AccentProviderProps {

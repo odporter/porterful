@@ -85,6 +85,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const currentTrackRef = useRef<Track | null>(null);
   const purchasedTracksRef = useRef<Set<string>>(new Set());
   const preloadRef = useRef<HTMLAudioElement | null>(null);
+  const playInitiatedRef = useRef(false); // Prevent double-play race condition
 
   // Keep refs in sync
   useEffect(() => {
@@ -236,6 +237,14 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
         log('canplay', current.id);
 
+        // Skip auto-play if playTrack already initiated playback
+        // This prevents double-play race condition
+        if (playInitiatedRef.current) {
+          log('canplay skipped — playTrack already handled playback');
+          playInitiatedRef.current = false; // Reset for next track
+          return;
+        }
+
         // Normalize URLs for comparison
         const expectedAudioUrl = current.audio_url.startsWith('http')
           ? current.audio_url
@@ -385,8 +394,11 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         audioRef.current.pause();
         audioRef.current.src = track.audio_url || '';
         audioRef.current.load();
+        // Mark that playTrack initiated playback to prevent canplay race
+        playInitiatedRef.current = true;
         audioRef.current.play().catch((err: any) => {
           logError('playTrack.play().catch', err, { trackId: track.id });
+          playInitiatedRef.current = false; // Reset on failure
         });
       }
     } catch (err) {

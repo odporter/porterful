@@ -144,10 +144,11 @@ export const TRACKS = [
   { id: 'od-s05', title: 'Kuato Ft Rick & Morty', artist: 'O D Porter', album: 'Singles', duration: '4:15', price: 1, plays: 38000, image: ALBUM_ART.Singles, audio_url: audio('Singles', 'O D Porter - Kuato Ft. Rick & Morty.mp3') },
   { id: 'od-s06', title: '2BC BOUNCE', artist: 'O D Porter', album: 'Singles', duration: '3:28', price: 1, plays: 71000, image: ALBUM_ART.Singles, audio_url: audio('Singles', '2BC BOUNCE.mp3') },
   { id: 'od-s07', title: 'around 3', artist: 'O D Porter', album: 'Singles', duration: '4:31', price: 1, plays: 55000, image: ALBUM_ART.Singles, audio_url: audio('Singles', 'around 3 (Master 2.0).mp3') },
-  // ATM TRAP TRACKS
+  // ATM TRAP TRACKS (only files that exist)
   { id: 'atm-01', title: 'Thought We Was Bruddaz', artist: 'ATM Trap', album: 'Singles', duration: '3:42', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/Trap-Thought We Was Bruddaz (FINAL).m4a', featured: true },
-  { id: 'atm-02', title: 'Coming Home', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/master-Coming Home (FINAL)mp3.mp3' },
-  { id: 'atm-03', title: 'Heart of a Lion', artist: 'ATM Trap', album: 'Singles', duration: '3:15', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/Heart of A Lion (Master)mp3.mp3' },
+  { id: 'atm-04', title: 'Wacked Out Master', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/ATM Trap - Wacked Out Master mp3.mp3' },
+  // { id: 'atm-02', title: 'Coming Home', artist: 'ATM Trap', album: 'Singles', duration: '3:30', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/master-Coming Home (FINAL)mp3.mp3', comingSoon: true },
+  // { id: 'atm-03', title: 'Heart of a Lion', artist: 'ATM Trap', album: 'Singles', duration: '3:15', price: 1, plays: 0, image: '/artist-images/atm-trap/avatar.jpg', audio_url: '/artist-images/atm-trap/Heart of A Lion (Master)mp3.mp3', comingSoon: true },
 ];
 
 // Album data

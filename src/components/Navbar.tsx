@@ -119,10 +119,10 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-[var(--pf-text-secondary)] transition-colors duration-200 ease-out relative group hover:text-[var(--accent)]"
+                  className="text-sm font-medium text-[var(--pf-text-secondary)] transition-colors duration-200 ease-out relative group hover:text-[var(--pf-orange)]"
                 >
                   {link.label}
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[var(--accent)] transition-all duration-200 ease-out group-hover:w-full" />
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[var(--pf-orange)] transition-all duration-200 ease-out group-hover:w-full" />
                 </Link>
               ))}
             </div>
@@ -139,7 +139,7 @@ export function Navbar() {
                 >
                   <ShoppingCart size={20} />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[var(--accent)] text-[#111111] text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-[var(--pf-orange)] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                       {mounted ? (cartCount > 9 ? '9+' : cartCount) : '0'}
                     </span>
                   )}

@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { AudioProvider } from '@/lib/audio-context'
 import { ThemeProvider } from '@/lib/theme-context'
-import { AccentProvider } from '@/lib/accent-context'
 import { WalletProvider } from '@/lib/wallet-context'
 import { PayoutProvider } from '@/lib/payout-context'
 import { CartProvider } from '@/lib/cart-context'
@@ -142,19 +141,17 @@ export function Providers({
   return (
     <SupabaseContext.Provider value={{ supabase, user, session, loading }}>
       <ThemeProvider>
-        <AccentProvider>
-          <AudioProvider>
-            <CartProvider>
-              <WalletProvider>
-                <PayoutProvider>
-                  <ToastProvider>
-                    {children}
-                  </ToastProvider>
-                </PayoutProvider>
-              </WalletProvider>
-            </CartProvider>
-          </AudioProvider>
-        </AccentProvider>
+        <AudioProvider>
+          <CartProvider>
+            <WalletProvider>
+              <PayoutProvider>
+                <ToastProvider>
+                  {children}
+                </ToastProvider>
+              </PayoutProvider>
+            </WalletProvider>
+          </CartProvider>
+        </AudioProvider>
       </ThemeProvider>
     </SupabaseContext.Provider>
   )

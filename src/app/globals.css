@@ -25,20 +25,6 @@
   --pf-purple: #a855f7;     /* Porterful vivid purple */
   --background: #111111;
   --foreground: #ffffff;
-
-  /* ============================================
-     ACCENT COLOR SYSTEM — User Controllable
-     Only --accent is user-controlled
-     All derived values are computed from it
-     ============================================ */
-  --accent-h: 24;           /* Default orange hue */
-  --accent-s: 95%;          /* Locked saturation */
-  --accent-l: 53%;          /* Locked lightness */
-  --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
-  --accent-hover: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 8%));
-  --accent-soft: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.12);
-  --accent-border: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.5);
-  --accent-text: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) - 10%));
 }
 
 /* Light theme — Porterful default storefront */
@@ -60,9 +46,6 @@
   --pf-purple: #a855f7;
   --background: #ffffff;
   --foreground: #111111;
-  
-  /* Accent: slightly darker text in light mode for contrast */
-  --accent-text: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) - 15%));
 }
 
 /* Dark theme — Porterful dark mode */
@@ -84,9 +67,6 @@
   --pf-purple: #a855f7;
   --background: #111111;
   --foreground: #ffffff;
-  
-  /* Accent: standard in dark mode */
-  --accent-text: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) - 10%));
 }
 
 /* Creator theme */
@@ -207,31 +187,6 @@ body {
 }
 
 .pf-btn-primary {
-  @apply text-[#111111] hover:scale-[1.03] active:scale-[0.98];
-  background-color: var(--accent);
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.06) inset;
-  transition-property: transform, box-shadow, background-color, color, border-color, opacity;
-  transition-duration: 200ms;
-  transition-timing-function: ease-out;
-}
-
-.pf-btn-primary:hover {
-  background-color: var(--accent-hover);
-  box-shadow: 0 0 0 1px var(--accent-border), 0 14px 30px -18px var(--accent-soft);
-}
-
-.pf-btn-secondary {
-  @apply bg-[var(--pf-surface)] border transition-all duration-200;
-  border-color: var(--pf-border);
-}
-
-.pf-btn-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* Legacy accent-aware classes (for backwards compatibility with pf-orange) */
-.pf-btn-primary-legacy {
   @apply bg-[var(--pf-orange)] text-[#111111] hover:bg-[var(--pf-orange-light)] hover:scale-[1.03] active:scale-[0.98];
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.06) inset;
   transition-property: transform, box-shadow, background-color, color, border-color, opacity;
@@ -239,8 +194,12 @@ body {
   transition-timing-function: ease-out;
 }
 
-.pf-btn-primary-legacy:hover {
+.pf-btn-primary:hover {
   box-shadow: 0 0 0 1px rgba(198, 167, 94, 0.18), 0 14px 30px -18px rgba(198, 167, 94, 0.62);
+}
+
+.pf-btn-secondary {
+  @apply bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)] hover:text-[var(--pf-orange)];
 }
 
 .pf-card {
@@ -276,13 +235,6 @@ body {
 
 /* Section eyebrow — uppercase label, small but readable */
 .pf-eyebrow {
-  @apply text-xs font-semibold uppercase tracking-widest;
-  color: var(--accent);
-  opacity: 0.9;
-}
-
-/* Section eyebrow with fallback to orange (legacy) */
-.pf-eyebrow-legacy {
   @apply text-xs font-semibold uppercase tracking-widest;
   color: var(--pf-orange);
   opacity: 0.9;
@@ -322,22 +274,9 @@ input[type="search"],
 input[type="number"],
 textarea,
 select {
-  @apply w-full px-4 py-3 rounded-lg border bg-[var(--pf-bg)] text-[var(--pf-text)];
+  @apply w-full px-4 py-3 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text)];
   @apply placeholder:text-[var(--pf-text-muted)];
-  @apply focus:outline-none focus:ring-2;
-  border-color: var(--pf-border);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="search"]:focus,
-input[type="number"]:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  @apply focus:outline-none focus:border-[var(--pf-orange)] focus:ring-2;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -509,15 +448,8 @@ textarea::placeholder {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Focus ring — consistent, accessible, accent-aware */
+/* Focus ring — consistent, accessible, orange */
 *:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--pf-bg), 0 0 0 4px var(--accent);
-  border-radius: 4px;
-}
-
-/* Focus ring with orange fallback (legacy) */
-.pf-focus-legacy:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--pf-bg), 0 0 0 4px var(--pf-orange);
   border-radius: 4px;

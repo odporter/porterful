@@ -63,13 +63,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
+  // Apply current theme to <html> on every state change, but DO NOT write
+  // to localStorage here — that would record system-driven changes as a
+  // user preference and permanently block the prefers-color-scheme listener
+  // (the bug behind "light/dark doesn't switch live unless cache cleared").
   useEffect(() => {
     applyThemeToDocument(theme)
-    localStorage.setItem(THEME_STORAGE_KEY, theme)
   }, [theme]);
 
+  // Only an explicit user choice persists. System changes flow through
+  // setThemeState directly (in the matchMedia listener above) without
+  // touching localStorage, so the no-preference signal is preserved.
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme)
+    }
   }
 
   return (

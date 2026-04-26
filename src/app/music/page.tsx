@@ -80,8 +80,8 @@ function TrackRow({ track, index, isActive, isPlaying, onPlay, onTogglePlay }: {
         onClick={(e) => { e.stopPropagation(); onPlay(); }}
         className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
           isActive
-            ? 'bg-[var(--pf-orange)] text-black'
-            : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] group-hover:bg-[var(--pf-orange)] group-hover:text-black opacity-0 group-hover:opacity-100'
+            ? 'bg-[var(--pf-orange)] text-[var(--pf-text)]'
+            : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] group-hover:bg-[var(--pf-orange)] group-hover:text-[var(--pf-text)] opacity-0 group-hover:opacity-100'
         }`}
       >
         {isActive && isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
@@ -180,10 +180,10 @@ export default function MusicPage() {
   return (
     <div className="min-h-screen pb-24">
       {/* HERO PLAYER */}
-      <section className="relative bg-gradient-to-b from-[var(--pf-orange)]/5 to-[var(--pf-bg)]">
+      <section className="relative bg-[var(--pf-bg)]">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 50% 50%, var(--pf-orange) 0%, transparent 50%)',
+            backgroundImage: 'radial-gradient(circle at 50% 50%, var(--pf-border) 0%, transparent 50%)',
           }} />
         </div>
 
@@ -192,16 +192,16 @@ export default function MusicPage() {
           <div className="flex items-center gap-3 mb-8">
             <Link href="/artist/od-porter">
               {odArtist?.image && (
-                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--pf-orange)] hover:border-[var(--pf-orange)]/60 transition-colors">
+                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--pf-border)] hover:border-[var(--pf-text-secondary)] transition-colors">
                   <Image src={odArtist.image} alt={odArtist.name} fill className="object-cover" />
                 </div>
               )}
             </Link>
             <div>
-              <Link href="/artist/od-porter" className="flex items-center gap-2 hover:text-[var(--pf-orange)] transition-colors">
+              <Link href="/artist/od-porter" className="flex items-center gap-2 hover:text-[var(--pf-text)] transition-colors">
                 <h1 className="text-2xl font-bold">O D Porter</h1>
                 {odArtist?.verified && (
-                  <Verified size={18} className="text-[var(--pf-orange)]" />
+                  <Verified size={18} className="text-[var(--pf-text-secondary)]" />
                 )}
               </Link>
               <p className="text-[var(--pf-text-secondary)]">St. Louis, MO · {ALL_TRACKS.length} tracks</p>
@@ -211,14 +211,14 @@ export default function MusicPage() {
           {/* Hero track display */}
           <div className="flex flex-col lg:flex-row gap-8 items-center">
             {/* Album art */}
-            <div className="relative w-64 h-64 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl shadow-[var(--pf-orange)]/10">
+            <div className="relative w-64 h-64 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl">
               {heroTrack?.image && (
                 <Image src={heroTrack.image} alt={heroTrack.title} fill className="object-cover" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--pf-bg)]/60 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
-                <p className="font-bold text-lg">{heroTrack?.title}</p>
-                <p className="text-sm text-white/70">{heroTrack?.album}</p>
+                <p className="font-bold text-lg text-[var(--pf-text)]">{heroTrack?.title}</p>
+                <p className="text-sm text-[var(--pf-text-secondary)]">{heroTrack?.album}</p>
               </div>
             </div>
 
@@ -239,25 +239,25 @@ export default function MusicPage() {
               <div className="flex items-center justify-center lg:justify-start gap-6">
                 <button
                   onClick={() => setHeroTrackIndex(i => (i - 1 + TOP_TRACKS.length) % TOP_TRACKS.length)}
-                  className="w-12 h-12 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/20 flex items-center justify-center transition-colors"
+                  className="w-12 h-12 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] flex items-center justify-center transition-colors"
                 >
                   <SkipForward size={20} className="rotate-180" />
                 </button>
 
                 <button
                   onClick={() => currentTrack ? togglePlay() : playTrack(heroTrack!)}
-                  className="w-20 h-20 rounded-full bg-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/90 flex items-center justify-center transition-all shadow-lg shadow-[var(--pf-orange)]/20"
+                  className="w-20 h-20 rounded-full bg-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/90 flex items-center justify-center transition-all shadow-lg"
                 >
                   {isHeroActive && isPlaying ? (
-                    <Pause size={28} className="text-black" />
+                    <Pause size={28} className="text-[var(--pf-text)]" />
                   ) : (
-                    <Play size={28} className="text-black ml-1" />
+                    <Play size={28} className="text-[var(--pf-text)] ml-1" />
                   )}
                 </button>
 
                 <button
                   onClick={() => setHeroTrackIndex(i => (i + 1) % TOP_TRACKS.length)}
-                  className="w-12 h-12 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/20 flex items-center justify-center transition-colors"
+                  className="w-12 h-12 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] flex items-center justify-center transition-colors"
                 >
                   <SkipForward size={20} />
                 </button>
@@ -281,7 +281,7 @@ export default function MusicPage() {
         <div className="max-w-6xl mx-auto px-6 py-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Users size={18} className="text-[var(--pf-orange)]" />
+              <Users size={18} className="text-[var(--pf-text-secondary)]" />
               <h3 className="text-lg font-bold">Browse Artists</h3>
             </div>
           </div>
@@ -296,9 +296,9 @@ export default function MusicPage() {
                   href={`/artist/${artist.slug}`}
                   className="flex-shrink-0 w-56 group"
                 >
-                  <div className="bg-[var(--pf-surface)] rounded-2xl p-4 border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40 transition-all duration-200 hover:shadow-lg hover:shadow-[var(--pf-orange)]/5">
+                  <div className="bg-[var(--pf-surface)] rounded-2xl p-4 border border-[var(--pf-border)] hover:border-[var(--pf-text-muted)] transition-all duration-200 hover:shadow-lg">
                     {/* Avatar */}
-                    <div className="relative w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[var(--pf-border)] group-hover:border-[var(--pf-orange)]/60 transition-colors">
+                    <div className="relative w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[var(--pf-border)] group-hover:border-[var(--pf-text-secondary)] transition-colors">
                       <Image
                         src={artist.image}
                         alt={artist.name}
@@ -312,7 +312,7 @@ export default function MusicPage() {
                       <div className="flex items-center justify-center gap-1.5 mb-1">
                         <p className="font-semibold truncate">{artist.name}</p>
                         {artist.verified && (
-                          <Verified size={14} className="text-[var(--pf-orange)] flex-shrink-0" />
+                          <Verified size={14} className="text-[var(--pf-text-secondary)] flex-shrink-0" />
                         )}
                       </div>
                       <p className="text-xs text-[var(--pf-text-secondary)] truncate mb-2">{artist.genre}</p>
@@ -338,13 +338,13 @@ export default function MusicPage() {
         <div className="max-w-6xl mx-auto px-6 py-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Disc size={18} className="text-[var(--pf-orange)]" />
+              <Disc size={18} className="text-[var(--pf-text-secondary)]" />
               <h3 className="text-lg font-bold">Albums</h3>
             </div>
             {selectedAlbum && (
               <button
                 onClick={clearAlbumFilter}
-                className="flex items-center gap-1.5 text-sm text-[var(--pf-orange)] hover:text-[var(--pf-orange)]/80 transition-colors"
+                className="flex items-center gap-1.5 text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
               >
                 <X size={14} />
                 Clear filter
@@ -369,8 +369,8 @@ export default function MusicPage() {
                   }}
                   className={`group text-left rounded-xl overflow-hidden border transition-all duration-200 ${
                     isSelected
-                      ? 'border-[var(--pf-orange)] shadow-lg shadow-[var(--pf-orange)]/10'
-                      : 'border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40'
+                      ? 'border-[var(--pf-orange)] shadow-lg'
+                      : 'border-[var(--pf-border)] hover:border-[var(--pf-text-muted)]'
                   }`}
                 >
                   {/* Album art */}
@@ -389,9 +389,9 @@ export default function MusicPage() {
                       </div>
                     )}
                     {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 bg-[var(--pf-bg)]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <div className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center">
-                        <Play size={18} className="text-white ml-0.5" />
+                        <Play size={18} className="text-[var(--pf-text)] ml-0.5" />
                       </div>
                     </div>
                   </div>
@@ -415,7 +415,7 @@ export default function MusicPage() {
           <div>
             {selectedAlbum || albumFilter !== 'all' || searchQuery ? (
               <div>
-                <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-1">Filtered Results</p>
+                <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-1">Filtered Results</p>
                 <h3 className="text-2xl font-bold">
                   {selectedAlbum || (albumFilter !== 'all' ? albumFilter : 'Search Results')}
                   <span className="text-[var(--pf-text-secondary)] font-normal ml-2">· {filteredTracks.length} tracks</span>
@@ -423,7 +423,7 @@ export default function MusicPage() {
               </div>
             ) : (
               <div>
-                <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-1">All Tracks</p>
+                <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-1">All Tracks</p>
                 <h3 className="text-2xl font-bold">{ALL_TRACKS.length} tracks</h3>
               </div>
             )}
@@ -540,7 +540,7 @@ export default function MusicPage() {
             </p>
             <button
               onClick={() => { setSearchQuery(''); setAlbumFilter('all'); setSelectedAlbum(null); }}
-              className="mt-4 text-sm font-medium px-4 py-2 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/50 transition-colors"
+              className="mt-4 text-sm font-medium px-4 py-2 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-text-muted)] transition-colors"
             >
               Clear all filters
             </button>
@@ -567,28 +567,28 @@ export default function MusicPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Bio */}
             <div>
-              <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)] mb-4">About the Artist</p>
-              <div className="space-y-4 text-[var(--var(--pf-text-secondary))]">
+              <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-4">About the Artist</p>
+              <div className="space-y-4 text-[var(--pf-text-secondary)]">
                 <p>
                   Born Miami, raised NOLA &amp; St. Louis. Building Porterful — a direct marketplace where artists keep more of every sale.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-3 mt-6">
-                <Link href="/artist/od-porter" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-orange)] text-white text-sm font-medium hover:bg-[var(--pf-orange-dark)] transition-colors">
+                <Link href="/artist/od-porter" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text)] text-sm font-medium hover:border-[var(--pf-text-secondary)] transition-colors">
                   View Full Profile
                   <ChevronRight size={14} />
                 </Link>
                 <a href="https://instagram.com/od.porter" target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/20 text-sm transition-colors">
+                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] text-sm transition-colors">
                   @od.porter
                 </a>
                 <a href="https://tiktok.com/@odporter" target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/20 text-sm transition-colors">
+                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] text-sm transition-colors">
                   TikTok
                 </a>
                 <a href="https://youtube.com/@odporter" target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/20 text-sm transition-colors">
+                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] text-sm transition-colors">
                   YouTube
                 </a>
               </div>

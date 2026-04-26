@@ -94,16 +94,14 @@ export function GlobalPlayer() {
                   {currentTrack.title}
                 </p>
                 {mode !== 'track' && (
-                  <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${
-                    mode === 'radio' ? 'bg-red-500/20 text-red-400' : 'bg-[var(--pf-orange)]/20 text-[var(--pf-orange)]'
-                  }`}>
+                  <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] border border-[var(--pf-border)]">
                     {mode}
                   </span>
                 )}
               </div>
               <Link
                 href={artistHref}
-                className="text-sm text-[var(--pf-text-muted)] truncate hover:text-[var(--pf-orange)] transition-colors"
+                className="text-sm text-[var(--pf-text-muted)] truncate hover:text-[var(--pf-text)] transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 {currentTrack.artist}
@@ -119,12 +117,12 @@ export function GlobalPlayer() {
               >
                 <SkipBack size={20} />
               </button>
-              <button 
+              <button
                 onClick={togglePlay}
                 className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange)]/80 transition-colors"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
-                {isPlaying ? <Pause size={20} className="text-white" /> : <Play size={20} className="text-white ml-0.5" />}
+                {isPlaying ? <Pause size={20} className="text-[var(--pf-text)]" /> : <Play size={20} className="text-[var(--pf-text)] ml-0.5" />}
               </button>
               <button 
                 onClick={playNext}
@@ -169,11 +167,11 @@ export function GlobalPlayer() {
               aria-valuenow={progress}
               tabIndex={0}
             >
-              <div 
+              <div
                 className="h-full bg-[var(--pf-orange)] rounded-full transition-all relative group-hover:bg-[var(--pf-orange)]/80"
                 style={{ width: `${progressPercent}%` }}
               >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-[var(--pf-text)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md" />
               </div>
             </div>
             <div className="flex justify-between mt-1 text-xs text-[var(--pf-text-muted)] px-1">
@@ -214,9 +212,9 @@ export function GlobalPlayer() {
           {/* Track Info */}
           <div className="px-8 text-center">
             <h2 className="text-2xl font-bold truncate">{currentTrack.title}</h2>
-            <Link 
+            <Link
               href={artistHref}
-              className="text-lg text-[var(--pf-text-secondary)] truncate hover:text-[var(--pf-orange)] transition-colors block"
+              className="text-lg text-[var(--pf-text-secondary)] truncate hover:text-[var(--pf-text)] transition-colors block"
             >
               {currentTrack.artist}
             </Link>
@@ -248,11 +246,11 @@ export function GlobalPlayer() {
               aria-valuenow={progress}
               tabIndex={0}
             >
-              <div 
+              <div
                 className="h-full bg-[var(--pf-orange)] transition-all relative"
                 style={{ width: `${progressPercent}%` }}
               >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-[var(--pf-text)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
               </div>
             </div>
             <div className="flex justify-between mt-2 text-sm text-[var(--pf-text-muted)]">
@@ -269,11 +267,11 @@ export function GlobalPlayer() {
             >
               <SkipBack size={28} />
             </button>
-            <button 
+            <button
               onClick={togglePlay}
               className="w-16 h-16 rounded-full bg-[var(--pf-orange)] flex items-center justify-center hover:bg-[var(--pf-orange)]/80 transition-colors"
             >
-              {isPlaying ? <Pause size={28} className="text-white" /> : <Play size={28} className="text-white ml-1" />}
+              {isPlaying ? <Pause size={28} className="text-[var(--pf-text)]" /> : <Play size={28} className="text-[var(--pf-text)] ml-1" />}
             </button>
             <button 
               onClick={playNext}
@@ -302,14 +300,14 @@ export function GlobalPlayer() {
 
           {/* Fan CTA */}
           <div className="px-8 pb-8">
-            <div className="bg-gradient-to-r from-[var(--pf-orange)]/10 to-purple-500/10 rounded-xl p-4 border border-[var(--pf-orange)]/20">
+            <div className="bg-[var(--pf-surface)] rounded-xl p-4 border border-[var(--pf-border)]">
               <p className="text-sm font-medium mb-2">Support this artist directly</p>
               <p className="text-xs text-[var(--pf-text-muted)] mb-3">Artists who care share with fans who care. Unlock full tracks or become a superfan.</p>
               <div className="flex gap-2">
-                <Link href="/music" className="flex-1 py-2 px-3 bg-[var(--pf-orange)] text-white rounded-lg font-medium text-sm text-center hover:bg-[var(--pf-orange-dark)] transition-colors">
+                <Link href="/music" className="flex-1 py-2 px-3 bg-[var(--pf-bg)] border border-[var(--pf-border)] text-[var(--pf-text)] rounded-lg font-medium text-sm text-center hover:border-[var(--pf-text-secondary)] transition-colors">
                   Buy Tracks
                 </Link>
-                <Link href="/signup?role=supporter" className="flex-1 py-2 px-3 border border-[var(--pf-border)] rounded-lg font-medium text-sm text-center hover:border-[var(--pf-orange)] transition-colors">
+                <Link href="/signup?role=supporter" className="flex-1 py-2 px-3 border border-[var(--pf-border)] rounded-lg font-medium text-sm text-center hover:border-[var(--pf-text-secondary)] transition-colors">
                   Become a Superfan
                 </Link>
               </div>
@@ -320,28 +318,28 @@ export function GlobalPlayer() {
 
       {/* Visualizer Modal */}
       {showVisualizer && (
-        <div className="fixed inset-0 bg-black z-[70] flex flex-col">
+        <div className="fixed inset-0 bg-[var(--pf-bg)] z-[70] flex flex-col">
           {/* Track Info at top */}
-          <div className="p-6 bg-gradient-to-b from-black/80 to-transparent">
+          <div className="p-6 bg-gradient-to-b from-[var(--pf-bg)]/80 to-transparent">
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-bold text-white truncate">{currentTrack.title}</h2>
-                <Link 
+                <h2 className="text-2xl font-bold text-[var(--pf-text)] truncate">{currentTrack.title}</h2>
+                <Link
                   href={artistHref}
-                  className="text-lg text-white/80 truncate hover:text-[var(--pf-orange)] transition-colors block"
+                  className="text-lg text-[var(--pf-text-secondary)] truncate hover:text-[var(--pf-text)] transition-colors block"
                   onClick={() => setShowVisualizer(false)}
                 >
                   {currentTrack.artist}
                 </Link>
                 {currentTrack.album && (
-                  <p className="text-sm text-white/60 truncate">{currentTrack.album}</p>
+                  <p className="text-sm text-[var(--pf-text-muted)] truncate">{currentTrack.album}</p>
                 )}
               </div>
               <button
                 onClick={() => setShowVisualizer(false)}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20"
+                className="p-3 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)]"
               >
-                <X size={24} className="text-white" />
+                <X size={24} className="text-[var(--pf-text)]" />
               </button>
             </div>
           </div>
@@ -363,25 +361,25 @@ export function GlobalPlayer() {
           </div>
 
           {/* Play Controls */}
-          <div className="p-6 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="p-6 bg-gradient-to-t from-[var(--pf-bg)]/80 to-transparent">
             <div className="flex items-center justify-center gap-6">
-              <button 
+              <button
                 onClick={playPrev}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20"
+                className="p-3 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)]"
               >
-                <SkipBack size={24} className="text-white" />
+                <SkipBack size={24} className="text-[var(--pf-text)]" />
               </button>
-              <button 
+              <button
                 onClick={togglePlay}
                 className="w-14 h-14 rounded-full bg-[var(--pf-orange)] flex items-center justify-center"
               >
-                {isPlaying ? <Pause size={24} className="text-white" /> : <Play size={24} className="text-white ml-0.5" />}
+                {isPlaying ? <Pause size={24} className="text-[var(--pf-text)]" /> : <Play size={24} className="text-[var(--pf-text)] ml-0.5" />}
               </button>
-              <button 
+              <button
                 onClick={playNext}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20"
+                className="p-3 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)]"
               >
-                <SkipForward size={24} className="text-white" />
+                <SkipForward size={24} className="text-[var(--pf-text)]" />
               </button>
             </div>
           </div>

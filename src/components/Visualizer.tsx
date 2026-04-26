@@ -6,6 +6,23 @@ import { X, Maximize2, Minimize2, ChevronLeft, ChevronRight } from 'lucide-react
 
 type VisualizerType = 'waves' | 'bars' | 'circular'
 
+// Read a Porterful token's hex value from the document.
+// Canvas APIs need explicit color strings; this lets the visualizer follow tokens.
+function readToken(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return v || fallback
+}
+
+function withAlpha(hex: string, alpha: number): string {
+  const h = hex.replace('#', '').trim()
+  if (h.length !== 6) return hex
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 interface VisualizerProps {
   type: VisualizerType
   analyser: AnalyserNode | null
@@ -26,10 +43,13 @@ function WaveVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null
 
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
+    const bg = readToken('--pf-bg', '#111111')
+    const orange = readToken('--pf-orange', '#f97316')
+    const fadeFill = withAlpha(bg, 0.1)
 
     const draw = () => {
       if (!isPlaying) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+        ctx.fillStyle = fadeFill
         ctx.fillRect(0, 0, canvas.width, canvas.height)
         return
       }
@@ -37,11 +57,11 @@ function WaveVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null
       animationRef.current = requestAnimationFrame(draw)
       analyser.getByteTimeDomainData(dataArray)
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+      ctx.fillStyle = fadeFill
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       ctx.lineWidth = 2
-      ctx.strokeStyle = '#f97316'
+      ctx.strokeStyle = orange
       ctx.beginPath()
 
       const sliceWidth = canvas.width / bufferLength
@@ -90,20 +110,23 @@ function BarVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null;
 
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
+    const bg = readToken('--pf-bg', '#111111')
+    const orange = readToken('--pf-orange', '#f97316')
+    const bgFill = withAlpha(bg, 0.95)
+    const orangeIdle = withAlpha(orange, 0.3)
 
     const draw = () => {
       if (!isPlaying) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.95)'
+        ctx.fillStyle = bgFill
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        
+
         // Draw static bars when paused
         const barCount = 64
         const barWidth = canvas.width / barCount
         for (let i = 0; i < barCount; i++) {
           const barHeight = canvas.height * 0.1
           const x = i * barWidth
-          const hue = (i / barCount) * 60 + 10 // Orange to yellow gradient
-          ctx.fillStyle = `hsla(${hue}, 90%, 60%, 0.3)`
+          ctx.fillStyle = orangeIdle
           ctx.fillRect(x + 1, canvas.height - barHeight, barWidth - 2, barHeight)
         }
         return
@@ -112,7 +135,7 @@ function BarVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null;
       animationRef.current = requestAnimationFrame(draw)
       analyser.getByteFrequencyData(dataArray)
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.95)'
+      ctx.fillStyle = bgFill
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       const barCount = 64
@@ -120,11 +143,11 @@ function BarVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null;
 
       for (let i = 0; i < barCount; i++) {
         const dataIndex = Math.floor(i * (bufferLength / barCount))
-        const barHeight = (dataArray[dataIndex] / 255) * canvas.height * 0.8
-        
+        const intensity = dataArray[dataIndex] / 255
+        const barHeight = intensity * canvas.height * 0.8
+
         const x = i * barWidth
-        const hue = (i / barCount) * 60 + 10 // Orange to yellow
-        ctx.fillStyle = `hsl(${hue}, 90%, 60%)`
+        ctx.fillStyle = withAlpha(orange, Math.max(0.4, intensity))
         ctx.fillRect(x + 1, canvas.height - barHeight, barWidth - 2, barHeight)
       }
     }
@@ -155,18 +178,23 @@ function CircularVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | 
 
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
+    const bg = readToken('--pf-bg', '#111111')
+    const orange = readToken('--pf-orange', '#f97316')
+    const bgFill = withAlpha(bg, 0.95)
+    const orangeIdle = withAlpha(orange, 0.3)
+    const orangeCenter = withAlpha(orange, 0.1)
 
     const draw = () => {
       if (!isPlaying) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.95)'
+        ctx.fillStyle = bgFill
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        
+
         // Draw static circle when paused
         const centerX = canvas.width / 2
         const centerY = canvas.height / 2
         ctx.beginPath()
         ctx.arc(centerX, centerY, 50, 0, Math.PI * 2)
-        ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'
+        ctx.strokeStyle = orangeIdle
         ctx.lineWidth = 3
         ctx.stroke()
         return
@@ -175,7 +203,7 @@ function CircularVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | 
       animationRef.current = requestAnimationFrame(draw)
       analyser.getByteFrequencyData(dataArray)
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.95)'
+      ctx.fillStyle = bgFill
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       const centerX = canvas.width / 2
@@ -186,8 +214,9 @@ function CircularVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | 
       const barCount = 180
       for (let i = 0; i < barCount; i++) {
         const dataIndex = Math.floor(i * (bufferLength / barCount))
-        const barHeight = (dataArray[dataIndex] / 255) * radius * 0.8
-        
+        const intensity = dataArray[dataIndex] / 255
+        const barHeight = intensity * radius * 0.8
+
         const angle = (i / barCount) * Math.PI * 2
         const x1 = centerX + Math.cos(angle) * radius
         const y1 = centerY + Math.sin(angle) * radius
@@ -197,9 +226,8 @@ function CircularVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | 
         ctx.beginPath()
         ctx.moveTo(x1, y1)
         ctx.lineTo(x2, y2)
-        
-        const hue = (i / barCount) * 60 + 10
-        ctx.strokeStyle = `hsl(${hue}, 90%, 60%)`
+
+        ctx.strokeStyle = withAlpha(orange, Math.max(0.4, intensity))
         ctx.lineWidth = 2
         ctx.stroke()
       }
@@ -207,9 +235,9 @@ function CircularVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | 
       // Draw center circle
       ctx.beginPath()
       ctx.arc(centerX, centerY, radius * 0.3, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(249, 115, 22, 0.1)'
+      ctx.fillStyle = orangeCenter
       ctx.fill()
-      ctx.strokeStyle = '#f97316'
+      ctx.strokeStyle = orange
       ctx.lineWidth = 2
       ctx.stroke()
     }
@@ -328,9 +356,9 @@ export function Visualizer() {
   if (!currentTrack) return null
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className={`fixed inset-0 bg-black z-50 ${isFullscreen ? '' : 'hidden'}`}
+      className={`fixed inset-0 bg-[var(--pf-bg)] z-50 ${isFullscreen ? '' : 'hidden'}`}
     >
       {/* Visualizer Canvas */}
       <div className="absolute inset-0">
@@ -340,49 +368,49 @@ export function Visualizer() {
       </div>
 
       {/* Track Info Overlay */}
-      <div className="absolute top-0 left-0 right-0 p-6 bg-gradient-to-b from-black/80 to-transparent">
+      <div className="absolute top-0 left-0 right-0 p-6 bg-gradient-to-b from-[var(--pf-bg)]/80 to-transparent">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold text-white truncate">{currentTrack.title}</h2>
-            <p className="text-lg text-white/80 truncate">{currentTrack.artist}</p>
+            <h2 className="text-2xl font-bold text-[var(--pf-text)] truncate">{currentTrack.title}</h2>
+            <p className="text-lg text-[var(--pf-text-secondary)] truncate">{currentTrack.artist}</p>
             {currentTrack.album && (
-              <p className="text-sm text-white/60 truncate">{currentTrack.album}</p>
+              <p className="text-sm text-[var(--pf-text-muted)] truncate">{currentTrack.album}</p>
             )}
           </div>
-          
+
           <div className="flex gap-2">
             <button
               onClick={cycleVisualizer}
-              className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="p-3 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] transition-colors"
               aria-label="Change visualizer"
             >
-              <ChevronRight size={24} className="text-white" />
+              <ChevronRight size={24} className="text-[var(--pf-text)]" />
             </button>
             <button
               onClick={toggleFullscreen}
-              className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="p-3 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] transition-colors"
               aria-label="Exit fullscreen"
             >
-              <Minimize2 size={24} className="text-white" />
+              <Minimize2 size={24} className="text-[var(--pf-text)]" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Bottom Controls */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[var(--pf-bg)]/80 to-transparent">
         <div className="flex items-center justify-between">
           <button
             onClick={cycleVisualizer}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] transition-colors"
           >
-            <span className="text-white text-sm">Visualizer {visualizerIndex + 1}/3</span>
-            <ChevronLeft size={16} className="text-white" />
+            <span className="text-[var(--pf-text)] text-sm">Visualizer {visualizerIndex + 1}/3</span>
+            <ChevronLeft size={16} className="text-[var(--pf-text)]" />
           </button>
 
           <button
             onClick={toggleFullscreen}
-            className="px-6 py-3 rounded-full bg-[var(--pf-orange)] text-white font-semibold hover:bg-[var(--pf-orange)]/80 transition-colors"
+            className="px-6 py-3 rounded-full bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text)] font-semibold hover:border-[var(--pf-text-secondary)] transition-colors"
           >
             Close
           </button>

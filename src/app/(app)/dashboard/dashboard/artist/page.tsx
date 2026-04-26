@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/app/providers'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 const Icon = {
   Music: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>,
@@ -111,6 +112,14 @@ export default function ArtistDashboardPage() {
   return (
     <div className="min-h-screen pt-24 pb-12">
       <div className="pf-container max-w-4xl">
+
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-sm text-[var(--pf-text-muted)] transition-colors hover:text-[var(--pf-text)] mb-4"
+        >
+          <ArrowLeft size={16} />
+          Back to Dashboard
+        </Link>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

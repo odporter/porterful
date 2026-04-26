@@ -145,6 +145,14 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen pt-24 pb-12">
       <div className="pf-container max-w-2xl">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-sm text-[var(--pf-text-muted)] transition-colors hover:text-[var(--pf-text)] mb-4"
+        >
+          <ArrowLeft size={16} />
+          Back to Dashboard
+        </Link>
+
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/dashboard/artist" className="p-2 hover:bg-[var(--pf-surface)] rounded-lg transition-colors">

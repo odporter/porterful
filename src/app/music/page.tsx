@@ -1,522 +1,397 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Play, Pause, SkipForward, Volume2, VolumeX, Clock, Heart, Share2, Verified, ChevronRight, Disc, Music2, Users, Star, Search, X, SlidersHorizontal, LayoutGrid } from 'lucide-react';
-import { useAudio, Track } from '@/lib/audio-context';
-import { TRACKS } from '@/lib/data';
+import { useCallback, useMemo, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import {
+  Play,
+  Pause,
+  Search,
+  X,
+  Verified,
+  Disc,
+  Music2,
+  Users,
+  SlidersHorizontal,
+} from 'lucide-react'
+import { useAudio, Track } from '@/lib/audio-context'
+import { TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
 
-// Only show artists with confirmed music/catalog
+// Public artists with confirmed music/catalog
 const VALID_SLUGS = ['od-porter', 'gune', 'atm-trap']
-const PUBLIC_ARTISTS = ARTISTS.filter(a => VALID_SLUGS.includes(a.slug))
-import { FEATURED_PRODUCTS } from '@/lib/products';
+const PUBLIC_ARTISTS = ARTISTS.filter((a) => VALID_SLUGS.includes(a.slug))
 
-// All public tracks (O D Porter + collaborators)
-const ALL_TRACKS = TRACKS.filter(t => 
+// All public tracks
+const ALL_TRACKS = TRACKS.filter((t) =>
   ['O D Porter', 'Gune', 'ATM Trap', 'Jai Jai'].includes(t.artist)
 ).sort((a, b) => {
-  // Sort by artist priority
-  const artistOrder: Record<string, number> = { 'O D Porter': 0, 'Gune': 1, 'ATM Trap': 2, 'Jai Jai': 3 };
-  return (artistOrder[a.artist] || 99) - (artistOrder[b.artist] || 99);
-}) as unknown as Track[];
+  const order: Record<string, number> = { 'O D Porter': 0, 'Gune': 1, 'ATM Trap': 2, 'Jai Jai': 3 }
+  return (order[a.artist] || 99) - (order[b.artist] || 99)
+}) as unknown as Track[]
 
-// Top tracks by order
-const TOP_TRACKS = [...ALL_TRACKS];
+type DisplayTrack = (typeof ALL_TRACKS)[number]
 
-// For display purposes we use the raw data type (duration is string)
-type DisplayTrack = typeof ALL_TRACKS[number];
-
-function formatDuration(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-function TrackRow({ track, index, isActive, isPlaying, onPlay, onTogglePlay }: {
-  track: DisplayTrack;
-  index: number;
-  isActive: boolean;
-  isPlaying: boolean;
-  onPlay: () => void;
-  onTogglePlay: () => void;
+function TrackRow({
+  track,
+  index,
+  isActive,
+  isPlaying,
+  onPlay,
+  onTogglePlay,
+}: {
+  track: DisplayTrack
+  index: number
+  isActive: boolean
+  isPlaying: boolean
+  onPlay: () => void
+  onTogglePlay: () => void
 }) {
   return (
     <div
       onClick={onPlay}
-      className={`group flex items-center gap-4 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-200 ${
+      className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
         isActive
-          ? 'bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30'
-          : 'hover:bg-[var(--pf-surface)] border border-transparent hover:border-[var(--pf-border-subtle)]'
+          ? 'bg-[var(--pf-orange)]/10'
+          : 'hover:bg-[var(--pf-surface)]'
       }`}
     >
-      <div className="w-8 flex items-center justify-center">
+      {/* Index / playing indicator */}
+      <div className="w-6 flex items-center justify-center shrink-0">
         {isActive && isPlaying ? (
-          <div className="flex items-center gap-0.5" onClick={(e) => { e.stopPropagation(); onTogglePlay(); }}>
-            <div className="w-1 h-4 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-1 h-3 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-1 h-5 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div
+            className="flex items-center gap-0.5"
+            onClick={(e) => {
+              e.stopPropagation()
+              onTogglePlay()
+            }}
+          >
+            <span className="w-0.5 h-3 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <span className="w-0.5 h-2 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <span className="w-0.5 h-4 bg-[var(--pf-orange)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
         ) : (
-          <span className={`text-sm font-mono ${isActive ? 'text-[var(--pf-orange)]' : 'text-[var(--pf-text-secondary)] group-hover:text-[var(--pf-text)]'}`}>
+          <span
+            className={`text-xs font-mono ${
+              isActive ? 'text-[var(--pf-orange)]' : 'text-[var(--pf-text-muted)]'
+            }`}
+          >
             {index + 1}
           </span>
         )}
       </div>
 
+      {/* Cover */}
+      <div className="relative w-10 h-10 rounded-md overflow-hidden bg-[var(--pf-surface)] shrink-0">
+        {track.image && (
+          <Image src={track.image} alt={track.title} fill sizes="40px" className="object-cover" />
+        )}
+      </div>
+
+      {/* Title + album */}
       <div className="flex-1 min-w-0">
-        <p className={`font-medium truncate ${isActive ? 'text-[var(--pf-orange)]' : ''}`}>{track.title}</p>
-        <p className="text-sm text-[var(--pf-text-secondary)]">{track.album}</p>
+        <p
+          className={`text-sm font-medium truncate ${
+            isActive ? 'text-[var(--pf-orange)]' : 'text-[var(--pf-text)]'
+          }`}
+        >
+          {track.title}
+        </p>
+        <p className="text-xs text-[var(--pf-text-secondary)] truncate">{track.album}</p>
       </div>
 
-      <div className="hidden sm:flex items-center gap-4">
-        <span className="text-sm text-[var(--pf-text-secondary)] font-mono w-12 text-right">
-          {track.duration}
-        </span>
-      </div>
+      {/* Duration */}
+      <span className="hidden sm:inline text-xs font-mono text-[var(--pf-text-muted)] w-10 text-right">
+        {track.duration}
+      </span>
 
+      {/* Play */}
       <button
-        onClick={(e) => { e.stopPropagation(); onPlay(); }}
-        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+        onClick={(e) => {
+          e.stopPropagation()
+          onPlay()
+        }}
+        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
           isActive
             ? 'bg-[var(--pf-orange)] text-[var(--pf-text)]'
-            : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] group-hover:bg-[var(--pf-orange)] group-hover:text-[var(--pf-text)] opacity-0 group-hover:opacity-100'
+            : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] sm:opacity-0 group-hover:opacity-100 group-hover:bg-[var(--pf-orange)] group-hover:text-[var(--pf-text)]'
         }`}
+        aria-label={isActive && isPlaying ? 'Pause' : 'Play'}
       >
-        {isActive && isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+        {isActive && isPlaying ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
       </button>
     </div>
-  );
+  )
 }
 
 export default function MusicPage() {
-  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio();
-  const [showAllTracks, setShowAllTracks] = useState(false);
-  const [heroTrackIndex, setHeroTrackIndex] = useState(0);
-  const heroIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [albumFilter, setAlbumFilter] = useState<string>('all')
+  const [selectedAlbum, setSelectedAlbum] = useState<string | null>(null)
 
-  // Search & filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [albumFilter, setAlbumFilter] = useState<string>('all');
-  const [selectedAlbum, setSelectedAlbum] = useState<string | null>(null);
+  // Featured track is the first track when none is playing, else the playing one
+  const heroTrack = currentTrack ?? ALL_TRACKS[0]
+  const isHeroActive = currentTrack?.id === heroTrack?.id
+  const heroArtist = ARTISTS.find((a) => a.name === heroTrack?.artist) ?? ARTISTS.find((a) => a.id === 'od-porter')
 
-  // Hero auto-advance — only runs when no track is loaded
-  // Clears on unmount or when currentTrack becomes available
-  useEffect(() => {
-    if (!currentTrack) {
-      heroIntervalRef.current = setInterval(() => {
-        setHeroTrackIndex(i => (i + 1) % TOP_TRACKS.length);
-      }, 12000);
-    }
-    return () => {
-      if (heroIntervalRef.current) {
-        clearInterval(heroIntervalRef.current);
-        heroIntervalRef.current = null;
+  const handlePlayTrack = useCallback(
+    (track: Track) => {
+      if (currentTrack?.id === track.id) {
+        togglePlay()
+      } else {
+        playTrack(track)
       }
-    };
-  }, [currentTrack]);
+    },
+    [currentTrack, playTrack, togglePlay]
+  )
 
-  // Hero track rotates but does NOT auto-play — user must click play
-
-
-  const handlePlayTrack = useCallback((track: Track) => {
-    if (currentTrack?.id === track.id) {
-      togglePlay();
-    } else {
-      playTrack(track);
-    }
-  }, [currentTrack, playTrack, togglePlay]);
-
-  const heroTrack = TOP_TRACKS[heroTrackIndex] || TOP_TRACKS[0];
-  const isHeroActive = currentTrack?.id === heroTrack?.id;
-
-  // Get unique albums from ALL_TRACKS
   const uniqueAlbums = useMemo(() => {
-    const albumMap = new Map<string, { name: string; image: string; count: number }>();
-    ALL_TRACKS.forEach(t => {
-      if (!albumMap.has(t.album || 'Unknown')) {
-        albumMap.set(t.album || 'Unknown', { name: t.album || 'Unknown', image: t.image || '', count: 0 });
+    const map = new Map<string, { name: string; image: string; count: number }>()
+    ALL_TRACKS.forEach((t) => {
+      const key = t.album || 'Unknown'
+      if (!map.has(key)) {
+        map.set(key, { name: key, image: t.image || '', count: 0 })
       }
-      albumMap.get(t.album || 'Unknown')!.count++;
-    });
-    return Array.from(albumMap.values());
-  }, []);
+      map.get(key)!.count++
+    })
+    return Array.from(map.values())
+  }, [])
 
-  // Filter tracks based on search, album filter, and selected album card
   const filteredTracks = useMemo(() => {
-    let tracks = ALL_TRACKS;
-
-    // Album card filter (takes precedence)
-    if (selectedAlbum) {
-      tracks = tracks.filter(t => t.album === selectedAlbum);
-    }
-
-    // Dropdown album filter
-    if (albumFilter !== 'all') {
-      tracks = tracks.filter(t => t.album === albumFilter);
-    }
-
-    // Search filter
+    let tracks = ALL_TRACKS
+    if (selectedAlbum) tracks = tracks.filter((t) => t.album === selectedAlbum)
+    if (albumFilter !== 'all') tracks = tracks.filter((t) => t.album === albumFilter)
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      tracks = tracks.filter(t => t.title.toLowerCase().includes(q));
+      const q = searchQuery.toLowerCase()
+      tracks = tracks.filter((t) => t.title.toLowerCase().includes(q))
     }
+    return tracks
+  }, [searchQuery, albumFilter, selectedAlbum])
 
-    return tracks;
-  }, [searchQuery, albumFilter, selectedAlbum]);
-
-  const displayedTracks = showAllTracks ? filteredTracks : filteredTracks.slice(0, 10) as unknown as Track[];
-
-  // Od's artist data
-  const odArtist = ARTISTS.find(a => a.id === 'od-porter');
-
-  // Clear album card selection
   const clearAlbumFilter = () => {
-    setSelectedAlbum(null);
-    setAlbumFilter('all');
-  };
+    setSelectedAlbum(null)
+    setAlbumFilter('all')
+  }
 
   return (
-    <div className="min-h-screen pb-24">
-      {/* HERO PLAYER */}
-      <section className="relative bg-[var(--pf-bg)]">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 50% 50%, var(--pf-border) 0%, transparent 50%)',
-          }} />
-        </div>
-
-        <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-12">
-          {/* Artist badge */}
-          <div className="flex items-center gap-3 mb-8">
-            <Link href="/artist/od-porter">
-              {odArtist?.image && (
-                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--pf-border)] hover:border-[var(--pf-text-secondary)] transition-colors">
-                  <Image src={odArtist.image} alt={odArtist.name} fill className="object-cover" />
-                </div>
+    <div className="min-h-screen pb-32">
+      {/* HERO — compact featured track */}
+      <section className="bg-[var(--pf-bg)] border-b border-[var(--pf-border)]">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6 pt-6 sm:pt-10 pb-5 sm:pb-8">
+          <p className="text-[11px] uppercase tracking-widest text-[var(--pf-text-secondary)] mb-3">Featured</p>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <Link
+              href={heroArtist ? `/artist/${heroArtist.slug}` : '/artists'}
+              className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden flex-shrink-0 bg-[var(--pf-surface)]"
+              aria-label={`Open ${heroArtist?.name ?? 'artist'} page`}
+            >
+              {heroTrack?.image && (
+                <Image
+                  src={heroTrack.image}
+                  alt={heroTrack.title}
+                  fill
+                  sizes="(max-width: 640px) 80px, 112px"
+                  className="object-cover"
+                />
               )}
             </Link>
-            <div>
-              <Link href="/artist/od-porter" className="flex items-center gap-2 hover:text-[var(--pf-text)] transition-colors">
-                <h1 className="text-2xl font-bold">O D Porter</h1>
-                {odArtist?.verified && (
-                  <Verified size={18} className="text-[var(--pf-text-secondary)]" />
-                )}
-              </Link>
-              <p className="text-[var(--pf-text-secondary)]">St. Louis, MO · {ALL_TRACKS.length} tracks</p>
-            </div>
-          </div>
 
-          {/* Hero track display */}
-          <div className="flex flex-col lg:flex-row gap-8 items-center">
-            {/* Album art */}
-            <div className="relative w-64 h-64 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl">
-              {heroTrack?.image && (
-                <Image src={heroTrack.image} alt={heroTrack.title} fill className="object-cover" />
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold truncate">{heroTrack?.title}</h1>
+              {heroArtist && (
+                <Link
+                  href={`/artist/${heroArtist.slug}`}
+                  className="text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors truncate inline-block max-w-full"
+                >
+                  {heroArtist.name}
+                </Link>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--pf-bg)]/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="font-bold text-lg text-[var(--pf-text)]">{heroTrack?.title}</p>
-                <p className="text-sm text-[var(--pf-text-secondary)]">{heroTrack?.album}</p>
-              </div>
+              {heroTrack?.album && (
+                <p className="text-xs text-[var(--pf-text-muted)] truncate">{heroTrack.album}</p>
+              )}
             </div>
 
-            {/* Controls */}
-            <div className="flex-1 text-center lg:text-left">
-              <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-2">Now Playing</p>
-              <h2 className="text-5xl lg:text-7xl font-bold mb-4 leading-none">
-                {heroTrack?.title}
-              </h2>
-              <p className="text-xl text-[var(--pf-text-secondary)] mb-8">{heroTrack?.album}</p>
-
-              {/* Progress bar */}
-              <div className="w-full max-w-md mx-auto lg:mx-0 h-1 bg-[var(--pf-surface)] rounded-full overflow-hidden mb-8">
-                <div className="h-full bg-[var(--pf-orange)] rounded-full w-1/3" />
-              </div>
-
-              {/* Controls */}
-              <div className="flex items-center justify-center lg:justify-start gap-6">
-                <button
-                  onClick={() => setHeroTrackIndex(i => (i - 1 + TOP_TRACKS.length) % TOP_TRACKS.length)}
-                  className="w-12 h-12 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] flex items-center justify-center transition-colors"
-                >
-                  <SkipForward size={20} className="rotate-180" />
-                </button>
-
-                <button
-                  onClick={() => currentTrack ? togglePlay() : playTrack(heroTrack!)}
-                  className="w-20 h-20 rounded-full bg-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/90 flex items-center justify-center transition-all shadow-lg"
-                >
-                  {isHeroActive && isPlaying ? (
-                    <Pause size={28} className="text-[var(--pf-text)]" />
-                  ) : (
-                    <Play size={28} className="text-[var(--pf-text)] ml-1" />
-                  )}
-                </button>
-
-                <button
-                  onClick={() => setHeroTrackIndex(i => (i + 1) % TOP_TRACKS.length)}
-                  className="w-12 h-12 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] flex items-center justify-center transition-colors"
-                >
-                  <SkipForward size={20} />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-center lg:justify-start gap-8 mt-8">
-                <div className="flex items-center gap-2 text-[var(--pf-text-secondary)]">
-                  <Disc size={16} />
-                  <span className="text-sm">{uniqueAlbums.length} albums</span>
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => (currentTrack ? togglePlay() : playTrack(heroTrack!))}
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/90 flex items-center justify-center flex-shrink-0 transition-colors shadow-lg"
+              aria-label={isHeroActive && isPlaying ? 'Pause featured track' : 'Play featured track'}
+            >
+              {isHeroActive && isPlaying ? (
+                <Pause size={24} className="text-[var(--pf-text)]" />
+              ) : (
+                <Play size={24} className="text-[var(--pf-text)] ml-0.5" />
+              )}
+            </button>
           </div>
         </div>
       </section>
 
-      {/* ============================================================
-          1. ARTIST BROWSE SECTION
-      ============================================================ */}
+      {/* BROWSE ARTISTS — compact rail */}
       <section className="border-b border-[var(--pf-border)]">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Users size={18} className="text-[var(--pf-text-secondary)]" />
-              <h3 className="text-lg font-bold">Browse Artists</h3>
-            </div>
+        <div className="max-w-6xl mx-auto px-5 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Users size={16} className="text-[var(--pf-text-secondary)]" />
+            <h2 className="text-base font-semibold">Browse Artists</h2>
           </div>
 
-          {/* Horizontal scrollable artist cards */}
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto -mx-5 sm:-mx-6 px-5 sm:px-6 scrollbar-hide pb-1">
             {PUBLIC_ARTISTS.map((artist) => {
-              const artistTracks = TRACKS.filter(t => t.artist === artist.name || t.artist === artist.id);
+              const trackCount = TRACKS.filter((t) => t.artist === artist.name || t.artist === artist.id).length
               return (
                 <Link
                   key={artist.id}
                   href={`/artist/${artist.slug}`}
-                  className="flex-shrink-0 w-56 group"
+                  className="group flex-shrink-0 w-32 sm:w-36"
                 >
-                  <div className="bg-[var(--pf-surface)] rounded-2xl p-4 border border-[var(--pf-border)] hover:border-[var(--pf-text-muted)] transition-all duration-200 hover:shadow-lg">
-                    {/* Avatar */}
-                    <div className="relative w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[var(--pf-border)] group-hover:border-[var(--pf-text-secondary)] transition-colors">
-                      <Image
-                        src={artist.image}
-                        alt={artist.name}
-                        fill
-                        sizes="80px"
-                        className="object-cover"
-                      />
-                    </div>
-                    {/* Info */}
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <p className="font-semibold truncate">{artist.name}</p>
-                        {artist.verified && (
-                          <Verified size={14} className="text-[var(--pf-text-secondary)] flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-xs text-[var(--pf-text-secondary)] truncate mb-2">{artist.genre}</p>
-                      <div className="flex items-center justify-center gap-3 text-xs text-[var(--pf-text-muted)]">
-                        <span className="flex items-center gap-1">
-                          <Music2 size={12} />
-                          {artistTracks.length} tracks
-                        </span>
-                      </div>
-                    </div>
+                  <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-[var(--pf-surface)] mb-2">
+                    <Image
+                      src={artist.image}
+                      alt={artist.name}
+                      fill
+                      sizes="(max-width: 640px) 128px, 144px"
+                      className="object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+                    />
                   </div>
+                  <div className="flex items-center gap-1">
+                    <p className="text-sm font-medium truncate">{artist.name}</p>
+                    {artist.verified && <Verified size={12} className="text-[var(--pf-text-secondary)] shrink-0" />}
+                  </div>
+                  <p className="text-xs text-[var(--pf-text-muted)] truncate">{trackCount} tracks</p>
                 </Link>
-              );
+              )
             })}
           </div>
         </div>
       </section>
 
-      {/* ============================================================
-          4. ALBUMS SECTION
-      ============================================================ */}
+      {/* ALBUMS — compact rail */}
       <section className="border-b border-[var(--pf-border)]">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex items-center justify-between mb-6">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Disc size={18} className="text-[var(--pf-text-secondary)]" />
-              <h3 className="text-lg font-bold">Albums</h3>
+              <Disc size={16} className="text-[var(--pf-text-secondary)]" />
+              <h2 className="text-base font-semibold">Albums</h2>
             </div>
             {selectedAlbum && (
               <button
                 onClick={clearAlbumFilter}
-                className="flex items-center gap-1.5 text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
+                className="flex items-center gap-1 text-xs text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
               >
-                <X size={14} />
-                Clear filter
+                <X size={12} />
+                Clear
               </button>
             )}
           </div>
 
-          {/* Album cards grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="flex gap-3 overflow-x-auto -mx-5 sm:-mx-6 px-5 sm:px-6 scrollbar-hide pb-1">
             {uniqueAlbums.map((album) => {
-              const isSelected = selectedAlbum === album.name || albumFilter === album.name;
+              const isSelected = selectedAlbum === album.name || albumFilter === album.name
               return (
                 <button
                   key={album.name}
                   onClick={() => {
                     if (isSelected) {
-                      clearAlbumFilter();
+                      clearAlbumFilter()
                     } else {
-                      setSelectedAlbum(album.name);
-                      setAlbumFilter('all');
+                      setSelectedAlbum(album.name)
+                      setAlbumFilter('all')
                     }
                   }}
-                  className={`group text-left rounded-xl overflow-hidden border transition-all duration-200 ${
-                    isSelected
-                      ? 'border-[var(--pf-orange)] shadow-lg'
-                      : 'border-[var(--pf-border)] hover:border-[var(--pf-text-muted)]'
-                  }`}
+                  className="group flex-shrink-0 w-32 sm:w-36 text-left"
                 >
-                  {/* Album art */}
-                  <div className="relative aspect-square w-full overflow-hidden">
+                  <div
+                    className={`relative w-32 h-32 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-[var(--pf-surface)] mb-2 border-2 transition-colors ${
+                      isSelected ? 'border-[var(--pf-orange)]' : 'border-transparent'
+                    }`}
+                  >
                     {album.image ? (
                       <Image
                         src={album.image}
                         alt={album.name}
                         fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 640px) 128px, 144px"
+                        className="object-cover transition-transform duration-200 group-hover:scale-[1.03]"
                       />
                     ) : (
-                      <div className="w-full h-full bg-[var(--pf-surface)] flex items-center justify-center">
-                        <Disc size={32} className="text-[var(--pf-text-muted)]" />
+                      <div className="w-full h-full flex items-center justify-center text-[var(--pf-text-muted)]">
+                        <Disc size={28} />
                       </div>
                     )}
-                    {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-[var(--pf-bg)]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-[var(--pf-orange)] flex items-center justify-center">
-                        <Play size={18} className="text-[var(--pf-text)] ml-0.5" />
-                      </div>
-                    </div>
                   </div>
-                  {/* Album info */}
-                  <div className="p-3">
-                    <p className="font-medium text-sm truncate">{album.name}</p>
-                    <p className="text-xs text-[var(--pf-text-muted)] mt-0.5">{album.count} tracks</p>
-                  </div>
+                  <p className="text-sm font-medium truncate">{album.name}</p>
+                  <p className="text-xs text-[var(--pf-text-muted)] truncate">{album.count} tracks</p>
                 </button>
-              );
+              )
             })}
           </div>
         </div>
       </section>
 
-      {/* ============================================================
-          TRACK LIST with SEARCH & FILTER
-      ============================================================ */}
-      <section className="max-w-6xl mx-auto px-6 py-12">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      {/* TRACKS — dense list with search + filter */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-6 py-6 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
           <div>
-            {selectedAlbum || albumFilter !== 'all' || searchQuery ? (
-              <div>
-                <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-1">Filtered Results</p>
-                <h3 className="text-2xl font-bold">
-                  {selectedAlbum || (albumFilter !== 'all' ? albumFilter : 'Search Results')}
-                  <span className="text-[var(--pf-text-secondary)] font-normal ml-2">· {filteredTracks.length} tracks</span>
-                </h3>
-              </div>
-            ) : (
-              <div>
-                <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-1">All Tracks</p>
-                <h3 className="text-2xl font-bold">{ALL_TRACKS.length} tracks</h3>
-              </div>
-            )}
+            <div className="flex items-center gap-2 mb-1">
+              <Music2 size={16} className="text-[var(--pf-text-secondary)]" />
+              <h2 className="text-base font-semibold">
+                {selectedAlbum
+                  ? selectedAlbum
+                  : albumFilter !== 'all'
+                  ? albumFilter
+                  : searchQuery.trim()
+                  ? 'Search results'
+                  : 'All Tracks'}
+              </h2>
+            </div>
+            <p className="text-xs text-[var(--pf-text-muted)]">{filteredTracks.length} tracks</p>
           </div>
 
-          {/* Search & Filter row */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search bar */}
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]" />
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]" />
               <input
                 type="text"
-                placeholder="Search tracks..."
+                placeholder="Search tracks…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-9 py-2.5 w-full sm:w-64 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 focus:ring-1 focus:ring-[var(--pf-orange)]/20 transition-all placeholder:text-[var(--pf-text-muted)]"
+                className="pl-8 pr-8 py-2 w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 focus:ring-1 focus:ring-[var(--pf-orange)]/20 transition-all placeholder:text-[var(--pf-text-muted)]"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] hover:text-[var(--pf-text)] transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[var(--pf-text-muted)] hover:text-[var(--pf-text)]"
+                  aria-label="Clear search"
                 >
                   <X size={14} />
                 </button>
               )}
             </div>
 
-            {/* Album filter dropdown */}
-            <div className="relative">
-              <SlidersHorizontal size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] pointer-events-none" />
+            <div className="relative w-full sm:w-44">
+              <SlidersHorizontal size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] pointer-events-none" />
               <select
                 value={albumFilter}
                 onChange={(e) => {
-                  setAlbumFilter(e.target.value);
-                  if (e.target.value !== 'all') setSelectedAlbum(null);
+                  setAlbumFilter(e.target.value)
+                  if (e.target.value !== 'all') setSelectedAlbum(null)
                 }}
-                className="pl-9 pr-9 py-2.5 w-full sm:w-52 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 appearance-none cursor-pointer transition-all"
+                className="pl-8 pr-3 py-2 w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 appearance-none cursor-pointer"
               >
-                <option value="all">All Albums</option>
-                {uniqueAlbums.map((album) => (
-                  <option key={album.name} value={album.name}>
-                    {album.name}
+                <option value="all">All albums</option>
+                {uniqueAlbums.map((a) => (
+                  <option key={a.name} value={a.name}>
+                    {a.name}
                   </option>
                 ))}
               </select>
-              <ChevronRight size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] rotate-90 pointer-events-none" />
             </div>
-
-            {/* Show all / less toggle */}
-            <button
-              onClick={() => setShowAllTracks(!showAllTracks)}
-              className="text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] flex items-center gap-1 transition-colors whitespace-nowrap py-2.5"
-            >
-              {showAllTracks ? 'Show less' : `All ${filteredTracks.length} tracks`}
-              <ChevronRight size={16} className={showAllTracks ? 'rotate-90' : ''} />
-            </button>
           </div>
         </div>
 
-        {/* Active filters pills */}
-        {(searchQuery || albumFilter !== 'all' || selectedAlbum) && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-xs text-[var(--pf-orange)]">
-                "{searchQuery}"
-                <button onClick={() => setSearchQuery('')} className="hover:text-[var(--pf-orange)]/70">
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            {selectedAlbum && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-xs text-[var(--pf-orange)]">
-                {selectedAlbum}
-                <button onClick={clearAlbumFilter} className="hover:text-[var(--pf-orange)]/70">
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            {albumFilter !== 'all' && !selectedAlbum && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-xs text-[var(--pf-orange)]">
-                {albumFilter}
-                <button onClick={() => { setAlbumFilter('all'); }} className="hover:text-[var(--pf-orange)]/70">
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Track list */}
         {filteredTracks.length > 0 ? (
-          <div className="space-y-1">
-            {displayedTracks.map((track, i) => (
+          <div className="space-y-0.5">
+            {filteredTracks.map((track, i) => (
               <TrackRow
                 key={track.id}
                 track={track}
@@ -529,75 +404,25 @@ export default function MusicPage() {
             ))}
           </div>
         ) : (
-          /* Empty state */
           <div className="pf-empty">
             <div className="pf-empty-icon">
-              <Music2 size={22} />
+              <Music2 size={20} />
             </div>
             <p className="pf-empty-title">No tracks found</p>
-            <p className="pf-empty-desc">
-              Try adjusting your search or filters
-            </p>
+            <p className="pf-empty-desc">Try adjusting your search or filters.</p>
             <button
-              onClick={() => { setSearchQuery(''); setAlbumFilter('all'); setSelectedAlbum(null); }}
+              onClick={() => {
+                setSearchQuery('')
+                setAlbumFilter('all')
+                setSelectedAlbum(null)
+              }}
               className="mt-4 text-sm font-medium px-4 py-2 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-border)] hover:border-[var(--pf-text-muted)] transition-colors"
             >
-              Clear all filters
+              Clear filters
             </button>
           </div>
         )}
-
-        {/* Show all toggle at bottom if there are more than 10 tracks */}
-        {!showAllTracks && filteredTracks.length > 10 && (
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setShowAllTracks(true)}
-              className="text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] flex items-center gap-1 mx-auto transition-colors"
-            >
-              Show all {filteredTracks.length} tracks
-              <ChevronRight size={16} className="rotate-90" />
-            </button>
-          </div>
-        )}
-      </section>
-
-      {/* ABOUT SECTION */}
-      <section className="border-t border-[var(--pf-border)]">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Bio */}
-            <div>
-              <p className="text-sm uppercase tracking-widest text-[var(--pf-text-secondary)] mb-4">About the Artist</p>
-              <div className="space-y-4 text-[var(--pf-text-secondary)]">
-                <p>
-                  Born Miami, raised NOLA &amp; St. Louis. Building Porterful — a direct marketplace where artists keep more of every sale.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3 mt-6">
-                <Link href="/artist/od-porter" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text)] text-sm font-medium hover:border-[var(--pf-text-secondary)] transition-colors">
-                  View Full Profile
-                  <ChevronRight size={14} />
-                </Link>
-                <a href="https://instagram.com/od.porter" target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] text-sm transition-colors">
-                  @od.porter
-                </a>
-                <a href="https://tiktok.com/@odporter" target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] text-sm transition-colors">
-                  TikTok
-                </a>
-                <a href="https://youtube.com/@odporter" target="_blank" rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full bg-[var(--pf-surface)] hover:bg-[var(--pf-border)] text-sm transition-colors">
-                  YouTube
-                </a>
-              </div>
-            </div>
-
-
-          </div>
-        </div>
       </section>
     </div>
-  );
+  )
 }

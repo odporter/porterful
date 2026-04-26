@@ -272,6 +272,62 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
   }, [queue, currentIndex, currentTrack]);
 
+  // ─── MEDIA SESSION (iOS / Android lock screen) ───────────────────────────
+  // Sets the native lock-screen / control-center metadata so it shows the
+  // actual track + artist instead of "Porterful". Re-registers when the
+  // current track or the queue-aware nav callbacks change.
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+    const ms = navigator.mediaSession;
+
+    if (!currentTrack) {
+      ms.metadata = null;
+      return;
+    }
+
+    const artworkUrl = currentTrack.image || currentTrack.cover_url || '';
+    ms.metadata = new MediaMetadata({
+      title: currentTrack.title || '',
+      artist: currentTrack.artist || '',
+      album: currentTrack.album || '',
+      artwork: artworkUrl
+        ? [
+            { src: artworkUrl, sizes: '512x512', type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '256x256', type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '128x128', type: 'image/jpeg' },
+          ]
+        : [],
+    });
+
+    try {
+      ms.setActionHandler('play', () => {
+        audioRef.current?.play().catch(() => {});
+      });
+      ms.setActionHandler('pause', () => {
+        audioRef.current?.pause();
+      });
+      ms.setActionHandler('previoustrack', () => {
+        playPrev();
+      });
+      ms.setActionHandler('nexttrack', () => {
+        playNext();
+      });
+      ms.setActionHandler('seekto', (details: MediaSessionActionDetails) => {
+        if (audioRef.current && typeof details.seekTime === 'number') {
+          audioRef.current.currentTime = details.seekTime;
+        }
+      });
+    } catch {
+      // Older browsers may not support every action — ignore.
+    }
+  }, [currentTrack, playPrev, playNext]);
+
+  // Reflect playback state so the lock-screen play/pause icon stays in sync.
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+    navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+  }, [isPlaying]);
+
   return (
     <AudioCtx.Provider value={{
       currentTrack, isPlaying, volume, progress, duration, mode, setMode,

@@ -47,32 +47,17 @@ export function Navbar() {
     }
   }
 
-  const isLikenessSurface =
-    pathname.startsWith('/dashboard/likeness') ||
-    pathname.startsWith('/dashboard/access') ||
-    pathname.startsWith('/dashboard/payout') ||
-    pathname.startsWith('/signal') ||
-    pathname.startsWith('/tap-in') ||
-    pathname.startsWith('/register') ||
-    pathname.startsWith('/verify')
-
-  const navLinks = isLikenessSurface
-    ? [
-        { href: '/register', label: 'Register' },
-        { href: '/dashboard', label: 'Verify' },
-        { href: '/signal', label: 'Signal' },
-        { href: '/dashboard/access', label: 'Access' },
-      ]
-    : [
-        { href: '/music', label: 'Music' },
-        { href: '/artists', label: 'Artists' },
-        { href: '/store', label: 'Store' },
-        { href: '/apply', label: 'Apply' },
-      ]
-  const brandLabel = isLikenessSurface ? 'Likeness™' : 'Porterful'
-  const brandLetter = isLikenessSurface ? 'L' : 'P'
-  const dashboardHref = isLikenessSurface ? '/dashboard' : '/dashboard/artist'
-  const dashboardLabel = isLikenessSurface ? 'Dashboard' : 'My Dashboard'
+  const navLinks = [
+    { href: '/music', label: 'Music' },
+    { href: '/artists', label: 'Artists' },
+    { href: '/store', label: 'Store' },
+    { href: '/apply', label: 'Apply' },
+  ]
+  const brandLabel = 'Porterful'
+  const brandLetter = 'P'
+  const dashboardHref = '/dashboard/artist'
+  const dashboardLabel = 'My Dashboard'
+  const isActiveLink = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   // Never render auth-dependent state until both:
   // 1. mounted=true (no SSR mismatch)
@@ -96,18 +81,10 @@ export function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 ${
-                isLikenessSurface
-                  ? 'bg-[var(--pf-orange)]'
-                  : 'bg-gradient-to-br from-[var(--pf-orange)] via-[var(--pf-pink)] to-[var(--pf-purple)] shadow-[0_10px_24px_-14px_rgba(236,72,153,0.72)]'
-              }`}>
-                <span className="text-[#111111] font-bold text-sm">{brandLetter}</span>
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center border border-[var(--pf-border)] bg-[var(--pf-surface)] shadow-sm transition-transform group-hover:scale-105">
+                <span className="text-[var(--pf-text)] font-bold text-sm">{brandLetter}</span>
               </div>
-              <span
-                className={`hidden text-lg font-semibold tracking-tight sm:block ${
-                  isLikenessSurface ? 'text-[var(--pf-text)]' : 'pf-brand-gradient-text'
-                }`}
-              >
+              <span className="hidden text-lg font-semibold tracking-tight text-[var(--pf-text)] sm:block">
                 {brandLabel}
               </span>
             </Link>
@@ -118,10 +95,18 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-[var(--pf-text-secondary)] transition-colors duration-200 ease-out relative group hover:text-[var(--pf-orange)]"
+                  className={`text-sm font-medium transition-colors duration-200 ease-out relative group ${
+                    isActiveLink(link.href)
+                      ? 'text-[var(--pf-text)]'
+                      : 'text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)]'
+                  }`}
                 >
                   {link.label}
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[var(--pf-orange)] transition-all duration-200 ease-out group-hover:w-full" />
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-200 ease-out ${
+                      isActiveLink(link.href) ? 'w-full bg-[var(--pf-orange)]' : 'w-0 bg-[var(--pf-orange)] group-hover:w-full'
+                    }`}
+                  />
                 </Link>
               ))}
             </div>
@@ -130,20 +115,18 @@ export function Navbar() {
             <div className="flex items-center gap-2">
 
               {/* Cart Icon */}
-              {!isLikenessSurface && (
-                <Link
-                  href="/cart"
-                  className="relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-colors duration-200 ease-out hover:bg-[var(--pf-surface)]"
-                  aria-label={`Cart (${cartCount} items)`}
-                >
-                  <ShoppingCart size={20} />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[var(--pf-orange)] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                      {mounted ? (cartCount > 9 ? '9+' : cartCount) : '0'}
-                    </span>
-                  )}
-                </Link>
-              )}
+              <Link
+                href="/cart"
+                className="relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-colors duration-200 ease-out hover:bg-[var(--pf-surface)]"
+                aria-label={`Cart (${cartCount} items)`}
+              >
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text)] text-xs font-bold flex items-center justify-center">
+                    {mounted ? (cartCount > 9 ? '9+' : cartCount) : '0'}
+                  </span>
+                )}
+              </Link>
 
               {/* User Menu — only renders once session is confirmed */}
               {showUser && (
@@ -152,7 +135,7 @@ export function Navbar() {
                     onClick={() => setProfileOpen(!profileOpen)}
                     className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-colors duration-200 ease-out hover:bg-[var(--pf-surface)]"
                   >
-                    <div className="w-8 h-8 rounded-full bg-[var(--pf-orange)] flex items-center justify-center text-[#111111] text-sm font-semibold">
+                    <div className="w-8 h-8 rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center justify-center text-[var(--pf-text)] text-sm font-semibold">
                       {user.email?.[0].toUpperCase()}
                     </div>
                     <ChevronDown size={14} />
@@ -164,7 +147,7 @@ export function Navbar() {
                         <p className="text-sm font-medium truncate">{user.email}</p>
                       </div>
                       <div className="py-2">
-                        <Link href={dashboardHref} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[var(--pf-bg)] transition-colors" onClick={() => setProfileOpen(false)}>
+                        <Link href={dashboardHref} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--pf-text-secondary)] hover:bg-[var(--pf-surface-hover)] hover:text-[var(--pf-text)] transition-colors" onClick={() => setProfileOpen(false)}>
                           <User size={16} />
                           <span>{dashboardLabel}</span>
                         </Link>
@@ -172,7 +155,7 @@ export function Navbar() {
                       <div className="border-t border-[var(--pf-border)] py-2">
                         <button
                           onClick={handleSignOut}
-                          className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-red-400 hover:bg-[var(--pf-bg)] transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-[var(--pf-text-secondary)] hover:bg-[var(--pf-surface-hover)] hover:text-[var(--pf-text)] transition-colors"
                         >
                           <LogOut size={16} />
                           <span>Sign Out</span>
@@ -202,7 +185,7 @@ export function Navbar() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-2 md:hidden"
+                className="p-2 rounded-lg transition-colors hover:bg-[var(--pf-surface)] md:hidden"
                 aria-label="Menu"
               >
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -227,7 +210,11 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block py-4 text-lg font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] border-b border-[var(--pf-border)]"
+                className={`block py-4 text-lg font-medium border-b border-[var(--pf-border)] transition-colors ${
+                  isActiveLink(link.href)
+                    ? 'text-[var(--pf-text)]'
+                    : 'text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)]'
+                }`}
               >
                 {link.label}
               </Link>
@@ -235,11 +222,11 @@ export function Navbar() {
             <Link
               href="/cart"
               onClick={() => setMobileOpen(false)}
-                className="block py-4 text-lg font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] border-b border-[var(--pf-border)] flex items-center justify-between"
-              >
+              className="block py-4 text-lg font-medium text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] border-b border-[var(--pf-border)] flex items-center justify-between transition-colors"
+            >
               Cart
               {cartCount > 0 && (
-                <span className="bg-[var(--pf-orange)] text-white text-sm font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-[var(--pf-surface)] border border-[var(--pf-border)] text-[var(--pf-text)] text-sm font-bold px-2 py-0.5 rounded-full">
                   {cartCount}
                 </span>
               )}
@@ -251,13 +238,13 @@ export function Navbar() {
 
           {showUser && (
             <div className="space-y-1">
-              <Link href={dashboardHref} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 text-[var(--pf-text-secondary)]">
+              <Link href={dashboardHref} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors">
                 <User size={20} />
                 <span>{dashboardLabel}</span>
               </Link>
               <button
                 onClick={() => { handleSignOut(); setMobileOpen(false); }}
-                className="flex items-center gap-3 py-3 w-full text-red-400"
+                className="flex items-center gap-3 py-3 w-full text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
               >
                 <LogOut size={20} />
                 <span>Sign Out</span>

@@ -144,7 +144,7 @@ export default function ArtistDashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <div className="pf-card p-4">
             <div className="flex items-center gap-3">
-              <div className="text-purple-400"><Icon.Music /></div>
+              <div className="text-[var(--pf-text-secondary)]"><Icon.Music /></div>
               <div>
                 <p className="text-2xl font-bold">{dbTracks.length}</p>
                 <p className="text-sm text-[var(--pf-text-muted)]">Tracks</p>
@@ -153,7 +153,7 @@ export default function ArtistDashboardPage() {
           </div>
           <div className="pf-card p-4">
             <div className="flex items-center gap-3">
-              <div className="text-orange-400"><Icon.Package /></div>
+              <div className="text-[var(--pf-text-secondary)]"><Icon.Package /></div>
               <div>
                 <p className="text-2xl font-bold">{dbProducts.length}</p>
                 <p className="text-sm text-[var(--pf-text-muted)]">Products</p>
@@ -162,7 +162,7 @@ export default function ArtistDashboardPage() {
           </div>
           <div className="pf-card p-4 col-span-2 md:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="text-yellow-400"><Icon.Star /></div>
+              <div className="text-[var(--pf-text-secondary)]"><Icon.Star /></div>
               <div>
                 <p className="text-2xl font-bold">{dbProducts.filter((p: any) => p.status === 'live').length}</p>
                 <p className="text-sm text-[var(--pf-text-muted)]">Live Products</p>
@@ -175,7 +175,16 @@ export default function ArtistDashboardPage() {
         <div className="border-b border-[var(--pf-border)] mb-6">
           <div className="flex gap-8">
             {(['tracks', 'products'] as const).map((tab) => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className={'pb-4 font-semibold capitalize ' + (activeTab === tab ? 'text-orange-500 border-b-2 border-orange-500' : 'text-[var(--pf-text-muted)] hover:text-white')}>
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={
+                  'pb-4 font-semibold capitalize transition-colors ' +
+                  (activeTab === tab
+                    ? 'text-[var(--pf-orange)] border-b-2 border-[var(--pf-orange)]'
+                    : 'text-[var(--pf-text-muted)] hover:text-[var(--pf-text)]')
+                }
+              >
                 {tab}
               </button>
             ))}
@@ -221,11 +230,11 @@ export default function ArtistDashboardPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={'px-2 py-1 rounded text-xs ' + (track.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400')}>
+                      <span className="px-2 py-1 rounded text-xs border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text-muted)]">
                         {track.is_active ? 'Live' : 'Draft'}
                       </span>
-                      <button className="pf-btn pf-btn-secondary"><Icon.Eye /></button>
-                      <button className="p-2 hover:bg-[var(--pf-surface)] rounded text-red-400">
+                      <button className="pf-btn pf-btn-secondary text-[var(--pf-text-secondary)]"><Icon.Eye /></button>
+                      <button className="p-2 rounded text-[var(--pf-text-muted)] hover:bg-[var(--pf-surface-hover)] hover:text-[var(--pf-text)] transition-colors">
                         <Icon.Trash />
                       </button>
                     </div>
@@ -279,7 +288,7 @@ export default function ArtistDashboardPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={'px-2 py-1 rounded text-xs ' + (product.status === 'live' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400')}>
+                        <span className="px-2 py-1 rounded text-xs border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text-muted)]">
                           {product.status === 'live' ? 'Live' : 'Draft'}
                         </span>
                         <button className="pf-btn pf-btn-secondary"><Icon.Edit /></button>

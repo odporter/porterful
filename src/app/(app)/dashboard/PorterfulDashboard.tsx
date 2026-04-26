@@ -45,8 +45,8 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--accent)] via-[var(--pf-pink)] to-[var(--pf-purple)] flex items-center justify-center">
-              <span className="text-[#111111] font-bold">P</span>
+            <div className="w-10 h-10 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center justify-center shadow-sm">
+              <span className="text-[var(--pf-text)] font-bold">P</span>
             </div>
             <div>
               <h1 className="text-2xl font-bold">Porterful Dashboard</h1>
@@ -56,7 +56,7 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
           
           <Link 
             href="/" 
-            className="inline-flex items-center gap-2 text-[var(--accent)] hover:underline"
+            className="inline-flex items-center gap-2 text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
           >
             <Home size={16} />
             Back to Homepage
@@ -71,9 +71,9 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
               <Link
                 key={link.href}
                 href={link.href}
-                className="p-4 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] hover:border-[var(--accent)] transition-colors"
+                className="p-4 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] hover:bg-[var(--pf-surface-hover)] transition-colors"
               >
-                <Icon className="mb-2" size={24} style={{ color: 'var(--accent)' }} />
+                <Icon className="mb-2 text-[var(--pf-text-secondary)]" size={24} />
                 <span className="font-medium">{link.label}</span>
               </Link>
             )
@@ -84,12 +84,11 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
         <div className="p-6 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)]">
           <h2 className="text-lg font-semibold mb-2">Personalize Your Experience</h2>
           <p className="text-[var(--pf-text-muted)] mb-4">
-            Customize your accent color and other preferences in Settings.
+            Customize your profile preferences in Settings.
           </p>
           <Link
             href="/settings/settings"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[#111111] transition-all hover:scale-[1.03]"
-            style={{ backgroundColor: 'var(--accent)' }}
+            className="pf-btn pf-btn-primary inline-flex items-center gap-2"
           >
             <Settings size={18} />
             Open Settings

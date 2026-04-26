@@ -223,14 +223,14 @@ export default function EditArtistPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-400">
+          <div className="mb-6 p-4 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center gap-2 text-[var(--pf-text-secondary)]">
             <AlertCircle size={18} />
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center gap-2 text-green-400">
+          <div className="mb-6 p-4 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center gap-2 text-[var(--pf-text-secondary)]">
             <Check size={18} />
             Profile saved successfully!
           </div>
@@ -256,8 +256,8 @@ export default function EditArtistPage() {
                   </div>
                 </div>
               )}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Upload size={24} />
+              <div className="absolute inset-0 bg-[var(--pf-surface)]/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Upload size={24} className="text-[var(--pf-text)]" />
               </div>
             </div>
             <input
@@ -284,8 +284,8 @@ export default function EditArtistPage() {
                     <Camera className="text-[var(--pf-text-muted)]" size={32} />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Camera size={20} />
+                <div className="absolute inset-0 bg-[var(--pf-surface)]/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera size={20} className="text-[var(--pf-text)]" />
                 </div>
               </div>
               <div>
@@ -294,7 +294,7 @@ export default function EditArtistPage() {
                 <button
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
-                  className="mt-2 text-sm text-[var(--pf-orange)] hover:underline"
+                  className="mt-2 text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] transition-colors"
                 >
                   Upload new photo
                 </button>
@@ -380,7 +380,7 @@ export default function EditArtistPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                <Youtube size={14} className="inline mr-1 text-red-500" /> YouTube
+                <Youtube size={14} className="inline mr-1 text-[var(--pf-text-muted)]" /> YouTube
               </label>
               <input
                 type="url"
@@ -393,7 +393,7 @@ export default function EditArtistPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                <Instagram size={14} className="inline mr-1 text-pink-400" /> Instagram
+                <Instagram size={14} className="inline mr-1 text-[var(--pf-text-muted)]" /> Instagram
               </label>
               <input
                 type="url"
@@ -406,7 +406,7 @@ export default function EditArtistPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                <Twitter size={14} className="inline mr-1 text-blue-400" /> X (Twitter)
+                <Twitter size={14} className="inline mr-1 text-[var(--pf-text-muted)]" /> X (Twitter)
               </label>
               <input
                 type="url"
@@ -430,7 +430,7 @@ export default function EditArtistPage() {
             >
               {saving ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-[var(--pf-border)] border-t-[var(--pf-text)] rounded-full animate-spin" />
                   Saving...
                 </>
               ) : (

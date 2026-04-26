@@ -131,9 +131,9 @@ export default function UploadPage() {
   if (success) {
     return (
       <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center">
-            <Check size={32} className="text-green-400" />
+        <div className="pf-card p-8 text-center max-w-md w-full mx-6">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center justify-center">
+            <Check size={32} className="text-[var(--pf-text-secondary)]" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Track Uploaded!</h2>
           <p className="text-[var(--pf-text-muted)]">Redirecting to your catalog...</p>
@@ -164,15 +164,15 @@ export default function UploadPage() {
           </div>
         </div>
 
-        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-start gap-3">
-          <Check className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 rounded-xl border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-start gap-3">
+          <Check className="w-4 h-4 text-[var(--pf-text-secondary)] shrink-0 mt-0.5" />
           <p className="text-sm text-[var(--pf-text-muted)]">
-            You can sell now. Likeness verification is only required to withdraw earnings.
+            Your track will appear in your Porterful catalog after upload.
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-400">
+          <div className="mb-6 p-4 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center gap-2 text-[var(--pf-text-secondary)]">
             <AlertCircle size={18} />
             {error}
           </div>
@@ -187,7 +187,7 @@ export default function UploadPage() {
               className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
                 audioFile
                   ? 'border-[var(--pf-orange)] bg-[var(--pf-orange)]/5'
-                  : 'border-[var(--pf-border)] hover:border-[var(--pf-orange)]'
+                  : 'border-[var(--pf-border)] hover:border-[var(--pf-border-hover)]'
               }`}
             >
               {audioFile ? (
@@ -200,7 +200,7 @@ export default function UploadPage() {
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setAudioFile(null) }}
-                    className="ml-2 text-[var(--pf-text-muted)] hover:text-red-400"
+                    className="ml-2 text-[var(--pf-text-muted)] hover:text-[var(--pf-text)]"
                   >
                     <X size={16} />
                   </button>
@@ -236,8 +236,8 @@ export default function UploadPage() {
                   <ImageIcon size={32} className="text-[var(--pf-text-muted)]" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Upload size={20} />
+              <div className="absolute inset-0 bg-[var(--pf-surface)]/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Upload size={20} className="text-[var(--pf-text)]" />
               </div>
             </div>
             <input
@@ -315,7 +315,7 @@ export default function UploadPage() {
             >
               {submitting ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-[var(--pf-border)] border-t-[var(--pf-text)] rounded-full animate-spin" />
                   Uploading...
                 </>
               ) : (

@@ -1,11 +1,12 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getArtistById, getArtistTracks, ARTISTS } from '@/lib/artists'
+import { getArtistTracks, ARTISTS } from '@/lib/artists'
+import { getArtistWithDb } from '@/lib/artist-db'
 import { ArtistHero } from '@/components/artist/ArtistHero'
 import { ArtistTabs } from '@/components/artist/ArtistTabs'
 import type { Track } from '@/lib/audio-context'
 import { createClient } from '@supabase/supabase-js'
-import { mergeCanonicalTracks, dedupeQueueTracks } from '@/lib/track-dedupe'
+import { mergeCanonicalTracks, dedupeQueueTracks, getTrackDedupeKey } from '@/lib/track-dedupe'
 
 interface SocialLinks {
   instagram?: string
@@ -54,7 +55,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const artist = getArtistById(slug)
+  const artist = await getArtistWithDb(slug)
   if (!artist) return { title: 'Artist Not Found' }
 
   return {
@@ -81,7 +82,8 @@ const ALBUM_LIST = [
 
 export default async function ArtistPage({ params }: PageProps) {
   const { slug } = await params
-  const artist = getArtistById(slug)
+  // Fetch artist from DB + static merge (DB bio/image overrides static)
+  const artist = await getArtistWithDb(slug)
 
   if (!artist) {
     notFound()
@@ -106,8 +108,23 @@ export default async function ArtistPage({ params }: PageProps) {
   // Dedupe queue before passing to player
   const dedupedTracks = dedupeQueueTracks(tracks)
 
-  const albumTracks = dedupedTracks.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
-  const singles = dedupedTracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
+  // Featured set: active DB tracks flagged featured. Read from raw rows since
+  // the canonical Track shape doesn't carry `featured`.
+  const featuredKeys = new Set<string>(
+    (dbTracksRaw as any[])
+      .filter((r) => r.is_active !== false && r.featured === true)
+      .map((r) => getTrackDedupeKey({ artist: r.artist, album: r.album, title: r.title }))
+  )
+
+  const featuredTracks = dedupedTracks
+    .filter((t) => featuredKeys.has(getTrackDedupeKey(t)))
+    .slice(0, 3)
+
+  const featuredIdSet = new Set(featuredTracks.map((t) => t.id))
+  const nonFeatured = dedupedTracks.filter((t) => !featuredIdSet.has(t.id))
+
+  const albumTracks = nonFeatured.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
+  const singles = nonFeatured.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
   const products: never[] = []
 
   return (
@@ -128,8 +145,10 @@ export default async function ArtistPage({ params }: PageProps) {
       />
       <ArtistTabs
         artistName={artist.name}
-        bio={artist.bio}
+        // Use DB bio if available, else empty state
+        bio={artist.bio?.trim() || 'This artist has not added a bio yet.'}
         social={artist.social}
+        featuredTracks={featuredTracks}
         singles={singles}
         albumTracks={albumTracks}
         products={products}

@@ -3,10 +3,11 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Disc } from 'lucide-react'
+import { ArrowRight, ChevronDown, Disc, Star } from 'lucide-react'
 import type { Track } from '@/lib/audio-context'
 import type { Product } from '@/lib/products'
 import { ArtistTrackList } from '@/components/artist/ArtistTrackList'
+import { FeaturedTrackCard } from '@/components/artist/FeaturedTrackCard'
 
 type TabKey = 'music' | 'store' | 'about'
 
@@ -28,6 +29,7 @@ interface ArtistTabsProps {
   artistName: string
   bio: string
   social?: SocialLinks
+  featuredTracks?: Track[]
   singles: Track[]
   albumTracks: Track[]
   products: Product[]
@@ -64,12 +66,20 @@ export function ArtistTabs({
   artistName,
   bio,
   social,
+  featuredTracks = [],
   singles,
   albumTracks,
   products,
 }: ArtistTabsProps) {
   const [active, setActive] = useState<TabKey>('music')
+  const [openAlbum, setOpenAlbum] = useState<string | null>(null)
   const albumGroups = useMemo(() => buildAlbumGroups(albumTracks), [albumTracks])
+
+  const cappedFeatured = featuredTracks.slice(0, 3)
+  const featuredQueue = useMemo(
+    () => [...cappedFeatured, ...singles, ...albumTracks],
+    [cappedFeatured, singles, albumTracks]
+  )
 
   const socialEntries = social
     ? (Object.entries(social).filter(([, v]) => !!v) as Array<[keyof SocialLinks, string]>)
@@ -104,45 +114,101 @@ export function ArtistTabs({
       {/* Music */}
       {active === 'music' && (
         <div className="space-y-8">
-          {singles.length === 0 && albumGroups.length === 0 && (
+          {cappedFeatured.length === 0 && singles.length === 0 && albumGroups.length === 0 && (
             <div className="text-center py-16">
               <p className="text-sm text-[var(--pf-text-muted)]">No tracks yet.</p>
             </div>
           )}
 
+          {/* Featured */}
+          {cappedFeatured.length === 1 && (
+            <section>
+              <FeaturedTrackCard track={cappedFeatured[0]} queue={featuredQueue} />
+            </section>
+          )}
+
+          {cappedFeatured.length > 1 && (
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <Star size={14} className="text-[var(--pf-orange)] fill-[var(--pf-orange)]" />
+                <h2 className="text-base font-semibold">Featured Tracks</h2>
+              </div>
+              <ArtistTrackList tracks={cappedFeatured} />
+            </section>
+          )}
+
+          {/* Singles */}
           {singles.length > 0 && (
             <section>
-              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
+              <h2 className="text-base font-semibold mb-3">Singles</h2>
               <ArtistTrackList tracks={singles} />
             </section>
           )}
 
-          {albumGroups.map((album) => (
-            <section key={album.name}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[var(--pf-surface)] border border-[var(--pf-border)] shrink-0">
-                  {album.image ? (
-                    <Image
-                      src={album.image}
-                      alt={album.name}
-                      fill
-                      sizes="48px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[var(--pf-text-muted)]">
-                      <Disc size={20} />
+          {/* Albums / Projects */}
+          {albumGroups.length > 0 && (
+            <section>
+              <h2 className="text-base font-semibold mb-3">Albums &amp; Projects</h2>
+              <div className="space-y-3">
+                {albumGroups.map((album) => {
+                  const isOpen = openAlbum === album.name
+                  return (
+                    <div
+                      key={album.name}
+                      className={`rounded-2xl border transition-colors overflow-hidden ${
+                        isOpen
+                          ? 'border-[var(--pf-orange)] bg-[var(--pf-surface)]'
+                          : 'border-[var(--pf-border)] bg-[var(--pf-surface)] hover:border-[var(--pf-text-muted)]'
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenAlbum(isOpen ? null : album.name)}
+                        aria-expanded={isOpen}
+                        aria-controls={`album-${album.name}`}
+                        className="w-full flex items-center gap-3 p-3 text-left"
+                      >
+                        <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[var(--pf-bg)] border border-[var(--pf-border)] shrink-0">
+                          {album.image ? (
+                            <Image
+                              src={album.image}
+                              alt={album.name}
+                              fill
+                              sizes="56px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[var(--pf-text-muted)]">
+                              <Disc size={20} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-base font-semibold truncate ${isOpen ? 'text-[var(--pf-orange)]' : ''}`}>
+                            {album.name}
+                          </p>
+                          <p className="text-xs text-[var(--pf-text-muted)]">
+                            {album.tracks.length} {album.tracks.length === 1 ? 'track' : 'tracks'}
+                          </p>
+                        </div>
+                        <ChevronDown
+                          size={18}
+                          className={`text-[var(--pf-text-muted)] flex-shrink-0 transition-transform ${
+                            isOpen ? 'rotate-180 text-[var(--pf-orange)]' : ''
+                          }`}
+                        />
+                      </button>
+                      {isOpen && (
+                        <div id={`album-${album.name}`} className="px-2 pb-2">
+                          <ArtistTrackList tracks={album.tracks} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-base font-semibold truncate">{album.name}</p>
-                  <p className="text-xs text-[var(--pf-text-muted)]">{album.tracks.length} tracks</p>
-                </div>
+                  )
+                })}
               </div>
-              <ArtistTrackList tracks={album.tracks} />
             </section>
-          ))}
+          )}
         </div>
       )}
 

@@ -47,15 +47,6 @@ export function Navbar() {
     }
   }
 
-  const baseNavLinks = [
-    { href: '/music', label: 'Music' },
-    { href: '/artists', label: 'Artists' },
-    { href: '/store', label: 'Store' },
-  ]
-  
-  const navLinks = showUser 
-    ? baseNavLinks 
-    : [...baseNavLinks, { href: '/apply', label: 'Apply' }]
   const dashboardHref = '/dashboard/artist'
   const dashboardLabel = 'My Dashboard'
   const isActiveLink = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
@@ -67,6 +58,13 @@ export function Navbar() {
   const ready = mounted && !loading
   const showUser = ready && !!user
   const showGuest = ready && !user
+
+  const navLinks = [
+    { href: '/music', label: 'Music' },
+    { href: '/artists', label: 'Artists' },
+    { href: '/store', label: 'Store' },
+    ...(showGuest ? [{ href: '/apply', label: 'Apply' }] : []),
+  ]
 
   if (hideOnTapRoute) {
     return null

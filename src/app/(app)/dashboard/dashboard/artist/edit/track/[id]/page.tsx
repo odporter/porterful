@@ -19,6 +19,7 @@ interface Track {
   audio_url: string
   is_active: boolean
   featured: boolean
+  track_number: number | null
   created_at: string
   updated_at?: string
   play_count: number
@@ -44,6 +45,7 @@ export default function EditTrackPage() {
   const [isActive, setIsActive] = useState(true)
   const [featured, setFeatured] = useState(false)
   const [coverUrl, setCoverUrl] = useState('')
+  const [trackNumber, setTrackNumber] = useState<number | ''>('')
 
   // Load track data
   useEffect(() => {
@@ -94,6 +96,7 @@ export default function EditTrackPage() {
       setIsActive(trackData.is_active ?? true)
       setFeatured(trackData.featured ?? false)
       setCoverUrl(trackData.cover_url || '')
+      setTrackNumber(trackData.track_number ?? '')
       setLoading(false)
     }
 
@@ -121,6 +124,7 @@ export default function EditTrackPage() {
           is_active: isActive,
           featured: featured,
           cover_url: coverUrl.trim() || null,
+          track_number: trackNumber === '' ? null : parseInt(String(trackNumber), 10),
         }),
       })
 
@@ -276,6 +280,31 @@ export default function EditTrackPage() {
                 placeholder="https://example.com/album-art.jpg"
               />
               <p className="text-xs text-[var(--pf-text-muted)] mt-1">Leave blank to use default artwork</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Track Number</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={trackNumber}
+                onChange={(e) => {
+                  const val = e.target.value
+                  if (val === '') {
+                    setTrackNumber('')
+                  } else {
+                    const num = parseInt(val, 10)
+                    if (!isNaN(num) && num >= 1 && num <= 99) {
+                      setTrackNumber(num)
+                    }
+                  }
+                }}
+                className="pf-input w-24"
+                placeholder="#"
+                min={1}
+                max={99}
+              />
+              <p className="text-xs text-[var(--pf-text-muted)] mt-1">Position in album (1-99, optional)</p>
             </div>
 
             <div>

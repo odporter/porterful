@@ -84,6 +84,13 @@ export async function PATCH(
       updates.featured = Boolean(body.featured);
     }
 
+    if (body.track_number !== undefined) {
+      updates.track_number = body.track_number === null ? null : parseInt(body.track_number, 10);
+      if (isNaN(updates.track_number)) {
+        updates.track_number = null;
+      }
+    }
+
     // Require at least one field to update
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });

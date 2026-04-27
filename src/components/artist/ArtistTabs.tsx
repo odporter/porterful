@@ -44,7 +44,25 @@ function buildAlbumGroups(tracks: Track[]): Array<{ name: string; image: string;
     }
     map.get(key)!.tracks.push(t)
   })
-  return Array.from(map.values())
+  
+  // Sort tracks within each album by track_number, then by title
+  const result = Array.from(map.values())
+  result.forEach((album) => {
+    album.tracks.sort((a, b) => {
+      // Sort by track_number if available
+      const aNum = (a as any).track_number
+      const bNum = (b as any).track_number
+      if (aNum != null && bNum != null) {
+        return aNum - bNum
+      }
+      if (aNum != null) return -1
+      if (bNum != null) return 1
+      // Fallback to title
+      return a.title.localeCompare(b.title)
+    })
+  })
+  
+  return result
 }
 
 function externalUrl(platform: keyof SocialLinks, value: string): string {

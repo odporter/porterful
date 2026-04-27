@@ -210,18 +210,21 @@ export default function ArtistDashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{track.title}</p>
                       <p className="text-sm text-[var(--pf-text-muted)]">
-                        {track.price === 0 ? 'Free' : `$${track.price}`}
+                        {(track.proud_to_pay_min ?? track.price) === 0 ? 'Free' : `$${track.proud_to_pay_min ?? track.price ?? 1}`}
                         {track.description && ` • ${track.description.slice(0, 50)}${track.description.length > 50 ? '...' : ''}`}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-1 rounded text-xs border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text-muted)]">
+                      <span className={`px-2 py-1 rounded text-xs border ${track.is_active ? 'border-green-500/30 bg-green-500/10 text-green-400' : 'border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text-muted)]'}`}>
                         {track.is_active ? 'Live' : 'Draft'}
                       </span>
-                      <button className="pf-btn pf-btn-secondary text-[var(--pf-text-secondary)]"><Icon.Eye /></button>
-                      <button className="p-2 rounded text-[var(--pf-text-muted)] hover:bg-[var(--pf-surface-hover)] hover:text-[var(--pf-text)] transition-colors">
-                        <Icon.Trash />
-                      </button>
+                      <Link 
+                        href={`/dashboard/artist/edit/track/${track.id}`}
+                        className="pf-btn pf-btn-secondary text-[var(--pf-text-secondary)]"
+                        title="Edit track"
+                      >
+                        <Icon.Edit />
+                      </Link>
                     </div>
                   </div>
                 ))}

@@ -67,8 +67,8 @@ export default async function ArtistPage({ params }: PageProps) {
   if (tracks.length === 0) {
     notFound()
   }
-  const singles = tracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
   const albumTracks = tracks.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
+  const singles = tracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
 
   // Per-artist storefront isn't wired into product data yet; spec rule is
   // "real products only, or coming soon" — pass empty so Store tab shows

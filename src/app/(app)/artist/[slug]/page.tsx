@@ -5,6 +5,14 @@ import { ArtistHero } from '@/components/artist/ArtistHero'
 import { ArtistTabs } from '@/components/artist/ArtistTabs'
 import type { Track } from '@/lib/audio-context'
 
+interface SocialLinks {
+  instagram?: string
+  twitter?: string
+  tiktok?: string
+  youtube?: string
+  website?: string
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }
@@ -61,7 +69,20 @@ export default async function ArtistPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen pb-32">
-      <ArtistHero artist={artist} firstTrack={tracks[0] ?? null} queueTracks={tracks} />
+      <ArtistHero
+        artist={{
+          name: artist.name,
+          slug: artist.slug,
+          genre: artist.genre,
+          location: artist.location,
+          verified: artist.verified,
+          likeness_verified: artist.likeness_verified,
+          image: artist.image,
+          social: artist.social as SocialLinks | undefined,
+        }}
+        firstTrack={tracks[0] ?? null}
+        queueTracks={tracks}
+      />
       <ArtistTabs
         artistName={artist.name}
         bio={artist.bio}

@@ -112,7 +112,7 @@ export function ArtistTabs({
 
           {singles.length > 0 && (
             <section>
-              <h2 className="text-base font-semibold mb-3">Songs</h2>
+              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
               <ArtistTrackList tracks={singles} />
             </section>
           )}

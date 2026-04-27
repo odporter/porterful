@@ -44,7 +44,7 @@ function WaveVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
     const bg = readToken('--pf-bg', '#111111')
-    const orange = readToken('--pf-orange', '#f97316')
+    const orange = readToken('--pf-accent', '#f97316')
     const fadeFill = withAlpha(bg, 0.1)
 
     const draw = () => {
@@ -111,7 +111,7 @@ function BarVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | null;
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
     const bg = readToken('--pf-bg', '#111111')
-    const orange = readToken('--pf-orange', '#f97316')
+    const orange = readToken('--pf-accent', '#f97316')
     const bgFill = withAlpha(bg, 0.95)
     const orangeIdle = withAlpha(orange, 0.3)
 
@@ -179,7 +179,7 @@ function CircularVisualizer({ analyser, isPlaying }: { analyser: AnalyserNode | 
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
     const bg = readToken('--pf-bg', '#111111')
-    const orange = readToken('--pf-orange', '#f97316')
+    const orange = readToken('--pf-accent', '#f97316')
     const bgFill = withAlpha(bg, 0.95)
     const orangeIdle = withAlpha(orange, 0.3)
     const orangeCenter = withAlpha(orange, 0.1)

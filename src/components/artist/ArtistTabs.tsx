@@ -35,6 +35,15 @@ interface ArtistTabsProps {
   products: Product[]
 }
 
+function getTrackNumberFromId(track: Track): number | null {
+  // Extract number from static track IDs like 'rox-09', 'amb-01', etc.
+  const match = track.id.match(/-(\d+)$/)
+  if (match) {
+    return parseInt(match[1], 10)
+  }
+  return null
+}
+
 function buildAlbumGroups(tracks: Track[]): Array<{ name: string; image: string; tracks: Track[] }> {
   const map = new Map<string, { name: string; image: string; tracks: Track[] }>()
   tracks.forEach((t) => {
@@ -45,18 +54,28 @@ function buildAlbumGroups(tracks: Track[]): Array<{ name: string; image: string;
     map.get(key)!.tracks.push(t)
   })
   
-  // Sort tracks within each album by track_number, then by title
+  // Sort tracks within each album by track_number, then by extracted ID number, then by title
   const result = Array.from(map.values())
   result.forEach((album) => {
     album.tracks.sort((a, b) => {
-      // Sort by track_number if available
-      const aNum = (a as any).track_number
-      const bNum = (b as any).track_number
-      if (aNum != null && bNum != null) {
-        return aNum - bNum
+      // Priority 1: DB track_number if available
+      const aDbNum = (a as any).track_number
+      const bDbNum = (b as any).track_number
+      if (aDbNum != null && bDbNum != null) {
+        return aDbNum - bDbNum
       }
-      if (aNum != null) return -1
-      if (bNum != null) return 1
+      if (aDbNum != null) return -1
+      if (bDbNum != null) return 1
+      
+      // Priority 2: Extract from track ID (e.g., 'rox-09' -> 9)
+      const aIdNum = getTrackNumberFromId(a)
+      const bIdNum = getTrackNumberFromId(b)
+      if (aIdNum != null && bIdNum != null) {
+        return aIdNum - bIdNum
+      }
+      if (aIdNum != null) return -1
+      if (bIdNum != null) return 1
+      
       // Fallback to title
       return a.title.localeCompare(b.title)
     })

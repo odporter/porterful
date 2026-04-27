@@ -4,7 +4,8 @@ import { getArtistById, getArtistTracks, ARTISTS } from '@/lib/artists'
 import { ArtistHero } from '@/components/artist/ArtistHero'
 import { ArtistTabs } from '@/components/artist/ArtistTabs'
 import type { Track } from '@/lib/audio-context'
-import { getServerTracksByArtistName } from '@/lib/artist-tracks-server'
+import { createClient } from '@supabase/supabase-js'
+import { mergeCanonicalTracks, dedupeQueueTracks } from '@/lib/track-dedupe'
 
 interface SocialLinks {
   instagram?: string
@@ -16,6 +17,31 @@ interface SocialLinks {
 
 interface PageProps {
   params: Promise<{ slug: string }>
+}
+
+// Server-side Supabase client
+function getServerSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+}
+
+async function getServerTracksByArtistNameFull(artistName: string) {
+  const supabase = getServerSupabase()
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*')
+    .eq('artist', artistName)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('[getServerTracksByArtistNameFull] Error:', error)
+    return []
+  }
+  
+  return data || []
 }
 
 export async function generateStaticParams() {
@@ -53,36 +79,6 @@ const ALBUM_LIST = [
   'Levi',
 ]
 
-// Merge DB tracks with static, preferring DB
-function mergeArtistTracks(dbTracks: any[], staticTracks: any[]): Track[] {
-  const merged = new Map<string, any>()
-  
-  // Add DB tracks first (preferred)
-  dbTracks.forEach((t: any) => {
-    merged.set(t.id, {
-      id: t.id,
-      title: t.title,
-      artist: t.artist || 'Unknown',
-      album: t.album,
-      duration: t.duration,
-      audio_url: t.audio_url,
-      cover_url: t.cover_url,
-      image: t.cover_url,
-      plays: t.play_count || 0,
-      price: t.proud_to_pay_min || 1,
-    })
-  })
-  
-  // Add static tracks only if not in DB
-  staticTracks.forEach((t: any) => {
-    if (!merged.has(t.id)) {
-      merged.set(t.id, t)
-    }
-  })
-  
-  return Array.from(merged.values()) as Track[]
-}
-
 export default async function ArtistPage({ params }: PageProps) {
   const { slug } = await params
   const artist = getArtistById(slug)
@@ -91,20 +87,27 @@ export default async function ArtistPage({ params }: PageProps) {
     notFound()
   }
 
-  // Fetch DB tracks (filtered by is_active=true)
-  const dbTracks = await getServerTracksByArtistName(artist.name)
+  // Fetch ALL DB tracks (including inactive for canonical dedupe)
+  const dbTracksRaw = await getServerTracksByArtistNameFull(artist.name)
   const staticTracks = getArtistTracks(slug)
   
-  // Merge: DB tracks preferred, static as fallback
-  const tracks = mergeArtistTracks(dbTracks, staticTracks)
+  // Merge using canonical dedupe: inactive DB blocks matching static
+  const tracks = mergeCanonicalTracks(
+    dbTracksRaw as any[],
+    staticTracks as any[],
+    { includeInactive: false }
+  )
   
   // Block empty public artist pages
   if (tracks.length === 0) {
     notFound()
   }
 
-  const albumTracks = tracks.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
-  const singles = tracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
+  // Dedupe queue before passing to player
+  const dedupedTracks = dedupeQueueTracks(tracks)
+
+  const albumTracks = dedupedTracks.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
+  const singles = dedupedTracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
   const products: never[] = []
 
   return (
@@ -120,8 +123,8 @@ export default async function ArtistPage({ params }: PageProps) {
           image: artist.image,
           social: artist.social as SocialLinks | undefined,
         }}
-        firstTrack={tracks[0] ?? null}
-        queueTracks={tracks}
+        firstTrack={dedupedTracks[0] ?? null}
+        queueTracks={dedupedTracks}
       />
       <ArtistTabs
         artistName={artist.name}

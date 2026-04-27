@@ -19,6 +19,7 @@ import { TRACKS as STATIC_TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
 import { getTrackArtwork } from '@/lib/artwork'
 import { createBrowserSupabaseClient } from '@/lib/create-browser-client'
+import { mergeCanonicalTracks, dedupeQueueTracks } from '@/lib/track-dedupe'
 
 // Public artists with confirmed music/catalog
 const VALID_SLUGS = ['od-porter', 'gune', 'atm-trap']
@@ -31,24 +32,6 @@ const LEGACY_TRACKS = STATIC_TRACKS.filter((t) =>
   const order: Record<string, number> = { 'O D Porter': 0, 'Gune': 1, 'ATM Trap': 2, 'Jai Jai': 3, 'Jay Jay': 3 }
   return (order[a.artist] || 99) - (order[b.artist] || 99)
 }) as unknown as Track[]
-
-// Merge DB tracks with static fallback, preferring DB tracks by stable id
-function mergeTracks(dbTracks: Track[], staticTracks: Track[]): Track[] {
-  const dbMap = new Map(dbTracks.map(t => [t.id, t]))
-  const merged = new Map<string, Track>()
-  
-  // Add DB tracks first (preferred)
-  dbTracks.forEach(t => merged.set(t.id, t))
-  
-  // Add static tracks only if not already in DB
-  staticTracks.forEach(t => {
-    if (!merged.has(t.id)) {
-      merged.set(t.id, t)
-    }
-  })
-  
-  return Array.from(merged.values())
-}
 
 type DisplayTrack = Track
 
@@ -162,22 +145,21 @@ export default function MusicPage() {
   const [dbTracks, setDbTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Fetch DB tracks on mount (only active tracks for public)
+  // Fetch DB tracks on mount (all tracks for canonical dedupe)
   useEffect(() => {
     async function loadTracks() {
       const supabase = createBrowserSupabaseClient()
       const { data } = await supabase
         .from('tracks')
         .select('*')
-        .eq('is_active', true)
         .order('created_at', { ascending: false })
       
       if (data) {
-        // Map DB tracks to Track format
-        const mapped: Track[] = data.map((t: any) => ({
+        // Map DB tracks to Track format (keep is_active for dedupe logic)
+        const mapped = data.map((t: any) => ({
           id: t.id,
           title: t.title,
-          artist: t.artist_name || 'Unknown',
+          artist: t.artist_name || t.artist || 'Unknown',
           album: t.album,
           duration: t.duration,
           audio_url: t.audio_url,
@@ -185,6 +167,7 @@ export default function MusicPage() {
           image: t.cover_url,
           plays: t.play_count || 0,
           price: t.proud_to_pay_min || 1,
+          is_active: t.is_active,
         }))
         setDbTracks(mapped)
       }
@@ -193,9 +176,10 @@ export default function MusicPage() {
     loadTracks()
   }, [])
 
-  // Merge DB tracks with static fallback
+  // Merge DB tracks with static fallback using canonical dedupe
+  // Inactive DB tracks block matching static from public display
   const ALL_TRACKS = useMemo(() => {
-    return mergeTracks(dbTracks, LEGACY_TRACKS)
+    return mergeCanonicalTracks(dbTracks as any[], LEGACY_TRACKS, { includeInactive: false })
   }, [dbTracks])
 
   // Featured track: prefer featured DB track, fallback to first track
@@ -213,7 +197,9 @@ export default function MusicPage() {
   const startTrack = useCallback(
     (track: Track) => {
       // Build a queue that gives the tapped artist first run, then the rest.
-      setQueue(buildArtistQueue(ALL_TRACKS, track))
+      // Dedupe queue to prevent repeats from DB/static duplicates.
+      const queue = buildArtistQueue(ALL_TRACKS, track)
+      setQueue(dedupeQueueTracks(queue))
       playTrack(track)
     },
     [playTrack, setQueue, ALL_TRACKS]

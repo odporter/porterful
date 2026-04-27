@@ -80,8 +80,8 @@ const FAQS = [
   },
 ]
 
-// Show first 3 artists from the ARTISTS array
-const FEATURED_ARTISTS = ARTISTS.slice(0, 3)
+// Show first 3 artists from the ARTISTS array (only those with tracks)
+const FEATURED_ARTISTS = ARTISTS.filter((a) => a.trackCount && a.trackCount > 0).slice(0, 3)
 
 // Placeholder values — replace with real data from your backend
 const PLACEHOLDER_STATS = {
@@ -212,7 +212,7 @@ export default function SuperfanPage() {
           <section className="mb-8">
             <h2 className="text-lg font-bold mb-4">Support Artists</h2>
             <div className="flex flex-wrap gap-3">
-              {ARTISTS.map((artist) => (
+              {ARTISTS.filter((a) => a.trackCount && a.trackCount > 0).map((artist) => (
                 <Link
                   key={artist.id}
                   href={`/artist/${artist.slug}`}

@@ -3,6 +3,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ARTISTS } from '@/lib/artists'
 
+// Only count artists with playable tracks
+const PUBLIC_ARTIST_COUNT = ARTISTS.filter((a) => a.trackCount && a.trackCount > 0).length
+
 export const metadata: Metadata = {
   title: 'About Porterful - The Artist Economy Platform',
   description: 'Porterful is where independent artists earn 80% on every sale. No label. No middleman. Music, merch, marketplace — built for creators who deserve a retirement plan.',
@@ -48,7 +51,7 @@ export default function AboutPage() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">
-              <div className="text-3xl md:text-4xl font-bold text-[var(--pf-orange)]">{ARTISTS.length}</div>
+              <div className="text-3xl md:text-4xl font-bold text-[var(--pf-orange)]">{PUBLIC_ARTIST_COUNT}</div>
               <div className="text-sm text-[var(--pf-text-muted)]">Public artists</div>
             </div>
             <div className="text-center p-6 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)]">

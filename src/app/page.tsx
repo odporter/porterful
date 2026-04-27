@@ -9,7 +9,10 @@ import { useAudio, type Track } from '@/lib/audio-context'
 import { TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
 
-const featuredArtist = ARTISTS.find((artist) => artist.slug === 'gune') ?? ARTISTS[0]
+// Only artists with playable tracks
+const PUBLIC_ARTISTS = ARTISTS.filter((a) => a.trackCount && a.trackCount > 0)
+
+const featuredArtist = PUBLIC_ARTISTS.find((artist) => artist.slug === 'gune') ?? PUBLIC_ARTISTS[0]
 
 const featuredTracks = TRACKS
   .filter((track) => track.artist === featuredArtist.name)
@@ -209,7 +212,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {ARTISTS.slice(0, 4).map((artist, index) => (
+              {PUBLIC_ARTISTS.slice(0, 4).map((artist, index) => (
                 <Link
                   key={artist.id}
                   href={`/artist/${artist.slug}`}

@@ -136,6 +136,12 @@ export default function SignupPage() {
       const data = await res.json()
 
       if (!res.ok) {
+        // Check if user already exists
+        if (data.error?.toLowerCase().includes('already') || data.error?.toLowerCase().includes('registered')) {
+          // Redirect to login with message
+          router.push(`/login?exists=true&email=${encodeURIComponent(email)}${nextPath ? `&next=${encodeURIComponent(nextPath)}` : ''}`)
+          return
+        }
         setError(data.error || 'Failed to create account')
         setLoading(false)
         return

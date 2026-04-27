@@ -27,6 +27,8 @@ function getLoginError(error: string | undefined) {
       return 'Login is temporarily unavailable.'
     case 'profile_create_failed':
       return 'Your account could not be prepared. Please try again.'
+    case 'exists':
+      return null // Handled separately as success message
     default:
       return error ? 'Sign-in could not be completed.' : null
   }
@@ -35,7 +37,7 @@ function getLoginError(error: string | undefined) {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams?: { return?: string; next?: string; error?: string }
+  searchParams?: { return?: string; next?: string; error?: string; exists?: string; email?: string }
 }) {
   const nextPath = getSafeNextPath(searchParams?.return || searchParams?.next)
   const user = await getServerUser()
@@ -44,5 +46,10 @@ export default async function LoginPage({
     redirect(nextPath)
   }
 
-  return <LoginClient nextPath={nextPath} initialError={getLoginError(searchParams?.error)} />
+  return <LoginClient 
+    nextPath={nextPath} 
+    initialError={getLoginError(searchParams?.error)}
+    emailExists={searchParams?.exists === 'true'}
+    prefillEmail={searchParams?.email || ''}
+  />
 }

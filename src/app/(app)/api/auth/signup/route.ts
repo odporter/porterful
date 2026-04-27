@@ -16,6 +16,16 @@ export async function POST(request: Request) {
     // Create auth user with service role key (bypasses RLS)
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
+    // First check if user already exists
+    const { data: existingUser } = await supabase.auth.admin.listUsers()
+    const userExists = existingUser?.users?.some((u: any) => u.email?.toLowerCase() === email.toLowerCase())
+    
+    if (userExists) {
+      return NextResponse.json({ 
+        error: 'This email is already registered. Please sign in instead.' 
+      }, { status: 409 })
+    }
+    
     const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
       email,
       password,

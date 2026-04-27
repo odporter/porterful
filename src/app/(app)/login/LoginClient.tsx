@@ -9,16 +9,18 @@ import { useSupabase } from '@/app/providers'
 interface LoginClientProps {
   nextPath: string
   initialError?: string | null
+  emailExists?: boolean
+  prefillEmail?: string
 }
 
-export default function LoginClient({ nextPath, initialError = null }: LoginClientProps) {
+export default function LoginClient({ nextPath, initialError = null, emailExists = false, prefillEmail = '' }: LoginClientProps) {
   const router = useRouter()
   const { supabase, user } = useSupabase()
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(prefillEmail)
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(initialError || '')
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(emailExists)
 
   useEffect(() => {
     if (user) {
@@ -78,6 +80,13 @@ export default function LoginClient({ nextPath, initialError = null }: LoginClie
           <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
           <p className="text-[var(--pf-text-secondary)]">Sign in to your account</p>
         </div>
+
+        {emailExists && (
+          <div className="mb-6 p-4 rounded-lg bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 text-[var(--pf-text)] text-sm">
+            <p className="font-medium mb-1">This email already has an account.</p>
+            <p>Sign in below to continue.</p>
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">

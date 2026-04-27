@@ -40,7 +40,7 @@ export default function EditTrackPage() {
   // Form state
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [proudToPayMin, setProudToPayMin] = useState(1)
+  const [proudToPayMin, setProudToPayMin] = useState('1.00')
   const [isActive, setIsActive] = useState(true)
   const [featured, setFeatured] = useState(false)
 
@@ -89,7 +89,7 @@ export default function EditTrackPage() {
       // Initialize form state
       setTitle(trackData.title || '')
       setDescription(trackData.description || '')
-      setProudToPayMin(trackData.proud_to_pay_min ?? trackData.price ?? 1)
+      setProudToPayMin((trackData.proud_to_pay_min ?? trackData.price ?? 1).toFixed(2))
       setIsActive(trackData.is_active ?? true)
       setFeatured(trackData.featured ?? false)
       setLoading(false)
@@ -129,6 +129,8 @@ export default function EditTrackPage() {
 
       // Update local track state
       setTrack(data.track)
+      setIsActive(data.track.is_active)
+      setFeatured(data.track.featured)
       setSuccessMessage('Track saved successfully')
       setTimeout(() => setSuccessMessage(''), 2000)
     } catch (err: any) {

@@ -4,6 +4,7 @@ import { getArtistById, getArtistTracks, ARTISTS } from '@/lib/artists'
 import { ArtistHero } from '@/components/artist/ArtistHero'
 import { ArtistTabs } from '@/components/artist/ArtistTabs'
 import type { Track } from '@/lib/audio-context'
+import { getServerTracksByArtistName } from '@/lib/artist-tracks-server'
 
 interface SocialLinks {
   instagram?: string
@@ -18,7 +19,6 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  // Only generate static pages for artists with playable tracks
   return ARTISTS
     .filter((artist) => artist.trackCount && artist.trackCount > 0)
     .map((artist) => ({
@@ -53,6 +53,36 @@ const ALBUM_LIST = [
   'Levi',
 ]
 
+// Merge DB tracks with static, preferring DB
+function mergeArtistTracks(dbTracks: any[], staticTracks: any[]): Track[] {
+  const merged = new Map<string, any>()
+  
+  // Add DB tracks first (preferred)
+  dbTracks.forEach((t: any) => {
+    merged.set(t.id, {
+      id: t.id,
+      title: t.title,
+      artist: t.artist || 'Unknown',
+      album: t.album,
+      duration: t.duration,
+      audio_url: t.audio_url,
+      cover_url: t.cover_url,
+      image: t.cover_url,
+      plays: t.play_count || 0,
+      price: t.proud_to_pay_min || 1,
+    })
+  })
+  
+  // Add static tracks only if not in DB
+  staticTracks.forEach((t: any) => {
+    if (!merged.has(t.id)) {
+      merged.set(t.id, t)
+    }
+  })
+  
+  return Array.from(merged.values()) as Track[]
+}
+
 export default async function ArtistPage({ params }: PageProps) {
   const { slug } = await params
   const artist = getArtistById(slug)
@@ -61,18 +91,20 @@ export default async function ArtistPage({ params }: PageProps) {
     notFound()
   }
 
-  const tracks = getArtistTracks(slug) as unknown as Track[]
+  // Fetch DB tracks (filtered by is_active=true)
+  const dbTracks = await getServerTracksByArtistName(artist.name)
+  const staticTracks = getArtistTracks(slug)
   
-  // Block empty public artist pages - artists with no playable tracks
+  // Merge: DB tracks preferred, static as fallback
+  const tracks = mergeArtistTracks(dbTracks, staticTracks)
+  
+  // Block empty public artist pages
   if (tracks.length === 0) {
     notFound()
   }
+
   const albumTracks = tracks.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
   const singles = tracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
-
-  // Per-artist storefront isn't wired into product data yet; spec rule is
-  // "real products only, or coming soon" — pass empty so Store tab shows
-  // a clean coming-soon state instead of fake/global fallback merch.
   const products: never[] = []
 
   return (

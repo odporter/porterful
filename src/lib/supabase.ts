@@ -146,6 +146,17 @@ export async function getTracks(stationId: string) {
   return { data, error }
 }
 
+// Track helpers
+export async function getTracksByArtist(artistId: string) {
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*')
+    .eq('artist_id', artistId)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+  return { data, error }
+}
+
 // Order helpers
 export async function createOrder(userId: string, items: any[], total: number) {
   const { data: order, error: orderError } = await supabase

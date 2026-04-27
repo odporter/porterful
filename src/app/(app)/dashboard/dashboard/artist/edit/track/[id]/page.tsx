@@ -280,19 +280,33 @@ export default function EditTrackPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">Proud to Pay Minimum (USD)</label>
-              <div className="flex items-center gap-2">
-                <span className="text-lg text-[var(--pf-text)]">$</span>
+              <div className="flex items-center gap-3">
+                <span className="text-lg text-[var(--pf-text)] select-none">$</span>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   value={proudToPayMin}
-                  onChange={(e) => setProudToPayMin(e.target.value)}
+                  onChange={(e) => {
+                    // Allow only valid decimal input
+                    const val = e.target.value
+                    if (val === '' || /^\d*\.?\d{0,2}$/.test(val)) {
+                      setProudToPayMin(val)
+                    }
+                  }}
+                  onBlur={() => {
+                    // Normalize to 2 decimals on blur
+                    const num = parseFloat(proudToPayMin)
+                    if (isNaN(num) || proudToPayMin === '') {
+                      setProudToPayMin('0.00')
+                    } else {
+                      setProudToPayMin(num.toFixed(2))
+                    }
+                  }}
                   className="pf-input flex-1"
-                  min="0"
-                  step="0.01"
-                  placeholder="1.00"
+                  placeholder="0.00"
                 />
               </div>
-              <p className="text-xs text-[var(--pf-text-muted)] mt-1">Set to 0 for free downloads. Defaults to $1.00.</p>
+              <p className="text-xs text-[var(--pf-text-muted)] mt-1">Set to 0.00 for free downloads. Defaults to $1.00.</p>
             </div>
           </div>
 

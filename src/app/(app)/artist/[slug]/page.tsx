@@ -18,9 +18,12 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return ARTISTS.map((artist) => ({
-    slug: artist.slug,
-  }))
+  // Only generate static pages for artists with playable tracks
+  return ARTISTS
+    .filter((artist) => artist.trackCount && artist.trackCount > 0)
+    .map((artist) => ({
+      slug: artist.slug,
+    }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -59,6 +62,11 @@ export default async function ArtistPage({ params }: PageProps) {
   }
 
   const tracks = getArtistTracks(slug) as unknown as Track[]
+  
+  // Block empty public artist pages - artists with no playable tracks
+  if (tracks.length === 0) {
+    notFound()
+  }
   const singles = tracks.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
   const albumTracks = tracks.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
 

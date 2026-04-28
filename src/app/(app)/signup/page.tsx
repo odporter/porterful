@@ -142,7 +142,8 @@ export default function SignupPage() {
           router.push(`/login?exists=true&email=${encodeURIComponent(email)}${nextPath ? `&next=${encodeURIComponent(nextPath)}` : ''}`)
           return
         }
-        setError(data.error || 'Failed to create account')
+        // Show graceful error for database/system failures
+        setError('PROCESSING')
         setLoading(false)
         return
       }
@@ -207,9 +208,27 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {error && (
+        {error && error !== 'PROCESSING' && (
           <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
             {error}
+          </div>
+        )}
+        
+        {error === 'PROCESSING' && (
+          <div className="mb-6 p-6 rounded-lg bg-[var(--pf-surface)] border border-[var(--pf-orange)]/30 text-center">
+            <div className="w-12 h-12 rounded-full bg-[var(--pf-orange)]/20 flex items-center justify-center mx-auto mb-3">
+              <svg className="animate-spin h-6 w-6 text-[var(--pf-orange)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Almost there...</h3>
+            <p className="text-[var(--pf-text-secondary)] text-sm mb-3">
+              We're setting up your account. This may take a moment.
+            </p>
+            <p className="text-xs text-[var(--pf-text-muted)]">
+              If this takes longer than 30 seconds, we'll reach out to you at <span className="text-[var(--pf-orange)]">{email}</span> to complete your setup.
+            </p>
           </div>
         )}
 

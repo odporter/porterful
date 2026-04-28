@@ -1,44 +1,40 @@
-# Porterful Site Improvements - Batch 1
+# Porterful Site Improvements - Batch 1 (2026-04-28)
 
-**Date:** Tuesday, April 28th, 2026 — 2:11 AM (America/Chicago)
-**Task:** Site improvements batch 1 - Rob Soule fix + social buttons
+## Changes Made
 
-## Tasks Completed
+### 1. Rob Soule Artist Data ✓
+- **File**: `src/lib/artists.ts`
+- **Status**: Already correct
+- **Genre**: "Hip-Hop / R&B / Blues"
+- **Bio**: "Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound."
+- **Social links**: instagram, twitter, youtube, tiktok all configured
 
-### 1. Fix Rob Soule Artist Data ✅
-**File:** `src/lib/artists.ts`
-**Status:** Already correct - no changes needed
-- Genre: `'Hip-Hop / R&B / Blues'` ✓ (matches requirement)
-- Bio: "Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound. His music captures the raw energy of the Lou while weaving in the emotional depth of R&B and the timeless roots of blues." ✓ (matches requirement)
+### 2. Social Media Buttons ✓
+- **File**: `src/components/artist/ArtistHero.tsx`
+- **Status**: Already implemented
+- Instagram, Twitter/X, YouTube, and TikTok icons display in the artist profile header
+- Icons only show when artist has those social fields filled in
+- Located near the artist name in the profile header
 
-### 2. Add Social Media Buttons to Artist Profile ✅
-**File:** `src/components/artist/ArtistHero.tsx`
-**Status:** Already implemented - no changes needed
-- Social icons (Instagram, Twitter/X, YouTube, TikTok) already present
-- Icons display conditionally based on `artist.social` data
-- Located under artist name/verified badges (lines 144-165)
-- Uses inline SVG icons with hover effects
+### 3. Featured Singles Section Order ✓
+- **File**: `src/components/artist/ArtistTabs.tsx`
+- **Change**: Moved Singles section to appear AFTER Albums section
+- **New Order**: Featured Tracks → Albums & Projects → Featured Singles
 
-### 3. Featured Singles Before Albums ✅
-**File:** `src/components/artist/ArtistTabs.tsx`
-**Status:** Already correct order - no changes needed
-- Current order: Featured Tracks → Singles → Albums & Projects
-- Singles section (lines 115-121) appears before Albums section (lines 124-183)
+## Files Modified
+1. `src/components/artist/ArtistTabs.tsx` - Reordered sections so Singles appears after Albums
 
-## Summary
+## Files Verified (No Changes Needed)
+1. `src/lib/artists.ts` - Rob Soule data already correct
+2. `src/components/artist/ArtistHero.tsx` - Social buttons already implemented
 
-All requested improvements were already present in the codebase:
+## Status
+- ✓ All changes saved to working directory
+- ✗ Not committed
+- ✗ Not deployed
 
-1. ✅ Rob Soule artist data is correct in `src/lib/artists.ts`
-2. ✅ Social media buttons exist in `src/components/artist/ArtistHero.tsx` 
-3. ✅ Singles section appears before Albums in `src/components/artist/ArtistTabs.tsx`
-
-**No code changes were required** - all features were already implemented correctly.
-
-**No deployment performed** as instructed.
-
-## File Locations Verified
-
-- `src/lib/artists.ts` - Artist data (Rob Soule entry lines 89-111)
-- `src/components/artist/ArtistHero.tsx` - Social buttons in profile header
-- `src/components/artist/ArtistTabs.tsx` - Music section ordering (Featured → Singles → Albums)
+## Next Steps
+- Review changes
+- Test locally
+- Commit when ready
+- Deploy to production

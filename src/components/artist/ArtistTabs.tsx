@@ -155,14 +155,6 @@ export function ArtistTabs({
             </section>
           )}
 
-          {/* Singles */}
-          {singles.length > 0 && (
-            <section>
-              <h2 className="text-base font-semibold mb-3">Singles</h2>
-              <ArtistTrackList tracks={singles} />
-            </section>
-          )}
-
           {/* Albums / Projects */}
           {albumGroups.length > 0 && (
             <section>
@@ -225,6 +217,14 @@ export function ArtistTabs({
                   )
                 })}
               </div>
+            </section>
+          )}
+
+          {/* Featured Singles */}
+          {singles.length > 0 && (
+            <section>
+              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
+              <ArtistTrackList tracks={singles} />
             </section>
           )}
         </div>

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { TRACKS, ALBUMS } from '@/lib/data'
+import { formatDuration } from '@/lib/duration-formatter'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,7 +62,7 @@ export default async function AlbumPage({ params }: PageProps) {
     return acc + mins * 60 + secs
   }, 0)
   
-  const formatDuration = (seconds: number) => {
+  const formatDurationAlbum = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
     const mins = Math.floor((seconds % 3600) / 60)
     if (hours > 0) {
@@ -108,7 +109,7 @@ export default async function AlbumPage({ params }: PageProps) {
               <div className="flex flex-wrap gap-4 text-sm text-[var(--pf-text-secondary)] mb-6">
                 <span>{albumTracks.length} tracks</span>
                 <span>•</span>
-                <span>{formatDuration(totalDuration)}</span>
+                <span>{formatDurationAlbum(totalDuration)}</span>
               </div>
               
               {/* Play Button */}
@@ -158,7 +159,7 @@ export default async function AlbumPage({ params }: PageProps) {
               
               {/* Duration */}
               <span className="text-sm text-[var(--pf-text-muted)]">
-                {track.duration}
+                {formatDuration(track.duration)}
               </span>
               
               {/* Price */}

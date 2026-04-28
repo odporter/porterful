@@ -20,6 +20,7 @@ import { ARTISTS } from '@/lib/artists'
 import { getTrackArtwork } from '@/lib/artwork'
 import { createBrowserSupabaseClient } from '@/lib/create-browser-client'
 import { mergeCanonicalTracks, dedupeQueueTracks } from '@/lib/track-dedupe'
+import { formatDuration, canonicalAlbum } from '@/lib/duration-formatter'
 
 // Public artists with confirmed music/catalog
 const VALID_SLUGS = ['od-porter', 'gune', 'atm-trap']
@@ -103,7 +104,7 @@ function TrackRow({
 
       {/* Duration */}
       <span className="hidden sm:inline text-xs font-mono text-[var(--pf-text-muted)] w-10 text-right">
-        {track.duration}
+        {formatDuration(track.duration)}
       </span>
 
       {/* Play */}
@@ -219,11 +220,13 @@ export default function MusicPage() {
   const uniqueAlbums = useMemo(() => {
     const map = new Map<string, { name: string; image: string; count: number }>()
     ALL_TRACKS.forEach((t) => {
-      const key = t.album || 'Unknown'
-      if (!map.has(key)) {
-        map.set(key, { name: key, image: t.image || '', count: 0 })
+      const canonicalName = canonicalAlbum(t.album)
+      if (!canonicalName) return // Skip singles/no album
+      
+      if (!map.has(canonicalName)) {
+        map.set(canonicalName, { name: canonicalName, image: t.image || '', count: 0 })
       }
-      map.get(key)!.count++
+      map.get(canonicalName)!.count++
     })
     return Array.from(map.values())
   }, [ALL_TRACKS])

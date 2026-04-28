@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react'
 import { useAudio, Track } from '@/lib/audio-context'
 import { Play, Pause, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { formatDuration } from '@/lib/duration-formatter'
 
 interface ArtistTrackListProps {
   tracks: Track[]
@@ -117,7 +118,7 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
                 {/* Right side */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                   <span className="text-sm text-[var(--pf-text-muted)] font-mono w-12 text-right">
-                    {track.duration}
+                    {formatDuration(track.duration)}
                   </span>
 
                   {/* Buy — neutral price chip per UX spec (calm commerce) */}

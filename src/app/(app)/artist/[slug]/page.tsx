@@ -7,6 +7,7 @@ import { ArtistTabs } from '@/components/artist/ArtistTabs'
 import type { Track } from '@/lib/audio-context'
 import { createClient } from '@supabase/supabase-js'
 import { mergeCanonicalTracks, dedupeQueueTracks, getTrackDedupeKey } from '@/lib/track-dedupe'
+import { canonicalAlbum, isRealAlbum } from '@/lib/duration-formatter'
 
 interface SocialLinks {
   instagram?: string
@@ -123,8 +124,9 @@ export default async function ArtistPage({ params }: PageProps) {
   const featuredIdSet = new Set(featuredTracks.map((t) => t.id))
   const nonFeatured = dedupedTracks.filter((t) => !featuredIdSet.has(t.id))
 
-  const albumTracks = nonFeatured.filter((t) => !!t.album && ALBUM_LIST.includes(t.album))
-  const singles = nonFeatured.filter((t) => !t.album || !ALBUM_LIST.includes(t.album))
+  // Use canonical album matching for proper grouping
+  const albumTracks = nonFeatured.filter((t) => isRealAlbum(t.album))
+  const singles = nonFeatured.filter((t) => !isRealAlbum(t.album))
   const products: never[] = []
 
   return (

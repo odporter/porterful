@@ -1,11 +1,12 @@
 import { Track } from '@/lib/audio-context'
+import { canonicalAlbum, canonicalTitle } from '@/lib/duration-formatter'
 
-// Canonical dedupe key: normalized artist + album + title
+// Canonical dedupe key: normalized artist + canonical album + canonical title
 export function getTrackDedupeKey(track: { artist: string; album?: string | null; title: string }): string {
   const normalize = (s: string) => s.toLowerCase().trim().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ')
   const artist = normalize(track.artist)
-  const album = normalize(track.album || '')
-  const title = normalize(track.title)
+  const album = normalize(canonicalAlbum(track.album) || '')
+  const title = normalize(canonicalTitle(track.title))
   return `${artist}|${album}|${title}`
 }
 

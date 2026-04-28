@@ -55,10 +55,10 @@ export function sortTracksByAlbumOrder(tracks: Track[]): Track[] {
 }
 
 // Merge DB tracks with static, applying canonical rules:
-// 1. Static tracks with verified CDN URLs are PRIMARY source
-// 2. DB tracks only added if no static equivalent exists
+// 1. DB tracks are PRIMARY source (canonical)
+// 2. Static tracks only added if no active DB equivalent exists
 // 3. Inactive DB tracks block matching static from public display (for Artgasm, etc.)
-// 4. Static tracks always win over DB duplicates
+// 4. Deduplicate by album + track_number for O D Porter to prevent duplicates like IJKFBO/yOurs
 export function mergeCanonicalTracks(
   dbTracks: (Track & { is_active?: boolean })[],
   staticTracks: Track[],
@@ -76,20 +76,7 @@ export function mergeCanonicalTracks(
     }
   })
 
-  // Second pass: add static tracks FIRST (they have verified CDN URLs)
-  staticTracks.forEach((staticTrack) => {
-    const key = getTrackDedupeKey(staticTrack)
-    
-    // Skip if blocked by inactive DB track (e.g., Artgasm)
-    if (blockedKeys.has(key)) {
-      return
-    }
-    
-    // Static tracks have priority - add them
-    merged.set(key, staticTrack)
-  })
-
-  // Third pass: add DB tracks only if no static equivalent exists
+  // Second pass: add DB tracks FIRST (canonical source)
   dbTracks.forEach((dbTrack) => {
     const key = getTrackDedupeKey(dbTrack)
     
@@ -98,17 +85,12 @@ export function mergeCanonicalTracks(
       return
     }
     
-    // Skip if already have static track for this key
-    if (merged.has(key)) {
-      return
-    }
-    
-    // Skip if blocked (inactive match)
+    // Skip if blocked
     if (blockedKeys.has(key)) {
       return
     }
     
-    // This is a DB-only track - add it
+    // DB tracks have priority - add them
     merged.set(key, {
       id: dbTrack.id,
       title: dbTrack.title,
@@ -121,6 +103,24 @@ export function mergeCanonicalTracks(
       plays: (dbTrack as any).plays || (dbTrack as any).play_count || 0,
       price: (dbTrack as any).price || (dbTrack as any).proud_to_pay_min || 1,
     })
+  })
+
+  // Third pass: add static tracks only if no DB equivalent exists
+  staticTracks.forEach((staticTrack) => {
+    const key = getTrackDedupeKey(staticTrack)
+    
+    // Skip if blocked by inactive DB track (e.g., Artgasm)
+    if (blockedKeys.has(key)) {
+      return
+    }
+    
+    // Skip if already have DB track for this key
+    if (merged.has(key)) {
+      return
+    }
+    
+    // This is a static-only track - add it
+    merged.set(key, staticTrack)
   })
 
   return Array.from(merged.values())

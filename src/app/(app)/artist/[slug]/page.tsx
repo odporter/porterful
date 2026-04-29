@@ -128,8 +128,20 @@ export default async function ArtistPage({ params }: PageProps) {
     notFound()
   }
 
+  // Resolve DB artist UUID by slug for album order lookup
+  // Static fallback uses string slug as id, but album_order rows use auth UUID
+  let artistId = artist.id
+  const { data: dbArtist } = await getServerSupabase()
+    .from('artists')
+    .select('id')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (dbArtist?.id) {
+    artistId = dbArtist.id
+  }
+
   // Fetch custom album order
-  const albumOrder = await getArtistAlbumOrder(artist.id)
+  const albumOrder = await getArtistAlbumOrder(artistId)
 
   // Dedupe queue before passing to player
   const dedupedTracks = dedupeQueueTracks(tracks)

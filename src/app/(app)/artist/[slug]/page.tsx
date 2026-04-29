@@ -46,7 +46,8 @@ async function getArtistAlbumOrder(artistId: string): Promise<Record<string, num
   
   const order: Record<string, number> = {}
   data?.forEach((row) => {
-    order[row.album_name] = row.sort_order
+    const key = canonicalAlbum(row.album_name) || row.album_name
+    order[key] = row.sort_order
   })
   return order
 }

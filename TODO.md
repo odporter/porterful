@@ -1,30 +1,50 @@
-# Porterful Site Improvements - Batch 1 (Completed)
+# Porterful Site Improvements - Batch 1
 
-**Date:** 2026-04-29 10:38 AM CDT
+**Date:** April 29, 2026  
+**Status:** Changes saved, NOT committed or deployed
+
+---
+
+## Changes Made
+
+### 1. Rob Soule Artist Data
+**File:** `src/lib/artists.ts`
+
+**Status:** ✅ Already correct - no changes needed
+- Genre: `Hip-Hop / R&B / Blues`
+- Bio: St. Louis hip-hop and R&B artist blending blues into a soulful sound
+
+---
+
+### 2. Social Media Buttons on Artist Profile Page
+**File:** `src/components/artist/ArtistHero.tsx`
+
+**Status:** ✅ Already implemented - no changes needed
+- Social icons (Instagram, Twitter/X, YouTube, TikTok) appear near artist name
+- Only shows icons for social fields that have values
+- Icons are styled with circular background and hover effects
+
+---
+
+### 3. Reorder: Featured Singles BEFORE Albums
+**File:** `src/components/artist/ArtistTabs.tsx`
+
+**Status:** ✅ **CHANGED**
+- Moved "Featured Singles" section to appear BEFORE "Albums & Projects" section
+- Section order on artist pages is now:
+  1. Featured Tracks (if any)
+  2. **Featured Singles** ← MOVED UP
+  3. **Albums & Projects** ← MOVED DOWN
+
+---
 
 ## Summary
+- Files modified: 1 (`ArtistTabs.tsx`)
+- Lines changed: Reordered sections in Music tab (~65 lines relocated)
+- Pre-existing features verified: 2 (Rob Soule data, social buttons)
 
-### 1. Rob Soule Artist Data - VERIFIED ✓
-- **File:** `src/lib/artists.ts`
-- **Status:** Already correct (verified, no changes needed)
-- **Genre:** 'Hip-Hop / R&B / Blues' ✓
-- **Bio:** Already reflects "St. Louis hip-hop and R&B artist blending blues into a soulful sound" ✓
-
-### 2. Social Media Buttons on Artist Profile - VERIFIED ✓
-- **File:** `src/components/artist/ArtistHero.tsx`
-- **Status:** Already implemented
-- Shows icons for Instagram, Twitter/X, YouTube, TikTok (if fields filled)
-- Located in profile header near artist name (below genre/location line)
-- Uses inline SVG icons for each platform
-- Example: Rob Soule has all 4 social links (instagram, twitter, youtube, tiktok)
-
-### 3. Singles Section Order - FIXED ✓
-- **File:** `src/components/artist/ArtistTabs.tsx`
-- **Change:** Moved Featured Singles section to appear BEFORE Albums & Projects
-- **Order now:** Featured Tracks → Featured Singles → Albums & Projects
-
-## Notes
-- No commits made
-- No deployment
-- All changes saved to codebase only
-- Verified all 3 items are working correctly
+**Next Steps:**
+- Review changes
+- Run `npm run build` to verify no TypeScript errors
+- Commit when ready
+- Deploy via Vercel

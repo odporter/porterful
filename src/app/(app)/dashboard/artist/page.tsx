@@ -223,7 +223,7 @@ export default function ArtistDashboardPage() {
                         </span>
                       )}
                       <Link
-                        href={`/dashboard/artist/edit/track/${track.id}`}
+                        href={`/dashboard/artist/tracks/${track.id}/edit`}
                         className="pf-btn pf-btn-secondary text-[var(--pf-text-secondary)]"
                         title="Edit track"
                       >

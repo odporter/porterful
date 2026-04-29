@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useSupabase } from '@/app/providers'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, Check, AlertCircle, Save, Trash2, Eye, EyeOff, X, Music } from 'lucide-react'
+import { ArrowLeft, Check, AlertCircle, Save, Trash2, Eye, EyeOff, X, Music, Play, Lock } from 'lucide-react'
 
 interface Track {
   id: string
@@ -20,6 +20,9 @@ interface Track {
   is_active: boolean
   featured: boolean
   track_number: number | null
+  playback_mode?: 'full' | 'preview' | 'locked'
+  preview_duration_seconds?: number
+  unlock_required?: boolean
   created_at: string
   updated_at?: string
   play_count: number
@@ -46,6 +49,8 @@ export default function EditTrackPage() {
   const [featured, setFeatured] = useState(false)
   const [coverUrl, setCoverUrl] = useState('')
   const [trackNumber, setTrackNumber] = useState<number | ''>('')
+  const [playbackMode, setPlaybackMode] = useState<'full' | 'preview' | 'locked'>('full')
+  const [previewDuration, setPreviewDuration] = useState<number>(60)
 
   // Load track data
   useEffect(() => {
@@ -97,6 +102,8 @@ export default function EditTrackPage() {
       setFeatured(trackData.featured ?? false)
       setCoverUrl(trackData.cover_url || '')
       setTrackNumber(trackData.track_number ?? '')
+      setPlaybackMode(trackData.playback_mode || 'full')
+      setPreviewDuration(trackData.preview_duration_seconds || 60)
       setLoading(false)
     }
 
@@ -125,6 +132,8 @@ export default function EditTrackPage() {
           featured: featured,
           cover_url: coverUrl.trim() || null,
           track_number: trackNumber === '' ? null : parseInt(String(trackNumber), 10),
+          playback_mode: playbackMode,
+          preview_duration_seconds: playbackMode === 'preview' ? Math.max(5, Math.min(300, previewDuration || 60)) : 60,
         }),
       })
 
@@ -371,6 +380,92 @@ export default function EditTrackPage() {
                   className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${featured ? 'translate-x-6' : 'translate-x-0'}`}
                 />
               </button>
+            </div>
+          </div>
+
+          {/* Playback Access */}
+          <div className="pf-card p-6 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--pf-text-muted)]">Playback Access</h3>
+            
+            <div className="space-y-3">
+              {/* Full Track */}
+              <label className="flex items-start gap-3 p-4 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)] cursor-pointer hover:border-[var(--pf-orange)] transition-colors">
+                <input
+                  type="radio"
+                  name="playback_mode"
+                  value="full"
+                  checked={playbackMode === 'full'}
+                  onChange={(e) => setPlaybackMode(e.target.value as any)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Play size={18} className="text-[var(--pf-orange)]" />
+                    <span className="font-medium">Full Track</span>
+                  </div>
+                  <p className="text-xs text-[var(--pf-text-muted)] mt-1">
+                    Public listeners can play the complete track
+                  </p>
+                </div>
+              </label>
+
+              {/* Preview */}
+              <label className="flex items-start gap-3 p-4 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)] cursor-pointer hover:border-[var(--pf-orange)] transition-colors">
+                <input
+                  type="radio"
+                  name="playback_mode"
+                  value="preview"
+                  checked={playbackMode === 'preview'}
+                  onChange={(e) => setPlaybackMode(e.target.value as any)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Play size={18} className="text-yellow-400" />
+                    <span className="font-medium">60-Second Preview</span>
+                  </div>
+                  <p className="text-xs text-[var(--pf-text-muted)] mt-1">
+                    Public listeners hear only first {previewDuration} seconds
+                  </p>
+                  {playbackMode === 'preview' && (
+                    <div className="mt-3 flex items-center gap-3">
+                      <label className="text-sm">Preview duration:</label>
+                      <input
+                        type="number"
+                        min="5"
+                        max="300"
+                        value={previewDuration}
+                        onChange={(e) => setPreviewDuration(parseInt(e.target.value) || 60)}
+                        className="w-20 px-3 py-2 bg-[var(--pf-bg-secondary)] border border-[var(--pf-border)] rounded-lg text-white text-center"
+                      />
+                      <span className="text-sm text-[var(--pf-text-muted)]">seconds</span>
+                    </div>
+                  )}
+                </div>
+              </label>
+
+              {/* Locked - Disabled */}
+              <label className="flex items-start gap-3 p-4 bg-[var(--pf-surface)] rounded-xl border border-[var(--pf-border)] opacity-60 cursor-not-allowed">
+                <input
+                  type="radio"
+                  name="playback_mode"
+                  value="locked"
+                  checked={playbackMode === 'locked'}
+                  onChange={(e) => setPlaybackMode(e.target.value as any)}
+                  className="mt-1"
+                  disabled
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Lock size={18} className="text-red-400" />
+                    <span className="font-medium">Unlock Required</span>
+                    <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">Coming Soon</span>
+                  </div>
+                  <p className="text-xs text-[var(--pf-text-muted)] mt-1">
+                    Requires purchase/unlock to play (payment system in development)
+                  </p>
+                </div>
+              </label>
             </div>
           </div>
 

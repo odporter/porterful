@@ -174,7 +174,15 @@ export function ArtistTabs({
             </section>
           )}
 
-          {/* Albums / Projects */}
+          {/* Featured Singles - MOVED: Now appears before Albums */}
+          {singles.length > 0 && (
+            <section>
+              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
+              <ArtistTrackList tracks={singles} />
+            </section>
+          )}
+
+          {/* Albums / Projects - MOVED: Now appears after Singles */}
           {albumGroups.length > 0 && (
             <section>
               <h2 className="text-base font-semibold mb-3">Albums &amp; Projects</h2>
@@ -236,14 +244,6 @@ export function ArtistTabs({
                   )
                 })}
               </div>
-            </section>
-          )}
-
-          {/* Featured Singles */}
-          {singles.length > 0 && (
-            <section>
-              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
-              <ArtistTrackList tracks={singles} />
             </section>
           )}
 

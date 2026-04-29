@@ -117,7 +117,7 @@ export default function UploadPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12">
+      <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
         <div className="pf-container max-w-2xl">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-[var(--pf-surface)] rounded w-1/4" />
@@ -130,7 +130,7 @@ export default function UploadPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
+      <div className="min-h-screen pt-24 pb-12 mobile-page-safe flex items-center justify-center">
         <div className="pf-card p-8 text-center max-w-md w-full mx-6">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-[var(--pf-border)] bg-[var(--pf-surface)] flex items-center justify-center">
             <Check size={32} className="text-[var(--pf-text-secondary)]" />
@@ -143,7 +143,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
       <div className="pf-container max-w-2xl">
         <Link
           href="/dashboard"

@@ -55,14 +55,25 @@ export default function TrackEditPage() {
       return
     }
 
-    // Verify ownership
-    const { data: artist } = await supabase
-      .from('artists')
-      .select('user_id')
-      .eq('id', track.artist_id)
-      .single()
+    // Canonical Porterful ownership: auth.users.id === profiles.id === artists.id === tracks.artist_id
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, email, role')
+      .eq('id', user.id)
+      .maybeSingle()
 
-    if (artist?.user_id !== user.id) {
+    const { data: artistRow } = await supabase
+      .from('artists')
+      .select('id, slug')
+      .eq('id', track.artist_id)
+      .maybeSingle()
+
+    const isOwner =
+      track.artist_id === user.id ||
+      profile?.id === user.id ||
+      artistRow?.id === user.id
+
+    if (!isOwner) {
       setMessage('You do not own this track')
       setLoading(false)
       return
@@ -104,14 +115,14 @@ export default function TrackEditPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-24 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-24 mobile-page-safe flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[var(--pf-orange)]" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-24">
+    <div className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-24 mobile-page-safe">
       <div className="pf-container max-w-2xl">
         <h1 className="text-3xl font-bold mb-2">Edit Track</h1>
         <p className="text-[var(--pf-text-secondary)] mb-8">{form.title}</p>

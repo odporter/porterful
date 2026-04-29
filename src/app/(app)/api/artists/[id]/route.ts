@@ -142,6 +142,7 @@ export async function PATCH(
     if (youtube_url !== undefined) artistUpdates.youtube_url = youtube_url
     if (twitter_url !== undefined) artistUpdates.twitter_url = twitter_url
     if (instagram_url !== undefined) artistUpdates.instagram_url = instagram_url
+    if (avatar_url !== undefined) artistUpdates.avatar_url = avatar_url
     if (cover_url !== undefined) artistUpdates.cover_url = cover_url
 
     if (Object.keys(artistUpdates).length > 0) {

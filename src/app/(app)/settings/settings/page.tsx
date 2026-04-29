@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSupabase } from '@/app/providers';
 import { useRouter } from 'next/navigation';
@@ -14,9 +14,12 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'referrals' | 'payouts' | 'notifications'>('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [message, setMessage] = useState('');
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState({
+    role: '',
     name: '',
     email: '',
     bio: '',
@@ -52,6 +55,7 @@ export default function SettingsPage() {
     
     if (data) {
       setProfile({
+        role: data.role || '',
         name: data.full_name || data.name || '',
         email: data.email || user.email || '',
         bio: data.bio || '',
@@ -92,6 +96,7 @@ export default function SettingsPage() {
         bio: profile.bio,
         location: profile.location,
         website: profile.website,
+        avatar_url: profile.avatar_url,
       })
       .eq('id', user.id);
 
@@ -116,12 +121,73 @@ export default function SettingsPage() {
           bio: profile.bio,
           location: profile.location,
           website_url: profile.website,
+          avatar_url: profile.avatar_url,
         })
         .eq('id', user.id);
     }
 
     setMessage('Profile saved!');
     setSaving(false);
+  }
+
+  async function uploadProfilePhoto(file: File) {
+    if (!user || !supabase) return;
+
+    setPhotoUploading(true);
+    setMessage('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'artist-images');
+
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const uploadData = await uploadRes.json().catch(() => ({}));
+
+      if (!uploadRes.ok || uploadData.error) {
+        throw new Error(uploadData.error || 'Upload failed');
+      }
+
+      const url = uploadData.url as string;
+      setProfile((prev) => ({ ...prev, avatar_url: url }));
+
+      if (profile.role === 'artist') {
+        const patchRes = await fetch(`/api/artists/${user.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: profile.name,
+            bio: profile.bio,
+            location: profile.location,
+            website: profile.website,
+            avatar_url: url,
+          }),
+        });
+
+        if (!patchRes.ok) {
+          const patchData = await patchRes.json().catch(() => ({}));
+          throw new Error(patchData.error || 'Failed to update profile photo');
+        }
+      } else {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: url })
+          .eq('id', user.id);
+
+        if (profileError) {
+          throw profileError;
+        }
+      }
+
+      setMessage('Profile photo updated!');
+    } catch (err: any) {
+      setMessage('Error updating photo: ' + (err?.message || 'Unknown error'));
+    } finally {
+      setPhotoUploading(false);
+    }
   }
 
   if (loading) {
@@ -133,7 +199,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--pf-bg)] text-white py-8 px-6">
+    <div className="min-h-screen bg-[var(--pf-bg)] text-white py-8 px-6 mobile-page-safe">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -263,9 +329,25 @@ export default function SettingsPage() {
                       )}
                     </div>
                     <div>
-                      <button className="bg-[var(--pf-orange)] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[var(--pf-orange-light)] transition-colors">
-                        Upload Photo
+                      <button
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={photoUploading}
+                        className="bg-[var(--pf-orange)] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[var(--pf-orange-light)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {photoUploading ? 'Uploading...' : 'Upload Photo'}
                       </button>
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) void uploadProfilePhoto(file)
+                          e.currentTarget.value = ''
+                        }}
+                        className="hidden"
+                      />
                       <p className="text-gray-500 text-sm mt-2">JPG, PNG. Max 5MB.</p>
                     </div>
                   </div>
@@ -406,17 +488,24 @@ export default function SettingsPage() {
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold">Stripe Account</p>
-                      <p className="text-gray-500 text-sm">Connect to receive payouts</p>
+                      <p className="text-gray-500 text-sm">Stripe payouts are not live yet</p>
                     </div>
-                    <button className="bg-[var(--pf-orange)] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[var(--pf-orange-light)] transition-colors">
-                      Connect Stripe
+                    <button
+                      type="button"
+                      disabled
+                      className="bg-[var(--pf-surface-hover)] text-[var(--pf-text-muted)] px-4 py-2 rounded-lg font-semibold cursor-not-allowed opacity-80"
+                    >
+                      Stripe payouts coming soon
                     </button>
                   </div>
+                  <p className="text-[var(--pf-text-muted)] text-sm mt-3">
+                    Honest status: Stripe Connect is not live in this build yet.
+                  </p>
                 </div>
 
                 <div className="border-t border-[var(--pf-border)] pt-6">
                   <h3 className="font-semibold mb-4">Payout History</h3>
-                  <p className="text-gray-500 text-sm">No payouts yet. Connect Stripe to start receiving earnings.</p>
+                  <p className="text-gray-500 text-sm">No payouts yet. Stripe Connect is coming soon.</p>
                 </div>
               </div>
             )}

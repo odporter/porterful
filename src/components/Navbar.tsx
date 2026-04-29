@@ -40,6 +40,25 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [profileOpen])
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false)
+        setProfileOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileOpen])
+
   const handleSignOut = async () => {
     if (supabase) {
       await supabase.auth.signOut()
@@ -207,7 +226,24 @@ export function Navbar() {
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col h-full pt-20 px-6">
+        <div
+          className="flex flex-col h-full pt-20 px-6 overflow-y-auto"
+          onClick={() => setMobileOpen(false)}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--pf-text-muted)]">Menu</p>
+              <p className="text-sm font-medium text-[var(--pf-text)]">Porterful</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(false)}
+              className="p-2 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-surface)] text-[var(--pf-text)]"
+              aria-label="Close menu"
+            >
+              <X size={18} />
+            </button>
+          </div>
 
           {/* Mobile Nav — only items NOT covered by the persistent bottom nav
               (Music / Artists / Store / Dashboard live there). */}

@@ -17,6 +17,8 @@ export default async function DashboardRoot() {
     redirect('/login')
   }
 
+  const inferredRole = user.user_metadata?.role === 'artist' ? 'artist' : 'supporter'
+
   const { data: existingProfile } = await supabase
     .from('profiles')
     .select('*')
@@ -37,7 +39,7 @@ export default async function DashboardRoot() {
           id: user.id,
           email: user.email?.toLowerCase() ?? '',
           name: user.email?.split('@')[0] ?? '',
-          role: 'supporter',
+          role: inferredRole,
         },
         { onConflict: 'id' }
       )
@@ -50,6 +52,18 @@ export default async function DashboardRoot() {
     }
 
     profile = createdProfile
+  } else if (inferredRole === 'artist' && profile.role !== 'artist') {
+    const adminSb = createServerClient()
+    const { data: normalizedProfile } = await adminSb
+      .from('profiles')
+      .update({ role: 'artist' })
+      .eq('id', user.id)
+      .select('*')
+      .single()
+
+    if (normalizedProfile) {
+      profile = normalizedProfile
+    }
   }
 
   // Role-aware redirect: artists to their specific dashboard

@@ -186,7 +186,7 @@ export default function EditArtistPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12">
+      <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
         <div className="pf-container max-w-3xl">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-[var(--pf-surface)] rounded w-1/4" />
@@ -199,7 +199,7 @@ export default function EditArtistPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
       <div className="pf-container max-w-3xl">
         <Link
           href="/dashboard"

@@ -28,6 +28,7 @@ export function GlobalPlayer() {
   const [showVisualizer, setShowVisualizer] = useState(false)
   const [mounted, setMounted] = useState(false)
   const progressRef = useRef<HTMLDivElement>(null)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -67,6 +68,26 @@ export function GlobalPlayer() {
   const artistHref = `/artist/${artistSlug}`
 
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0
+
+  const handleExpandedTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0]
+    if (!touch) return
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleExpandedTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current
+    const touch = e.changedTouches[0]
+    touchStartRef.current = null
+    if (!start || !touch) return
+
+    const dx = touch.clientX - start.x
+    const dy = touch.clientY - start.y
+
+    if (dy > 70 && Math.abs(dy) > Math.abs(dx)) {
+      setExpanded(false)
+    }
+  }
 
   return (
     <>
@@ -204,9 +225,13 @@ export function GlobalPlayer() {
 
       {/* Expanded Player */}
       {expanded && (
-        <div className="fixed inset-0 bg-[var(--pf-bg)] z-[60] flex flex-col">
+        <div
+          className="fixed inset-0 bg-[var(--pf-bg)] z-[60] flex flex-col overflow-hidden"
+          onTouchStart={handleExpandedTouchStart}
+          onTouchEnd={handleExpandedTouchEnd}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-[var(--pf-border)]">
+          <div className="flex items-center justify-between p-4 border-b border-[var(--pf-border)] shrink-0">
             <button onClick={() => setExpanded(false)} className="p-2">
               <ChevronDown size={24} />
             </button>
@@ -217,8 +242,8 @@ export function GlobalPlayer() {
           </div>
 
           {/* Album Art */}
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-sm aspect-square rounded-2xl overflow-hidden shadow-2xl relative">
+          <div className="flex-1 min-h-0 flex items-center justify-center px-4 py-4 md:px-8 md:py-8">
+            <div className="w-full max-w-xs md:max-w-sm aspect-square rounded-2xl overflow-hidden shadow-2xl relative">
               <Image 
                 src={getTrackArtwork(currentTrack)}
                 alt={currentTrack.title}
@@ -230,11 +255,11 @@ export function GlobalPlayer() {
           </div>
 
           {/* Track Info */}
-          <div className="px-8 text-center">
-            <h2 className="text-2xl font-bold truncate">{currentTrack.title}</h2>
+          <div className="px-4 text-center md:px-8">
+            <h2 className="text-xl font-bold truncate md:text-2xl">{currentTrack.title}</h2>
             <Link
               href={artistHref}
-              className="text-lg text-[var(--pf-text-secondary)] truncate hover:text-[var(--pf-text)] transition-colors block"
+              className="block truncate text-base text-[var(--pf-text-secondary)] transition-colors hover:text-[var(--pf-text)] md:text-lg"
             >
               {currentTrack.artist}
             </Link>
@@ -244,7 +269,7 @@ export function GlobalPlayer() {
           </div>
 
           {/* Progress */}
-          <div className="px-8 py-6">
+          <div className="px-4 py-4 md:px-8 md:py-6">
             <div 
               className="h-2 bg-[var(--pf-bg)] rounded-full overflow-hidden cursor-pointer group"
               onClick={handleProgressClick}
@@ -280,7 +305,7 @@ export function GlobalPlayer() {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-6 pb-8">
+          <div className="flex items-center justify-center gap-6 pb-4 md:pb-8 shrink-0">
             <button 
               onClick={playPrev}
               className="p-3 rounded-full hover:bg-[var(--pf-surface)] transition-colors"
@@ -302,7 +327,7 @@ export function GlobalPlayer() {
           </div>
 
           {/* Volume */}
-          <div className="px-8 pb-4">
+          <div className="hidden px-8 pb-4 md:block">
             <div className="flex items-center gap-3">
               <button onClick={() => setIsMuted(!isMuted)} className="p-2">
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
@@ -319,7 +344,7 @@ export function GlobalPlayer() {
           </div>
 
           {/* Fan CTA */}
-          <div className="px-8 pb-8">
+          <div className="hidden px-8 pb-8 md:block">
             <div className="bg-[var(--pf-surface)] rounded-xl p-4 border border-[var(--pf-border)]">
               <p className="text-sm font-medium mb-2">Support this artist directly</p>
               <p className="text-xs text-[var(--pf-text-muted)] mb-3">Artists who care share with fans who care. Unlock full tracks or become a superfan.</p>

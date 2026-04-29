@@ -57,7 +57,7 @@ export default function HomePage() {
         <section className="relative overflow-hidden border-b border-[var(--pf-border)] bg-gradient-to-b from-[var(--pf-accent)]/10 via-[var(--pf-bg)] to-[var(--pf-bg)]">
           <div className="pf-container py-12 md:py-20">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--pf-accent)] mb-4">
+              <p className="hidden sm:block text-sm font-semibold uppercase tracking-[0.2em] text-[var(--pf-accent)] mb-4">
                 Porterful
               </p>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-[-0.03em]">

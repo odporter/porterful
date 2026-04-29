@@ -185,7 +185,7 @@ export default function EditTrackPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12">
+      <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
         <div className="pf-container max-w-2xl">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-[var(--pf-surface)] rounded w-1/4" />
@@ -198,7 +198,7 @@ export default function EditTrackPage() {
 
   if (error && !track) {
     return (
-      <div className="min-h-screen pt-24 pb-12">
+      <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
         <div className="pf-container max-w-2xl">
           <div className="pf-card p-8 text-center">
             <AlertCircle size={48} className="mx-auto mb-4 text-[var(--pf-text-muted)]" />
@@ -214,7 +214,7 @@ export default function EditTrackPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12 mobile-page-safe">
       <div className="pf-container max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">

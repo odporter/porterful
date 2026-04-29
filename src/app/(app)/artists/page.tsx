@@ -1,8 +1,10 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Check, MapPin, Music } from 'lucide-react'
+import { useSupabase } from '@/app/providers'
 
 const PUBLIC_ARTISTS = [
   {
@@ -41,6 +43,61 @@ const PUBLIC_ARTISTS = [
 ] as const
 
 export default function ArtistsPage() {
+  const { user, supabase, loading: authLoading } = useSupabase()
+  const [ctaReady, setCtaReady] = useState(false)
+  const [ctaHref, setCtaHref] = useState('/signup?role=supporter')
+  const [ctaLabel, setCtaLabel] = useState('Join Porterful')
+  const [ctaDescription, setCtaDescription] = useState('Checking account...')
+
+  useEffect(() => {
+    let active = true
+
+    async function loadCta() {
+      if (authLoading) return
+
+      if (!user || !supabase) {
+        if (!active) return
+        setCtaHref('/signup?role=supporter')
+        setCtaLabel('Join Porterful')
+        setCtaDescription('Create your free fan account')
+        setCtaReady(true)
+        return
+      }
+
+      const [{ data: profile }, { data: artist }] = await Promise.all([
+        supabase.from('profiles').select('id, role').eq('id', user.id).maybeSingle(),
+        supabase.from('artists').select('id, slug').eq('id', user.id).maybeSingle(),
+      ])
+
+      if (!active) return
+
+      const isArtistAccount = Boolean(artist) || profile?.role === 'artist'
+
+      if (isArtistAccount && artist) {
+        setCtaHref('/dashboard/artist')
+        setCtaLabel('Manage My Artist Profile')
+        setCtaDescription('Go to your artist dashboard')
+      } else if (profile?.role === 'artist') {
+        setCtaHref('/dashboard/artist/edit')
+        setCtaLabel('Continue Setup')
+        setCtaDescription('Finish your Porterful artist setup')
+      } else {
+        setCtaHref('/apply/form')
+        setCtaLabel('Apply as Artist')
+        setCtaDescription('Join Porterful as a creator')
+      }
+
+      setCtaReady(true)
+    }
+
+    setCtaReady(false)
+    void loadCta()
+
+    return () => {
+      active = false
+    }
+  }, [authLoading, user, supabase])
+
   return (
     <div className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-24">
       <section className="relative overflow-hidden border-b border-[var(--pf-border)] bg-gradient-to-br from-[var(--pf-orange)]/10 via-[var(--pf-bg)] to-[var(--pf-bg)]">
@@ -56,13 +113,27 @@ export default function ArtistsPage() {
             <p className="mt-3 max-w-xl text-base text-[var(--pf-text-secondary)]">
               Only the artists we can stand behind publicly. Real profiles, real music, no filler.
             </p>
-            <Link
-              href="/apply/form"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--pf-orange)] px-5 py-3 font-semibold text-white transition-colors hover:bg-[var(--pf-orange-dark)]"
-            >
-              Apply to Join
-              <ArrowRight size={16} />
-            </Link>
+            {ctaReady ? (
+              <Link
+                href={ctaHref}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--pf-orange)] px-5 py-3 font-semibold text-white transition-colors hover:bg-[var(--pf-orange-dark)]"
+              >
+                {ctaLabel}
+                <ArrowRight size={16} />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--pf-orange)] px-5 py-3 font-semibold text-white opacity-70"
+              >
+                Checking account...
+                <ArrowRight size={16} />
+              </button>
+            )}
+            <p className="mt-3 text-sm text-[var(--pf-text-secondary)]">
+              {ctaDescription}
+            </p>
           </div>
         </div>
       </section>

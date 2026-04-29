@@ -93,7 +93,21 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     // percent for the bar via (progress / duration) * 100.
     const handleTimeUpdate = () => {
       if (!audioRef.current) return;
-      setProgress(audioRef.current.currentTime || 0);
+      const currentTime = audioRef.current.currentTime || 0;
+      setProgress(currentTime);
+      
+      // Check for preview mode - stop at preview duration
+      const track = currentTrackRef.current;
+      if (track && (track as any).playback_mode === 'preview') {
+        const previewDuration = (track as any).preview_duration_seconds || 60;
+        if (currentTime >= previewDuration) {
+          log('Preview ended for track:', track.title);
+          // Pause at preview end
+          audioRef.current.pause();
+          setIsPlaying(false);
+          // Optionally show preview ended state or auto-advance
+        }
+      }
     };
 
     // ─── EVENT: loadedmetadata ────────────────────────────────────────────────

@@ -99,6 +99,11 @@ export function GlobalPlayer() {
                     {mode}
                   </span>
                 )}
+                {(currentTrack as any).playback_mode === 'preview' && (
+                  <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                    Preview
+                  </span>
+                )}
               </div>
               <Link
                 href={artistHref}
@@ -179,6 +184,20 @@ export function GlobalPlayer() {
               <span>{formatTime(progress)}</span>
               <span>{formatTime(duration)}</span>
             </div>
+            
+            {/* Preview ended message */}
+            {(currentTrack as any).playback_mode === 'preview' && !isPlaying && progress >= ((currentTrack as any).preview_duration_seconds || 60) - 1 && (
+              <div className="mt-2 text-center">
+                <p className="text-sm text-yellow-400">Preview ended — unlock full track</p>
+                <button 
+                  className="mt-1 text-xs bg-[var(--pf-surface)] hover:bg-[var(--pf-orange)]/20 border border-[var(--pf-border)] px-3 py-1 rounded transition-colors disabled:opacity-50"
+                  disabled
+                  title="Unlock feature coming soon"
+                >
+                  Unlock Full Track
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

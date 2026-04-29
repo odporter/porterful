@@ -341,6 +341,7 @@ export default function ArtistProfilePage({ params }: { params: { id: string } }
                 )}
               </div>
               {/* Social icons next to name - moved to profile header */}
+              {/* Social media icons - inline with name */}
               <div className="flex items-center gap-1.5 mb-2">
                 {artistData.social?.instagram && (
                   <a href={`https://instagram.com/${artistData.social.instagram.replace('@', '')}`} target="_blank" rel="noopener" className="p-1.5 rounded-lg hover:bg-[var(--pf-surface)] transition-colors" title="Instagram">

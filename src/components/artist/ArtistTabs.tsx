@@ -35,6 +35,7 @@ interface ArtistTabsProps {
   singles: Track[]
   albumTracks: Track[]
   products: Product[]
+  albumOrder?: Record<string, number>
 }
 
 function getTrackNumberFromId(track: Track): number | null {
@@ -46,7 +47,7 @@ function getTrackNumberFromId(track: Track): number | null {
   return null
 }
 
-function buildAlbumGroups(tracks: Track[]): Array<{ name: string; image: string; tracks: Track[] }> {
+function buildAlbumGroups(tracks: Track[], albumOrder?: Record<string, number>): Array<{ name: string; image: string; tracks: Track[] }> {
   const map = new Map<string, { name: string; image: string; tracks: Track[] }>()
   tracks.forEach((t) => {
     // Use canonical album name to prevent duplicates (Roxannity -> Roxanity)
@@ -66,6 +67,18 @@ function buildAlbumGroups(tracks: Track[]): Array<{ name: string; image: string;
   result.forEach((album) => {
     album.tracks = sortTracksByAlbumOrder(album.tracks)
   })
+  
+  // Sort albums by custom order if provided, otherwise by name
+  if (albumOrder && Object.keys(albumOrder).length > 0) {
+    result.sort((a, b) => {
+      const orderA = albumOrder[a.name] ?? 999
+      const orderB = albumOrder[b.name] ?? 999
+      return orderA - orderB
+    })
+  } else {
+    // Default: sort by name
+    result.sort((a, b) => a.name.localeCompare(b.name))
+  }
   
   return result
 }
@@ -93,10 +106,11 @@ export function ArtistTabs({
   singles,
   albumTracks,
   products,
+  albumOrder,
 }: ArtistTabsProps) {
   const [active, setActive] = useState<TabKey>('music')
   const [openAlbum, setOpenAlbum] = useState<string | null>(null)
-  const albumGroups = useMemo(() => buildAlbumGroups(albumTracks), [albumTracks])
+  const albumGroups = useMemo(() => buildAlbumGroups(albumTracks, albumOrder), [albumTracks, albumOrder])
 
   const cappedFeatured = featuredTracks.slice(0, 3)
   const featuredQueue = useMemo(
@@ -157,14 +171,6 @@ export function ArtistTabs({
                 <h2 className="text-base font-semibold">Featured Tracks</h2>
               </div>
               <ArtistTrackList tracks={cappedFeatured} />
-            </section>
-          )}
-
-          {/* Featured Singles */}
-          {singles.length > 0 && (
-            <section>
-              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
-              <ArtistTrackList tracks={singles} />
             </section>
           )}
 
@@ -230,6 +236,14 @@ export function ArtistTabs({
                   )
                 })}
               </div>
+            </section>
+          )}
+
+          {/* Featured Singles */}
+          {singles.length > 0 && (
+            <section>
+              <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
+              <ArtistTrackList tracks={singles} />
             </section>
           )}
 

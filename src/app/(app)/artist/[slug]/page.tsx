@@ -30,6 +30,27 @@ function getServerSupabase() {
   )
 }
 
+// Fetch album display order for artist
+async function getArtistAlbumOrder(artistId: string): Promise<Record<string, number>> {
+  const supabase = getServerSupabase()
+  const { data, error } = await supabase
+    .from('artist_album_order')
+    .select('album_name, sort_order')
+    .eq('artist_id', artistId)
+    .order('sort_order')
+  
+  if (error) {
+    console.error('[getArtistAlbumOrder] Error:', error)
+    return {}
+  }
+  
+  const order: Record<string, number> = {}
+  data?.forEach((row) => {
+    order[row.album_name] = row.sort_order
+  })
+  return order
+}
+
 async function getServerTracksByArtistNameFull(artistName: string) {
   const supabase = getServerSupabase()
   const { data, error } = await supabase
@@ -106,6 +127,9 @@ export default async function ArtistPage({ params }: PageProps) {
     notFound()
   }
 
+  // Fetch custom album order
+  const albumOrder = await getArtistAlbumOrder(artist.id)
+
   // Dedupe queue before passing to player
   const dedupedTracks = dedupeQueueTracks(tracks)
 
@@ -154,6 +178,7 @@ export default async function ArtistPage({ params }: PageProps) {
         singles={singles}
         albumTracks={albumTracks}
         products={products}
+        albumOrder={albumOrder}
       />
     </div>
   )

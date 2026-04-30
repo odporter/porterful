@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createBrowserSupabaseClient } from '@/lib/create-browser-client'
-import { Loader2, Save, Play, Lock } from 'lucide-react'
+import { Loader2, Save, Play, Lock, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 interface TrackEditForm {
   title: string
@@ -136,6 +137,11 @@ export default function TrackEditPage() {
   return (
     <div className="min-h-screen bg-[var(--pf-bg)] pt-20 pb-24 mobile-page-safe">
       <div className="pf-container max-w-2xl">
+        <Link href="/dashboard/artist" className="inline-flex items-center gap-2 text-sm text-[var(--pf-text-muted)] transition-colors hover:text-[var(--pf-text)] mb-4">
+          <ArrowLeft size={16} />
+          Back to Catalog
+        </Link>
+
         <h1 className="text-3xl font-bold mb-2">Edit Track</h1>
         <p className="text-[var(--pf-text-secondary)] mb-8">{form.title}</p>
 

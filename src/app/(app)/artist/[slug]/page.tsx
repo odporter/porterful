@@ -58,7 +58,7 @@ async function getServerTracksByArtistNameFull(artistName: string) {
     .from('tracks')
     .select('*')
     .eq('artist', artistName)
-    .order('created_at', { ascending: false })
+    .order('track_number', { ascending: true, nullsFirst: false })
   
   if (error) {
     console.error('[getServerTracksByArtistNameFull] Error:', error)

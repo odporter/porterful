@@ -8,7 +8,7 @@ import type { Track } from '@/lib/audio-context'
 import type { Product } from '@/lib/products'
 import { ArtistTrackList } from '@/components/artist/ArtistTrackList'
 import { FeaturedTrackCard } from '@/components/artist/FeaturedTrackCard'
-import { sortTracksByAlbumOrder, getTrackDedupeKey, dedupeQueueTracks } from '@/lib/track-dedupe'
+import { sortTracksByAlbumOrder, getTrackDedupeKey, dedupeQueueTracks, filterPlayableTracks } from '@/lib/track-dedupe'
 import { canonicalAlbum } from '@/lib/duration-formatter'
 
 type TabKey = 'music' | 'store' | 'about'
@@ -110,12 +110,15 @@ export function ArtistTabs({
 }: ArtistTabsProps) {
   const [active, setActive] = useState<TabKey>('music')
   const [openAlbum, setOpenAlbum] = useState<string | null>(null)
-  const albumGroups = useMemo(() => buildAlbumGroups(albumTracks, albumOrder), [albumTracks, albumOrder])
+  const playableFeatured = useMemo(() => filterPlayableTracks(featuredTracks), [featuredTracks])
+  const playableSingles = useMemo(() => filterPlayableTracks(singles), [singles])
+  const playableAlbumTracks = useMemo(() => filterPlayableTracks(albumTracks), [albumTracks])
+  const albumGroups = useMemo(() => buildAlbumGroups(playableAlbumTracks, albumOrder), [playableAlbumTracks, albumOrder])
 
-  const cappedFeatured = featuredTracks.slice(0, 3)
+  const cappedFeatured = playableFeatured.slice(0, 3)
   const featuredQueue = useMemo(
-    () => dedupeQueueTracks([...cappedFeatured, ...singles, ...albumTracks]),
-    [cappedFeatured, singles, albumTracks]
+    () => dedupeQueueTracks([...cappedFeatured, ...playableSingles, ...playableAlbumTracks]),
+    [cappedFeatured, playableSingles, playableAlbumTracks]
   )
 
   const socialEntries = social
@@ -151,7 +154,7 @@ export function ArtistTabs({
       {/* Music */}
       {active === 'music' && (
         <div className="space-y-8">
-          {cappedFeatured.length === 0 && singles.length === 0 && albumGroups.length === 0 && (
+          {cappedFeatured.length === 0 && playableSingles.length === 0 && albumGroups.length === 0 && (
             <div className="text-center py-16">
               <p className="text-sm text-[var(--pf-text-muted)]">No tracks yet.</p>
             </div>
@@ -175,10 +178,10 @@ export function ArtistTabs({
           )}
 
           {/* Featured Singles - Moved BEFORE Albums */}
-          {singles.length > 0 && (
+          {playableSingles.length > 0 && (
             <section>
               <h2 className="text-base font-semibold mb-3">Featured Singles</h2>
-              <ArtistTrackList tracks={singles} />
+              <ArtistTrackList tracks={playableSingles} />
             </section>
           )}
 

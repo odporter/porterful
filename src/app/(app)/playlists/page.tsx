@@ -6,8 +6,9 @@ import Image from 'next/image'
 import { useAudio } from '@/lib/audio-context'
 import { TRACKS } from '@/lib/data'
 import { isPublicTrackArtist } from '@/lib/artists'
+import { filterPlayableTracks } from '@/lib/track-dedupe'
 
-const PUBLIC_TRACKS = TRACKS.filter((track) => isPublicTrackArtist(track.artist))
+const PUBLIC_TRACKS = filterPlayableTracks(TRACKS.filter((track) => isPublicTrackArtist(track.artist)))
 
 // Custom Porterful Icons
 const Icon = {
@@ -133,6 +134,10 @@ function resolvePlaylistTracks(tracks: PlaylistTrack[]): PlaylistTrack[] {
   return tracks.map(resolvePlaylistTrack)
 }
 
+function getPlayablePlaylistTracks(tracks: PlaylistTrack[]): PlaylistTrack[] {
+  return resolvePlaylistTracks(tracks).filter((track) => !!track.audioUrl)
+}
+
 export default function PlaylistPage() {
   const { currentTrack, isPlaying, playTrack, setQueue } = useAudio()
   const [playlists, setPlaylists] = useState<Playlist[]>([])
@@ -150,7 +155,7 @@ export default function PlaylistPage() {
       const parsed = JSON.parse(saved) as Playlist[]
       setPlaylists(parsed.map((playlist) => ({
         ...playlist,
-        tracks: resolvePlaylistTracks(playlist.tracks.filter((track) => isPublicTrackArtist(track.artist))),
+        tracks: getPlayablePlaylistTracks(playlist.tracks.filter((track) => isPublicTrackArtist(track.artist))),
       })))
     }
   }, [])
@@ -216,7 +221,7 @@ export default function PlaylistPage() {
   }
 
   const playPlaylist = (playlist: Playlist) => {
-    const playableTracks = resolvePlaylistTracks(playlist.tracks).filter((track) => track.audioUrl)
+    const playableTracks = getPlayablePlaylistTracks(playlist.tracks)
     if (playableTracks.length === 0) return
 
     setQueue(playableTracks.map(t => ({

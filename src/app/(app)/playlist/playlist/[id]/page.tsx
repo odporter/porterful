@@ -52,6 +52,10 @@ function resolvePlaylistTracks(tracks: PlaylistTrack[]): PlaylistTrack[] {
   return tracks.map(resolvePlaylistTrack)
 }
 
+function getPlayablePlaylistTracks(tracks: PlaylistTrack[]): PlaylistTrack[] {
+  return resolvePlaylistTracks(tracks).filter((track) => !!track.audioUrl)
+}
+
 const Icon = {
   Play: () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -90,7 +94,7 @@ export default function PlaylistDetailPage() {
       const found = playlists.find(p => p.id === id)
       setPlaylist(found ? {
         ...found,
-        tracks: resolvePlaylistTracks(found.tracks),
+        tracks: getPlayablePlaylistTracks(found.tracks),
       } : null)
     }
     setLoading(false)
@@ -98,7 +102,7 @@ export default function PlaylistDetailPage() {
 
   const playPlaylist = () => {
     if (!playlist) return
-    const playableTracks = resolvePlaylistTracks(playlist.tracks).filter((track) => track.audioUrl)
+    const playableTracks = getPlayablePlaylistTracks(playlist.tracks)
     if (playableTracks.length === 0) return
 
     setQueue(playableTracks.map(t => ({
@@ -177,7 +181,7 @@ export default function PlaylistDetailPage() {
                 key={track.id}
                 className="flex items-center gap-4 p-4 bg-[var(--pf-surface)] rounded-xl hover:bg-[var(--pf-border)] transition-colors cursor-pointer"
                 onClick={() => {
-                  const playableTracks = resolvePlaylistTracks(playlist.tracks).filter((item) => item.audioUrl)
+                  const playableTracks = getPlayablePlaylistTracks(playlist.tracks)
                   const resolvedTrack = resolvePlaylistTrack(track)
                   if (!resolvedTrack.audioUrl) return
                   setQueue(playableTracks.map(t => ({ ...t, audio_url: t.audioUrl, duration: 180 })))

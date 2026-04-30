@@ -5,24 +5,15 @@
 2. Add social media buttons (IG, X, YouTube, TikTok) to artist profile header
 3. Move Featured Singles section above Albums on artist pages
 
-## Completed 2026-04-29 18:30 CDT
-All three changes verified present and correct. No new edits required.
+## Verified 2026-04-29 21:10 CDT
+Re-checked all three changes. Already in place — no edits needed.
 
-- Rob Soule genre: `Hip-Hop / R&B / Blues` ✓
-- Rob Soule bio: reflects STL hip-hop/R&B artist blending blues into a soulful sound ✓
-- Social icons (IG, X/Twitter, YouTube, TikTok) rendered in `ArtistHero.tsx` under artist name ✓
-- Singles section positioned before Albums & Projects in `ArtistTabs.tsx` ✓
+- `src/lib/artists.ts` — Rob Soule genre: `Hip-Hop / R&B / Blues` ✓
+- `src/lib/artists.ts` — Rob Soule bio: "Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound." ✓
+- `src/components/artist/ArtistHero.tsx` — Social icon buttons (Instagram, Twitter/X SVG, YouTube, TikTok) rendered conditionally below artist name in hero header ✓
+- `src/components/artist/ArtistTabs.tsx` — "Featured Singles" section positioned before "Albums & Projects" ✓
 
 Nothing staged, committed, or deployed.
-
-## Status
-All three changes were **already present** in the codebase at time of check:
-
-- `src/lib/artists.ts` — Rob Soule genre is `'Hip-Hop / R&B / Blues'` and bio reads "Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound."
-- `src/components/artist/ArtistHero.tsx` — Social icon buttons (Instagram, Twitter/X, YouTube, TikTok) rendered conditionally under artist name in profile header
-- `src/components/artist/ArtistTabs.tsx` — Singles section positioned before Albums/Projects section
-
-No new edits were required. Nothing committed or deployed.
 
 ## Porterful Deck Mode Backlog (2026-04-29)
 

@@ -5,6 +5,7 @@ import { useAudio, Track } from '@/lib/audio-context'
 import { Play, Pause, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { formatDuration } from '@/lib/duration-formatter'
+import { filterPlayableTracks } from '@/lib/track-dedupe'
 
 interface ArtistTrackListProps {
   tracks: Track[]
@@ -20,6 +21,7 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
   const { currentTrack, isPlaying, playTrack, togglePlay, setMode, setQueue } = useAudio()
   const router = useRouter()
   const [purchasing, setPurchasing] = useState<string | null>(null)
+  const playableTracks = filterPlayableTracks(tracks)
 
   const handlePlay = useCallback((track: Track) => {
     if (currentTrack?.id === track.id) {
@@ -29,14 +31,14 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
       // section the user tapped on (singles row stays in singles, an album
       // section stays in that album).
       setMode('artist')
-      const idx = tracks.findIndex((t) => t.id === track.id)
+      const idx = playableTracks.findIndex((t) => t.id === track.id)
       if (idx >= 0) {
-        const reordered = [...tracks.slice(idx), ...tracks.slice(0, idx)]
+        const reordered = [...playableTracks.slice(idx), ...playableTracks.slice(0, idx)]
         setQueue(reordered)
       }
       playTrack(track)
     }
-  }, [currentTrack, playTrack, togglePlay, setMode, setQueue, tracks])
+  }, [currentTrack, playTrack, togglePlay, setMode, setQueue, playableTracks])
 
   const handleBuy = useCallback(async (e: React.MouseEvent, track: Track) => {
     e.stopPropagation()
@@ -75,13 +77,13 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
   return (
     <div className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] overflow-hidden">
       <div className="divide-y divide-[var(--pf-border)]">
-        {tracks.length === 0 ? (
+        {playableTracks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
             <p className="text-sm text-[var(--pf-text-muted)] mb-2">No tracks yet</p>
             <p className="text-xs text-[var(--pf-text-secondary)]">Check back soon — music is on the way.</p>
           </div>
         ) : (
-          tracks.map((track, index) => {
+          playableTracks.map((track, index) => {
             const isActive = currentTrack?.id === track.id
 
             return (

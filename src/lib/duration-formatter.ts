@@ -54,6 +54,8 @@ const TITLE_ALIASES: Record<string, string> = {
   // Roxanity tracks
   'Roxannity (Intro)': 'Roxanne',
   'Roxanity (Intro)': 'Roxanne',
+  'Pure Lust': 'GBK Good By Kisses',
+  'GBK Good By Kisses': 'GBK Good By Kisses',
   
   // God Is Good tracks  
   'DreamWorld': 'Dream World',
@@ -70,7 +72,13 @@ const TITLE_ALIASES: Record<string, string> = {
   // From Feast to Famine tracks
   'BandFlow': 'Band Flow',
   'Band Flow': 'Band Flow',
-  
+
+  // Audio/file suffix variants
+  'Goddess to Me': 'Goddess to Me SD 480p',
+  'Goddess to Me SD 480p': 'Goddess to Me SD 480p',
+  'Facts of Life': '18 Facts Of Life',
+  '18 Facts Of Life': '18 Facts Of Life',
+
   // One Day tracks
   'Back At It': 'Back At It SD 480p',
   'Back At It SD 480p': 'Back At It SD 480p',
@@ -86,6 +94,8 @@ const TITLE_ALIASES: Record<string, string> = {
   'We The Shh Now': 'We The Shh Now',
   'Sometime': 'Sometimes',
   'Sometimes': 'Sometimes',
+  "Tory's Total Trip": 'Torys Total Trip',
+  'Torys Total Trip': 'Torys Total Trip',
 }
 
 // Normalize album name to canonical

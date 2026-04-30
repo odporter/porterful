@@ -19,7 +19,7 @@ import { TRACKS as STATIC_TRACKS } from '@/lib/data'
 import { ARTISTS } from '@/lib/artists'
 import { getTrackArtwork } from '@/lib/artwork'
 import { createBrowserSupabaseClient } from '@/lib/create-browser-client'
-import { mergeCanonicalTracks, dedupeQueueTracks, sortTracksByAlbumOrder } from '@/lib/track-dedupe'
+import { mergeCanonicalTracks, dedupeQueueTracks, sortTracksByAlbumOrder, filterPlayableTracks } from '@/lib/track-dedupe'
 import { formatDuration, canonicalAlbum } from '@/lib/duration-formatter'
 
 // Public artists with confirmed music/catalog
@@ -153,7 +153,7 @@ export default function MusicPage() {
       const { data } = await supabase
         .from('tracks')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('track_number', { ascending: true })
       
       if (data) {
         // Map DB tracks to Track format (keep is_active for dedupe logic)
@@ -169,6 +169,7 @@ export default function MusicPage() {
           plays: t.play_count || 0,
           price: t.proud_to_pay_min || 1,
           is_active: t.is_active,
+          track_number: t.track_number,
         }))
         setDbTracks(mapped)
       }
@@ -180,15 +181,17 @@ export default function MusicPage() {
   // Merge DB tracks with static fallback using canonical dedupe
   // Inactive DB tracks block matching static from public display
   const ALL_TRACKS = useMemo(() => {
-    return sortTracksByAlbumOrder(
-      mergeCanonicalTracks(dbTracks as any[], LEGACY_TRACKS, { includeInactive: false })
+    return filterPlayableTracks(
+      sortTracksByAlbumOrder(
+        mergeCanonicalTracks(dbTracks as any[], LEGACY_TRACKS, { includeInactive: false })
+      )
     )
   }, [dbTracks])
 
   // Featured track: prefer featured DB track, fallback to first track
   const heroTrack = useMemo(() => {
     // First, try to find a featured DB track
-    const featuredDb = dbTracks.find(t => (t as any).featured)
+    const featuredDb = dbTracks.find(t => (t as any).featured && t.audio_url)
     if (featuredDb) return featuredDb
     // Otherwise use current or first available
     return currentTrack ?? ALL_TRACKS[0]

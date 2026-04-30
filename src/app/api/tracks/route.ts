@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedClient } from '@/lib/auth-utils';
 import { createServerClient } from '@/lib/supabase';
 import { TRACKS } from '@/lib/data';
-import { dedupeQueueTracks, sortTracksByAlbumOrder } from '@/lib/track-dedupe';
+import { mergeCanonicalTracks } from '@/lib/track-dedupe';
 
 // POST /api/tracks — Upload a new track
 export async function POST(request: NextRequest) {
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     .from('tracks')
     .select('*')
     .eq('is_active', true)
-    .order('created_at', { ascending: false });
+    .order('track_number', { ascending: true, nullsFirst: false });
 
   if (artistId) {
     query = query.eq('artist_id', artistId);
@@ -105,19 +105,14 @@ export async function GET(request: NextRequest) {
     price: t.price || 1,
     plays: t.plays || 0,
     duration: t.duration,
+    track_number: (t as any).track_number,
     is_active: true,
     created_at: '2024-01-01T00:00:00Z',
   }));
 
-  // Merge database tracks with local tracks (local takes priority for duplicates)
-  const merged = [...data || []];
-  localTracks.forEach(local => {
-    if (!merged.find(db => db.id === local.id || db.title === local.title)) {
-      merged.push(local);
-    }
-  });
-
-  const canonicalTracks = dedupeQueueTracks(sortTracksByAlbumOrder(merged as any));
+  // Canonical merge: static/CDN tracks first, then DB rows.
+  // This keeps the public route aligned with the music page and player queue.
+  const canonicalTracks = mergeCanonicalTracks(data || [], localTracks, { includeInactive: false });
 
   return NextResponse.json({ tracks: canonicalTracks });
 }

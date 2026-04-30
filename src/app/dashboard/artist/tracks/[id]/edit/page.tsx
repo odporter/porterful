@@ -119,6 +119,9 @@ export default function TrackEditPage() {
       }
 
       setMessage('Track updated successfully!')
+      
+      // Reload track data to reflect saved changes
+      await loadTrack()
     } catch (err: any) {
       setMessage('Error saving: ' + err.message)
     } finally {

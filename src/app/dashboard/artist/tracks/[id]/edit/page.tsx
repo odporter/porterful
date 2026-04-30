@@ -243,16 +243,18 @@ export default function TrackEditPage() {
           {/* Price */}
           <div>
             <label className="block text-sm font-medium mb-2">Price (USD)</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]">$</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.proud_to_pay_min}
-                onChange={(e) => setForm({ ...form, proud_to_pay_min: parseFloat(e.target.value) || 0 })}
-                className="w-full pl-8 pr-4 py-3 bg-[var(--pf-bg-secondary)] border border-[var(--pf-border)] rounded-xl text-white"
-              />
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] text-base z-10 pointer-events-none">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.proud_to_pay_min}
+                  onChange={(e) => setForm({ ...form, proud_to_pay_min: parseFloat(e.target.value) || 0 })}
+                  className="w-full pl-10 pr-4 py-3 bg-[var(--pf-bg-secondary)] border border-[var(--pf-border)] rounded-xl text-white text-base"
+                />
+              </div>
             </div>
             <p className="text-xs text-[var(--pf-text-muted)] mt-1">Set to 0 for free download</p>
           </div>

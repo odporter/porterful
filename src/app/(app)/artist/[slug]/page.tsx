@@ -68,6 +68,8 @@ async function getServerTracksByArtistNameFull(artistName: string) {
   return data || []
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
   return ARTISTS
     .filter((artist) => artist.trackCount && artist.trackCount > 0)

@@ -34,6 +34,13 @@
       "description": "Your lyric, plus a tip / stream / follow button built in.",
       "vibe": "Fan-funded",
       "formats": ["9:16", "1:1", "16:9"]
+    },
+    {
+      "id": "ocean-deck",
+      "name": "Ocean Deck",
+      "description": "Warm nostalgic glow. EQ bars, dolphin animation, wood-panel feel.",
+      "vibe": "Retro stereo",
+      "formats": ["9:16", "1:1", "16:9"]
     }
   ]
 }

@@ -124,6 +124,19 @@
         </div>
       </div>
 
+      <!-- Full Screen Preview -->
+      <div class="section preview-section">
+        <div class="preview-header">
+          <h3>Preview</h3>
+          <button id="btn-fullscreen-preview" class="btn-secondary" disabled>
+            <span class="icon">⛶</span> Full Screen Preview
+          </button>
+        </div>
+        <div id="preview-frame" class="preview-frame empty">
+          <p class="empty-msg">Select a template and format to preview</p>
+        </div>
+      </div>
+
       <!-- Rights + Generate -->
       <div class="section generate-section">
         <label class="rights-check">
@@ -175,5 +188,27 @@
   </div>
 
   <script src="app.js"></script>
+
+  <!-- Full Screen Preview Overlay -->
+  <div id="fullscreen-overlay" class="fullscreen-overlay hidden">
+    <div class="fs-canvas-wrapper">
+      <div id="fs-canvas"></div>
+      <div id="fs-hud" class="fs-hud">
+        <div class="fs-top">
+          <span id="fs-template-name"></span>
+        </div>
+        <div class="fs-bottom">
+          <div class="fs-controls">
+            <button id="fs-play-pause" class="fs-btn" title="Play / Pause">⏸</button>
+            <div class="fs-seek">
+              <input type="range" id="fs-scrubber" min="0" max="100" value="0">
+              <span id="fs-time">0:00 / 0:00</span>
+            </div>
+            <button id="fs-exit" class="fs-btn" title="Exit full screen (Esc)">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

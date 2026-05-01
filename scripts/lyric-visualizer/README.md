@@ -10,6 +10,7 @@ Now includes **Visualizer Studio** — a browser-based creator UI at `http://127
 - ✅ **Timed lyrics sync** — SRT and LRC formats with precise timestamps
 - ✅ **Plain text fallback** — evenly divides lines across song duration
 - ✅ **Three output formats** — 16:9 (YouTube), 9:16 (Shorts/Reels/TikTok), 1:1 (Instagram)
+- ✅ **Full-screen preview** — Preview template + format before generating (Esc to exit)
 - ✅ **Frame-by-frame rendering** — each frame shows the correct lyric at the right time
 - ✅ **No cloud services** — 100% local processing
 - ✅ **No cloud AI** — no cloud transcription, no generation, no external APIs
@@ -99,6 +100,11 @@ Standard LRC format with millisecond precision.
 | Template | Description |
 |----------|-------------|
 | **classic-lyric** | Dark overlay, gold artist name, white lyrics |
+| **cover-pulse** | Full-bleed cover art with bottom overlay |
+| **minimal-wave** | Clean minimal, floating text |
+| **release-promo** | "OUT NOW" badge for release day |
+| **support-this-artist** | Tip / stream / follow CTA built in |
+| **ocean-deck** | Warm nostalgic wood-panel glow, EQ bars, dolphin animation (v0.2) |
 
 ## Sync Behavior
 
@@ -107,6 +113,9 @@ Standard LRC format with millisecond precision.
 - ✅ SRT/LRC timestamps display lyrics at correct times
 - ✅ Plain text evenly divides lines across song duration
 - ✅ Static frame changes on lyric transitions
+- ✅ **Full-screen preview** — Preview template + format before generating (Esc to exit)
+- ✅ **Exported MP4 fills the canvas** — 16:9, 9:16, 1:1 with no black bars
+- ✅ Safe margins protect lyrics, handles, and CTA text
 
 ### v0.2 (Planned)
 - Beat-aware motion (BPM detection)

@@ -15,7 +15,12 @@ import sys
 import threading
 import uuid
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import TCPServer
 from urllib.parse import urlparse, parse_qs
+
+# Reuse address to avoid "Address already in use" after restart
+class ReusableHTTPServer(TCPServer):
+    allow_reuse_address = True
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +35,7 @@ os.makedirs(JOBS_DIR, exist_ok=True)
 # Whitelists
 ALLOWED_TEMPLATES = {
     'classic-lyric', 'cover-pulse', 'minimal-wave',
-    'release-promo', 'support-this-artist'
+    'release-promo', 'support-this-artist', 'ocean-deck'
 }
 ALLOWED_FORMATS = {'9x16', '16x9', '1x1', '9:16', '16:9', '1:1'}
 ALLOWED_LYRIC_KINDS = {'text', 'srt', 'lrc'}
@@ -279,7 +284,7 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     port = 8765
-    server = HTTPServer(('127.0.0.1', port), Handler)
+    server = ReusableHTTPServer(('127.0.0.1', port), Handler)
     print(f'\n╔══════════════════════════════════════════════════════════╗')
     print(f'║  Porterful Visualizer Studio — Local UI                  ║')
     print(f'║  Running at: http://127.0.0.1:{port}/                   ║')

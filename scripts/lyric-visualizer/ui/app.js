@@ -12,7 +12,9 @@ let state = {
   selectedFormat: null,
   jobs: [],
   currentJobId: null,
-  pollInterval: null
+  pollInterval: null,
+  isFullscreen: false,
+  previewPlaying: false
 };
 
 // DOM refs
@@ -125,6 +127,9 @@ function setupListeners() {
     showScreen('screen-start');
   });
 
+  // Full screen preview
+  setupFullscreenListeners();
+
   // Lyrics tabs
   document.querySelectorAll('.lyrics-tabs .tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -209,6 +214,8 @@ function validateForm() {
 function updatePreview() {
   const preview = document.getElementById('template-preview');
   const fmtDisplay = document.getElementById('format-display');
+  const frame = document.getElementById('preview-frame');
+  const fsBtn = document.getElementById('btn-fullscreen-preview');
 
   if (state.selectedTemplate) {
     const t = state.templates.find(x => x.id === state.selectedTemplate);
@@ -222,6 +229,173 @@ function updatePreview() {
   if (state.selectedFormat) {
     const labels = { '9:16': 'Reels / TikTok', '1:1': 'Instagram / X', '16:9': 'YouTube' };
     fmtDisplay.innerHTML = `<p><strong>${labels[state.selectedFormat]}</strong> · ${state.selectedFormat}</p>`;
+
+    // Update inline preview frame aspect ratio
+    if (frame) {
+      frame.classList.remove('empty');
+      frame.innerHTML = '';
+      const ratioMap = { '9:16': '9/16', '1:1': '1/1', '16:9': '16/9' };
+      frame.style.aspectRatio = ratioMap[state.selectedFormat];
+
+      // Render a static preview of the template
+      renderPreviewInto(frame, state.selectedTemplate, state.selectedFormat);
+      fsBtn.disabled = false;
+    }
+  } else {
+    if (frame) {
+      frame.classList.add('empty');
+      frame.innerHTML = '<p class="empty-msg">Select a template and format to preview</p>';
+      fsBtn.disabled = true;
+    }
+  }
+}
+
+// Render a static preview frame into a container
+function renderPreviewInto(container, templateId, format) {
+  const canvas = document.createElement('div');
+  canvas.style.cssText = 'width:100%;height:100%;position:relative;overflow:hidden;';
+
+  // Cover art background (use a placeholder gradient if no cover selected)
+  const coverPath = document.getElementById('cover-select').value;
+  if (coverPath) {
+    canvas.style.backgroundImage = `url(file://${encodeURIComponent(coverPath)})`;
+  } else {
+    canvas.style.background = 'linear-gradient(135deg, #1a1a22 0%, #0d0d12 100%)';
+  }
+  canvas.style.backgroundSize = 'cover';
+  canvas.style.backgroundPosition = 'center';
+
+  // Template-specific overlay
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:8% 6%;';
+
+  // Top: artist + title
+  const artist = document.getElementById('artist-input').value.trim() || 'Artist Name';
+  const title = document.getElementById('title-input').value.trim() || 'Track Title';
+
+  const top = document.createElement('div');
+  top.innerHTML = `
+    <div style="font-size:clamp(10px,2.5vw,16px);color:#C6A75E;text-align:center;margin-bottom:4px;opacity:0.9;">${artist}</div>
+    <div style="font-size:clamp(12px,3vw,20px);color:#F2F2F2;text-align:center;font-weight:600;">${title}</div>
+  `;
+
+  // Bottom: lyric line + CTA if applicable
+  const bottom = document.createElement('div');
+  let lyricText = 'Your lyric line appears here';
+  const lyricsTextarea = document.getElementById('lyrics-text');
+  if (lyricsTextarea && lyricsTextarea.value.trim()) {
+    const lines = lyricsTextarea.value.trim().split('\n').filter(l => l.trim());
+    if (lines.length > 0) lyricText = lines[0];
+  }
+
+  if (templateId === 'release-promo') {
+    bottom.innerHTML = `
+      <div style="font-size:clamp(14px,4vw,28px);color:#F2F2F2;text-align:center;font-weight:600;margin-bottom:12%;">${lyricText}</div>
+      <div style="display:flex;justify-content:center;">
+        <span style="background:#C6A75E;color:#08080B;padding:3% 8%;border-radius:8px;font-size:clamp(10px,2.5vw,16px);font-weight:700;">OUT NOW</span>
+      </div>
+    `;
+  } else if (templateId === 'support-this-artist') {
+    bottom.innerHTML = `
+      <div style="font-size:clamp(14px,4vw,28px);color:#F2F2F2;text-align:center;font-weight:600;margin-bottom:12%;">${lyricText}</div>
+      <div style="font-size:clamp(10px,2.5vw,16px);color:#C6A75E;text-align:center;font-weight:600;">Support This Artist</div>
+    `;
+  } else if (templateId === 'cover-pulse') {
+    bottom.innerHTML = `
+      <div style="font-size:clamp(14px,4vw,28px);color:#F2F2F2;text-align:center;font-weight:600;">${lyricText}</div>
+    `;
+  } else {
+    // classic-lyric, minimal-wave, fallback
+    bottom.innerHTML = `
+      <div style="font-size:clamp(14px,4vw,28px);color:#F2F2F2;text-align:center;font-weight:600;">${lyricText}</div>
+    `;
+  }
+
+  overlay.appendChild(top);
+  overlay.appendChild(bottom);
+  canvas.appendChild(overlay);
+  container.appendChild(canvas);
+
+  // Add template badge
+  const badge = document.createElement('span');
+  badge.className = 'fs-badge';
+  badge.textContent = templateId;
+  container.appendChild(badge);
+}
+
+// ===== FULL SCREEN PREVIEW =====
+
+function openFullscreenPreview() {
+  const overlay = document.getElementById('fullscreen-overlay');
+  const canvas = document.getElementById('fs-canvas');
+  const fsBtn = document.getElementById('btn-fullscreen-preview');
+
+  if (!state.selectedTemplate || !state.selectedFormat) return;
+
+  // Set aspect ratio class
+  canvas.className = '';
+  canvas.classList.add(`fs-${state.selectedFormat.replace(':', 'x')}`);
+  if (state.selectedTemplate === 'ocean-deck' || state.selectedTemplate === 'classic-lyric') {
+    canvas.classList.add('ocean-deck');
+  }
+
+  // Render content
+  canvas.innerHTML = '';
+  renderPreviewInto(canvas, state.selectedTemplate, state.selectedFormat);
+
+  // Update HUD template name
+  const t = state.templates.find(x => x.id === state.selectedTemplate);
+  document.getElementById('fs-template-name').textContent = (t?.name || state.selectedTemplate).toUpperCase();
+
+  // Show overlay
+  overlay.classList.remove('hidden');
+  state.isFullscreen = true;
+
+  // Focus play button
+  setTimeout(() => document.getElementById('fs-play-pause').focus(), 50);
+}
+
+function closeFullscreenPreview() {
+  const overlay = document.getElementById('fullscreen-overlay');
+  overlay.classList.add('hidden');
+  state.isFullscreen = false;
+}
+
+// Full screen controls
+function setupFullscreenListeners() {
+  const fsBtn = document.getElementById('btn-fullscreen-preview');
+  if (fsBtn) {
+    fsBtn.addEventListener('click', openFullscreenPreview);
+  }
+
+  const exitBtn = document.getElementById('fs-exit');
+  if (exitBtn) {
+    exitBtn.addEventListener('click', closeFullscreenPreview);
+  }
+
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && state.isFullscreen) {
+      closeFullscreenPreview();
+    }
+  });
+
+  // Play/pause stub (no audio in preview v0.1)
+  const playBtn = document.getElementById('fs-play-pause');
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      state.previewPlaying = !state.previewPlaying;
+      playBtn.textContent = state.previewPlaying ? '⏸' : '▶';
+    });
+  }
+
+  // Scrubber stub
+  const scrubber = document.getElementById('fs-scrubber');
+  if (scrubber) {
+    scrubber.addEventListener('input', (e) => {
+      const pct = e.target.value;
+      document.getElementById('fs-time').textContent = `${Math.floor(pct * 0.03)}:00 / 3:00`;
+    });
   }
 }
 

@@ -7,6 +7,7 @@ Now includes **Visualizer Studio** — a browser-based creator UI at `http://127
 ## Features
 
 - ✅ **Audio plays in the rendered MP4** — full song audio preserved
+- ✅ **Auto-transcribe** — One-shot mode: drop a song → get a lyric video (no manual lyrics needed)
 - ✅ **Timed lyrics sync** — SRT and LRC formats with precise timestamps
 - ✅ **Plain text fallback** — evenly divides lines across song duration
 - ✅ **Three output formats** — 16:9 (YouTube), 9:16 (Shorts/Reels/TikTok), 1:1 (Instagram)
@@ -22,7 +23,31 @@ Now includes **Visualizer Studio** — a browser-based creator UI at `http://127
 - FFmpeg 5.0+ (`brew install ffmpeg`)
 - Python 3.9+ with Pillow (`pip3 install Pillow` or `python3 -m pip install Pillow`)
 
-## Quick Start
+## Quick Start (One-Shot Mode)
+
+**Just drop a song and get a lyric video.** No manual lyrics needed.
+
+```bash
+cd scripts/lyric-visualizer
+
+# One command: song → transcribe → video
+python3 auto-lyric-video.py input/audio.mp3 --artist "O D Porter" --title "Heart of a Lion" --format 9x16
+
+# With cover art and template
+python3 auto-lyric-video.py input/audio.mp3 \
+  --cover input/cover.jpg \
+  --artist "O D Porter" \
+  --title "Heart of a Lion" \
+  --template classic-lyric \
+  --format 9x16
+```
+
+**That's it.** The script:
+1. Transcribes the audio with local Whisper (offline)
+2. Formats lyrics with timestamps
+3. Generates the synced lyric video
+
+## Manual Mode (Full Control)
 
 ```bash
 cd scripts/lyric-visualizer

@@ -15,6 +15,7 @@ Now includes **Visualizer Studio** — a browser-based creator UI at `http://127
 - ✅ **Frame-by-frame rendering** — each frame shows the correct lyric at the right time
 - ✅ **No cloud services** — 100% local processing
 - ✅ **No cloud AI** — no cloud transcription, no generation, no external APIs
+- ✅ **Local Whisper** — first model download may require internet. After cached, transcription runs locally with no API service.
 - ✅ **No FFmpeg drawtext** — works with Homebrew FFmpeg (uses Pillow for text rendering)
 
 ## Requirements
@@ -43,7 +44,7 @@ python3 auto-lyric-video.py input/audio.mp3 \
 ```
 
 **That's it.** The script:
-1. Transcribes the audio with local Whisper (offline)
+1. Transcribes the audio with local Whisper (first model download may require internet; after cached, transcription runs locally with no API service)
 2. Formats lyrics with timestamps
 3. Generates the synced lyric video
 

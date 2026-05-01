@@ -11,9 +11,9 @@ export function BusinessModal({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     const closed = localStorage.getItem('business_modal_closed');
     if (!closed) {
-      // Show after 4 seconds (after superfan modal)
-      const timer = setTimeout(() => setIsOpen(true), 4000);
-      return () => clearTimeout(timer);
+      // Modal auto-open disabled — business feature not yet active
+      // const timer = setTimeout(() => setIsOpen(true), 4000);
+      // return () => clearTimeout(timer);
     }
   }, []);
 

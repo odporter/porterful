@@ -13,7 +13,7 @@ const PLAYER_OFFSET_PX = 96
 const ITEMS = [
   { href: '/music', label: 'Music', icon: Music },
   { href: '/artists', label: 'Artists', icon: Users },
-  { href: '/store', label: 'Store', icon: Store },
+  // { href: '/store', label: 'Store', icon: Store }, // Hidden: store has no real products yet
   { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
 ]
 

@@ -13,7 +13,7 @@ export function Footer() {
 
   const links = [
     { href: '/music', label: 'Music' },
-    { href: '/store', label: 'Store' },
+    // { href: '/store', label: 'Store' }, // Hidden: store has no real products yet
     { href: '/artists', label: 'Artists' },
     { href: '/contact', label: 'Contact' },
   ]

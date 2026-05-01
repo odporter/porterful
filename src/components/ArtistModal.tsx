@@ -43,8 +43,8 @@ export function ArtistModal({ onClose }: { onClose?: () => void }) {
 
     fetchData();
 
-    // Use ref to hold timer so we can clean it up regardless of how we exit
-    timerRef.current = setTimeout(() => setIsOpen(true), 2000);
+    // Modal auto-open disabled — competition feature not yet active
+    // timerRef.current = setTimeout(() => setIsOpen(true), 2000);
 
     // ALWAYS return cleanup — runs on unmount or deps change
     return () => {

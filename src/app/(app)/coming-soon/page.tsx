@@ -49,9 +49,9 @@ export default function ComingSoonPage() {
     setLoading(true)
     
     // In real impl, this would save to Supabase or send email
-    await new Promise(r => setTimeout(r, 1000))
+    // await new Promise(r => setTimeout(r, 1000))
     
-    setSubmitted(true)
+    setSubmitted(true);
     setLoading(false)
   }
 

@@ -81,7 +81,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/music', label: 'Music' },
     { href: '/artists', label: 'Artists' },
-    { href: '/store', label: 'Store' },
+    // { href: '/store', label: 'Store' }, // Hidden: store has no real products yet
     ...(showGuest ? [{ href: '/apply', label: 'Apply' }] : []),
   ]
 
@@ -248,7 +248,7 @@ export function Navbar() {
           {/* Mobile Nav — only items NOT covered by the persistent bottom nav
               (Music / Artists / Store / Dashboard live there). */}
           {(() => {
-            const bottomNavHrefs = new Set(['/music', '/artists', '/store', '/dashboard'])
+            const bottomNavHrefs = new Set(['/music', '/artists', '/dashboard'])
             const drawerLinks = navLinks.filter(l => !bottomNavHrefs.has(l.href))
             if (drawerLinks.length === 0) return null
             return (

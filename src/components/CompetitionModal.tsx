@@ -45,8 +45,9 @@ export function CompetitionModal({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     const closed = localStorage.getItem('competition_modal_closed');
     if (!closed && !hasClosed) {
-      const timer = setTimeout(() => setIsOpen(true), 2000);
-      return () => clearTimeout(timer);
+      // Modal auto-open disabled — competition feature not yet active
+      // const timer = setTimeout(() => setIsOpen(true), 2000);
+      // return () => clearTimeout(timer);
     }
   }, [hasClosed]);
 

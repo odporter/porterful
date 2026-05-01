@@ -13,9 +13,9 @@ export function SuperfanModal({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     const closed = localStorage.getItem('superfan_modal_closed');
     if (!closed) {
-      // Show after 3 seconds (after competition modal)
-      const timer = setTimeout(() => setIsOpen(true), 3000);
-      return () => clearTimeout(timer);
+      // Modal auto-open disabled — superfan feature not yet wired
+      // const timer = setTimeout(() => setIsOpen(true), 3000);
+      // return () => clearTimeout(timer);
     }
   }, []);
 
@@ -96,28 +96,33 @@ export function SuperfanModal({ onClose }: { onClose?: () => void }) {
             </div>
           </div>
 
-          {/* CTA */}
-          <div className="flex flex-col gap-3">
-            <Link 
-              href="/signup?role=superfan" 
-              onClick={handleClose}
-              className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-center hover:opacity-90 transition-opacity"
-            >
-              Sign Up as Superfan
-            </Link>
-            <button 
-              onClick={handleClose}
-              className="w-full py-2 text-[var(--pf-text-muted)] text-sm hover:text-[var(--pf-text)] transition-colors"
-            >
-              Maybe Later
-            </button>
-          </div>
+          {/* CTA — hidden: superfan feature not yet wired */}
+          {false && (
+            <div className="flex flex-col gap-3">
+              <Link 
+                href="/signup?role=superfan" 
+                onClick={handleClose}
+                className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-center hover:opacity-90 transition-opacity"
+              >
+                Sign Up as Superfan
+              </Link>
+              <button 
+                onClick={handleClose}
+                className="w-full py-2 text-[var(--pf-text-muted)] text-sm hover:text-[var(--pf-text)] transition-colors"
+              >
+                Maybe Later
+              </button>
+            </div>
+          )}
 
-          <p className="text-xs text-center text-[var(--pf-text-muted)] mt-4">
-            <Link href="/superfan" onClick={handleClose} className="hover:text-purple-400">
-              Learn more about Superfans →
-            </Link>
-          </p>
+          {/* Learn more link — hidden: superfan feature not yet wired */}
+          {false && (
+            <p className="text-xs text-center text-[var(--pf-text-muted)] mt-4">
+              <Link href="/superfan" onClick={handleClose} className="hover:text-purple-400">
+                Learn more about Superfans →
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

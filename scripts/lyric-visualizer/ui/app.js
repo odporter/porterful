@@ -3,6 +3,32 @@
 
 const API_BASE = '';
 
+// Safe DOM helper — never crash on missing elements
+function $(id) {
+  const el = document.getElementById(id);
+  return el;
+}
+function setText(id, text) {
+  const el = $(id);
+  if (el) el.textContent = text;
+}
+function setClass(id, className) {
+  const el = $(id);
+  if (el) el.className = className;
+}
+function setStyle(id, prop, value) {
+  const el = $(id);
+  if (el && el.style) el.style[prop] = value;
+}
+function addHidden(id) {
+  const el = $(id);
+  if (el) el.classList.add('hidden');
+}
+function removeHidden(id) {
+  const el = $(id);
+  if (el) el.classList.remove('hidden');
+}
+
 // State
 let state = {
   currentScreen: 'screen-start',
@@ -420,27 +446,27 @@ async function handleGenerate() {
 
   try {
     showScreen('screen-status');
-    document.getElementById('status-pill').className = 'status-pill queued';
-    document.getElementById('status-pill').textContent = 'Queued';
-    document.getElementById('progress-fill').style.width = '0%';
-    document.getElementById('status-detail').textContent = 'Waiting to start...';
-    document.getElementById('job-meta').classList.add('hidden');
+    setClass('status-pill', 'status-pill queued');
+    setText('status-pill', 'Queued');
+    setStyle('progress-fill', 'width', '0%');
+    setText('status-detail', 'Waiting to start...');
+    addHidden('job-meta');
 
     const result = await apiPost('/api/generate', body);
     state.currentJobId = result.jobId;
 
     // Show job meta
-    document.getElementById('job-artist').textContent = body.artist;
-    document.getElementById('job-title').textContent = body.title;
-    document.getElementById('job-template').textContent = state.selectedTemplate;
-    document.getElementById('job-format').textContent = state.selectedFormat;
-    document.getElementById('job-meta').classList.remove('hidden');
+    setText('job-artist', body.artist);
+    setText('job-title', body.title);
+    setText('job-template', state.selectedTemplate);
+    setText('job-format', state.selectedFormat);
+    removeHidden('job-meta');
 
     startPolling(result.jobId);
   } catch (e) {
-    document.getElementById('status-pill').className = 'status-pill failed';
-    document.getElementById('status-pill').textContent = 'Failed';
-    document.getElementById('status-detail').textContent = e.message;
+    setClass('status-pill', 'status-pill failed');
+    setText('status-pill', 'Failed');
+    setText('status-detail', e.message || 'Request failed');
   }
 }
 
@@ -470,55 +496,55 @@ function startPolling(jobId) {
 }
 
 function updateStatusUI(job) {
-  const pill = document.getElementById('status-pill');
-  const fill = document.getElementById('progress-fill');
-  const detail = document.getElementById('status-detail');
+  const pill = $('status-pill');
+  const fill = $('progress-fill');
+  const detail = $('status-detail');
 
-  pill.className = 'status-pill ' + job.status;
-  pill.textContent = job.status.charAt(0).toUpperCase() + job.status.slice(1);
+  if (pill) {
+    pill.className = 'status-pill ' + job.status;
+    pill.textContent = job.status.charAt(0).toUpperCase() + job.status.slice(1);
+  }
 
   if (job.status === 'queued') {
-    fill.style.width = '10%';
-    detail.textContent = 'Waiting to start...';
+    setStyle('progress-fill', 'width', '10%');
+    setText('status-detail', 'Waiting to start...');
   } else if (job.status === 'rendering') {
-    fill.style.width = '60%';
-    detail.textContent = 'Rendering your video...';
+    setStyle('progress-fill', 'width', '60%');
+    setText('status-detail', 'Rendering your video...');
   } else if (job.status === 'complete') {
-    fill.style.width = '100%';
-    detail.textContent = 'Done!';
+    setStyle('progress-fill', 'width', '100%');
+    setText('status-detail', 'Done!');
   } else if (job.status === 'failed') {
-    fill.style.width = '100%';
-    detail.textContent = job.error || 'Generation failed';
+    setStyle('progress-fill', 'width', '100%');
+    setText('status-detail', job.error || 'Generation failed');
   }
 }
 
 function showOutput(job) {
   showScreen('screen-output');
 
-  const thumb = document.getElementById('output-thumb');
-  const fallback = document.getElementById('output-fallback');
+  const thumb = $('output-thumb');
+  const fallback = $('output-fallback');
 
-  if (job.thumbnailPath) {
+  if (job.thumbnailPath && thumb) {
     thumb.src = 'file://' + job.thumbnailPath;
     thumb.classList.remove('hidden');
-    fallback.classList.add('hidden');
+    if (fallback) fallback.classList.add('hidden');
   } else {
-    thumb.classList.add('hidden');
-    fallback.classList.remove('hidden');
+    if (thumb) thumb.classList.add('hidden');
+    if (fallback) fallback.classList.remove('hidden');
   }
 
-  const link = document.getElementById('output-link');
-  if (job.outputPath) {
+  const link = $('output-link');
+  if (job.outputPath && link) {
     link.href = 'file://' + job.outputPath;
     link.classList.remove('hidden');
-  } else {
+  } else if (link) {
     link.classList.add('hidden');
   }
 
-  document.getElementById('output-path').textContent = job.outputPath || '-';
-  document.getElementById('output-time').textContent = job.completedAt
-    ? new Date(job.completedAt).toLocaleString()
-    : '-';
+  setText('output-path', job.outputPath || '-');
+  setText('output-time', job.completedAt ? new Date(job.completedAt).toLocaleString() : '-');
 }
 
 // Reset form

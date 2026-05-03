@@ -1,6 +1,6 @@
 ---
 date: 2026-05-03
-status: implemented + Codex-review revisions (uncommitted) — awaiting OD review
+status: committed (a4236fd0) — local only, not pushed, not deployed
 source_audit: docs/CODEX_PORTERFUL_ARTIST_PROFILE_AUTH_UI_AUDIT_2026-05-03.md
 patch_prep: docs/CLAUDE_PORTERFUL_SMALL_UX_PATCH_PREP_2026-05-03.md
 codex_review: docs/CODEX_REVIEW_CLAUDE_BUCKET_A_UX_PATCH_2026-05-03.md
@@ -192,4 +192,59 @@ This revision pass:
 The only newly attributable changes in this revision pass are the four-line `tiktok_url` merge addition in `artist-db.ts` and the icon-source swap in `artist/artist/[id]/page.tsx`.
 
 Awaiting OD merge call.
+
+---
+
+## Post-Commit Verification Clarification (2026-05-03, after Codex post-commit review)
+
+After Codex's post-commit review returned HOLD PUSH on the basis that commit `a4236fd0` allegedly still contained the `HOME_FEATURED_TRACKS` / featured-card reshape in `src/app/page.tsx`, the commit was independently rechecked with `git show HEAD -- src/app/page.tsx`.
+
+### What the commit actually contains for `src/app/page.tsx`
+
+The commit's `src/app/page.tsx` diff (range `a726a1f4..3b2c4310`) is auth-CTA-only:
+
+- `+import { useSupabase } from '@/app/providers'`
+- `+const { user, loading: authLoading } = useSupabase()`
+- `+const authReady = mounted && !authLoading` plus `showUser` / `showGuest` flags
+- The hero CTA `<div>` block updated to branch `Go to Dashboard` (signed-in) vs `Create your account` (guest), with a small skeleton placeholder while auth is resolving
+- Whitespace-only cleanup on the existing `Start Listening` `<Link>` opening tag
+
+The commit **does not contain** any of the following:
+
+- No `HOME_FEATURED_TRACKS` array constant
+- No `index === 0 ? 'md:col-span-2 lg:col-span-3' : ''` grid-span change on the featured card
+- No `h-20 w-20 sm:h-24 sm:w-24` first-card image-size change
+- No `text-lg md:text-xl` first-card title-size change
+- No `Featured track` label addition
+- No `sizes={index === 0 ? ... }` change
+
+### Probable cause of the HOLD PUSH
+
+Codex appears to have inspected the working tree (which still has OD's pre-existing `HOME_FEATURED_TRACKS` reshape restored on top of `HEAD` per Option A from the prior pass) rather than the commit itself. `git diff origin/main -- src/app/page.tsx` against the working tree would surface both the auth CTA changes (in HEAD) and the uncommitted reshape (working tree only) in one combined diff, which would read as if the reshape were part of the commit. `git show HEAD -- src/app/page.tsx` is the authoritative view of the commit, and it shows only the auth CTA work.
+
+### Decision
+
+No reset or commit rewrite was performed. Rewriting a commit that is already in the desired state would either be a no-op or an unnecessary risk to a passing build. Per OD's Option 1 directive: confirm and skip the rewrite.
+
+### State after this clarification
+
+- `src/app/page.tsx` in HEAD: auth CTA only, attributed to Bucket A.
+- `src/app/page.tsx` in working tree: HEAD content + OD's pre-existing `HOME_FEATURED_TRACKS` reshape restored from backup. Reshape is uncommitted and remains for OD to handle separately.
+- All other Bucket A files in HEAD as expected.
+- Branch is `main`. Branch is local only — no `git push` was run.
+- No deploy step was run.
+
+Build continues to pass (verification log below).
+
+### Verification commands run for this clarification
+
+```
+git show --name-only HEAD
+git diff HEAD -- src/app/page.tsx
+git status --short
+npm run build
+```
+
+Results recorded below in the report tail.
+
 

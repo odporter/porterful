@@ -1,8 +1,15 @@
 // API route for email-based access recovery to purchased music
-// Generates a recovery token and sends access link
+// Generates a recovery token and sends access link via Resend
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import { Resend } from 'resend';
+
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -71,15 +78,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // TODO: Send actual email via Resend or similar
-    // For now, we return success and the links would be sent via email service
-    // await sendRecoveryEmail(email, accessLinks);
-
-    console.log('[email-access] Generated access links for:', email, accessLinks.length);
+    // ── Send access email via Resend (honest result) ──
+    let emailDelivered = false;
+    const resend = getResend();
+    // Use verified domain: likenessverified.com
+    // TODO: Switch to support@porterful.com after verifying porterful.com in Resend
+    const fromAddress = 'Porterful <noreply@likenessverified.com>';
+    if (resend && accessLinks.length > 0) {
+      try {
+        const { error: sendError } = await resend.emails.send({
+          from: fromAddress,
+          to: email,
+          subject: 'Your Porterful Music Access',
+          html: `<p>Hi there,</p>
+<p>Your music access is ready. Here are your purchased tracks:</p>
+<ul>
+${accessLinks.map(l => `<li><a href="${l.accessUrl}">${l.trackTitle}</a> by ${l.artist} (expires ${new Date(l.expiresAt).toLocaleDateString()})</li>`).join('\n')}
+</ul>
+<p>Questions? Reply to this email.</p>`,
+        });
+        if (sendError) {
+          console.error('[email-access] Resend error:', sendError.message);
+        } else {
+          emailDelivered = true;
+          console.log('[email-access] Resend delivered to:', email);
+        }
+      } catch (e) {
+        console.error('[email-access] Resend exception:', e);
+      }
+    } else if (!resend) {
+      console.warn('[email-access] Resend not configured — email not sent');
+    }
 
     return NextResponse.json({
-      success: true,
-      message: 'Access link sent to your email',
+      success: emailDelivered,
+      message: emailDelivered
+        ? 'Access link sent to your email'
+        : 'Purchase confirmed. Access link could not be sent — sign in with this email to access your music.',
+      emailDelivered,
       // Only include links in development for testing
       ...(process.env.NODE_ENV === 'development' ? { debugLinks: accessLinks } : {}),
     });

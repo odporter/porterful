@@ -35,17 +35,25 @@ function resolvePurchasedTrack(track: PurchasedTrack): PurchasedTrack {
     };
   }
 
+  // 1st fallback: match by exact track ID
+  if (track.id) {
+    const byId = TRACKS.find((c) => c.id === track.id);
+    if (byId?.audio_url) {
+      return { ...track, audioUrl: byId.audio_url };
+    }
+  }
+
+  // 2nd fallback: match by name + artist
   const catalogTrack = TRACKS.find((candidate) => (
-    candidate.id === track.id
-    || (candidate.title === track.name && candidate.artist === track.artist)
+    (candidate.title === track.name || candidate.title?.toLowerCase() === track.name?.toLowerCase()) &&
+    (candidate.artist === track.artist || candidate.artist?.toLowerCase() === track.artist?.toLowerCase())
   ))
 
-  if (!catalogTrack?.audio_url) return track;
+  if (catalogTrack?.audio_url) {
+    return { ...track, audioUrl: catalogTrack.audio_url };
+  }
 
-  return {
-    ...track,
-    audioUrl: catalogTrack.audio_url,
-  };
+  return track;
 }
 
 function SuccessContent() {
@@ -251,7 +259,7 @@ function SuccessContent() {
     if (!order?.customerEmail) return;
     
     try {
-      await fetch('/api/music/email-access', {
+      const res = await fetch('/api/music/email-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -259,7 +267,12 @@ function SuccessContent() {
           orderId: order.orderId,
         }),
       });
-      setEmailSent(true);
+      const data = await res.json();
+      // Only show "sent" if the API confirmed Resend delivery
+      setEmailSent(data.success === true);
+      if (!data.success) {
+        console.warn('[success] Email not delivered:', data.message);
+      }
     } catch (e) {
       console.error('Failed to send email:', e);
     }
@@ -389,10 +402,12 @@ function SuccessContent() {
                 className="w-full py-3 rounded-xl border border-[var(--pf-border)] font-medium flex items-center justify-center gap-2 hover:border-[var(--pf-orange)] transition-colors disabled:opacity-50"
               >
                 <Mail size={18} />
-                {emailSent ? 'Access Link Sent!' : 'Access by Email'}
+                {emailSent ? 'Access Link Sent!' : 'Send Access Link'}
               </button>
               <p className="text-xs text-[var(--pf-text-muted)] text-center mt-2">
-                {order.customerEmail}
+                {emailSent
+                  ? `Sent to ${order.customerEmail}`
+                  : `Access link will be sent to: ${order.customerEmail}`}
               </p>
             </div>
           )}

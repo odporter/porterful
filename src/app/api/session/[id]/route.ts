@@ -43,26 +43,62 @@ export async function GET(
       currency: session.currency,
     }
 
-    // If we have order items with download URLs
+    // Resolve items: order_items → metadata.items JSON → metadata.product_id catalog fallback
+    let resolvedItems: any[] = []
+
     if (order?.items && Array.isArray(order.items)) {
-      response.items = order.items.map((item: any) => ({
+      resolvedItems = order.items.map((item: any) => ({
         id: item.id,
         name: item.name,
         artist: item.artist,
         type: item.type,
         price: item.price,
+        audioUrl: item.download_url || item.audio_url || item.audioUrl || '',
         downloadUrl: item.download_url || item.audio_url,
         storagePath: item.storage_path,
       }))
-    } else if (session.metadata) {
-      // Fallback to metadata
-      response.items = [{
-        name: session.metadata.item_name || 'Track Purchase',
-        artist: session.metadata.item_artist || 'Unknown Artist',
-        type: session.metadata.item_type || 'track',
-        downloadUrl: session.metadata.download_url || null,
-      }]
     }
+
+    // If no order items, try metadata.items JSON array
+    if (resolvedItems.length === 0 && session.metadata?.items) {
+      try {
+        const parsed = JSON.parse(session.metadata.items)
+        if (Array.isArray(parsed)) {
+          resolvedItems = parsed.map((item: any) => ({
+            id: item.id || '',
+            name: item.name || item.title || 'Unknown Track',
+            artist: item.artist || 'Unknown Artist',
+            type: item.type || 'track',
+            audioUrl: item.audioUrl || item.audio_url || '',
+            image: item.image || '',
+          }))
+        }
+      } catch (e) {
+        console.error('[session]', sessionId, 'Failed to parse metadata.items:', e)
+      }
+    }
+
+    // Last resort: single product_id catalog lookup
+    if (resolvedItems.length === 0 && session.metadata?.product_id) {
+      const { data: catalogItem } = await supabase
+        .from('products')
+        .select('id, name, artist, image, type, audio_url')
+        .eq('id', session.metadata.product_id)
+        .maybeSingle()
+
+      if (catalogItem) {
+        resolvedItems = [{
+          id: catalogItem.id,
+          name: catalogItem.name,
+          artist: catalogItem.artist || 'Unknown Artist',
+          type: catalogItem.type || 'track',
+          audioUrl: catalogItem.audio_url || '',
+          image: catalogItem.image || '',
+        }]
+      }
+    }
+
+    response.items = resolvedItems
 
     return NextResponse.json(response)
   } catch (error: any) {

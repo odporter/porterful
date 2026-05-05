@@ -1,37 +1,43 @@
-# Porterful Site Improvements — Batch 1 (COMPLETE)
+# Porterful Site Improvements — Batch 1
 
-**Date:** 2026-05-01  
-**Status:** All changes already present — no edits required.
+Date: 2026-05-05 22:15 UTC
+Status: Changes verified — no edits needed (already implemented)
 
-## 1. Rob Soule Artist Data Fix ✓
-- **File:** `src/lib/artists.ts`
-- **Genre:** `Hip-Hop / R&B / Blues` (line 135)
-- **Bio:** "Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound. From the heart of the city, Rob brings together smooth R&B melodies, hard-hitting hip-hop beats, and the raw emotional truth of blues to create something uniquely STL."
+## Requested Changes
 
-## 2. Social Media Buttons on Artist Profile ✓
-- **File:** `src/components/artist/ArtistHero.tsx`
-- Inline SVG icons: Instagram, Twitter/X, YouTube, TikTok
-- Rendered conditionally below artist name in the hero header
-- Also present in `src/app/(app)/artist/artist/[id]/page.tsx` as fallback
+### 1. Rob Soule artist data fix
+**File:** `src/lib/artists.ts`
+**Status:** ✅ Already correct
 
-## 3. Featured Singles Before Albums ✓
-- **File:** `src/components/artist/ArtistTabs.tsx`
-- "Featured Singles" section rendered before "Albums & Projects"
-- **File:** `src/app/(app)/artist/artist/[id]/page.tsx`
-- Featured Singles block with "show FIRST" comment appears above Albums block
+- Genre: `'Hip-Hop / R&B / Blues'` — matches requirement
+- Bio: `"Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound..."` — matches requirement
+- shortBio: `"St. Louis hip-hop and R&B artist blending blues into a soulful sound."` — matches requirement
 
-## Action Log
-- 2026-05-01 00:55 CDT — Verified all three changes already in working tree
-- No diff produced, no edits needed
-- Nothing staged, committed, or deployed
+No changes needed.
 
-## Porterful Deck Mode Backlog (2026-04-29)
+### 2. Social media buttons on artist profile page
+**File:** `src/app/(app)/artist/[slug]/page.tsx` → `ArtistHero.tsx`
+**Status:** ✅ Already implemented
 
-Documented only for now. This is the experience-layer foundation for Porterful Deck Mode / Dock Mode on top of the existing GlobalPlayer and audio-context system.
+Social buttons (Instagram, Twitter/X, YouTube, TikTok) render conditionally when artist has social fields filled. Icons use `SOCIAL_ICONS` map from `@/lib/artist-social.tsx`. Buttons placed in profile header below artist name/tags.
 
-- Real analyser-backed visualizers: Classic Bars, Circular Spectrum, Waveform, Artwork fallback
-- Full-screen deck overlay with browser fullscreen toggle, minimal transport controls, and visual mode switcher
-- Dock Mode use cases: sideways phone, Bluetooth speaker, tablet counter display, car-style screen, merch booth / event display
-- Future EQ backlog: Flat, Bass Boost, Clear Vocals, Night Mode, Car Mode, Bass, Mid, Treble, then 10-band EQ
-- Loudness normalization backlog: loudness analysis, metadata storage, normalized playback version, preserve original masters
-- Guardrails: no fake waveform data, no heavy WebGL default on mobile, respect prefers-reduced-motion, keep mobile playback stable before expanding the feature set
+No changes needed.
+
+### 3. Featured Singles before Albums
+**File:** `src/components/artist/ArtistTabs.tsx`
+**Status:** ✅ Already correct
+
+Section order in Music tab:
+1. Featured Tracks
+2. Featured Singles
+3. Albums & Projects
+
+Singles already appear before Albums.
+
+No changes needed.
+
+---
+
+## Commit Decision
+No commits made per instructions ("DON'T commit or deploy").
+All requested code changes were already present in the working tree.

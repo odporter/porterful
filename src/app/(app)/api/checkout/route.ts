@@ -262,14 +262,14 @@ export async function POST(request: NextRequest) {
       track_name: resolvedItems[0]?.name || '',
       track_artist: resolvedItems[0]?.artist || '',
       track_image: resolvedItems[0]?.image || '',
+      // Store minimal items — Stripe metadata values have 500-char limit per key.
+      // Full item data is recovered server-side via /api/session/{id} using catalog lookup.
       items: JSON.stringify(resolvedItems.map((item) => ({
         id: item.id,
         name: item.name,
         artist: item.artist,
-        price_cents: item.unitAmountCents,
-        quantity: item.quantity,
+        price: (item.unitAmountCents || 0) / 100,
         type: item.kind,
-        image: item.image || '',
         audioUrl: item.audioUrl || '',
       }))),
       activation_code_value: activationCodeValue || '',

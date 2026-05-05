@@ -280,17 +280,33 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Store music purchase for download access
+    // ── MUSIC PURCHASE: record entitlement + derive real storage path ──
     const itemsJson = metadata.items;
     if (itemsJson && session.customer_email) {
       try {
         const items = JSON.parse(itemsJson);
         for (const item of items) {
-          // Only store music/track purchases
-          if (item.type === 'track' || item.audioUrl || item.audio_url) {
-            const storagePath = item.storagePath || item.storage_path || 
-              `tracks/${item.artist}/${item.name}.mp3`.replace(/[^a-zA-Z0-9/_-]/g, '_');
-            
+          const isTrack = item.type === 'track' || item.kind === 'track';
+          const hasAudio = item.audioUrl || item.audio_url || item.audioUrl === '';
+          if (isTrack || hasAudio) {
+            // Derive real Supabase storage path from the public audio URL
+            // e.g.  https://...supabase.co/storage/v1/object/audio/artists/atm-trap/...
+            //   →  audio/artists/atm-trap/thought-we-was-bruddaz.mp3
+            const publicAudioUrl: string = item.audioUrl || item.audio_url || '';
+            let storagePath = item.storagePath || '';
+            if (!storagePath && publicAudioUrl.includes('/storage/v1/object/')) {
+              const match = publicAudioUrl.match(/\/storage\/v1\/object\/(.+?\?.+)$/);
+              if (match) {
+                storagePath = decodeURIComponent(match[1].split('?')[0]);
+              }
+            }
+            // Final fallback: canonical naming
+            if (!storagePath) {
+              storagePath = `audio/artists/${item.artist}/${item.name}.mp3`
+                .toLowerCase()
+                .replace(/[^a-z0-9/_.-]/g, '_');
+            }
+
             const { error: musicError } = await supabase
               .from('music_purchases')
               .upsert({
@@ -300,8 +316,8 @@ export async function POST(req: NextRequest) {
                 track_title: item.name || item.title || 'Unknown Track',
                 artist_name: item.artist || 'Unknown Artist',
                 stripe_session_id: session.id,
-                amount_paid: Math.round((item.price || 0) * 100),
-                storage_bucket: 'music',
+                amount_paid: Math.round((item.price_cents || item.price || 0)),
+                storage_bucket: 'audio',
                 storage_path: storagePath,
                 purchased_at: new Date().toISOString(),
               }, {
@@ -310,9 +326,9 @@ export async function POST(req: NextRequest) {
               });
 
             if (musicError) {
-              console.error('[stripe-webhook] Music purchase insert failed:', musicError.message);
+              console.error('[stripe-webhook] Music purchase insert failed:', musicError.message, { code: musicError.code });
             } else {
-              console.log('[stripe-webhook] Music purchase recorded:', item.name);
+              console.log('[stripe-webhook] Music purchase recorded:', item.name, '| path:', storagePath);
             }
           }
         }
@@ -320,6 +336,8 @@ export async function POST(req: NextRequest) {
         console.error('[stripe-webhook] Failed to parse items for music purchase:', e);
       }
     }
+
+    console.log('[stripe-webhook] checkout.session.completed processed:', session.id, '| email:', session.customer_email, '| amount:', amount);
   }
 
   return NextResponse.json({ received: true });

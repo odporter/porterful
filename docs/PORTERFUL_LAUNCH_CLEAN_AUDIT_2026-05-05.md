@@ -249,10 +249,90 @@ Live HTTP route checks (redirect-loop, 500s, redirect-on-unauthenticated) were *
 
 ---
 
-## 13. Remaining Launch Blockers
+## 13. Live $1 Checkout Test Result (2026-05-05 17:04–17:42 CDT)
+
+**Product:** "Thought We Was Bruddaz" by ATM Trap (track ID: `atm-01`)  
+**Buyer:** porter.jonathanj@gmail.com  
+**Amount:** $1.00  
+**Payment:** ✅ Succeeded (Stripe checkout completed)
+
+### 13.1 Database Proof
+
+| Check | Result |
+|-------|--------|
+| Order row with test session ID | ❌ **NOT FOUND** |
+| Most recent order in DB | April 17, 2026 (cs_live_a1ZFbgc...) |
+| music_purchases row | ❌ **EMPTY** — table exists, zero rows |
+| `buyer_email: porter.jonathanj@gmail.com` for today | ❌ Not present |
+
+**Verdict:** The Stripe webhook did not create an order or music_purchase row. Payment succeeded, fulfillment failed.
+
+### 13.2 Playback Failure — Root Cause
+
+**The audio file exists:** `https://tsdjmiqczgxnkpvirkya.supabase.co/storage/v1/object/audio/artists/atm-trap/thought-we-was-bruddaz.mp3` → 200 OK, 4.7MB, `audio/mpeg`.
+
+**The bug is in the data path:**
+
+1. Checkout metadata stored `audio_url` (from `item.audioUrl`), but the success page read `item.audioUrl` from the API response
+2. The API response parsed `item.audioUrl` from Stripe metadata JSON — the JSON had `audioUrl` (camelCase) and the client expected `audio_url` (snake_case) in some paths
+3. More critically: the checkout metadata `items` array was never actually used by the success page — the page used `data.item` (singular), which only had metadata fields when `items` was empty
+4. The `audio_url` metadata field was passed to Stripe, but the success page only looked at `item.audioUrl` (from the API response), which was empty because the API response built from Stripe metadata incorrectly
+
+**Fix applied (commit `65f6dbad`):**
+- `checkout/route.ts`: Include `audioUrl` in metadata.items JSON; include `price_cents` (not `price`) to avoid double-conversion
+- `api/session/[id]/route.ts`: Parse `metadata.items` JSON array, extract `audioUrl`, add `product_id` catalog fallback
+- `webhooks/stripe/route.ts`: Derive real `storage_path` from public audio URL; fix `amount_paid` math (was multiplying price by 100 twice)
+- `success/page.tsx`: `resolvePurchasedTrack` now falls back by exact `track.id` match first, then name+artist (case-insensitive)
+
+### 13.3 Email / Access Link Failure — Root Cause
+
+| Check | Result |
+|-------|--------|
+| `RESEND_API_KEY` configured | ✅ Yes in `.env.local` |
+| Resend imported in email-access API | ❌ **NO** — `import { Resend }` was missing |
+| Email actually sent | ❌ **NO** — line 74 had `// TODO: Send actual email` |
+| API response | `{success: true, message: "Access link sent to your email"}` regardless |
+| Success page behavior | Showed "Access Link Sent!" because API returned `success: true` |
+
+**Fix applied (commit `65f6dbad`):**
+- `email-access/route.ts`: Import `Resend`, instantiate with `RESEND_API_KEY`, call `resend.emails.send()`
+- Only set `emailDelivered = true` if Resend returns no error
+- API response: `success: emailDelivered`, message changes to honest fallback if email fails
+- Success page: Only shows "Access Link Sent!" if `data.success === true`; otherwise shows "Send Access Link" with honest copy
+
+### 13.4 Success Page Truth Check
+
+**Before fix:**
+- "Access Link Sent!" shown immediately on button click (no verification)
+- Play button rendered but did nothing (audioUrl empty)
+- "Your Music" section showed track with no playable source
+
+**After fix:**
+- Button label: "Send Access Link" → "Access Link Sent!" only on confirmed delivery
+- Subtitle: "Access link will be sent to: {email}" → "Sent to {email}" only on confirmed delivery
+- Play button receives real audioUrl from catalog fallback
+
+### 13.5 Commerce Launch Readiness Verdict
+
+> **Payment collection works. Fulfillment is not launch-ready until purchased audio playback, database order creation, and access email/link delivery are proven end-to-end.**
+
+The fixes are committed at `65f6dbad` but **not deployed yet**. The next $1 test must verify:
+1. Order row created in `orders` table
+2. `music_purchases` entitlement row created
+3. Success page shows playable track with working audioUrl
+4. Email API returns `success: true` and Resend log shows delivery
+5. Idempotency: re-triggering webhook with same session ID does not duplicate rows
+
+### 13.6 Required Vercel Env Var for Email
+
+`RESEND_API_KEY` is present in `.env.local`. Must be added to Vercel Production environment variables before deploy.
+
+---
+
+## 14. Remaining Launch Blockers
 
 1. **Stripe pricing authority** — checkout routes accept client `item.price`. Must move to DB-authoritative pricing before paid public launch. `src/lib/checkout-catalog.ts` already drafts the resolver but is unwired.
-2. **Webhook end-to-end proof** — entitlement creation + duplicate-event idempotency not verified in this pass. Run the §9 proof plan.
+2. **Webhook end-to-end proof** — entitlement creation + duplicate-event idempotency not verified in this pass. Run the §9 proof plan with the new fixes deployed.
 3. **Hardcoded play counts** in `src/lib/data.ts` (e.g. `999999`, `125000`) — credibility risk. Either zero them or back them with a real plays counter.
 4. **Cron re-applying stashed work** — process risk. Whatever cron pulled the experimental changes back into the tree after the prior 4:07 PM stash needs to be paused, removed, or scoped, otherwise the next stabilization pass will face the same dirty-tree problem.
 

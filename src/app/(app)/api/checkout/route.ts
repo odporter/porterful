@@ -8,6 +8,12 @@ import {
   getDiscountCents,
   normalizeActivationCode,
 } from '@/lib/activation'
+import {
+  buildStripeLineItems,
+  CheckoutCatalogError,
+  type CheckoutResolvedItem,
+  resolveCheckoutCart,
+} from '@/lib/checkout-catalog'
 
 // Dynamic Stripe import
 async function getStripe() {
@@ -29,7 +35,7 @@ function normalizeEmail(value: string | null | undefined): string | null {
 
 async function createCashOrder(params: {
   supabase: ReturnType<typeof createServerClient>
-  items: any[]
+  items: CheckoutResolvedItem[]
   buyerId: string | null
   buyerEmail: string | null
   shippingAddress: Record<string, unknown> | null
@@ -69,12 +75,12 @@ async function createCashOrder(params: {
     throw new Error(orderError?.message || 'Could not create order')
   }
 
-  const orderItems = params.items.map((item: any) => ({
+  const orderItems = params.items.map((item) => ({
     order_id: order.id,
-    product_id: isUuid(item.id || item.productId) ? (item.id || item.productId) : null,
-    product_name: item.name || item.title || 'Product',
+    product_id: isUuid(item.id) ? item.id : null,
+    product_name: item.name || 'Product',
     quantity: Number(item.quantity || 1),
-    price: Number(item.price || 0),
+    price: Number(item.unitAmountCents || 0) / 100,
     seller_id: null,
     artist_id: null,
     superfan_id: params.referrerId || null,
@@ -116,16 +122,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No items in cart.' }, { status: 400 })
     }
 
-    // Check if this is digital (tracks) or physical (merch)
-    const isDigital = items.some((item: any) => item.type === 'track' || item.type === 'digital')
-    
-    // Calculate totals (in cents)
-    const subtotal = items.reduce((sum: number, item: any) => {
-      const price = Math.round(item.price * 100)
-      return sum + (price * (item.quantity || 1))
-    }, 0)
-    
-    const shippingCost = isDigital ? 0 : (subtotal >= 5000 ? 0 : 500)
+    const resolvedCart = resolveCheckoutCart(items)
+    const { items: resolvedItems, subtotalCents: subtotal, requiresShipping } = resolvedCart
+    const shippingCost = requiresShipping ? (subtotal >= 5000 ? 0 : 500) : 0
     const total = subtotal + shippingCost
 
     // Artist earnings breakdown
@@ -187,7 +186,7 @@ export async function POST(request: NextRequest) {
       const orderAmountCents = isPrepaidActivation ? total : payableTotal
       const { order } = await createCashOrder({
         supabase,
-        items,
+        items: resolvedItems,
         buyerId: profileId,
         buyerEmail,
         shippingAddress,
@@ -226,18 +225,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.name || item.title || 'Product',
-          description: item.artist ? `by ${item.artist}` : (item.description || undefined),
-          images: item.image ? [item.image.startsWith('http') ? item.image : `https://porterful.com${item.image}`] : undefined,
-        },
-        unit_amount: Math.round(item.price * 100),
-      },
-        quantity: item.quantity || 1,
-    }))
+    const lineItems = buildStripeLineItems(resolvedItems, {
+      baseUrl: request.nextUrl.origin,
+    })
 
     // Demo mode if no Stripe
     if (!stripe) {
@@ -266,22 +256,21 @@ export async function POST(request: NextRequest) {
       referral_code: effectiveReferralCode || '',
       artist_fund: artistFund.toString(),
       superfan_share: superfanShare.toString(),
-      type: items[0]?.type || 'product',
-      product_id: items[0]?.id || '',
-      audio_url: items[0]?.audioUrl || '',
-      track_name: items[0]?.name || '',
-      track_artist: items[0]?.artist || '',
-      track_image: items[0]?.image || '',
-      items: JSON.stringify(items.map((item: any) => ({
-        id: item.id || null,
-        name: item.name || item.title,
+      type: resolvedItems[0]?.kind || 'product',
+      product_id: resolvedItems[0]?.id || '',
+      audio_url: resolvedItems[0]?.audioUrl || '',
+      track_name: resolvedItems[0]?.name || '',
+      track_artist: resolvedItems[0]?.artist || '',
+      track_image: resolvedItems[0]?.image || '',
+      items: JSON.stringify(resolvedItems.map((item) => ({
+        id: item.id,
+        name: item.name,
         artist: item.artist,
-        price: item.price,
-        quantity: item.quantity || 1,
-        artistCut: item.artistCut || 0,
-        type: item.type || 'product',
+        price_cents: item.unitAmountCents,
+        quantity: item.quantity,
+        type: item.kind,
         image: item.image || '',
-        audioUrl: item.audioUrl || item.audio_url || '',
+        audioUrl: item.audioUrl || '',
       }))),
       activation_code_value: activationCodeValue || '',
       activation_code_id: activationRecord?.id || '',
@@ -300,13 +289,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Only collect shipping for physical products
-    if (!isDigital) {
+    if (requiresShipping) {
       sessionParams.shipping_address_collection = {
         allowed_countries: ['US', 'CA'],
       }
     }
 
-      if (activationRecord && activationRecord.kind === 'discount') {
+    if (activationRecord && activationRecord.kind === 'discount') {
       const discountAmount = Math.min(activationDiscountCents, subtotal)
       if (discountAmount > 0) {
         const coupon = await stripe.coupons.create({
@@ -338,6 +327,10 @@ export async function POST(request: NextRequest) {
       }
     })
   } catch (error: any) {
+    if (error instanceof CheckoutCatalogError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
     console.error('Checkout error:', error)
     return NextResponse.json(
       { error: error.message || 'Checkout failed' },

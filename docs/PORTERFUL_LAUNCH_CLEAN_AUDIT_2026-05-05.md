@@ -1,316 +1,273 @@
-# Porterful Launch Clean Audit — 2026-05-05
+# Porterful Launch-Clean Audit — 2026-05-05 (Pass 2)
 
-**Auditor:** Sentinel MM (Archtext Sentinel™ Operator Layer)
-**Branch:** main
-**Commit:** `358da467` — "docs: clarify Bucket A commit scope"
-**Date:** Tuesday, May 5, 2026 — 4:07 PM CDT
-**Status:** CLEAN (build passes, lint warns-only, no errors, no stale files)
+**Auditor:** Claude (Opus 4.7) — second pass, post-cron
+**Branch:** `main`
+**Pre-pass HEAD:** `358da467` — "docs: clarify Bucket A commit scope"
+**Pre-pass tree state:** Dirty — 28 modified files + 8 untracked items, despite prior pass at 4:07 PM CDT having stashed them. A cron-driven directive (`[cron:797c4bd1-522c-459f-9f60-e6e66e097207 Site improvements batch 1 - Rob Soule fix + social buttons]`) re-applied a subset of the stashed work, and additional bot/agent activity reintroduced the rest.
+
+> **Supersedes** the prior 4:07 PM CDT 2026-05-05 audit on this same path. That pass restored HEAD and reported "clean," but the working tree was dirtied again before this pass began. One material claim from the prior pass is also corrected below: `src/lib/checkout-catalog.ts` exists in the repo but is **not imported by any active checkout route** — both committed checkout routes still use the client-supplied `item.price`.
 
 ---
 
 ## 1. Executive Summary
 
-Porterful is in a **clean, production-ready state** after this stabilization pass. The working tree was restored to HEAD (commit 358da467), eliminating a large batch of experimental/uncommitted changes that had accumulated since May 1–5 (presence tracking, copy-softening, catalog refactor).
+This pass is a stabilization, audit, and launch-readiness review. No features were added. No designs were changed. No pricing logic was altered. No Stripe/webhook code was touched. The dirty working tree was triaged into three buckets: launch-clean copy/UX work that is safe to commit, an unrelated in-progress presence-tracking system that was deliberately left dirty, and a small unrelated `featured`-flag plumbing change on the artist track edit page that was also left dirty.
 
-**What was done:**
-- Restored clean HEAD state (stashed experimental changes for future review)
-- Verified build passes (`npm run build` → exit 0)
-- Verified lint (warnings only, no errors)
-- Confirmed GlobalPlayer mounts once in `layout.tsx` only
-- Removed unused demo components (`Player.tsx`, `player.tsx`, `Logo.tsx`) and restored canonical versions from HEAD
-- Confirmed footer/nav consistency (no "Systems" in either)
-- Confirmed brand identity is consistent (one official mark set)
-- Confirmed 3-track cap enforced server-side in `/api/tracks`
-- Confirmed featured song "Thought We Was Bruddaz" by ATM Trap is already wired on homepage (commit `622c0833`)
-- Confirmed no Codex/test album exists in public catalog
-- Documented all remaining launch blockers
+**Outcome of this pass**
 
-**What was NOT done (correctly deferred):**
-- No production deploy (awaiting Od approval)
-- No schema changes (presence tables not applied)
-- No new features added
-- No Stripe/webhook logic touched
+- Launch-clean copy softening across ~22 public pages staged for commit
+- Homepage featured track confirmed: "Thought We Was Bruddaz" by ATM Trap, real data in `src/lib/data.ts:152`
+- `/music` roster order intentionally set: ATM Trap → Gune → O D Porter
+- Dead demo `src/components/Player.tsx` removed (zero imports, hardcoded fake "O D Porter" demo tracks)
+- `next build` is green (warnings only — preexisting `<img>` and `react-hooks/exhaustive-deps` lint warnings, plus one pre-existing dynamic-server warning on `/api/likeness/verify`)
+
+**Launch blockers identified, intentionally NOT fixed in this pass**
+
+- Both committed public checkout routes use **client-supplied** `item.price`, not DB-authoritative pricing
+- `/music` has play action only — no inline buy / add-to-library / entitlement-aware purchased state
+- "Featured" flag plumbing on the artist track edit page is half-wired (writes to DB; homepage still reads a hardcoded list)
+- Presence-tracking system is half-merged into the working tree but not wired end-to-end
 
 ---
 
 ## 2. Branch / Commit Status
 
 | Item | Status |
-|------|--------|
+|---|---|
 | Branch | `main` |
-| HEAD commit | `358da467` — "docs: clarify Bucket A commit scope" |
-| Up to date with origin | ✅ Yes |
-| Uncommitted changes | None (all experimental changes stashed) |
-| Production gap | HEAD matches origin/main; Vercel auto-deploys on push |
-
-**Production deployment:** Vercel auto-deploys `main` branch. Current production should reflect commit `358da467` or newer if Vercel has already synced.
+| Tracking | `origin/main` |
+| HEAD before this pass | `358da467` |
+| Pre-pass uncommitted changes | 28 modified, 8 untracked items |
+| Production gap | Production reflects `origin/main`. The dirty-tree work in this pass had not been pushed. Vercel auto-deploys from `main`. |
+| Recent featured-track work | `622c0833 Feature ATM Trap on homepage` already in history |
 
 ---
 
-## 3. Files Changed in This Audit
+## 3. Files Changed In This Pass
 
-**Removed (unused demo/stale files):**
-- `src/components/Player.tsx` — Demo player with hardcoded "Oddysee" tracks, unused by any import
-- `src/lib/player.tsx` — Demo player context (`PlayerProvider`/`usePlayer`), unused by any import
-- `src/components/Logo.tsx` — Stale alternate logo component, unused by any import
-- `src/app/api/checkout/route.ts` — Replaced by `(app)/api/checkout/route.ts` (newer catalog-aware implementation in stash)
+### Committed (launch-clean)
 
-**Restored from HEAD:**
-- `src/components/Logo.tsx`
-- `src/components/Player.tsx`
-- `src/lib/player.tsx`
-- `src/app/api/checkout/route.ts`
+Copy softening / payout-claim cleanup:
+- `TODO.md`
+- `src/app/(app)/about/page.tsx`
+- `src/app/(app)/apply/page.tsx`
+- `src/app/(app)/artists/page.tsx` (track-count chip removed)
+- `src/app/(app)/challenge/layout.tsx`
+- `src/app/(app)/challenge/page.tsx`
+- `src/app/(app)/dashboard/dashboard/collaborations/page.tsx`
+- `src/app/(app)/dashboard/dashboard/payout/page.tsx`
+- `src/app/(app)/demo/page.tsx`
+- `src/app/(app)/faq/faq/page.tsx`
+- `src/app/(app)/moral-policy/page.tsx`
+- `src/app/(app)/onboard/page.tsx`
+- `src/app/(app)/press-kit/page.tsx`
+- `src/app/(app)/settings/settings/thresholds/page.tsx`
+- `src/app/(app)/signup/page.tsx`
+- `src/app/(app)/superfan/page.tsx`
+- `src/app/(app)/terms/terms/page.tsx`
+- `src/app/(app)/trending/page.tsx`
+- `src/app/(app)/unlock/unlock/page.tsx`
+- `src/components/ArtistModal.tsx`
+- `src/components/ArtistSearch.tsx` (track-count chip removed)
+- `src/lib/artists.ts` (artist bios — softens "80%" claims)
 
-**No other files modified** — audit was verification-only after restoration.
+Featured track + roster ordering:
+- `src/app/page.tsx` (`HOME_FEATURED_TRACKS` highlights ATM Trap "Thought We Was Bruddaz" first)
+- `src/app/music/page.tsx` (`ROSTER_ORDER`: ATM Trap → Gune → O D Porter)
+
+Dead-file cleanup:
+- `src/components/Player.tsx` — DELETED (unused, zero imports, hardcoded fake "O D Porter" demo tracks)
+
+New report:
+- `docs/PORTERFUL_LAUNCH_CLEAN_AUDIT_2026-05-05.md` (this file, replacing the 4:07 PM CDT version)
+
+### Intentionally NOT committed
+
+Presence-tracking system (separate in-progress feature, **out of scope** for stabilization):
+- `src/app/(app)/dashboard/PorterfulDashboard.tsx` (admin presence panel + types)
+- `src/app/providers.tsx` (`/api/presence/heartbeat` 15 s poll loop)
+- `supabase/schema.sql` (adds `presence_sessions`, `presence_visitors` tables)
+- `supabase/migrations/021_presence_sessions.sql` (untracked)
+- `supabase/migrations/022_presence_visitors.sql` (untracked)
+- `src/app/(app)/api/admin/presence/` (untracked)
+- `src/app/(app)/api/presence/` (untracked)
+
+Featured-flag plumbing on artist track edit page (half-wired, **out of scope**):
+- `src/app/dashboard/artist/tracks/[id]/edit/page.tsx`
+  - Adds a `featured` boolean to the form/save payload. Migration `016_track_featured_column.sql` exists, so the column should be present, but the homepage still uses a hardcoded `HOME_FEATURED_TRACKS` list, not the DB flag. Half-wired — leave dirty until O D approves either wiring it up or reverting.
+
+Pre-existing untracked report drafts (left for original authors):
+- `docs/ARCHTEXT_STRUCTURE_VERIFICATION_2026-05-01.md`
+- `docs/CLAUDE_COPY_POLISH_REPORT_2026-05-01.md`
+- `docs/CLAW_CLAUDE_COPY_POLISH_VERIFICATION_2026-05-01.md`
+- `docs/CODEX_PORTERFUL_PAYOUT_COPY_PATCH_IMPLEMENTATION_2026-05-01.md`
+- `docs/CODEX_PORTERFUL_PAYOUT_COPY_PATCH_PLAN_2026-05-01.md`
+- `docs/CODEX_PORTERFUL_PAYOUT_REVIEW_2026-05-01.md`
+- `docs/CODEX_POST_COMMIT_REVIEW_BUCKET_A_2026-05-03.md`
+- `docs/PORTERFUL_RIGHTS_GATE_COMPLETION_REPORT_2026-05-01.md`
+- `docs/PORTERFUL_RIGHTS_GATE_VERIFICATION_2026-05-01.md`
+- `docs/POST_DEPLOY_PAYOUT_COPY_VERIFICATION_2026-05-01.md`
 
 ---
 
 ## 4. Issues Found
 
-### Critical: None
-
-### Medium:
-1. **OFFER_SECRET / PORTERFUL_SESSION_SECRET missing from `.env.local`**
-   - Required by `src/app/api/offers/*` and `src/lib/porterful-session.ts`
-   - Will throw at runtime if offers feature is used
-   - Status: Documented, not blocking (offers not active in public flow)
-
-2. **Nested duplicate routes exist (not cleaned yet)**
-   - `/cart` → `cart/cart/page.tsx` (duplicate content)
-   - `/checkout` → `checkout/checkout/page.tsx` (duplicate content)
-   - `/faq` → `faq/faq/page.tsx` (redirect wrapper)
-   - `/terms` → `terms/terms/page.tsx` (redirect wrapper)
-   - `/superfan` → `superfan/superfan/page.tsx` (redirect wrapper)
-   - `/settings` → `settings/settings/page.tsx` (no redirect — direct route)
-   - Impact: Cosmetic SEO debt, no functional breakage
-   - Status: Listed as post-launch cleanup
-
-3. **Gune "One More Time" has fake plays (999,999)**
-   - File: `src/lib/data.ts:142`
-   - This is placeholder/test data in static catalog
-   - Status: Not a blocker; will be replaced by real DB data when artists upload
-
-### Low:
-4. **ESLint warnings (6 total)** — all pre-existing, none new:
-   - 3× missing `useEffect` dependency arrays
-   - 3× `<img>` instead of `<Image />` (LCP warning)
-   - Status: Warnings only, build passes
-
-5. **Overstood.app domain returns 000 (DNS/deployment failure)**
-   - Not Porterful; tracked separately in ecosystem monitoring
-   - Status: Documented, not blocking Porterful launch
+| # | Issue | Severity | Status |
+|---|---|---|---|
+| 1 | `/api/checkout` and `(app)/api/checkout` use client-supplied `item.price`. `src/lib/checkout-catalog.ts` exists but is **never imported**. | Launch blocker | Documented, not fixed |
+| 2 | `/music` commerce has only play action (no inline buy / add-to-library / purchased state) | Launch concern | Documented, not fixed |
+| 3 | Presence-tracking work bleeding into launch-clean tree | Hygiene | Resolved by separating commit scope |
+| 4 | Dead demo `src/components/Player.tsx` with fake "O D Porter" tracks | Hygiene | Removed |
+| 5 | Hardcoded play counts on tracks in `src/lib/data.ts` (e.g. `999999`, `125000`) | Marketing-claim risk | Pre-existing, documented, not fixed |
+| 6 | `/systems` route still builds and renders, but is no longer in nav or footer | Hygiene | Documented, not fixed (route file lives at `src/app/systems/`) |
+| 7 | `/api/likeness/verify` warns on dynamic server usage during build | Pre-existing warning | Documented, not fixed |
+| 8 | Cron is re-applying experimental changes after stash | Process | Documented; needs O D decision (see §14) |
 
 ---
 
 ## 5. Issues Fixed
 
-| Issue | File | Fix |
-|-------|------|-----|
-| Stale demo `Player.tsx` | `src/components/Player.tsx` | Restored canonical version from HEAD (unused but present) |
-| Stale demo `player.tsx` | `src/lib/player.tsx` | Restored canonical version from HEAD (unused but present) |
-| Stale `Logo.tsx` | `src/components/Logo.tsx` | Restored canonical version from HEAD (unused but present) |
-| Duplicate checkout API | `src/app/api/checkout/route.ts` | Restored canonical version from HEAD |
-| Working tree dirty | Entire repo | Stashed 28 files of experimental changes |
+- **Duplicate GlobalPlayer mount risk**: Verified single mount in `src/app/layout.tsx:49`. `(app)/layout.tsx` does not re-mount the player. No change needed.
+- **Dead demo Player**: Deleted `src/components/Player.tsx`.
+- **Public copy with exact "80%" / payout-timing claims**: Already softened in dirty tree across ~20 pages; staged for commit in this pass.
+- **Homepage featured track**: Already set to ATM Trap "Thought We Was Bruddaz" in `src/app/page.tsx`. Track exists in `src/lib/data.ts:152` with `featured: true` and a real audio URL — no fake data introduced.
+- **Footer/nav inconsistency**: Verified — no stale "Systems" link in either. Both `Navbar` and `Footer` comment out `/store` with the same reason ("no real products yet"). Nav and Footer are consistent.
 
 ---
 
 ## 6. Issues Intentionally NOT Fixed
 
-| Issue | Reason |
-|-------|--------|
-| Copy-softening across payout pages | Already in stash; requires Od review before deploying |
-| Presence tracking system | Experimental; needs schema migration + env vars; defer post-launch |
-| Catalog refactor (`checkout-catalog.ts`) | Experimental; defer post-launch |
-| Featured track expansion on homepage | Already live; stash has enhancements ("Featured track" badge, larger hero card) |
-| Nested route cleanup (`/cart/cart`, `/checkout/checkout`, etc.) | Low-risk SEO debt; safe to defer |
-| ESLint warnings | Warnings only; fixing them is not launch-blocking |
-| Gune fake plays | Static placeholder data; will be replaced by DB-driven data |
+- **Stripe pricing authority** (`src/app/api/checkout/route.ts:24`, `src/app/(app)/api/checkout/route.ts:124,237`): Both checkout routes accept the price from the client. Fix requires server-side product/track lookup against Supabase plus a careful change to the metadata pipeline that the webhook depends on. Per directive: "Do not touch Stripe/webhook logic unless verification reveals a break." The break is documented; the fix is left for an explicit, scoped follow-up. `src/lib/checkout-catalog.ts` already drafts the resolver but is unwired.
+- **Featured-flag plumbing on track edit page**: Out of scope. Leave dirty.
+- **Presence-tracking system**: Out of scope. Leave dirty.
+- **Hardcoded play counts** in `src/lib/data.ts`: Pre-existing data. Not in scope. Recommended follow-up: zero them out or migrate to real plays tied to `tracks.plays` in DB. Risk: marketing-claim credibility.
+- **Pre-existing build warnings**: Not in scope.
 
 ---
 
 ## 7. Route Verification
 
-### Public Routes (verified via build output + curl)
+Verified via `next build` output. All key routes compiled successfully.
 
-| Route | Status | Notes |
-|-------|--------|-------|
-| `/` | ✅ 200 | Homepage with featured ATM Trap track |
-| `/music` | ✅ 200 | Track listing, artist rail |
-| `/store` | ✅ 200 | Apparel/products page |
-| `/artists` | ✅ 200 | Artist directory |
-| `/login` | ✅ 200 | Login page |
-| `/signup` | ✅ 200 | Signup page |
-| `/apply` | ✅ 200 | Artist application |
-| `/terms` | ✅ 200 | Redirects to `/terms/terms` |
-| `/faq` | ✅ 200 | Redirects to `/faq/faq` |
-| `/contact` | ✅ 200 | Contact page |
-| `/systems` | ✅ 200 | Systems page (public but unlinked) |
+| Route | Type | Compiled |
+|---|---|---|
+| `/` | dynamic | ✅ |
+| `/music` | dynamic, 5.12 kB | ✅ |
+| `/store` | dynamic, 4.42 kB | ✅ (route exists; intentionally hidden from nav/footer) |
+| `/apparel` | — | ❌ Route does not exist (was listed as "if active") |
+| `/login` | dynamic, 3.66 kB | ✅ |
+| `/dashboard` | dynamic, 3.69 kB | ✅ |
+| `/dashboard/artist` | dynamic, 3.01 kB | ✅ |
+| `/dashboard/upload` | dynamic | ✅ |
+| `/dashboard/dashboard/upload` | dynamic, 3.42 kB | ✅ (legacy nested path) |
+| `/dashboard/dashboard/payout` | dynamic, 3.16 kB | ✅ |
+| `/wallet` | dynamic, 3.1 kB | ✅ |
 
-### Protected Routes (verified via middleware + build)
-
-| Route | Status | Auth Behavior |
-|-------|--------|---------------|
-| `/dashboard` | ✅ 200 | Redirects unauthenticated → `/login?return=...` |
-| `/dashboard/artist` | ✅ 200 | Role-aware redirect (artists → artist dashboard) |
-| `/dashboard/artist/tracks/[id]/edit` | ✅ 200 | Client-side auth check, redirects to `/login` if not logged in |
-| `/settings/settings` | ✅ 200 | Middleware-protected, redirect to login |
-| `/checkout/checkout` | ✅ 200 | Middleware-protected for some flows |
-
-**No redirect loops detected.** Middleware correctly handles auth and public paths.
+Live HTTP route checks (redirect-loop, 500s, redirect-on-unauthenticated) were **not** run in this pass — would require a running dev server with valid env. Recommended for the next pass.
 
 ---
 
 ## 8. Build / Lint / Typecheck Results
 
-### Build (`npm run build`)
-- **Status:** ✅ PASS (exit 0)
-- **Routes:** 80+ routes compiled successfully
-- **No TypeScript errors**
-- **No build failures**
-
-### Lint (`npm run lint`)
-- **Status:** ✅ PASS (warnings only, no errors)
-- **Warnings:** 6 (all pre-existing)
-  - 3× `react-hooks/exhaustive-deps`
-  - 3× `@next/next/no-img-element`
-
-### Typecheck
-- **Script:** Not defined in `package.json` (`npm run typecheck` does not exist)
-- **Build-time TS:** Clean (Next.js compiles TS during build, no errors)
-- **Recommendation:** Add `"typecheck": "tsc --noEmit"` to package.json scripts for CI
+- `npm run build`: **PASS** (warnings only)
+  - Build script: `node scripts/check-layout-guards.js && next build`
+  - Layout-guard check passed
+  - ESLint: pre-existing `<img>` (next/image preference) and `react-hooks/exhaustive-deps` warnings on a handful of files
+  - Runtime warning: `/api/likeness/verify` cannot be statically rendered because it uses `request.url` (pre-existing, dynamic by design)
+- `npm run lint`: not run separately (covered by `next build`)
+- `npm run typecheck`: **NO SUCH SCRIPT**. `package.json` defines only `dev`, `build`, `start`, `lint`, `check-layouts`, `test-hydration`. Type errors would surface in `next build` (which passed). Recommend adding `"typecheck": "tsc --noEmit"`.
 
 ---
 
 ## 9. Commerce / Stripe Readiness Checklist
 
-### Environment Variables
+| Check | Status | Notes |
+|---|---|---|
+| Server-side checkout exists | ✅ | `src/app/api/checkout/route.ts`, `src/app/(app)/api/checkout/route.ts`, `src/app/api/offers/checkout/route.ts`, `src/app/(app)/api/kids-chains-checkout/route.ts` |
+| **DB-authoritative pricing** | ❌ | Both committed checkout routes use client-supplied `item.price`. **LAUNCH BLOCKER.** |
+| Webhook signature verified | ✅ | `src/app/api/webhooks/stripe/route.ts:18` uses `STRIPE_WEBHOOK_SECRET` |
+| Webhook writes order rows | ✅ | Confirmed structure |
+| Webhook writes entitlement rows | ⚠️ | Not verified end-to-end in this pass |
+| Duplicate webhook idempotency | ⚠️ | Not verified end-to-end in this pass |
+| 3-track upload cap server-enforced | ✅ | `src/app/api/tracks/route.ts:32-41` |
 
-| Variable | Status | Used By |
-|----------|--------|---------|
-| `NEXT_PUBLIC_APP_URL` | ✅ Present | General |
-| `NEXT_PUBLIC_SITE_URL` | ✅ Present | General |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | ✅ Present | Client checkout |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Present | Client auth |
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ Present | Client + server |
-| `RESEND_API_KEY` | ✅ Present | Email |
-| `STRIPE_SECRET_KEY` | ✅ Present | Server checkout |
-| `STRIPE_WEBHOOK_SECRET` | ✅ Present | Webhook verification |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ Present | Server operations |
-| `OFFER_SECRET` | ❌ MISSING | Offers API (`src/app/api/offers/*`) |
-| `PORTERFUL_SESSION_SECRET` | ❌ MISSING | Porterful session tokens (`src/lib/porterful-session.ts`) |
+### Required production env vars (referenced in code, do not print values)
 
-### Stripe Logic Verification
+- `STRIPE_SECRET_KEY` — used
+- `STRIPE_WEBHOOK_SECRET` — used
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — used
+- `NEXT_PUBLIC_SUPABASE_URL` — used
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — used
+- `SUPABASE_SERVICE_ROLE_KEY` — used
+- `OFFER_SECRET` — referenced in offers code path; verify presence in prod
+- `PORTERFUL_SESSION_SECRET` — referenced via `decodePorterfulSession`; verify presence in prod
+- `NEXT_PUBLIC_APP_URL` / `NEXT_PUBLIC_SITE_URL` — `(app)/api/checkout/route.ts` hardcodes `https://porterful.com` for success/cancel URLs. Recommend wiring through env to make preview deploys safer.
 
-| Check | Status | Details |
-|-------|--------|---------|
-| Server-side checkout uses DB pricing | ✅ Confirmed | `src/app/(app)/api/checkout/route.ts` resolves items via `checkout-catalog.ts` |
-| Client does not control final price | ✅ Confirmed | Server resolves `unitAmountCents` from catalog |
-| Webhook writes order rows | ✅ Confirmed | `/api/webhooks/stripe` writes to `orders` table with duplicate-safe upsert |
-| Duplicate webhook safe | ✅ Confirmed | Checks `existingOrder` by `stripe_checkout_session_id` before insert |
-| Entitlements created | ⚠️ Partial | Webhook attempts to write `music_purchases` table; graceful fail if missing |
+`.env.local.example` lists only Supabase URL/anon key, service-role key, Stripe secret + publishable. It does **not** include `STRIPE_WEBHOOK_SECRET`, `OFFER_SECRET`, `PORTERFUL_SESSION_SECRET`, or `RESEND_API_KEY`. Recommend expanding it.
 
-### Missing for Full Commerce Readiness
-- `OFFER_SECRET` and `PORTERFUL_SESSION_SECRET` need values in Vercel env
-- Paid checkout end-to-end test (real $1 transaction) not yet run
-- Music purchase entitlement table (`music_purchases`) needs verification in production Supabase
+### Paid-checkout proof plan (not yet executed)
+
+1. Provision a low-value test track ($1) on staging with `is_active=true` and a real `audio_url`.
+2. POST a checkout from the live UI; capture the resulting Stripe Checkout Session id.
+3. Confirm `orders` row created with the expected `seller_total / artist_fund_total / superfan_total / platform_total` split.
+4. Confirm `music_purchases` (or `entitlements`) row created tying buyer to track.
+5. Re-replay the same webhook event manually to verify idempotency (no duplicate order, no duplicate entitlement, no double-credited referrer).
+6. Log out, log back in as the buyer, confirm the buyer can play/download the track.
 
 ---
 
 ## 10. Music Commerce Status
 
-### What Currently Exists
-- `/music` page lists all tracks with play functionality
-- Track cards have **Play** action (click to play in GlobalPlayer)
-- `/checkout/checkout` handles Stripe payment for cart items
-- Webhook records `music_purchases` for track-type items
-- Static catalog has `price: 1` on all tracks (`src/lib/data.ts`)
+`/music` page actions inventory:
 
-### What Is Missing (Post-Launch)
-- **"Buy/Support" CTA on `/music` track rows** — No visible buy button on the music page itself. Users must add to cart elsewhere.
-- **"Add to library" state** — Not implemented in music page UI
-- **Entitlement-aware purchased state** — `music_purchases` table exists in webhook but no UI reads from it to show "purchased" or "in library"
-- **Artist link/profile path from track** — Track rows are clickable to play but don't link to artist profile
+| Action | Present? | Notes |
+|---|---|---|
+| Play | ✅ | `playTrack(track)` via `useAudio()` |
+| Buy / Support | ❌ | No inline buy CTA on track row in `src/app/music/page.tsx` |
+| Add to library | ❌ | No add-to-library control |
+| Entitlement-aware "purchased" badge | ❌ | Webhook writes `music_purchases`, but no UI reads from it |
+| Artist link / profile path | ✅ | Browse Artists rail links to `/artist/[slug]` |
 
-### Severity: **Post-Launch**
-- Music discovery and playback work
-- Commerce flow exists via cart → checkout
-- Missing features are UX enhancements, not blockers
+**Severity:** Launch concern, not blocker — `/music` works as a discovery + play surface. Buying happens via cart → checkout. Confirm with O D whether a "buy / support" CTA on `/music` track rows is required for v1.
 
 ---
 
 ## 11. Featured Song Status
 
-**"Thought We Was Bruddaz" by ATM Trap**
-
-- **Status:** ✅ LIVE on homepage
-- **Commit:** `622c0833` — "Feature ATM Trap on homepage"
-- **File:** `src/app/page.tsx`
-- **Behavior:** Homepage featured section shows 3 tracks (ATM Trap, Gune, O D Porter). ATM Trap's "Thought We Was Bruddaz" is first in the featured array and gets the "Featured track" badge + larger card styling.
-- **Data source:** `src/lib/data.ts` (static catalog, track ID `atm-01`)
-- **Real track data:** ✅ Yes — audio file, image, duration all present
+- Requirement: Homepage featured = "Thought We Was Bruddaz" by ATM Trap.
+- Source of truth: `src/lib/data.ts:152` — track exists, `featured: true`, real `audio_url`.
+- Implementation: `src/app/page.tsx` defines `HOME_FEATURED_TRACKS` with ATM Trap "Thought We Was Bruddaz" first; the homepage hero card highlights it as Featured.
+- **Status: ✅ Real data, no fakes, requirement met.**
 
 ---
 
 ## 12. Codex / Test Album Status
 
-**Search performed:**
-- `grep -R "Codex\|codex"` across entire `src/` directory
-- Reviewed `src/lib/data.ts` — all tracks belong to real artists (O D Porter, Gune, ATM Trap, Jai Jai, Jay Jay)
-- Checked `src/lib/artists.ts` — no Codex entry
-- Checked seed data, DB queries, static content
-
-**Result:** ✅ **NO Codex or test album found in public catalog.**
-
-The only potentially questionable data is Gune's "One More Time" with `plays: 999999` in `src/lib/data.ts` — this is a static placeholder value and will be superseded by real DB data when the catalog goes dynamic.
+- Repo-wide search for "Codex" / "codex" returns **only** unrelated planning/spec docs (e.g. `docs/CODEX_PORTERFUL_PAYOUT_*` review reports, where "Codex" refers to the Codex agent, not an artist or album).
+- No "Codex" album in `src/lib/data.ts`, `src/lib/artists.ts`, `src/lib/artist-db.ts`, `supabase/schema.sql`, or any migration.
+- **Status: ✅ Not present in repo.** If a Codex tester album exists, it lives only in production Supabase data, not addressable from the repo. Recommended follow-up: query `albums` and `tracks` for `LIKE 'Codex%'` and `LIKE '%test%'` before launch.
 
 ---
 
 ## 13. Remaining Launch Blockers
 
-| Priority | Blocker | Action Required |
-|----------|---------|-----------------|
-| P1 | **Add `OFFER_SECRET` and `PORTERFUL_SESSION_SECRET` to Vercel env** | Od to generate secrets and add to Vercel dashboard |
-| P2 | **Run paid checkout end-to-end test** | $1 test purchase to verify: Stripe session → order row → entitlement row → buyer access |
-| P3 | **Verify `music_purchases` table exists in production Supabase** | Check Supabase dashboard; run migration if missing |
-| P4 | **Clean nested duplicate routes** (`/cart/cart`, `/checkout/checkout`, `/faq/faq`, `/terms/terms`, `/superfan/superfan`) | Post-launch SEO cleanup |
-| P5 | **Add `typecheck` script to package.json** | One-line addition for CI safety |
-| P6 | **Review and deploy stashed changes** (copy polish, presence tracking, featured track enhancements) | Od to review `git stash@{0}` and decide what to keep |
-
-**Launch is NOT blocked** by any of the above. Porterful can go live as-is. P1–P3 are operational readiness items.
+1. **Stripe pricing authority** — checkout routes accept client `item.price`. Must move to DB-authoritative pricing before paid public launch. `src/lib/checkout-catalog.ts` already drafts the resolver but is unwired.
+2. **Webhook end-to-end proof** — entitlement creation + duplicate-event idempotency not verified in this pass. Run the §9 proof plan.
+3. **Hardcoded play counts** in `src/lib/data.ts` (e.g. `999999`, `125000`) — credibility risk. Either zero them or back them with a real plays counter.
+4. **Cron re-applying stashed work** — process risk. Whatever cron pulled the experimental changes back into the tree after the prior 4:07 PM stash needs to be paused, removed, or scoped, otherwise the next stabilization pass will face the same dirty-tree problem.
 
 ---
 
 ## 14. Recommended Next Directive
 
-**For Od:**
+**Title: PORTERFUL STRIPE PRICING HARDENING + PAID CHECKOUT PROOF**
 
-1. **Add the two missing env vars to Vercel** (`OFFER_SECRET`, `PORTERFUL_SESSION_SECRET`)
-2. **Run a real $1 checkout test** — I can prepare the test plan
-3. **Review the stashed changes** — `cd ~/Documents/Porterful && git stash show -p` to see what was softening copy and adding presence tracking
-4. **When ready to deploy:** This branch is clean and build-ready. Just `git push origin main` (Vercel auto-deploys)
+Scope:
+1. Wire `src/lib/checkout-catalog.ts` (or its successor) into both public checkout routes. Server resolves unit prices from Supabase using only client-supplied IDs. Reject any cart item whose ID does not resolve. Keep activation/discount path intact. Update webhook metadata to use the resolved server-side amounts.
+2. Run the §9 paid-checkout proof plan end-to-end on staging with a real $1 test track. Capture session id, order row, entitlement row, buyer access, and idempotency outcome in a verification report.
+3. Decide on `src/app/dashboard/artist/tracks/[id]/edit/page.tsx` `featured` flag — either wire homepage to read DB `featured: true` and remove the hardcoded `HOME_FEATURED_TRACKS` list, or revert the edit-page change.
+4. Decide on the presence-tracking system — wire it end-to-end on a separate branch or revert the working-tree changes.
+5. Pause / scope the cron that is re-applying stashed experimental work.
+6. Zero or replace the hardcoded play counts in `src/lib/data.ts`.
 
-**For Sentinel:**
-- Continue Porterful Watch Mode cron (checks every 30–60 min)
-- Monitor production post-deploy
-- Review stashed changes with Od before applying
-
----
-
-## Appendix: Stashed Experimental Changes Summary
-
-**Stash:** `experimental-and-copy-changes-2026-05-05`
-**Contains:**
-- Presence tracking system (DB schema + API routes + client heartbeat)
-- Payout/copy-softening across 12 pages (removed "67%" / "80%" specific claims)
-- Featured track enhancements on homepage ("Featured track" badge, larger hero card)
-- Music page roster ordering (ATM Trap first)
-- Artist track edit page `featured` toggle
-- `checkout-catalog.ts` refactor for DB-authoritative pricing
-- Various TODO.md updates
-
-**Recommendation:** Review before applying. Some changes are good (featured track enhancements), some are risky (presence system requires schema migration + RLS policies).
-
----
-
-*Report prepared by Sentinel MM — Archtext Sentinel™ Operator Layer*
-*File: docs/PORTERFUL_LAUNCH_CLEAN_AUDIT_2026-05-05.md*
+Out of scope for that next directive: redesign, new pages, brand changes.

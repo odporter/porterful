@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     if (signedError || !signedUrlData?.signedUrl) {
       console.error('[music-recover] Signed URL error:', signedError)
-      return NextResponse.json({ error: 'Failed to generate download link.' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to generate download link.', debug: { relativePath, signedErrorMessage: signedError?.message, signedErrorName: signedError?.name, signedErrorStatus: signedError?.statusCode } }, { status: 500 })
     }
 
     return NextResponse.json({

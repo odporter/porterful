@@ -307,7 +307,8 @@ export async function POST(req: NextRequest) {
             if (!storagePath) {
               storagePath = `artists/${item.artist}/${item.name}.mp3`
                 .toLowerCase()
-                .replace(/[^a-z0-9/_.-]/g, '_');
+                .replace(/\s+/g, '-')       // spaces → hyphens
+                .replace(/[^a-z0-9/_.-]/g, ''); // strip remaining invalid chars
             }
 
             const { error: musicError } = await supabase

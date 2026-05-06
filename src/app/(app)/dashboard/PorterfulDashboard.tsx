@@ -3,24 +3,12 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSupabase } from '@/app/providers'
-import { Disc, Music, Settings, Store, Upload, User } from 'lucide-react'
+import { Disc, Music, Settings, Store, Upload, User, Headphones, Heart, Gift, Wallet } from 'lucide-react'
 
 interface PorterfulDashboardProps {
   serverProfileId: string
   initialProfile: any
 }
-
-const PRIMARY_ACTIONS = [
-  { label: 'Upload Track', href: '/dashboard/upload', icon: Upload, hint: 'Add a new track' },
-  { label: 'Manage Catalog', href: '/dashboard/artist', icon: Disc, hint: 'Tracks & products' },
-  { label: 'Edit Profile', href: '/dashboard/artist/edit', icon: User, hint: 'Public artist info' },
-]
-
-const SUPPORTING_LINKS = [
-  { label: 'Music', href: '/music', icon: Music },
-  { label: 'Store', href: '/store', icon: Store },
-  { label: 'Settings', href: '/settings/settings', icon: Settings },
-]
 
 export default function PorterfulDashboard({ serverProfileId, initialProfile }: PorterfulDashboardProps) {
   // useSupabase is referenced so the provider is exercised on this surface;
@@ -28,6 +16,8 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
   useSupabase()
   const [mounted, setMounted] = useState(false)
   const [profile] = useState(initialProfile)
+  const role = profile?.role || 'supporter'
+  const isArtist = role === 'artist'
 
   useEffect(() => {
     setMounted(true)
@@ -52,41 +42,35 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
         <header className="mb-7">
           <h1 className="text-2xl sm:text-3xl font-bold">Porterful Dashboard</h1>
           <p className="text-sm text-[var(--pf-text-secondary)] mt-1">
-            Welcome back, {profile?.name || 'Artist'}
+            Welcome back, {profile?.name || (isArtist ? 'Artist' : 'Supporter')}
           </p>
         </header>
 
-        {/* Primary actions */}
+        {/* Primary actions — role-aware */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-          {PRIMARY_ACTIONS.map(({ label, href, icon: Icon, hint }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] hover:border-[var(--pf-text-muted)] transition-colors"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[var(--pf-bg)] border border-[var(--pf-border)] flex items-center justify-center text-[var(--pf-text-secondary)] shrink-0">
-                <Icon size={20} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-[var(--pf-text)] truncate">{label}</p>
-                <p className="text-xs text-[var(--pf-text-muted)] truncate">{hint}</p>
-              </div>
-            </Link>
-          ))}
+          {isArtist ? (
+            <>
+              <ActionCard label="Upload Track" href="/dashboard/upload" icon={Upload} hint="Add a new track" />
+              <ActionCard label="Manage Catalog" href="/dashboard/artist" icon={Disc} hint="Tracks & products" />
+              <ActionCard label="Edit Profile" href="/dashboard/artist/edit" icon={User} hint="Public artist info" />
+            </>
+          ) : (
+            <>
+              <ActionCard label="My Music" href="/music" icon={Headphones} hint="Tracks you\u0027ve purchased" />
+              <ActionCard label="Browse Artists" href="/artists" icon={Heart} hint="Discover new music" />
+              <ActionCard label="Referral Hub" href="/superfan" icon={Gift} hint="Share & earn" />
+            </>
+          )}
         </div>
 
         {/* Supporting links */}
         <div className="flex flex-wrap gap-2 mb-10">
-          {SUPPORTING_LINKS.map(({ label, href, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[var(--pf-border)] bg-[var(--pf-bg)] text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] hover:border-[var(--pf-text-muted)] transition-colors"
-            >
-              <Icon size={14} />
-              {label}
-            </Link>
-          ))}
+          <SupportLink label="Music" href="/music" icon={Music} />
+          <SupportLink label="Store" href="/store" icon={Store} />
+          <SupportLink label="Settings" href="/settings/settings" icon={Settings} />
+          {!isArtist && (
+            <SupportLink label="Earnings" href="/dashboard/dashboard/payout" icon={Wallet} />
+          )}
         </div>
 
         {/* Account — quiet, below */}
@@ -99,11 +83,40 @@ export default function PorterfulDashboard({ serverProfileId, initialProfile }: 
             </div>
             <div className="flex justify-between items-center text-sm px-4 py-3 gap-3">
               <span className="text-[var(--pf-text-muted)]">Role</span>
-              <span className="text-[var(--pf-text)] capitalize">{profile?.role || 'Supporter'}</span>
+              <span className="text-[var(--pf-text)] capitalize">{role}</span>
             </div>
           </div>
         </section>
       </div>
     </div>
+  )
+}
+
+function ActionCard({ label, href, icon: Icon, hint }: { label: string; href: string; icon: any; hint: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-surface)] hover:border-[var(--pf-text-muted)] transition-colors"
+    >
+      <div className="w-10 h-10 rounded-xl bg-[var(--pf-bg)] border border-[var(--pf-border)] flex items-center justify-center text-[var(--pf-text-secondary)] shrink-0">
+        <Icon size={20} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-[var(--pf-text)] truncate">{label}</p>
+        <p className="text-xs text-[var(--pf-text-muted)] truncate">{hint}</p>
+      </div>
+    </Link>
+  )
+}
+
+function SupportLink({ label, href, icon: Icon }: { label: string; href: string; icon: any }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[var(--pf-border)] bg-[var(--pf-bg)] text-sm text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] hover:border-[var(--pf-text-muted)] transition-colors"
+    >
+      <Icon size={14} />
+      {label}
+    </Link>
   )
 }

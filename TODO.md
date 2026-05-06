@@ -1,43 +1,26 @@
-# Porterful Site Improvements — Batch 1
+# Porterful Site Improvements — Batch 1 (2026-05-05)
 
-Date: 2026-05-05 22:15 UTC
-Status: Changes verified — no edits needed (already implemented)
-
-## Requested Changes
+## Status: No changes needed — already implemented in codebase
 
 ### 1. Rob Soule artist data fix
-**File:** `src/lib/artists.ts`
-**Status:** ✅ Already correct
-
-- Genre: `'Hip-Hop / R&B / Blues'` — matches requirement
-- Bio: `"Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound..."` — matches requirement
-- shortBio: `"St. Louis hip-hop and R&B artist blending blues into a soulful sound."` — matches requirement
-
-No changes needed.
+- **Location:** `src/lib/artists.ts`
+- **Status:** Already correct
+- `genre`: `Hip-Hop / R&B / Blues`
+- `bio`: "Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound. From the heart of the city, Rob brings together smooth R&B melodies, hard-hitting hip-hop beats, and the raw emotional truth of blues to create something uniquely STL."
 
 ### 2. Social media buttons on artist profile page
-**File:** `src/app/(app)/artist/[slug]/page.tsx` → `ArtistHero.tsx`
-**Status:** ✅ Already implemented
-
-Social buttons (Instagram, Twitter/X, YouTube, TikTok) render conditionally when artist has social fields filled. Icons use `SOCIAL_ICONS` map from `@/lib/artist-social.tsx`. Buttons placed in profile header below artist name/tags.
-
-No changes needed.
+- **Location:** `src/app/(app)/artist/artist/[id]/page.tsx`
+- **Status:** Already implemented
+- Instagram, Twitter/X, YouTube, and TikTok icons are displayed inline with the artist name in the profile header when the artist has those social fields populated.
+- Each icon links to the correct social profile via `normalizeSocialUrl()`.
 
 ### 3. Featured Singles before Albums
-**File:** `src/components/artist/ArtistTabs.tsx`
-**Status:** ✅ Already correct
-
-Section order in Music tab:
-1. Featured Tracks
-2. Featured Singles
-3. Albums & Projects
-
-Singles already appear before Albums.
-
-No changes needed.
+- **Location:** `src/app/(app)/artist/artist/[id]/page.tsx`
+- **Status:** Already correct
+- The "Featured Singles" section renders first (above "Albums") in the Music tab.
+- The comment in the code even says: `Featured Singles — show FIRST`.
 
 ---
 
-## Commit Decision
-No commits made per instructions ("DON'T commit or deploy").
-All requested code changes were already present in the working tree.
+## Note
+None of the three tasks required code changes. The requested improvements were already present in the codebase.

@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     const metadata = session.metadata || {};
     const { lk_id, user_id, username, product_id, source, offer_id, referral_code, affiliate_link_id } = metadata;
-    // Stripe customer_email may be null when customer pays without creating a Stripe account;
-    // we carry the email in metadata so the webhook can still identify the buyer.
-    const customerEmail = session.customer_email || metadata.email || null;
+    // Stripe customer_email may be null when customer pays without creating a Stripe account.
+    // Fallback chain: customer_email → metadata.email → customer_details.email
+    const customerEmail = session.customer_email || metadata.email || session.customer_details?.email || null;
     const supabase = createServerClient();
     const activationCodeValue = normalizeActivationCode(metadata.activation_code_value || metadata.activation_code || null);
     const discountCents = Math.max(0, Math.round(Number(metadata.discount_cents || 0)));

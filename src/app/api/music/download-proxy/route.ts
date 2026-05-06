@@ -56,10 +56,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to generate download link.' }, { status: 500 });
     }
 
-    // Ensure full URL (Supabase client may return relative path)
+    // Ensure full URL (Supabase client returns relative path like /object/sign/audio/...)
     const signedUrl = signedData.signedUrl.startsWith('http')
       ? signedData.signedUrl
-      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}${signedData.signedUrl}`;
+      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1${signedData.signedUrl}`;
 
     // Fetch the actual file bytes from Supabase Storage
     const fileRes = await fetch(signedUrl);

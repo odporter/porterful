@@ -102,8 +102,7 @@ function RecoveryContent() {
           </div>
 
           <a
-            href={state.track.downloadUrl}
-            download
+            href={`/api/music/download-proxy?token=${token}`}
             className="w-full py-3 rounded-xl bg-[var(--pf-orange)] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[var(--pf-orange-dark)] transition-colors"
           >
             <Download size={18} />

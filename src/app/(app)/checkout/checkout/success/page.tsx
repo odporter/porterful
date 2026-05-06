@@ -226,29 +226,37 @@ function SuccessContent() {
     
     setDownloadingId(track.id);
     try {
-      // If we have a storage path, fetch signed URL from API
+      // Determine the source URL
+      let sourceUrl = track.downloadUrl || '';
       if (track.storagePath) {
         const res = await fetch(`/api/music/download?path=${encodeURIComponent(track.storagePath)}`);
         const data = await res.json();
-        if (data.url) {
-          // Trigger download
-          const a = document.createElement('a');
-          a.href = data.url;
-          a.download = `${track.artist} - ${track.name}.mp3`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }
-      } else if (track.downloadUrl) {
-        // Direct download URL
-        const a = document.createElement('a');
-        a.href = track.downloadUrl;
-        a.download = `${track.artist} - ${track.name}.mp3`;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        if (data.url) sourceUrl = data.url;
       }
+      
+      if (!sourceUrl) {
+        console.error('No download URL available');
+        return;
+      }
+
+      // Cross-origin URLs ignore the `download` attribute on \u003ca\u003e tags.
+      // Fetch the file as a blob, create an object URL (same-origin), then
+      // trigger download — this forces the browser to save, not play inline.
+      const fileRes = await fetch(sourceUrl);
+      if (!fileRes.ok) throw new Error('File fetch failed');
+      
+      const blob = await fileRes.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = `${track.artist} - ${track.name}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Clean up object URL after a short delay
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
     } catch (e) {
       console.error('Download failed:', e);
     }

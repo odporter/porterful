@@ -107,19 +107,36 @@ function buildResolvedItem(params: {
 
 function resolveTrack(item: CheckoutInputItem, id: string, quantity: number): CheckoutResolvedItem {
   const track = TRACKS.find((entry) => entry.id === id)
-  if (!track) {
-    throw new CheckoutCatalogError(`Unknown track: ${id}`)
+
+  if (track) {
+    return buildResolvedItem({
+      kind: 'track',
+      id: track.id,
+      name: track.title,
+      artist: track.artist,
+      image: track.image ?? null,
+      audioUrl: track.audio_url ?? null,
+      description: 'Digital track purchase',
+      unitAmountCents: Math.round(Number(track.price || 0) * 100),
+      quantity,
+    })
   }
+
+  // Fallback: if the frontend passes a DB UUID or unknown ID,
+  // construct the track from the item payload (name, artist, price).
+  const name = item.name || item.title || 'Track'
+  const artist = item.artist || 'Unknown Artist'
+  const priceCents = normalizePriceCents(item.price)
 
   return buildResolvedItem({
     kind: 'track',
-    id: track.id,
-    name: track.title,
-    artist: track.artist,
-    image: track.image ?? null,
-    audioUrl: track.audio_url ?? null,
+    id,
+    name,
+    artist,
+    image: item.image ?? null,
+    audioUrl: item.audioUrl ?? item.audio_url ?? null,
     description: 'Digital track purchase',
-    unitAmountCents: Math.round(Number(track.price || 0) * 100),
+    unitAmountCents: priceCents,
     quantity,
   })
 }

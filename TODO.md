@@ -1,19 +1,23 @@
-# Porterful Site Improvements — Batch 1 (2026-05-06)
+# Porterful Site Improvements — Batch 1 (2026-05-06 4:23 PM CT)
 
-## Checked Items
+## Status: All items verified as already implemented — no new code changes needed.
 
-1. **Rob Soule artist data fix** — Already correct in `src/lib/artists.ts`:
-   - Genre: `'Hip-Hop / R&B / Blues'`
-   - Bio reflects St. Louis hip-hop and R&B artist blending blues into a soulful sound
+### 1. Rob Soule artist data fix
+- **File:** `src/lib/artists.ts`
+- **Genre:** already set to `'Hip-Hop / R&B / Blues'` ✓
+- **Bio:** already reads: *"Rob Soule is a St. Louis hip-hop and R&B artist blending blues into a soulful sound. From the heart of the city, Rob brings together smooth R&B melodies, hard-hitting hip-hop beats, and the raw emotional truth of blues to create something uniquely STL."* ✓
 
-2. **Social media buttons on artist profile** — Already implemented in `src/app/(app)/artist/artist/[id]/page.tsx`:
-   - Instagram, Twitter/X, YouTube, TikTok icons imported from `@/lib/artist-social`
-   - Render conditionally when social fields are filled
-   - Placed near artist name in profile header
+### 2. Social media buttons on artist profile
+- **Files:** `src/components/artist/ArtistHero.tsx` and `src/app/(app)/artist/artist/[id]/page.tsx`
+- Instagram, Twitter/X, YouTube, and TikTok icons already imported from `@/lib/artist-social` ✓
+- Icons render conditionally when social fields are filled ✓
+- Placed near artist name / in the profile header ✓
+- Uses `SOCIAL_ICONS` map + `normalizeSocialUrl()` for clean linking ✓
 
-3. **Featured Singles before Albums** — Already correct:
-   - Singles section renders first in the Music tab
-   - Albums section renders after
+### 3. Featured Singles before Albums
+- **Files:** `src/components/artist/ArtistTabs.tsx` and `src/app/(app)/artist/artist/[id]/page.tsx`
+- Singles section already renders **before** the Albums section in both pages ✓
+- Comments in code even note "Moved BEFORE Albums" ✓
 
-## Result
-No code changes needed — all three improvements were already in place. No commit or deploy made.
+## Action
+No code changes, commits, or deploys were made — all requested improvements were already present in the codebase.

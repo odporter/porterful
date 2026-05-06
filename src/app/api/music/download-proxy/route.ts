@@ -56,11 +56,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to generate download link.' }, { status: 500 });
     }
 
+    // Ensure full URL (Supabase client may return relative path)
+    const signedUrl = signedData.signedUrl.startsWith('http')
+      ? signedData.signedUrl
+      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}${signedData.signedUrl}`;
+
     // Fetch the actual file bytes from Supabase Storage
-    const fileRes = await fetch(signedData.signedUrl);
+    const fileRes = await fetch(signedUrl);
     if (!fileRes.ok) {
-      console.error('[download-proxy] File fetch failed:', fileRes.status, fileRes.statusText);
-      return NextResponse.json({ error: 'Failed to fetch file from storage.' }, { status: 500 });
+      console.error('[download-proxy] File fetch failed:', fileRes.status, fileRes.statusText, '| URL:', signedUrl.substring(0, 80) + '...');
+      return NextResponse.json({ error: `Failed to fetch file from storage. Status: ${fileRes.status} ${fileRes.statusText}` }, { status: 500 });
     }
 
     const fileBuffer = await fileRes.arrayBuffer();

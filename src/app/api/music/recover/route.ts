@@ -38,7 +38,8 @@ export async function GET(request: NextRequest) {
     // Generate signed download URL
     // storage_path includes bucket prefix (e.g. audio/artists/...), but
     // createSignedUrl expects the path relative to the bucket root.
-    const relativePath = purchase.storage_path.replace(/^audio\//, '')
+    const rawPath = purchase.storage_path
+    const relativePath = rawPath.replace(/^audio\//, '')
     const { data: signedUrlData, error: signedError } = await supabase
       .storage
       .from('audio')
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     if (signedError || !signedUrlData?.signedUrl) {
       console.error('[music-recover] Signed URL error:', signedError)
-      return NextResponse.json({ error: 'Failed to generate download link.', debug: { relativePath, signedErrorMessage: signedError?.message, signedErrorName: signedError?.name, signedErrorStatus: signedError?.statusCode } }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to generate download link.', debug: { rawPath, relativePath, signedErrorMessage: signedError?.message, signedErrorName: signedError?.name, signedErrorStatus: signedError?.statusCode } }, { status: 500 })
     }
 
     return NextResponse.json({

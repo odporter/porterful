@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     const metadata = session.metadata || {};
     const { lk_id, user_id, username, product_id, source, offer_id, referral_code, affiliate_link_id } = metadata;
+    // Stripe customer_email may be null when customer pays without creating a Stripe account;
+    // we carry the email in metadata so the webhook can still identify the buyer.
+    const customerEmail = session.customer_email || metadata.email || null;
     const supabase = createServerClient();
     const activationCodeValue = normalizeActivationCode(metadata.activation_code_value || metadata.activation_code || null);
     const discountCents = Math.max(0, Math.round(Number(metadata.discount_cents || 0)));
@@ -69,11 +72,11 @@ export async function POST(req: NextRequest) {
 
     // Also try to find buyer profile
     let buyerId: string | null = null;
-    if (session.customer_email) {
+    if (customerEmail) {
       const { data: buyerProfile } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', session.customer_email.toLowerCase())
+        .eq('email', customerEmail.toLowerCase())
         .limit(1)
         .maybeSingle();
       if (buyerProfile) buyerId = buyerProfile.id;
@@ -121,7 +124,7 @@ export async function POST(req: NextRequest) {
           superfan_total: superfanTotal,
           platform_total: platformTotal,
           stripe_checkout_session_id: session.id,
-          buyer_email: session.customer_email || null,
+          buyer_email: customerEmail || null,
           activation_code_id: activationCodeId,
           payment_method: paymentMethod,
           discount_cents: discountCents,
@@ -139,8 +142,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (session.customer_email && product_id) {
-      const normalizedEmail = session.customer_email.toLowerCase();
+    if (customerEmail && product_id) {
+      const normalizedEmail = customerEmail.toLowerCase();
       const { data: existingEntitlement } = await supabase
         .from('entitlements')
         .select('id')
@@ -183,7 +186,7 @@ export async function POST(req: NextRequest) {
       await supabase
         .from('payments')
         .insert({
-          email: session.customer_email || null,
+          email: customerEmail || null,
           name: username || lk_id || 'anonymous',
           tier: metadata.tier,
           amount: Math.round((amount || 0) / 100),
@@ -282,7 +285,7 @@ export async function POST(req: NextRequest) {
 
     // ── MUSIC PURCHASE: record entitlement + derive real storage path ──
     const itemsJson = metadata.items;
-    if (itemsJson && session.customer_email) {
+    if (itemsJson && customerEmail) {
       try {
         const items = JSON.parse(itemsJson);
         for (const item of items) {
@@ -310,7 +313,7 @@ export async function POST(req: NextRequest) {
             const { error: musicError } = await supabase
               .from('music_purchases')
               .upsert({
-                buyer_email: session.customer_email.toLowerCase(),
+                buyer_email: customerEmail.toLowerCase(),
                 buyer_user_id: buyerId,
                 track_id: item.id || `track-${Date.now()}`,
                 track_title: item.name || item.title || 'Unknown Track',
@@ -337,7 +340,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log('[stripe-webhook] checkout.session.completed processed:', session.id, '| email:', session.customer_email, '| amount:', amount);
+    console.log('[stripe-webhook] checkout.session.completed processed:', session.id, '| email:', customerEmail, '| amount:', amount);
   }
 
   return NextResponse.json({ received: true });

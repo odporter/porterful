@@ -99,13 +99,10 @@ export async function POST(req: NextRequest) {
 
     if (existingOrder) {
       order = existingOrder;
-      if (activationCodeId || paymentMethod !== 'stripe' || discountCents > 0) {
+      if (activationCodeId || discountCents > 0) {
         await supabase
           .from('orders')
           .update({
-            activation_code_id: activationCodeId,
-            payment_method: paymentMethod,
-            discount_cents: discountCents,
             referrer_id: referrerId,
           })
           .eq('id', order.id);
@@ -126,7 +123,6 @@ export async function POST(req: NextRequest) {
           stripe_checkout_session_id: session.id,
           buyer_email: customerEmail || null,
           activation_code_id: activationCodeId,
-          payment_method: paymentMethod,
           discount_cents: discountCents,
           // Store Likeness™ identity in metadata fields
           user_id: profileId || user_id || null,

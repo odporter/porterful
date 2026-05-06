@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
     const signedUrl = signedData.signedUrl.startsWith('http')
       ? signedData.signedUrl
       : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1${signedData.signedUrl}`;
+    console.log('[download-proxy] Signed URL:', signedUrl.substring(0, 120) + '...');
 
     // Fetch the actual file bytes from Supabase Storage
     const fileRes = await fetch(signedUrl);

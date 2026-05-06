@@ -3,91 +3,58 @@ import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * Download proxy — validates purchase token, fetches file from Supabase Storage,
- * and streams it back with Content-Disposition: attachment so browsers
- * treat it as a download (not inline playback).
- *
- * Why a proxy? Supabase Storage signed URLs are cross-origin. Browsers ignore
- * the `download` attribute on <a> tags for cross-origin URLs. By proxying through
- * our own domain, the file comes from same-origin and download works reliably.
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
-
-    if (!token) {
-      return NextResponse.json({ error: 'No recovery token provided.' }, { status: 400 });
-    }
+    if (!token) return NextResponse.json({ error: 'No token' }, { status: 400 });
 
     const supabase = createServerClient();
-
-    // Validate the recovery token
-    const { data: purchase, error: purchaseError } = await supabase
+    const { data: purchase } = await supabase
       .from('music_purchases')
       .select('track_title, artist_name, storage_path, recovery_token_expires_at')
       .eq('recovery_token', token)
       .maybeSingle();
 
-    if (purchaseError) {
-      console.error('[download-proxy] Database error:', purchaseError);
-      return NextResponse.json({ error: 'Database error.' }, { status: 500 });
-    }
-
-    if (!purchase) {
-      return NextResponse.json({ error: 'Invalid or expired recovery token.' }, { status: 404 });
-    }
-
-    // Check if token has expired
+    if (!purchase) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     if (purchase.recovery_token_expires_at && new Date(purchase.recovery_token_expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Recovery link has expired.' }, { status: 410 });
+      return NextResponse.json({ error: 'Expired' }, { status: 410 });
     }
 
-    // Generate a fresh signed URL (short-lived)
+    // Use the SAME signed URL generation that /api/music/recover uses
     const relativePath = purchase.storage_path.replace(/^audio\//, '');
-    const { data: signedData, error: signedError } = await supabase
-      .storage
-      .from('audio')
-      .createSignedUrl(relativePath, 60); // 1 minute — enough for the fetch
-
+    const { data: signedData, error: signedError } = await supabase.storage.from('audio').createSignedUrl(relativePath, 60);
+    
     if (signedError || !signedData?.signedUrl) {
       console.error('[download-proxy] Signed URL error:', signedError);
-      return NextResponse.json({ error: 'Failed to generate download link.' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to generate link' }, { status: 500 });
     }
 
-    // Ensure full URL (Supabase client returns relative path like /object/sign/audio/...)
-    const signedUrl = signedData.signedUrl.startsWith('http')
-      ? signedData.signedUrl
-      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1${signedData.signedUrl}`;
-    console.log('[download-proxy] Signed URL:', signedUrl.substring(0, 120) + '...');
+    // Build full URL -- Supabase returns /object/sign/audio/... (relative to /storage/v1)
+    const signedUrl = signedData.signedUrl.startsWith('http') 
+      ? signedData.signedUrl 
+      : `https://tsdjmiqczgxnkpvirkya.supabase.co/storage/v1${signedData.signedUrl}`;
 
-    // Fetch the actual file bytes from Supabase Storage
+    // Fetch file
     const fileRes = await fetch(signedUrl);
     if (!fileRes.ok) {
-      console.error('[download-proxy] File fetch failed:', fileRes.status, fileRes.statusText, '| URL:', signedUrl.substring(0, 80) + '...');
-      return NextResponse.json({ error: `Failed to fetch file from storage. Status: ${fileRes.status} ${fileRes.statusText}` }, { status: 500 });
+      console.error('[download-proxy] Fetch failed:', fileRes.status, fileRes.statusText, 'URL:', signedUrl.substring(0, 100));
+      return NextResponse.json({ error: `Fetch failed: ${fileRes.status}` }, { status: 500 });
     }
 
     const fileBuffer = await fileRes.arrayBuffer();
+    const filename = `${purchase.artist_name || 'artist'} - ${purchase.track_title || 'track'}.mp3`;
 
-    // Build a clean filename
-    const cleanTitle = (purchase.track_title || 'track').replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
-    const cleanArtist = (purchase.artist_name || 'artist').replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
-    const filename = `${cleanArtist} - ${cleanTitle}.mp3`;
-
-    // Stream back with forced download headers
     return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'audio/mpeg',
-        'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Content-Length': String(fileBuffer.byteLength),
-        'Cache-Control': 'private, no-store, max-age=0',
       },
     });
   } catch (err) {
-    console.error('[download-proxy] Unexpected error:', err);
-    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+    console.error('[download-proxy] Error:', err);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -303,9 +303,9 @@ export async function POST(req: NextRequest) {
                 storagePath = match[1];
               }
             }
-            // Final fallback: canonical naming
+            // Final fallback: canonical naming (relative to bucket root)
             if (!storagePath) {
-              storagePath = `audio/artists/${item.artist}/${item.name}.mp3`
+              storagePath = `artists/${item.artist}/${item.name}.mp3`
                 .toLowerCase()
                 .replace(/[^a-z0-9/_.-]/g, '_');
             }

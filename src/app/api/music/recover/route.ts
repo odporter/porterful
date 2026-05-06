@@ -36,10 +36,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate signed download URL
+    // storage_path includes bucket prefix (e.g. audio/artists/...), but
+    // createSignedUrl expects the path relative to the bucket root.
+    const relativePath = purchase.storage_path.replace(/^audio\//, '')
     const { data: signedUrlData, error: signedError } = await supabase
       .storage
       .from('audio')
-      .createSignedUrl(purchase.storage_path, 300) // 5 minutes
+      .createSignedUrl(relativePath, 300) // 5 minutes
 
     if (signedError || !signedUrlData?.signedUrl) {
       console.error('[music-recover] Signed URL error:', signedError)

@@ -298,9 +298,9 @@ export async function POST(req: NextRequest) {
             const publicAudioUrl: string = item.audioUrl || item.audio_url || '';
             let storagePath = item.storagePath || '';
             if (!storagePath && publicAudioUrl.includes('/storage/v1/object/')) {
-              const match = publicAudioUrl.match(/\/storage\/v1\/object\/(.+?\?.+)$/);
+              const match = publicAudioUrl.match(/\/storage\/v1\/object\/(.+?)(?:\?|$)/);
               if (match) {
-                storagePath = decodeURIComponent(match[1].split('?')[0]);
+                storagePath = match[1];
               }
             }
             // Final fallback: canonical naming

@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Check, Download, Mail, Music, ArrowRight, Play, Loader2 } from 'lucide-react';
+import { Check, Mail, Music, ArrowRight, Play, Loader2 } from 'lucide-react';
 import { useAudio } from '@/lib/audio-context';
 import { TRACKS } from '@/lib/data'
 import { loadPlaybackSnapshot, clearPlaybackSnapshot } from '@/lib/playback-persistence';
@@ -65,7 +65,6 @@ function SuccessContent() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [restoredPlayback, setRestoredPlayback] = useState(false);
   const [isResuming, setIsResuming] = useState(false);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
 
   // Restore playback state on mount
@@ -221,47 +220,6 @@ function SuccessContent() {
     }
   }, [audio]);
 
-  const handleDownload = useCallback(async (track: PurchasedTrack) => {
-    if (!track.storagePath && !track.downloadUrl) return;
-    
-    setDownloadingId(track.id);
-    try {
-      // Determine the source URL
-      let sourceUrl = track.downloadUrl || '';
-      if (track.storagePath) {
-        const res = await fetch(`/api/music/download?path=${encodeURIComponent(track.storagePath)}`);
-        const data = await res.json();
-        if (data.url) sourceUrl = data.url;
-      }
-      
-      if (!sourceUrl) {
-        console.error('No download URL available');
-        return;
-      }
-
-      // Cross-origin URLs ignore the `download` attribute on \u003ca\u003e tags.
-      // Fetch the file as a blob, create an object URL (same-origin), then
-      // trigger download — this forces the browser to save, not play inline.
-      const fileRes = await fetch(sourceUrl);
-      if (!fileRes.ok) throw new Error('File fetch failed');
-      
-      const blob = await fileRes.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = objectUrl;
-      a.download = `${track.artist} - ${track.name}.mp3`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      // Clean up object URL after a short delay
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
-    } catch (e) {
-      console.error('Download failed:', e);
-    }
-    setDownloadingId(null);
-  }, []);
 
   const handleEmailAccess = useCallback(async () => {
     if (!order?.customerEmail) return;
@@ -360,22 +318,6 @@ function SuccessContent() {
                       >
                         <Play size={16} fill="currentColor" />
                       </button>
-
-                      {/* Download Button */}
-                      {(track.storagePath || track.downloadUrl) && (
-                        <button
-                          onClick={() => handleDownload(track)}
-                          disabled={downloadingId === track.id}
-                          className="p-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors disabled:opacity-50"
-                          aria-label="Download MP3"
-                        >
-                          {downloadingId === track.id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <Download size={16} />
-                          )}
-                        </button>
-                      )}
                     </div>
                   </div>
                 ))}

@@ -280,7 +280,6 @@ export async function POST(request: NextRequest) {
     }
 
     const sessionParams: any = {
-      payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
       success_url: 'https://porterful.com/checkout/checkout/success?session_id={CHECKOUT_SESSION_ID}',

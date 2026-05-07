@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Generate signed URL valid for 5 minutes
     const { data, error } = await supabase
       .storage
-      .from('music')
+      .from('audio')
       .createSignedUrl(path, 300); // 300 seconds = 5 minutes
 
     if (error) {

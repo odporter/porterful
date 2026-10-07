@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Search, Disc, Users, Filter } from 'lucide-react';
@@ -37,6 +37,13 @@ export default function MusicClient() {
   const handlePlay = (track: typeof TRACKS[0]) => {
     playTrack(track);
   };
+
+  const handlePlayAlbum = useCallback((album: string) => {
+    const albumTracks = TRACKS.filter(t => t.album === album);
+    if (albumTracks.length > 0) {
+      playTrack(albumTracks[0], undefined, undefined, albumTracks, 0);
+    }
+  }, [playTrack]);
 
   const handleAddToCart = (track: typeof TRACKS[0]) => {
     addItem({
@@ -152,9 +159,8 @@ export default function MusicClient() {
             {albums.slice(0, 8).map(album => {
               const track = TRACKS.find(t => t.album === album);
               return (
-                <Link 
+                <div
                   key={album}
-                  href={`/album/${album.toLowerCase().replace(/\s+/g, '-')}`}
                   className="flex-shrink-0 w-36 sm:w-40 group"
                 >
                   <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-[24px] overflow-hidden mb-2 bg-[var(--pf-surface)]">
@@ -169,11 +175,23 @@ export default function MusicClient() {
                     ) : (
                       <div className="w-full h-full bg-[var(--pf-surface)]" />
                     )}
+                    {/* Play button overlay */}
+                    <button
+                      onClick={() => handlePlayAlbum(album)}
+                      className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label={`Play ${album}`}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-[var(--pf-orange)] flex items-center justify-center shadow-lg">
+                        <Play size={20} className="ml-0.5 text-white" />
+                      </div>
+                    </button>
                   </div>
-                  <p className="font-medium text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">
-                    {album}
-                  </p>
-                </Link>
+                  <Link href={`/album/${album.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <p className="font-medium text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">
+                      {album}
+                    </p>
+                  </Link>
+                </div>
               );
             })}
           </div>

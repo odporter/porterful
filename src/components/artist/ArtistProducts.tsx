@@ -74,7 +74,13 @@ export function ArtistProducts({ products, artistName }: ArtistProductsProps) {
                   className="flex items-center gap-3 p-3 rounded-xl bg-[var(--pf-bg)] border border-[var(--pf-border)] hover:border-[var(--pf-orange)]/40 transition-colors group"
                 >
                   <div className="relative w-11 h-11 rounded-lg overflow-hidden bg-black shrink-0">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="44px"
+                      className="object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{product.name}</p>

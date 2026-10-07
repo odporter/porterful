@@ -1,0 +1,10 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	ignorecase = true
+	precomposeunicode = true
+	worktree = .
+[remote "origin"]
+	url = git@github.com:odporter/porterful.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

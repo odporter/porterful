@@ -6,11 +6,13 @@ import Image from 'next/image';
 import { Play, Search, Disc, Users, Filter } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useAudio } from '@/lib/audio-context';
+import { useToast } from '@/components/Toast';
 import { TRACKS } from '@/lib/data';
 
 export default function MusicClient() {
   const { addItem } = useCart();
   const { playTrack, currentTrack, isPlaying } = useAudio();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAlbum, setSelectedAlbum] = useState('all');
 
@@ -45,6 +47,7 @@ export default function MusicClient() {
       artist: track.artist,
       artistCut: track.price * 0.8,
     });
+    showToast(`${track.title} added to cart`, 'success');
   };
 
   const formatPlays = (plays: number) => {

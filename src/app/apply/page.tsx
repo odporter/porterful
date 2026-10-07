@@ -3,10 +3,10 @@ import Link from 'next/link'
 import { Upload, Headphones, ShoppingCart, TrendingUp, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Apply as Artist — Sell Your Music on Porterful',
+  title: 'Apply as Artist',
   description: 'Join Porterful as an artist. Upload your music, sell merch, and keep 80% of every sale. No label, no middleman — direct from you to your fans.',
   openGraph: {
-    title: 'Apply as Artist — Porterful',
+    title: 'Apply as Artist | Porterful',
     description: 'Join Porterful as an artist. Keep 80% of every sale. No label, no middleman.',
     url: 'https://porterful.com/apply',
     siteName: 'Porterful',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Apply as Artist — Porterful',
+    title: 'Apply as Artist | Porterful',
     description: 'Join Porterful as an artist. Keep 80% of every sale. No label, no middleman.',
     images: ['https://porterful.com/og-image.png'],
   },

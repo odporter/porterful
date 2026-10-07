@@ -25,6 +25,7 @@ const jsonLd = {
       '@id': 'https://porterful.com/#organization',
       name: 'Porterful',
       url: 'https://porterful.com',
+      description: 'Music, merch, and direct support for independent artists.',
       logo: {
         '@type': 'ImageObject',
         url: 'https://porterful.com/logo.png',

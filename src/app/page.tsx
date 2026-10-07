@@ -29,6 +29,8 @@ const jsonLd = {
         '@type': 'ImageObject',
         url: 'https://porterful.com/logo.png',
       },
+      dateFounded: '2026-01-01',
+      foundingLocation: { '@type': 'Place', name: 'St. Louis, MO' },
       sameAs: [
         'https://twitter.com/porterful',
         'https://instagram.com/od.porter',
@@ -58,6 +60,7 @@ const jsonLd = {
         '@type': 'WebSite',
         name: 'Porterful',
       },
+      dateModified: '2026-10-07T00:00:00Z',
     },
   ],
 }

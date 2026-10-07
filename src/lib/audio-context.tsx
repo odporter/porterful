@@ -184,6 +184,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('error', handleError);
       audioRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Audio element setup must not re-run on playTrack/volume changes
   }, []);
 
   // Update volume

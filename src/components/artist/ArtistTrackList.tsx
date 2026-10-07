@@ -62,7 +62,7 @@ export function ArtistTrackList({ tracks }: ArtistTrackListProps) {
     } finally {
       setPurchasing(null)
     }
-  }, [])
+  }, [showToast])
 
   return (
     <div className="bg-[var(--pf-surface)] rounded-2xl border border-[var(--pf-border)] overflow-hidden">

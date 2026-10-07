@@ -200,7 +200,7 @@ export function StoreClient() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     fetchProducts();
@@ -247,7 +247,7 @@ export function StoreClient() {
           return (b.reviews || 0) - (a.reviews || 0);
       }
     });
-  }, [products, searchInput, activeTab, sortBy]);
+  }, [products, deferredQuery, activeTab, sortBy]);
 
   return (
     <div className="min-h-screen bg-[var(--pf-bg)]">

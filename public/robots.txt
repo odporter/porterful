@@ -10,8 +10,12 @@ Sitemap: https://porterful.com/sitemap.xml
 # Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# Disallow admin/dashboard paths
+# Disallow private/user paths
+Disallow: /api/
 Disallow: /dashboard/
 Disallow: /settings/
 Disallow: /wallet/
-Disallow: /api/
+Disallow: /checkout/
+Disallow: /register/
+Disallow: /login/
+Disallow: /verify/

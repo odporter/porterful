@@ -59,9 +59,16 @@ function generateSitemap(): Array<{url: string; lastMod: string; changeFreq: str
 
 export async function GET(): Promise<NextResponse> {
   const sitemap = generateSitemap()
+  // Full ISO 8601 timestamp for @generated (sitemaps.org spec)
+  const generated = new Date().toISOString()
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+>
+<!-- Generated: ${generated} -->
 ${sitemap.map(entry => `  <url>
     <loc>${entry.url}</loc>
     <lastmod>${entry.lastMod}</lastmod>

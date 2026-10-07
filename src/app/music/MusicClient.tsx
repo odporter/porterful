@@ -92,7 +92,7 @@ export default function MusicClient() {
             </Link>
             <div className="flex-1 min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate">
-                {featuredTrack ? featuredTrack.title : 'Featured Track'}
+                {featuredTrack?.title || 'Featured Track'}
               </h1>
               {featuredTrack ? (
               <div className="flex flex-wrap items-center gap-2">

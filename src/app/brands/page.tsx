@@ -9,11 +9,20 @@ export const metadata: Metadata = {
     url: 'https://porterful.com/brands',
     siteName: 'Porterful',
     type: 'website',
+    images: [
+      {
+        url: 'https://porterful.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Brands on Porterful — Independent Brands Selling Direct',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Brands | Porterful',
     description: 'Discover independent brands on Porterful.',
+    images: ['https://porterful.com/og-image.png'],
   },
 }
 

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { TRACKS } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'About Porterful - The Artist Economy Platform',
+  title: 'About Porterful',
   description: 'Porterful is where independent artists earn 80% on every sale. No label. No middleman. Music, merch, marketplace — built for creators who deserve a retirement plan.',
   keywords: [
     'independent artist platform',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     'artist revenue share'
   ],
   openGraph: {
-    title: 'About Porterful - The Artist Economy',
+    title: 'About Porterful',
     description: 'Where artists own everything. Music, merch, marketplace — 80% goes to artists.',
     url: 'https://porterful.com/about',
     siteName: 'Porterful',
@@ -28,13 +28,13 @@ export const metadata: Metadata = {
         url: 'https://porterful.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'About Porterful - The Artist Economy',
+        alt: 'About Porterful',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About Porterful - The Artist Economy',
+    title: 'About Porterful',
     description: 'Where artists own everything. 80% goes to artists.',
     images: ['https://porterful.com/og-image.png'],
     site: '@porterful',

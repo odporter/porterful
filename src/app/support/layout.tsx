@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Support - Help Center',
+  title: 'Help Center',
   description: 'Get help with Porterful. Support for artists and fans.',
 }
 

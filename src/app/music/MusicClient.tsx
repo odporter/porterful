@@ -132,8 +132,8 @@ export default function MusicClient() {
               <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-[24px] bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 mb-2 flex items-center justify-center text-4xl transition-transform group-hover:scale-105">
                 🎤
               </div>
-              <div className="h-4 w-24 rounded-full bg-[var(--pf-surface)] mb-1" />
-              <div className="h-3 w-16 rounded-full bg-[var(--pf-surface)]" />
+              <p className="font-semibold text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">O D Porter</p>
+              <p className="text-xs text-[var(--pf-text-muted)] truncate">Hip-Hop / R&B</p>
             </Link>
           </div>
         </div>

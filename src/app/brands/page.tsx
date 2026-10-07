@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Brands — Independent Brands on Porterful',
+  title: 'Brands',
   description: 'Discover independent brands building carefully and selling directly. Porterful only displays brands with an active public collection.',
   openGraph: {
     title: 'Brands | Porterful',

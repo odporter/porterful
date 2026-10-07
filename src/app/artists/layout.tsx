@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Discover Artists | Porterful',
+  title: 'Discover Artists',
   description: 'Discover independent artists on Porterful. Support creators directly through our music + commerce platform. Browse hip-hop, R&B, indie pop, and more.',
   keywords: ['independent artists', 'music artists', 'support artists', 'hip-hop artists', 'R&B artists', 'indie artists'],
   openGraph: {

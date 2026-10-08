@@ -400,7 +400,7 @@ export function HomeClient() {
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
                 <ShoppingCart size={24} className="text-[var(--pf-orange)]" />
               </div>
-              <h3 className="font-bold mb-1">Marketplace</h3>
+              <h3 className="font-bold mb-1">Store</h3>
               <p className="text-sm text-[var(--pf-text-secondary)]">Merch and products</p>
             </Link>
             

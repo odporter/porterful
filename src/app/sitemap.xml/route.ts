@@ -15,6 +15,7 @@ function generateSitemap(): Array<{url: string; lastMod: string; changeFreq: str
 
   return [
     { url: `${baseUrl}/`, lastMod: today, changeFreq: 'daily', priority: 1 },
+    { url: `${baseUrl}/music${cacheBust}`, lastMod: today, changeFreq: 'daily', priority: 0.9 },
     { url: `${baseUrl}/store${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/digital${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/artists${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },

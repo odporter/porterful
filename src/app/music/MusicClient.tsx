@@ -8,6 +8,7 @@ import { useCart } from '@/lib/cart-context';
 import { useAudio } from '@/lib/audio-context';
 import { useToast } from '@/components/Toast';
 import { TRACKS } from '@/lib/data';
+import { ARTISTS } from '@/lib/artists';
 
 export default function MusicClient() {
   const { addItem } = useCart();
@@ -147,13 +148,19 @@ export default function MusicClient() {
             </Link>
           </div>
           <div className="flex gap-3 overflow-x-auto -mx-5 sm:-mx-6 px-5 sm:px-6 scrollbar-hide pb-1">
-            <Link href="/artist/od-porter" className="flex-shrink-0 w-36 sm:w-40 group">
-              <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-[24px] bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 mb-2 flex items-center justify-center text-4xl transition-transform group-hover:scale-105">
-                🎤
-              </div>
-              <p className="font-semibold text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">O D Porter</p>
-              <p className="text-xs text-[var(--pf-text-muted)] truncate">Hip-Hop / R&B</p>
-            </Link>
+            {ARTISTS.map((artist) => (
+              <Link key={artist.id} href={`/artist/${artist.slug}`} className="flex-shrink-0 w-36 sm:w-40 group">
+                <div className={`w-36 h-36 sm:w-40 sm:h-40 rounded-[24px] bg-gradient-to-br ${artist.coverGradient} mb-2 flex items-center justify-center text-4xl transition-transform group-hover:scale-105`}>
+                  {artist.image ? (
+                    <Image src={artist.image} alt={artist.name} width={64} height={64} className="w-16 h-16 rounded-full object-cover" />
+                  ) : (
+                    <span role="img" aria-label={artist.name}>🎤</span>
+                  )}
+                </div>
+                <p className="font-semibold text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">{artist.name}</p>
+                <p className="text-xs text-[var(--pf-text-muted)] truncate">{artist.genre.split(',')[0]}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -137,9 +137,14 @@ export default function MusicClient() {
       {/* Browse Artists */}
       <section className="border-b border-[var(--pf-border)]">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 py-6 sm:py-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Users size={16} className="text-[var(--pf-text-secondary)]" />
-            <h2 className="text-base font-semibold">Browse Artists</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Users size={16} className="text-[var(--pf-text-secondary)]" />
+              <h2 className="text-base font-semibold">Browse Artists</h2>
+            </div>
+            <Link href="/artists" className="text-sm text-[var(--pf-orange)] hover:underline">
+              View All →
+            </Link>
           </div>
           <div className="flex gap-3 overflow-x-auto -mx-5 sm:-mx-6 px-5 sm:px-6 scrollbar-hide pb-1">
             <Link href="/artist/od-porter" className="flex-shrink-0 w-36 sm:w-40 group">

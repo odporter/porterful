@@ -268,9 +268,14 @@ export function HomeClient() {
             <h2 className="text-2xl md:text-3xl font-bold">
               Featured Artist
             </h2>
-            <Link href="/artist/od-porter" className="text-[var(--pf-orange)] hover:underline text-sm font-medium">
-              View Profile →
-            </Link>
+            <div className="flex gap-4">
+              <Link href="/artists" className="text-[var(--pf-orange)] hover:underline text-sm font-medium">
+                All Artists →
+              </Link>
+              <Link href="/artist/od-porter" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] text-sm font-medium">
+                View Profile →
+              </Link>
+            </div>
           </div>
           
           <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 to-purple-500/10 rounded-2xl overflow-hidden border border-[var(--pf-border)]">
@@ -290,10 +295,16 @@ export function HomeClient() {
                   </div>
                 </div>
                 
-                <p className="text-[var(--pf-text-secondary)] mb-6">
+                <p className="text-[var(--pf-text-secondary)] mb-4">
                   Independent artist and founder. Born in Miami, raised in NOLA & STL. 
                   Building a platform where artists own everything.
                 </p>
+                
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <span className="text-xs px-2 py-1 rounded-full bg-[var(--pf-orange)]/10 text-[var(--pf-orange)] border border-[var(--pf-orange)]/20">Hip-Hop</span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">R&B</span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">St. Louis</span>
+                </div>
                 
                 <div className="flex gap-4 mb-6">
                   <div>

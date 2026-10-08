@@ -1,13 +1,51 @@
 # Porterful Improvements Log
-*Last run: 2026-10-08 (11:59 AM)*
+*Last run: 2026-10-08 (2:11 PM)*
 
-## Status: 🟢 Site Live + MusicGroup Schema Added + Deploy Pending
+## Status: 🟢 Site Live + Cart Fix + Dead Sitemap Entry Removed
 
 ### 1. Site Uptime
-✅ porterful.com → HTTP 200
+✅ porterful.com → HTTP 200 (0.229s)
 
 ### 2. Git Commits (1 new commit this run)
-- **62cf431** chore: add MusicGroup schema for Google rich results + dateModified bump
+- **932275f** fix: cart option-aware deduplication + remove broken /signal from sitemap
+  - Cart: addItem now checks size+color when deduplicating cart items
+    Previously, same product with different sizes/colors would incorrectly merge
+  - Sitemap: removed /signal route (returns 404 after middleware redirect)
+    Signal product is at /product/signal-shirt, sitemap entry was dead link
+  - GitHub auto-deploy triggered (push succeeded)
+
+### 3. Key Findings
+✅ Build passes cleanly (0 errors) — 97 routes
+✅ GitHub push auto-deploys to Vercel (confirmed)
+✅ Site is solid — good SEO setup (Schema.org, OG tags, sitemap)
+✅ Vercel CLI not logged in — git push auto-deploys (working)
+⚠️ /signal sitemap entry was a 404 — removed
+
+### 4. Bug Fixed: Cart Option-Aware Deduplication
+The cart context's `addItem` function was only checking `productId` when deciding whether to increment quantity or add a new line item. This meant:
+- User adds "T-Shirt / Blue / Large" → added to cart
+- User adds "T-Shirt / Red / Large" → quantity of Blue/Large incremented (WRONG)
+Now it correctly checks `productId + size + color` together.
+
+### 5. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Sitemap: 41 routes, all valid (fixed /signal this run)
+✅ Build: 87.3 kB shared JS, ~100-170 kB per page
+
+### 6. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails but git push auto-deploys
+✅ GitHub push triggers Vercel auto-deploy (confirmed working)
+
+### 7. Recommended Actions (Priority Order)
+1. **Add real artist photos** for Noble Naturals, STL Collective, Velvet Dreams (placeholder)
+2. **Add real products to store** — still shows placeholder content in some sections
+3. **Add /shop to sitemap** — missing from sitemap (only /store is included)
   - Added MusicGroup structured data to homepage for music platform SEO
   - MusicGroup includes artist member O D Jonathan Porter and social links
   - Bumped dateModified to 2026-10-08T16:59:00Z for cache invalidation

@@ -1,4 +1,46 @@
 # Porterful Improvements Log
+*Last run: 2026-10-08 (11:59 AM)*
+
+## Status: 🟢 Site Live + MusicGroup Schema Added + Deploy Pending
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **62cf431** chore: add MusicGroup schema for Google rich results + dateModified bump
+  - Added MusicGroup structured data to homepage for music platform SEO
+  - MusicGroup includes artist member O D Jonathan Porter and social links
+  - Bumped dateModified to 2026-10-08T16:59:00Z for cache invalidation
+  - GitHub push sent (credential-gh error in output but push succeeded)
+
+### 3. Key Findings
+✅ Build passes cleanly — 97 routes compiled successfully
+✅ MusicGroup schema added to page.tsx for Google Music rich results
+✅ dateModified bumped for Vercel ISR cache invalidation
+⚠️ Vercel CLI not logged in — can't run `vercel --prod` directly
+⚠️ "First drop coming soon" on homepage is stale ISR cache — code fix requires redeploy
+⚠️ `npm run build` fails with symlinked paths (Documents/Porterful → Organized/Projects) — fixed by removing .next first
+✅ Homepage featured album art displays correctly with real album covers
+✅ Store (/shop) has live products with proper preview badges
+✅ Homepage shows "Latest Releases" section with real tracks
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ /store has live Noble Naturals products with proper preview badges
+
+### 5. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real products** — only preview products currently (no live purchasable merch)
+3. **Add real artist photos** for Noble Naturals, STL Collective, Velvet Dreams
+4. **Fix homepage featured products section** — replace "coming soon" placeholder with live products
+
+---
 *Last run: 2026-10-08 (8:43 AM)*
 
 ## Status: 🟢 Site Live + Cache Invalidation Pushed

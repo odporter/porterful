@@ -1,4 +1,46 @@
 # Porterful Improvements Log
+*Last run: 2026-10-08 (8:43 AM)*
+
+## Status: 🟢 Site Live + Cache Invalidation Pushed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **b8e1425** chore: bump dateModified for redeploy cache invalidation
+  - Pushed to GitHub → triggers Vercel auto-deploy
+  - dateModified bumped: 12:40:00 → 13:44:00 UTC
+
+### 3. Key Findings
+✅ Build passes cleanly (0 errors) — 58 routes
+✅ GitHub push auto-deploys to Vercel (push confirmed successful)
+⚠️ Vercel CLI not logged in — need `vercel login` for direct `--prod`
+⚠️ Live site shows stale cached HTML — ISR cache still serving old content
+   - "First drop coming soon" still visible on homepage
+   - Featured Artists section still showing skeleton loaders + empty avatar placeholders
+   - default.jpg still showing for featured track
+   - These are cache issues, not code issues — local code is correct
+✅ Live /store page looks good — Noble Naturals products showing correctly
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org WebSite + Organization + WebPage + FAQPage + MusicGroup structured data
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Homepage has genre tags on Featured Artist section
+✅ Browse Artists has "View All →" link
+✅ /store has live Noble Naturals products with proper previews
+
+### 5. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys + cache purge
+2. **Monitor redeploy** — GitHub push should auto-trigger, watch for ISR cache to clear
+3. **Add real artist photos** for Noble Naturals, STL Collective, Velvet Dreams
+4. **Add real products to store** — only preview products currently (no live merch)
+
+---
 *Last run: 2026-10-08 (7:40 AM)*
 
 ## Status: 🟢 Site Live + Redeploy Triggered

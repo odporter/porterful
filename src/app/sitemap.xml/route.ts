@@ -30,7 +30,6 @@ function generateSitemap(): Array<{url: string; lastMod: string; changeFreq: str
     { url: `${baseUrl}/contact${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/faq${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/support${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/signal${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/apply${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/land${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/signup${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },

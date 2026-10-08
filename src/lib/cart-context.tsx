@@ -56,10 +56,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
     setItems(prev => {
-      const existing = prev.find(i => i.productId === item.productId);
+      // Find existing item with same productId AND same options (size/color)
+      // If options are being newly selected, treat as separate cart entry
+      const existing = prev.find(i => 
+        i.productId === item.productId && 
+        i.size === item.size && 
+        i.color === item.color
+      );
       if (existing) {
         return prev.map(i => 
-          i.productId === item.productId 
+          i.productId === item.productId && i.size === item.size && i.color === item.color
             ? { ...i, quantity: i.quantity + 1 }
             : i
         );

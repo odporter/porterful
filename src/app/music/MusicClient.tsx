@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Search, Disc, Users, Filter } from 'lucide-react';
@@ -29,10 +29,25 @@ export default function MusicClient() {
     return matchesSearch && matchesAlbum;
   });
 
-  // Featured track (most plays)
-  const featuredTrack = TRACKS.reduce((prev, curr) => 
-    (curr.plays || 0) > (prev.plays || 0) ? curr : prev
-  , TRACKS[0]);
+  // Featured album (album with most total plays)
+  const featuredAlbumEntry = useMemo(() => {
+    const map = new Map<string, { plays: number; tracks: number; artist: string }>();
+    TRACKS.forEach(t => {
+      const existing = map.get(t.album);
+      if (existing) {
+        existing.plays += t.plays || 0;
+        existing.tracks += 1;
+      } else {
+        map.set(t.album, { plays: t.plays || 0, tracks: 1, artist: t.artist });
+      }
+    });
+    return Array.from(map.entries()).reduce(
+      (best, current) => current[1].plays > best[1].plays ? current : best
+    );
+  }, []);
+  const featuredAlbum = featuredAlbumEntry[0];
+  const featuredAlbumData = featuredAlbumEntry[1];
+  const featuredAlbumTrack = TRACKS.find(t => t.album === featuredAlbum);
 
   const handlePlay = (track: typeof TRACKS[0]) => {
     playTrack(track);
@@ -66,22 +81,22 @@ export default function MusicClient() {
 
   return (
     <div className="min-h-screen bg-[var(--pf-bg)]">
-      {/* Featured Track Hero */}
+      {/* Featured Album Hero */}
       <section className="bg-[var(--pf-bg)] border-b border-[var(--pf-border)]">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 pt-6 sm:pt-10 pb-5 sm:pb-8">
           <p className="text-[11px] uppercase tracking-widest text-[var(--pf-text-secondary)] mb-3">
-            Featured
+            Featured Album
           </p>
           <div className="flex items-center gap-4 sm:gap-5">
             <Link 
-              href={`/album/${featuredTrack?.album.toLowerCase().replace(/\s+/g, '-')}`}
+              href={`/album/${featuredAlbum.toLowerCase().replace(/\s+/g, '-')}`}
               className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden flex-shrink-0 bg-[var(--pf-surface)]"
-              aria-label="Open artist page"
+              aria-label={`Open ${featuredAlbum} album page`}
             >
-              {featuredTrack?.image ? (
+              {featuredAlbumTrack?.image ? (
                 <Image
-                  src={featuredTrack.image}
-                  alt={featuredTrack.album || featuredTrack.title}
+                  src={featuredAlbumTrack.image}
+                  alt={featuredAlbum}
                   fill
                   sizes="112px"
                   className="object-cover"
@@ -92,34 +107,26 @@ export default function MusicClient() {
             </Link>
             <div className="flex-1 min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate">
-                {featuredTrack?.title || 'Featured Track'}
+                {featuredAlbum}
               </h1>
-              {featuredTrack ? (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-[var(--pf-text-secondary)]">
-                  {featuredTrack.artist}
+                  {featuredAlbumData.artist}
                 </span>
-                {featuredTrack.album && (
-                  <>
-                    <span className="text-[var(--pf-text-muted)]">•</span>
-                    <Link 
-                      href={`/album/${featuredTrack.album.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="text-sm text-[var(--pf-orange)] hover:underline"
-                    >
-                      {featuredTrack.album}
-                    </Link>
-                  </>
-                )}
+                <span className="text-[var(--pf-text-muted)]">•</span>
+                <span className="text-sm text-[var(--pf-text-muted)]">
+                  {featuredAlbumData.tracks} tracks
+                </span>
+                <span className="text-[var(--pf-text-muted)]">•</span>
+                <span className="text-sm text-[var(--pf-text-muted)]">
+                  {formatPlays(featuredAlbumData.plays)} plays
+                </span>
               </div>
-              ) : (
-                <p className="text-sm text-[var(--pf-text-secondary)]">Stream music from independent artists.</p>
-              )}
             </div>
             <button
-              onClick={() => featuredTrack && handlePlay(featuredTrack)}
-              disabled={!featuredTrack}
+              onClick={() => handlePlayAlbum(featuredAlbum)}
               className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center flex-shrink-0 transition-colors shadow-lg bg-[var(--pf-orange)] hover:bg-[var(--pf-orange-dark)] text-white disabled:opacity-50"
-              aria-label="Play featured track"
+              aria-label={`Play ${featuredAlbum}`}
             >
               <Play size={24} className="ml-0.5" />
             </button>

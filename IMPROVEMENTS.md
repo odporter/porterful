@@ -1,4 +1,47 @@
 # Porterful Improvements Log
+*Last run: 2026-10-08 (2:05 AM)*
+
+## Status: 🟢 Site Live + Artists Grid Images Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /music → HTTP 200
+✅ /artists → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **e1beca0** fix(artists): add real images to artist profiles + ATM Trap
+  - All artists in ARTISTS[] had `image: ''` (empty) → showing placeholder letters in grid
+  - Fixed: O D Porter → `/artist-images/od-porter.jpg` (real photo)
+  - Fixed: Noble Naturals, STL Collective, Velvet Dreams → `/artist-images/od-porter.jpg` (placeholder until real images added)
+  - Fixed: ATM Trap → `/artist-images/atm-trap/avatar.jpg` (was missing from ARTISTS[] entirely despite 4 tracks in data.ts)
+  - Homepage Featured Artist: replaced "O" text avatar with real `<Image>` of od-porter.jpg
+  - Added ATM Trap to ARTISTS array (was orphaned from data.ts)
+
+### 3. Key Findings
+✅ Site + local code now in sync — no cache mismatch
+✅ Build passes cleanly (0 errors)
+✅ GitHub push auto-deploys to Vercel
+⚠️ Vercel CLI not logged in — `vercel login` needed for direct `--prod` deploys
+⚠️ ISR/revalidate means artist page updates may take 1-10 min to propagate
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org WebSite + Organization + WebPage + FAQPage + MusicGroup structured data
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Sitemap with cache-busting query params (ISR-safe)
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Featured Artist section shows genre tags + play/discover CTAs
+
+### 5. Recommended Actions (Priority Order)
+1. **Add real artist photos** for Noble Naturals, STL Collective, Velvet Dreams (currently using od-porter.jpg as placeholder)
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Add real products to store** — still shows "First drop coming soon" on homepage
+4. **Add Superfan referral section** — CTA is live but no referral flow exists yet
+
+---
 *Last run: 2026-10-08 (11:46 PM)*
 
 ## Status: 🟢 Site Live + Featured Artist Section Improved

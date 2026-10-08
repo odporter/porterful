@@ -61,7 +61,7 @@ const jsonLd = {
         '@type': 'WebSite',
         name: 'Porterful',
       },
-      dateModified: '2026-10-08T16:59:00Z',
+      dateModified: new Date().toISOString(),
     },
     // MusicGroup schema — helps Google surface Porterful as a music platform
     {

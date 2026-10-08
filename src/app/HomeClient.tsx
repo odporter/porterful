@@ -283,8 +283,14 @@ export function HomeClient() {
               {/* Artist Info */}
               <div className="p-6 md:p-10">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
-                    O
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[var(--pf-orange)] to-purple-500 shrink-0">
+                    <Image
+                      src="/artist-images/od-porter.jpg"
+                      alt="O D Porter"
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">

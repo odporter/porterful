@@ -1,4 +1,42 @@
 # Porterful Improvements Log
+*Last run: 2026-10-08 (7:40 AM)*
+
+## Status: 🟢 Site Live + Redeploy Triggered
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **ba5b409** chore: bump dateModified for redeploy trigger
+  - Pushed to GitHub to trigger Vercel auto-deploy (GitHub webhook)
+  - Vercel CLI not logged in — can't do direct --prod deploy
+
+### 3. Key Findings
+✅ Build passes cleanly (0 errors) — all 58 routes
+✅ GitHub push auto-deploys to Vercel (push confirmed successful)
+⚠️ Vercel CLI not logged in — need to run `vercel login` for direct --prod deploys
+⚠️ Live site shows stale cached HTML (pf-reveal-group classes, skeleton loaders, "First drop coming soon" in Featured Products) — this is Vercel ISR cache, will clear on redeploy
+✅ Local code is significantly better than what's live
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org WebSite + Organization + WebPage + FAQPage + MusicGroup structured data
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Homepage has genre tags on Featured Artist section
+✅ Browse Artists has "View All →" link
+✅ Local build: 87.3 kB first load JS (shared), ~100-170 kB per page
+
+### 5. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Clear Vercel ISR cache** after deploy — visit /api/revalidate or wait for TTL
+3. **Add real artist photos** for Noble Naturals, STL Collective, Velvet Dreams
+4. **Add real products to store** — still shows "First drop coming soon" on live (but local code has no such placeholder)
+
+---
 *Last run: 2026-10-08 (2:05 AM)*
 
 ## Status: 🟢 Site Live + Artists Grid Images Fixed

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'Brands',
@@ -26,6 +28,17 @@ export const metadata: Metadata = {
   },
 }
 
+const brands = [
+  {
+    slug: 'noble-naturals',
+    name: 'Noble Naturals™',
+    category: 'Wellness & Hair Care',
+    description: 'Natural hair care products crafted with premium ingredients for all hair types.',
+    live: 0,
+    preview: 3,
+  },
+]
+
 export default function BrandsPage() {
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -41,11 +54,48 @@ export default function BrandsPage() {
           <h1 className="mb-4 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Brands with a point of view.</h1>
           <p className="text-lg text-[var(--pf-text-secondary)] max-w-2xl">Independent brands building carefully and selling directly. Porterful only displays brands with an active public collection.</p>
         </div>
-        
-        {/* Coming Soon */}
-        <div className="text-center py-16">
-          <p className="text-lg text-[var(--pf-text-secondary)]">More brands coming soon.</p>
-          <p className="text-sm text-[var(--pf-text-muted)] mt-2">Check back as we onboard new independent brands.</p>
+
+        {/* Brand Cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {brands.map((brand) => (
+            <Link key={brand.slug} href={`/brands/${brand.slug}`} className="group block">
+              <article className="h-full rounded-[24px] border border-[var(--pf-border)] bg-[var(--pf-surface)] p-6 transition-all hover:border-[var(--pf-orange)]/30 hover:shadow-lg">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-[var(--pf-border)] bg-[var(--pf-bg)]">
+                    <Image
+                      src={`/brand/${brand.slug}-mark.svg`}
+                      alt={`${brand.name} logo`}
+                      fill
+                      className="object-contain p-2"
+                      sizes="64px"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold group-hover:text-[var(--pf-accent-text)] transition-colors">{brand.name}</h2>
+                    <p className="text-sm text-[var(--pf-accent-text)]">{brand.category}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-[var(--pf-text-secondary)] mb-4 line-clamp-2">{brand.description}</p>
+                <div className="flex items-center gap-4 text-xs text-[var(--pf-text-muted)]">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    {brand.live} Live
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--pf-text-muted)]"></span>
+                    {brand.preview} Preview
+                  </span>
+                </div>
+                <div className="mt-4 flex items-center gap-1 text-sm font-medium text-[var(--pf-accent-text)]">
+                  Explore {brand.name}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-right transition-transform group-hover:translate-x-1" aria-hidden="true">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </div>
+              </article>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

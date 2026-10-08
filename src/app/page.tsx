@@ -61,7 +61,31 @@ const jsonLd = {
         '@type': 'WebSite',
         name: 'Porterful',
       },
-      dateModified: '2026-10-08T14:46:00Z',
+      dateModified: '2026-10-08T16:59:00Z',
+    },
+    // MusicGroup schema — helps Google surface Porterful as a music platform
+    {
+      '@type': 'MusicGroup',
+      '@id': 'https://porterful.com/#music-group',
+      name: 'Porterful',
+      url: 'https://porterful.com',
+      description: 'Independent music platform where artists sell directly to fans and keep 80%.',
+      genre: 'Independent',
+      foundingLocation: { '@type': 'Place', name: 'St. Louis, MO' },
+      sameAs: [
+        'https://twitter.com/porterful',
+        'https://instagram.com/od.porter',
+        'https://youtube.com/@odporter',
+        'https://discord.gg/porterful',
+        'https://tiktok.com/@Porterful',
+      ],
+      member: {
+        '@type': 'Person',
+        name: 'O D Jonathan Porter',
+        alternateName: ['Od Jonathan Porter', 'O D Porter'],
+        url: 'https://www.imglikeness.com/od-jonathan-porter',
+        founderOf: { '@id': 'https://porterful.com/#music-group' },
+      },
     },
   ],
 }

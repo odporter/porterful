@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     description: 'Join Porterful as an artist. Keep 80% of every sale. No label, no middleman.',
     images: ['https://porterful.com/og-image.png'],
   },
+  alternates: { canonical: 'https://porterful.com/apply' },
   robots: { index: true, follow: true },
 }
 

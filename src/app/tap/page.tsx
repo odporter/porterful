@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     description: 'Tap into a verified identity. Document your likeness, explore the system, and choose your next step.',
     images: ['/og-image.png'],
   },
+  alternates: { canonical: 'https://porterful.com/tap' },
 }
 
 interface TapPageProps {

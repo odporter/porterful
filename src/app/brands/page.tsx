@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     description: 'Discover independent brands on Porterful.',
     images: ['https://porterful.com/og-image.png'],
   },
+  alternates: { canonical: 'https://porterful.com/brands' },
 }
 
 const brands = [

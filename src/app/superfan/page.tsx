@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     description: 'Earn 5% on artist merch, 3% on marketplace. Share artists you love and earn.',
     images: ['/og-image.png'],
   },
+  alternates: { canonical: 'https://porterful.com/superfan' },
 }
 
 export default function SuperfanPage() {

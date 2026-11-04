@@ -4,7 +4,7 @@ import { StoreClient } from './StoreClient'
 export const metadata: Metadata = {
   title: 'Shop — Music & Merch from Independent Artists',
   description: 'Shop music, apparel, tech, and home goods from independent artists. 80% of every sale goes directly to creators. Browse the Porterful marketplace.',
-  alternates: { canonical: 'https://porterful.com/shop' },
+  alternates: { canonical: 'https://porterful.com/store' },
   openGraph: {
     title: 'Porterful Store — Independent Artist Merch & Music',
     description: 'Shop music and merch from independent artists. 80% of every sale goes directly to creators.',

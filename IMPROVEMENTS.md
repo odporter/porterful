@@ -1,4 +1,59 @@
 # Porterful Improvements Log
+*Last run: 2026-11-04 (2:15 PM)*
+
+## Status: 🟡 Site Live + Partial Redirect Fix (Cache Purge Needed)
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 200
+✅ Git push auto-deploy confirmed (3 pushes succeeded)
+
+### 2. Git Commits (3 new commits this run)
+- **08e0aef** fix(vercel.json): add Edge-level 301 redirects for legacy URLs
+- **3cd71a2** fix(middleware): move legacy redirects before Supabase init (critical)
+- **b8f910b** fix(nav): align all /store links to /shop (canonical URL)
+
+### 3. Bug Fixed: Redirects Blocked by Supabase Init Crash
+The middleware was crashing on `supabaseUrl is required` before reaching the redirect
+code. Moved ALL redirect handling BEFORE Supabase initialization. Also wrapped
+Supabase in try/catch so middleware never breaks publicly.
+
+### 4. Bug Fixed: Dead /store Route Directory Removed
+Deleted src/app/store/ directory — it was a duplicate route that existed alongside
+the /shop route. All internal links now point to /shop (the canonical URL).
+
+### 5. Bug Fixed: Broken logo.png Reference
+Fixed Schema.org JSON-LD pointing to /logo.png (doesn't exist) → /porterful-logo-white.svg
+
+### 6. Known Issue: Vercel Cache Not Purging /store Redirect
+🔴 **URGENT:** /store is returning HTTP 200 directly (not redirecting) in production
+despite correct middleware.ts and vercel.json redirect code. This is a Vercel Edge
+cache issue — the old deployment's Edge Function is still running for /store.
+- /marketplace → 307 → /store ✅ (middleware working for /marketplace)
+- /competition → 307 → /apply ✅ (middleware working for /competition)  
+- /store → 200 ❌ (Edge serving stale direct response)
+
+**Fix:** Go to vercel.com → porterful project → Deployments → find the LATEST
+deployment → click "..." → "Purge Cache" → "Purge Everything"
+
+### 7. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors) — 96 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Suspense boundaries fixed on /shop and /claim
+
+### 8. Recommended Actions
+1. **[DO NOW]** Purge Vercel cache at vercel.com dashboard (see issue #6 above)
+2. **Add real products** — store shows only 3 placeholder products
+3. **Add artist photos** — some artist sections use placeholder images
+4. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
 *Last run: 2026-11-04 (1:02 PM)*
 
 ## Status: 🟢 Site Live + SEO Circular Redirect Fixed

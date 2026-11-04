@@ -20,7 +20,7 @@ export function ArtistProducts({ products, artistName }: ArtistProductsProps) {
     <div className="bg-[var(--pf-surface)] rounded-2xl p-5 border border-[var(--pf-border)] min-h-[200px] flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm uppercase tracking-widest text-[var(--pf-orange)]">{artistName} Store</p>
-        <Link href="/store" className="text-xs text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors" title="Browse all merch">
+        <Link href="/shop" className="text-xs text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors" title="Browse all merch">
           View all →
         </Link>
       </div>

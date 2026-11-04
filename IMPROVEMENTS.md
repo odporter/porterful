@@ -1,4 +1,48 @@
 # Porterful Improvements Log
+*Last run: 2026-11-04 (1:02 PM)*
+
+## Status: 🟢 Site Live + SEO Circular Redirect Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 200
+✅ Git push auto-deploy confirmed (push succeeded)
+
+### 2. Git Commits (1 new commit this run)
+- **162d5fd** fix(seo): 301 redirects + canonical alignment to end /store→/shop circular redirect
+  - middleware: /store and /marketplace now 301 (was 307) to /shop
+  - middleware: /competition now 301 (was 307) to /apply
+  - sitemap: /store entry replaced with /shop
+  - shop/page.tsx: canonical changed from /store to /shop
+  - Previously /store→307→/shop (canonical=/store) created a circular SEO signal
+  - Now: /store→301→/shop (canonical=/shop). Clean permanent redirect.
+
+### 3. Bug Fixed: Circular Redirect Loop (SEO Critical)
+🔴 **SEO Issue Found:** /store redirected to /shop with 307 (temporary), but /shop's canonical URL pointed back to /store. This creates a redirect loop that confuses search engine crawlers — they never land on the canonical URL and can't consolidate page authority.
+
+Fix: Changed all three legacy redirects (/store, /marketplace, /competition) to 301 (permanent), aligned sitemap and canonical URLs to /shop as the single canonical endpoint.
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors) — 97 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Suspense boundaries fixed on /shop and /claim (from last run)
+✅ SEO circular redirect fixed this run (301 + canonical alignment)
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails but git push auto-deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Add real products** — store is live but shows placeholder content
+2. **Add artist photos** — some artist sections use placeholder images
+3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
 *Last run: 2026-11-04 (12:00 PM)*
 
 ## Status: 🟢 Site Live + Suspense Boundary Fix Pushed

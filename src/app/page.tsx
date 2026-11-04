@@ -28,7 +28,7 @@ const jsonLd = {
       description: 'Music, merch, and direct support for independent artists.',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://porterful.com/logo.png',
+        url: 'https://porterful.com/porterful-logo-white.svg',
       },
       dateFounded: '2026-01-01',
       foundingLocation: { '@type': 'Place', name: 'St. Louis, MO' },

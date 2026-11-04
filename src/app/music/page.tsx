@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://porterful.com/music',
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function MusicPage() {

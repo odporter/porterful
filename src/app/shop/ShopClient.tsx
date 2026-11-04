@@ -194,6 +194,9 @@ export default function MarketplacePage() {
   const sortedProducts = useMemo(() => {
     let result = [...products]
     
+    // Filter out out-of-stock products (show only available items)
+    result = result.filter(p => p.inStock)
+    
     // Apply price range filter (only if any ranges selected)
     if (activePriceRanges.length > 0) {
       result = result.filter(p => {

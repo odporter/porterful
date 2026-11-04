@@ -5,7 +5,6 @@ const PUBLIC_PATHS = [
   '/',
   '/music',
   '/artists',
-  '/store',
   '/tap',
   '/signal',
   '/tap-in',
@@ -29,10 +28,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Redirect /shop and /marketplace to canonical /store (301 for SEO)
-  if (pathname === '/shop' || pathname === '/marketplace') {
+  // Redirect /store and /marketplace to canonical /shop (301 for SEO)
+  if (pathname === '/store' || pathname === '/marketplace') {
     const url = request.nextUrl.clone()
-    url.pathname = '/store'
+    url.pathname = '/shop'
     return NextResponse.redirect(url, 301)
   }
 

@@ -63,19 +63,6 @@
       ]
     },
     {
-      "source": "/store",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0"
-        },
-        {
-          "key": "x-vercel-set-bypass-cache",
-          "value": "true"
-        }
-      ]
-    },
-    {
       "source": "/marketplace",
       "headers": [
         {
@@ -90,11 +77,6 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/store",
-      "destination": "/shop",
-      "permanent": true
-    },
     {
       "source": "/marketplace",
       "destination": "/shop",

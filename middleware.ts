@@ -2,48 +2,46 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
-  // Create a Supabase client configured to use cookies
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // Refresh session if expired
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Redirect /store, /marketplace, /competition to canonical URLs (301 = permanent redirect)
-  if (request.nextUrl.pathname === '/store' || request.nextUrl.pathname === '/marketplace') {
+  // Handle legacy URL redirects FIRST — before any Supabase initialization
+  // This ensures redirects work even if Supabase credentials are missing
+  const { pathname } = request.nextUrl
+  
+  if (pathname === '/store' || pathname === '/marketplace') {
     const url = request.nextUrl.clone()
     url.pathname = '/shop'
     return NextResponse.redirect(url, 301) // permanent redirect for SEO
   }
   
-  if (request.nextUrl.pathname === '/competition') {
+  if (pathname === '/competition') {
     const url = request.nextUrl.clone()
     url.pathname = '/apply'
     return NextResponse.redirect(url, 301) // permanent redirect for SEO
+  }
+  
+  // Only initialize Supabase for protected routes (after redirects)
+  let supabaseResponse = NextResponse.next({ request })
+  let user = null
+
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+            supabaseResponse = NextResponse.next({ request })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+    ;({ data: { user } } = await supabase.auth.getUser())
+  } catch {
+    // Supabase unavailable — continue without auth (public pages only)
   }
 
   // Protected routes that require authentication

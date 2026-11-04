@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Loader2, CheckCircle, XCircle, Mail } from 'lucide-react';
 
-export default function ClaimPage() {
+function ClaimContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [email, setEmail] = useState(searchParams.get('email') || '');
@@ -129,5 +129,20 @@ export default function ClaimPage() {
         </p>
       </motion.div>
     </main>
+  );
+}
+
+export default function ClaimPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#08080B] flex flex-col items-center justify-center px-4 pt-16 md:pt-20">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[#f97316] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400 text-sm">Loading…</p>
+        </div>
+      </main>
+    }>
+      <ClaimContent />
+    </Suspense>
   );
 }

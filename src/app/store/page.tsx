@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { StoreClient } from './StoreClient'
 
 export const metadata: Metadata = {
@@ -34,5 +35,16 @@ export const metadata: Metadata = {
 }
 
 export default function StorePage() {
-  return <StoreClient />
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[var(--pf-orange)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-[var(--pf-text-secondary)] text-sm">Loading store…</p>
+        </div>
+      </div>
+    }>
+      <StoreClient />
+    </Suspense>
+  )
 }

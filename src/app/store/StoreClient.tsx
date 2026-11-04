@@ -78,7 +78,7 @@ const ARTIST_JSON_LD = {
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Official Merch & Music',
-    url: 'https://porterful.com/shop',
+    url: 'https://porterful.com/store',
   },
 };
 
@@ -269,7 +269,7 @@ export function StoreClient() {
             '@type': 'ItemList',
             name: 'Porterful Store - Independent Artist Merch & Music',
             description: 'Shop music, merch, and products from independent creators. 80% of proceeds go directly to artists.',
-            url: 'https://porterful.com/shop',
+            url: 'https://porterful.com/store',
             numberOfItems: totalProducts || filteredProducts.length,
             itemListElement: filteredProducts.slice(0, 20).map((product, index) => ({
               '@type': 'ListItem',
@@ -308,7 +308,7 @@ export function StoreClient() {
                 '@type': 'ListItem',
                 position: 2,
                 name: 'Store',
-                item: 'https://porterful.com/shop',
+                item: 'https://porterful.com/store',
               },
             ],
           }),

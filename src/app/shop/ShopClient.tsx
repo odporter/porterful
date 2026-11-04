@@ -350,7 +350,7 @@ export default function MarketplacePage() {
 
             {/* Sort */}
             <div className="flex items-center gap-2">
-              <label htmlFor="sort-select" className="sr-only">Sort products by</label>
+              <label htmlFor="sort-select" className="text-sm text-[var(--pf-text-secondary)]">Sort by:</label>
               <select
                 id="sort-select"
                 value={sortBy}

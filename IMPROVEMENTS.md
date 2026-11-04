@@ -1,4 +1,42 @@
 # Porterful Improvements Log
+*Last run: 2026-11-04 (3:21 PM)*
+
+## Status: 🟢 Site Live + Out-of-Stock Filter Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 307 (redirect)
+✅ Git push auto-deploy confirmed
+
+### 2. Git Commits (1 new commit this run)
+- **a981db0** fix(shop): filter out out-of-stock products from listings
+
+### 3. Bug Fixed: Out-of-Stock Products Showing in Shop
+The shop was displaying ALL products from the API, including sold-out items (inStock=false). Users clicking on these items only found unavailable products — poor UX. Fixed by adding client-side filter to only show inStock=true products.
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors) — 96 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Suspense boundaries on /shop and /claim
+✅ Out-of-stock products now filtered from shop
+
+### 5. Known Issues
+⚠️ **/store returns HTTP 200 (not redirecting)** — Vercel Edge cache issue. Need to purge cache at vercel.com dashboard. middleware.ts + vercel.json both have correct redirects but Edge is serving stale response. /marketplace and /competition correctly redirect (307).
+
+### 6. Recommended Actions
+1. **[DO NOW]** Purge Vercel cache at vercel.com dashboard for /store redirect fix
+2. **Add real products** — store only has 3 placeholder products (all out of stock)
+3. **Add artist photos** — some artist sections use placeholder images
+4. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
+
 *Last run: 2026-11-04 (2:15 PM)*
 
 ## Status: 🟡 Site Live + Partial Redirect Fix (Cache Purge Needed)

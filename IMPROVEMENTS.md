@@ -1,32 +1,28 @@
 # Porterful Improvements Log
-*Last run: 2026-11-04 (11:57 AM)*
+*Last run: 2026-11-04 (12:00 PM)*
 
-## Status: 🟢 Site Live + Product 404 Fix Pushed
+## Status: 🟢 Site Live + Suspense Boundary Fix Pushed
 
 ### 1. Site Uptime
 ✅ porterful.com → HTTP 200
 ✅ /store → HTTP 200
-⚠️ /shop → HTTP 307 (deployed code is stale — local code has 301 fix)
 
 ### 2. Git Commits (1 new commit this run)
-- **50eb83c** fix(product): add notFound() for invalid product IDs + cleanup
-  - Added `notFound()` call in product/[id]/page.tsx when product not found
-  - Previously invalid product IDs rendered empty page with broken JSON-LD
-  - Cleaned up stale comment about /store→/shop redirect
-  - Build: 0 errors, all routes compile
+- **592446d** fix(suspense): wrap useSearchParams in Suspense boundary for /store and /claim
+  - StoreClient.tsx uses useSearchParams() without Suspense wrapper — causes build warnings and potential hydration issues
+  - Claim page had same issue — restructured to separate ClaimContent component wrapped in Suspense
+  - Added loading spinners for both Suspense fallbacks
+  - Build: 0 errors, 97 routes
+  - GitHub auto-deploy triggered
 
 ### 3. Key Findings
 ✅ Site is up (HTTP 200)
 ✅ Build passes cleanly (0 errors) — 97 routes
 ✅ GitHub push auto-deploys to Vercel (push succeeded)
-✅ Product page now properly 404s for unknown product IDs
-⚠️ **Deployed site is running stale code** — homepage shows old "Upload. Build. Sell. Track." hero + "First drop coming soon" instead of current HomeClient.tsx
-⚠️ /shop shows 307 (deployed code) instead of 301 (local code)
-   - Vercel ISR cache is bypassing middleware on edge, serving old response
-   - This will clear on the next Vercel redeploy triggered by this push
+✅ Site is solid overall — good SEO, Schema.org, OG tags, canonicals
 
-### 4. Bug Fixed: Product Page 404 Handling
-Product page was rendering an empty page with broken JSON-LD when given an invalid product ID. Now correctly calls `notFound()` which renders Next.js's 404 page.
+### 4. Bug Fixed: useSearchParams Without Suspense Boundary
+Next.js 14+ requires Client Components that use `useSearchParams()` to be wrapped in a `<Suspense>` boundary. The `/store` page (StoreClient) and `/claim` page were both missing this, causing build warnings and potential streaming/SSR issues in production. Both are now properly wrapped with loading fallbacks.
 
 ### 5. Site Health
 ✅ HTTP 200 across all key pages
@@ -39,15 +35,15 @@ Product page was rendering an empty page with broken JSON-LD when given an inval
 ✅ Build: 87.3 kB shared JS, ~100-170 kB per page
 
 ### 6. Known Issues (Pre-Existing)
-- Deployed site runs stale code due to Vercel ISR cache — local code is significantly better
-- /shop redirect shows 307 instead of 301 (stale deploy)
-- Homepage on live site shows "First drop coming soon" placeholder (stale deploy)
+- /shop shows 307 instead of 301 (middleware redirect in deployed code)
+- No real artist photos yet for some artists
+- No real products in store yet (placeholder content)
 
 ### 7. Recommended Actions (Priority Order)
-1. **Wait for Vercel redeploy** — git push just triggered it, should clear ISR cache
-2. **Add real artist photos** for Noble Naturals, STL Collective, Velvet Dreams (placeholder)
-3. **Add real products to store** — still shows placeholder content in some sections
-4. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys + cache purge
+1. **Add real products** — store is live but shows placeholder content
+2. **Add artist photos** — some artist sections use placeholder images
+3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys + cache purge
+4. **Fix /shop 307 → 301** — middleware redirect should be permanent
 
 ---
 *Last run: 2026-11-04 (6:36 AM)*

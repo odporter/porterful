@@ -33,18 +33,17 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Redirect /store and /marketplace to /shop (canonical shop URL)
+  // Redirect /store, /marketplace, /competition to canonical URLs (301 = permanent redirect)
   if (request.nextUrl.pathname === '/store' || request.nextUrl.pathname === '/marketplace') {
     const url = request.nextUrl.clone()
     url.pathname = '/shop'
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(url, 301) // permanent redirect for SEO
   }
   
-  // Redirect /competition to /apply (canonical URL)
   if (request.nextUrl.pathname === '/competition') {
     const url = request.nextUrl.clone()
     url.pathname = '/apply'
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(url, 301) // permanent redirect for SEO
   }
 
   // Protected routes that require authentication

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { ALL_PRODUCTS } from '@/lib/products'
 import ProductClient from './ProductClient'
 
@@ -79,6 +80,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     ],
   }
   
+  // Return 404 if product doesn't exist
+  if (!product) {
+    notFound()
+  }
+
   return (
     <>
       {jsonLd && (

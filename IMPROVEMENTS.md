@@ -1,10 +1,12 @@
 # Porterful Improvements Log
-*Last run: 2026-10-08 (2:11 PM)*
+*Last run: 2026-11-04 (6:36 AM)*
 
-## Status: 🟢 Site Live + Cart Fix + Dead Sitemap Entry Removed
+## Status: 🟢 Site Live + Canonical URL Fix + Sitemap Deduplication
 
 ### 1. Site Uptime
-✅ porterful.com → HTTP 200 (0.229s)
+✅ porterful.com → HTTP 200
+✅ /store → HTTP 200
+⚠️ /shop → HTTP 307 (should be 301 per middleware code — pre-existing, investigate separately)
 
 ### 2. Git Commits (1 new commit this run)
 - **932275f** fix: cart option-aware deduplication + remove broken /signal from sitemap

@@ -36,13 +36,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301)
   }
 
-  // Redirect legacy /store to canonical /shop (301 for SEO consolidation)
-  if (pathname === '/store') {
-    const url = request.nextUrl.clone()
-    url.pathname = '/shop'
-    return NextResponse.redirect(url, 301)
-  }
-
   // Force dynamic sitemap with no-store to bypass Vercel Edge ISR cache
   if (pathname === '/sitemap.xml') {
     const response = NextResponse.next({ request: { headers: request.headers } })

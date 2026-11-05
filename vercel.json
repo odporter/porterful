@@ -86,6 +86,11 @@
       "source": "/competition",
       "destination": "/apply",
       "permanent": true
+    },
+    {
+      "source": "/store",
+      "destination": "/shop",
+      "permanent": true
     }
   ],
   "rewrites": [

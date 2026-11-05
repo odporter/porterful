@@ -29,11 +29,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Redirect legacy /marketplace to canonical /shop (301 for SEO)
-  // Note: /store → /shop redirect is handled in vercel.json (Edge-level, before middleware)
+  // Redirect legacy /marketplace to canonical /store (301 for SEO)
   if (pathname === '/marketplace') {
     const url = request.nextUrl.clone()
-    url.pathname = '/shop'
+    url.pathname = '/store'
     return NextResponse.redirect(url, 301)
   }
 

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Shop Merch - Porterful',
     description: 'Official artist merchandise. Support independent artists directly.',
-    images: ['/og-image.png'],
+    images: ['https://porterful.com/og-image.png'],
     type: 'website',
   },
   twitter: {

@@ -1,5 +1,29 @@
 import Link from 'next/link'
+import { Metadata } from 'next'
 import { CreditCard, DollarSign, TrendingUp, PiggyBank, FileText, Calculator, ArrowRight, ExternalLink } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Artist Resources — Credit, Finance & Business Tools | Porterful',
+  description: 'Free credit repair tools, payment platforms, and business resources for independent artists. Build credit, manage money, and run your creative business.',
+  keywords: ['artist resources', 'credit for artists', 'free credit repair', 'payment processing', 'artist business tools', 'independent artist finance'],
+  alternates: { canonical: 'https://porterful.com/resources' },
+  openGraph: {
+    title: 'Artist Resources | Porterful',
+    description: 'Free credit, finance, and business tools for independent artists.',
+    url: 'https://porterful.com/resources',
+    siteName: 'Porterful',
+    locale: 'en_US',
+    type: 'website',
+    images: [{ url: 'https://porterful.com/og-image.png', width: 1200, height: 630, alt: 'Artist Resources on Porterful' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Artist Resources | Porterful',
+    description: 'Free credit, finance, and business tools for independent artists.',
+    images: ['https://porterful.com/og-image.png'],
+  },
+  robots: { index: true, follow: true },
+}
 
 const RESOURCES = [
   {

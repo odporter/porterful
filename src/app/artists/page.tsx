@@ -65,6 +65,7 @@ const FAQ_JSON_LD = {
 export const metadata: Metadata = {
   title: 'Discover Artists',
   description: 'Browse and support independent artists on Porterful. Every purchase helps them keep creating.',
+  alternates: { canonical: 'https://porterful.com/artists' },
   openGraph: {
     title: 'Discover Artists | Porterful',
     description: 'Browse and support independent artists. Every purchase helps them keep creating.',

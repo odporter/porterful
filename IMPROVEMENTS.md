@@ -1,4 +1,53 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (12:04 PM)*
+
+## Status: 🟢 Site Live + FAQ A11y Improvement
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **8f91290** fix(a11y): convert FAQ accordion to button-based with proper ARIA
+  - Replaced native `<details>/<summary>` with button + div for full ARIA control
+  - Added `aria-expanded` on toggle buttons so screen readers know open/closed state
+  - Added `aria-controls` linking each button to its answer region
+  - Added `role="region"` and `aria-labelledby` on answer containers
+  - Smooth CSS max-height/opacity transition on open/close
+  - FAQPage schema.org structured data preserved
+
+### 3. Fix Applied: FAQ Accordion Accessibility
+The FAQ page used native `<details>/<summary>` elements. While functional, they don't expose `aria-expanded` state to screen readers — users couldn't tell which items were open. Converted to a button-based accordion with proper ARIA attributes:
+- `aria-expanded` tells screen readers the open/closed state
+- `aria-controls` links each toggle to its answer region
+- `role="region"` + `aria-labelledby` marks answer divs as regions
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering
+✅ Middleware handles /store→/shop and /marketplace→/shop redirects
+✅ FAQPage schema (preserved through refactor)
+✅ Contact form has proper validation (subject required, message min 20 chars)
+✅ Music page search/filter inputs have aria-labels
+✅ FAQ accordion now has proper ARIA expanded/controls (new this run)
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **No real artist photos** — avatar files are placeholders
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real artist photos** — avatar files are placeholders
+3. **Add real products to store** — still shows "Coming Soon"
+
+---
+
 *Last run: 2026-11-05 (10:31 AM)*
 
 ## Status: 🟢 Site Live + Canonical URL Fix on /digital

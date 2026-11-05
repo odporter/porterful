@@ -1,4 +1,59 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (10:31 AM)*
+
+## Status: 🟢 Site Live + Canonical URL Fix on /digital
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (2 new commits this run)
+- **0a34e82** docs: update IMPROVEMENTS.md for Nov 5 10:01 AM run
+- **2adf929** fix(seo): fix canonical URL on /digital page to avoid redirect chain
+  - /digital was pointing canonical at /music which redirects back to /digital, creating a redirect chain
+  - Now canonical correctly points to /digital as the canonical URL
+  - Also fixed og:url to point to /digital instead of /music
+
+### 3. SEO Fix: /digital Canonical URL Chain
+🔧 The /digital page (the actual music page) had its canonical URL pointing to /music, which redirects back to /digital. This creates a redirect chain that hurts SEO crawl efficiency.
+- Before: canonical = /music → redirect → /digital (chain)
+- After: canonical = /digital (direct)
+
+### 4. Known Issue: Live Site ISR Cache Mismatch
+🔴 Live site HTML (from curl) shows the OLD homepage structure:
+- "Four steps" section (old design pattern)
+- Skeleton loaders for Featured Artists and Featured Track
+- "First drop coming soon" Featured Products section
+- Live site uses old CSS class names: pf-reveal-group, pf-container
+- Local code has completely different structure (no "four steps", no skeleton loaders)
+- The deployed site appears to be running a different/older version than local main branch
+- GitHub push → Vercel auto-deploy seems to work (confirmed push success)
+- But Vercel ISR cache appears to serve stale HTML despite git pushes
+- Vercel CLI not logged in — `vercel --prod` fails ("No existing credentials")
+
+### 5. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org WebSite + Organization structured data
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Sitemap uses daily cache-busting query params
+
+### 6. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push triggers auto-deploy on Vercel (just pushed: 2adf929)
+- Run `vercel login` for direct CLI deploys
+
+### 7. Recommended Actions (Priority Order)
+1. **Force-redeploy via Vercel Dashboard** — dashboard has a "Redeploy" button that bypasses ISR cache
+2. **Login to Vercel CLI** — `vercel login` to enable `vercel --prod` for instant deploys
+3. **Investigate ISR cache mismatch** — deployed site HTML doesn't match local code
+4. **Add real artist photos** — avatar files are placeholders
+5. **Add real products to store** — still shows "Coming Soon"
+
+---
 *Last run: 2026-11-05 (10:01 AM)*
 
 ## Status: 🟢 Site Live + Git Push Auto-Deploy Triggered

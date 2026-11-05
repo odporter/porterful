@@ -1,4 +1,66 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (3:44 PM)*
+
+## Status: 🟢 Site Live + Skip-to-Content Accessibility Improvement
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+✅ /shop returning HTTP 200 (→ /store redirect working)
+✅ /artists returning HTTP 200
+✅ /music returning HTTP 200
+✅ /contact returning HTTP 200
+✅ /apply returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **48472a0** fix(a11y): add skip-to-content link for keyboard/screen reader users
+  - Adds skip link as first focusable element in DOM
+  - Visible on focus only (sr-only until tabbed to)
+  - Fixed positioning top-left, orange bg, white ring
+  - Wraps main content in focusable container (tabIndex=-1)
+  - Follows WCAG 2.1 SC 2.4.1 (Bypass Blocks)
+
+### 3. Fix Applied: Skip-to-Content Accessibility Link
+Keyboard and screen reader users previously had to tab through the entire navbar and mobile nav before reaching main content. Added a "Skip to content" link that:
+- Lives as the very first focusable element in the DOM
+- Hidden by default (sr-only class)
+- Appears prominently when focused (fixed top-left, orange bg, shadow)
+- Links to #main-content which wraps all page content
+- The main wrapper has tabIndex=-1 so it receives focus programmatically
+- Follows WCAG 2.1 Success Criterion 2.4.1 "Bypass Blocks"
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + Brand + SoftwareApplication on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering
+✅ Middleware handles /marketplace→/store and /store→/shop redirects
+✅ FAQPage schema (preserved through refactor)
+✅ Contact form has proper validation (subject required, message min 20 chars)
+✅ Music page search/filter inputs have aria-labels
+✅ FAQ accordion now has proper ARIA expanded/controls
+✅ Music page has clear button on search input
+✅ Artists page has clear button on search input
+✅ Skip-to-content link for keyboard/screen reader users (new this run)
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **No real artist photos** — avatar files are placeholders
+⚠️ /dashboard/* routes are auth-protected but redirect to /login (no auth UI yet)
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real artist photos** — avatar files are placeholders
+3. **Add real products to store** — still shows "Coming Soon"
+4. **Build auth UI** — /dashboard redirects to /login but no login page exists
+5. **Add more canonical URLs** — /apply, /brands, /resources need canonical alternates
+
+---
+
 *Last run: 2026-11-05 (2:12 PM)*
 
 ## Status: 🟢 Site Live + Artists Search UX Improvement

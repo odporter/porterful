@@ -138,6 +138,9 @@ const faqJsonLd = {
   ],
 }
 
+// Force dynamic rendering so homepage always shows fresh content (no stale ISR cache)
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Porterful — Music, Merch, and Direct Support',
   description: 'Music, merch, and direct support for independent artists. Upload your music, sell merch, and connect directly with fans.',

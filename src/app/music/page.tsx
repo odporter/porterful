@@ -2,8 +2,12 @@ import type { Metadata } from 'next'
 import MusicClient from './MusicClient'
 
 export const metadata: Metadata = {
-  title: 'Music',
-  description: 'Stream and buy music from independent artists. Support creators directly. MP3s, albums, and exclusive releases — 80% goes to artists.',
+  title: 'Music — Stream & Buy from Independent Artists | Porterful',
+  description: 'Stream and buy music directly from independent artists. No label, no middleman — 80% of every sale goes to the creator. Browse albums, singles, and EPs.',
+  keywords: ['buy music', 'independent artists', 'direct to fan', 'albums', 'EPs', 'singles', 'hip-hop', 'R&B', 'stream music', 'support artists', 'music downloads'],
+  alternates: {
+    canonical: 'https://porterful.com/music',
+  },
   openGraph: {
     title: 'Music | Porterful',
     description: 'Stream and buy music from independent artists. Support creators directly.',
@@ -24,9 +28,6 @@ export const metadata: Metadata = {
     title: 'Music | Porterful',
     description: 'Stream and buy music from independent artists. Support creators directly.',
     images: ['https://porterful.com/og-image.png'],
-  },
-  alternates: {
-    canonical: 'https://porterful.com/music',
   },
   robots: {
     index: true,

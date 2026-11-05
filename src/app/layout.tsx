@@ -62,6 +62,28 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 }
 
+function SkipLink() {
+  return (
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[var(--pf-orange)] focus:text-black focus:font-semibold focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
+    >
+      Skip to content
+    </a>
+  )
+}
+
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <SkipLink />
+      <main id="main-content" tabIndex={-1} className="outline-none">
+        {children}
+      </main>
+    </>
+  )
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -71,7 +93,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
         <Providers>
-          {children}
+          <LayoutContent>{children}</LayoutContent>
         </Providers>
       </body>
     </html>

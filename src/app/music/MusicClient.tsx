@@ -238,6 +238,7 @@ export default function MusicClient() {
                 placeholder="Search tracks…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search tracks"
                 className="pl-8 pr-8 py-2 w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 focus:ring-1 focus:ring-[var(--pf-orange)]/20 transition-all placeholder:text-[var(--pf-text-muted)]"
               />
             </div>
@@ -247,6 +248,7 @@ export default function MusicClient() {
               <select
                 value={selectedAlbum}
                 onChange={(e) => setSelectedAlbum(e.target.value)}
+                aria-label="Filter by album"
                 className="pl-8 pr-3 py-2 w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 appearance-none cursor-pointer"
               >
                 <option value="all">All albums</option>

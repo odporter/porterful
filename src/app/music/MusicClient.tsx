@@ -76,7 +76,7 @@ export default function MusicClient() {
   const formatPlays = (plays: number) => {
     if (!plays) return '0';
     if (plays >= 1000000) return `${(plays / 1000000).toFixed(1)}M`;
-    if (plays >= 1000) return `${(plays / 1000).toFixed(0)}K`;
+    if (plays >= 1000) return `${(plays / 1000).toFixed(1)}K`;
     return plays.toString();
   };
 

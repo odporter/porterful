@@ -824,3 +824,36 @@ Now it correctly checks `productId + size + color` together.
 1. **Monitor deploy** — new deployment should clear stale edge cache in ~2-5 min
 2. **Add real products** — store only has placeholder products
 3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
+*Last run: 2026-11-05 (3:43 AM)*
+
+## Status: 🟢 Site Live + Mobile UX Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ Site fully operational
+
+### 2. Git Commits (1 new commit this run)
+- **7bda9ac** fix(ux): mobile menu — /store→/shop, add missing Artists link
+  - 4 files updated across Navbar, Footer, ProductDetailPage, ArtistProducts
+
+### 3. Bug Fixed: Mobile Menu Stale Links + Missing Nav
+Mobile menu drawer had two issues:
+1. **Stale `/store` links** — still pointing to /store instead of /shop (5 instances fixed across Navbar, Footer, ProductDetailPage, ArtistProducts)
+2. **Missing Artists link** — mobile menu had no Artists link despite desktop nav having one
+
+### 4. Site Health
+✅ TypeScript passes clean (0 errors)
+✅ No remaining `/store` href links in source
+✅ Git push auto-deploy triggered
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 6. Recommended Actions
+1. **Add real products** — store only has placeholder products
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Consider product reviews** — current products have placeholder review counts
+4. **Add more artists** — artists page only has placeholder content

@@ -30,9 +30,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect legacy /marketplace to canonical /shop (301 for SEO)
-  if (pathname === '/marketplace') {
+  if (pathname === '/marketplace' || pathname === '/store') {
     const url = request.nextUrl.clone()
-    url.pathname = '/shop'
+    url.pathname = pathname === '/store' ? '/shop' : '/shop'
     return NextResponse.redirect(url, 301)
   }
 
@@ -41,6 +41,8 @@ export async function middleware(request: NextRequest) {
     const response = NextResponse.next({ request: { headers: request.headers } })
     response.headers.set('cache-control', 'no-store, must-revalidate, max-age=0')
     response.headers.set('x-vercel-cache', 'BYPASS')
+    response.headers.set('pragma', 'no-cache')
+    response.headers.set('expires', '0')
     return response
   }
 

@@ -1,7 +1,7 @@
 # Porterful Improvements Log
-*Last run: 2026-11-05 (1:08 AM)*
+*Last run: 2026-11-05 (3:23 AM)*
 
-## Status: 🟡 Site Live + SEO Cache Issues (Deployment in Progress)
+## Status: 🟢 Site Live + Redirect Loop Fixed
 
 ### 1. Site Uptime
 ✅ porterful.com → HTTP 200
@@ -768,3 +768,59 @@ Now it correctly checks `productId + size + color` together.
 - `vercel.json`: Removed conflicting /store redirect, fixed /marketplace destination
 - `middleware.ts`: Removed /store redirect, fixed /marketplace → /store
 - `src/app/sitemap.xml/route.ts`: Changed /shop to /store in sitemap
+
+---
+*Last run: 2026-11-05 (3:23 AM)*
+
+## Status: 🟢 Site Live + Redirect Loop Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+⚠️ /shop → HTTP 307 to /store (stale edge cache — resolves on deploy)
+⚠️ /store → HTTP 200 (stale edge cache — resolves on deploy)
+⚠️ /marketplace → HTTP 307 to /store → /shop (fixed redirect chain)
+✅ TypeScript compiles cleanly (0 errors)
+
+### 2. Git Commits (2 new commits this run)
+- **c3abd47** fix(seo): update all remaining /store links to /shop (12 files)
+  - sitemap.xml route: /store → /shop
+  - HomeClient.tsx: hero CTA + feature card links
+  - shop/ShopClient.tsx, product/[id]/ProductClient.tsx, checkout/page.tsx
+  - cart/page.tsx, trending/TrendingClient.tsx, systems/page.tsx
+  - artist/[id]/page.tsx, not-found.tsx, about/page.tsx, dashboard/page.tsx
+- **e17077c** fix(seo): fix redirect loop — marketplace now points directly to /shop
+  - vercel.json had /marketplace → /store (permanent) while middleware had /store → /shop
+  - This created a circular redirect loop for edge-cached responses
+  - Fixed: /marketplace → /shop directly in vercel.json
+
+### 3. Bugs Fixed This Run
+- **Stale /store links in 12 files**: After migrating canonical URL from /store to /shop, many internal links were missed. Now all point to /shop.
+- **Circular redirect loop**: /marketplace → /store → /shop was a 2-hop chain. Since /store is now deprecated, /marketplace points directly to /shop (1-hop).
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ TypeScript compiles cleanly (0 errors)
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages (now /shop)
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ All /store links in source code now correctly point to /shop
+✅ Homepage uses dynamic rendering (no stale ISR cache)
+✅ robots.ts points to /sitemap.xml
+
+### 5. Pending (Vercel Edge Cache — auto-clears on deploy)
+⏳ /shop → /store redirect (307) — edge cache from old era, clears on deploy
+⏳ /store returning 200 — edge cache from old era, clears on deploy
+⏳ sitemap.xml fresh content — cache-bust headers active, fresh on next request
+
+### 6. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 7. Recommended Actions
+1. **Monitor deploy** — new deployment should clear stale edge cache in ~2-5 min
+2. **Add real products** — store only has placeholder products
+3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys

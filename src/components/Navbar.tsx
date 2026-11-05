@@ -413,6 +413,9 @@ export function Navbar() {
       {/* Mobile Menu */}
       <div 
         id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
         className={`fixed left-0 right-0 bottom-0 z-[100] bg-[var(--pf-bg)] overflow-y-auto transition-all duration-300 rounded-t-2xl ${
           mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
         }`}

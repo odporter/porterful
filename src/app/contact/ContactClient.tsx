@@ -91,6 +91,7 @@ export default function ContactClient() {
               <label htmlFor="contact-subject" className="block text-sm font-medium mb-2">Subject</label>
               <select
                 id="contact-subject"
+                required
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] transition-colors"

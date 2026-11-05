@@ -1,8 +1,0 @@
-.env.local
-node_modules/
-.next/
-.git/
-*.tsbuildinfo
-.DS_Store
-coverage/
-.next.old/

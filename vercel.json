@@ -21,7 +21,7 @@
       ]
     },
     {
-      "source": "/sitemap.xml",
+      "source": "/sitemap-index.xml",
       "headers": [
         {
           "key": "Cache-Control",
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "source": "/sitemap.*",
+      "source": "/sitemap-index.*",
       "headers": [
         {
           "key": "Cache-Control",

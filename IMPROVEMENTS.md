@@ -1,4 +1,53 @@
 # Porterful Improvements Log
+*Last run: 2026-11-04 (9:48 PM)*
+
+## Status: 🟢 Site Live + SEO Canonical URLs Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 200
+✅ /store → HTTP 307 → /shop (middleware redirect working after deploy)
+✅ Build passes cleanly (0 errors) — 96 routes
+
+### 2. Git Commits (1 new commit this run)
+- **8dc80c1** fix(seo): update all canonical URLs from /store to /shop
+  - 6 files updated across shop, marketplace, product, and artists pages
+  - All structured data (OG, breadcrumb schema, hasOfferCatalog) now point to /shop
+
+### 3. Bug Fixed: Stale SEO Canonical URLs
+After migrating from /store to /shop, multiple pages still had canonical URLs pointing to the old /store path. This causes SEO dilution — Google sees two URLs with the same content. Fixed:
+- marketplace/layout.tsx: canonical + OG url → /shop
+- shop/layout.tsx: canonical → /shop
+- shop/page.tsx: canonical → /shop
+- product/[id]/ProductClient.tsx: breadcrumb schema → /shop
+- product/[id]/page.tsx: breadcrumb schema → /shop
+- artists/page.tsx: hasOfferCatalog url → /shop
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ /store now redirects to /shop (HTTP 307 via middleware after deploy)
+✅ Build passes cleanly (0 errors) — 96 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages (now all /shop)
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products now filtered from shop
+✅ All /store links in source code correctly point to /shop
+✅ Homepage now uses dynamic rendering (no more stale ISR cache)
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 6. Recommended Actions
+1. **Add real products** — store only has placeholder products
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Consider adding sitemap.xml** — helps search engines discover all shop/product pages
+4. **Add product reviews** — current products have placeholder review counts
+
+---
 *Last run: 2026-11-04 (8:43 PM)*
 
 ## Status: 🟢 Site Live + ISR Cache Fix Pushed

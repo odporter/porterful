@@ -1,0 +1,21 @@
+# Porterful robots.txt
+# https://porterful.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://porterful.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Disallow private/user paths
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /wallet/
+Disallow: /checkout/
+Disallow: /register/
+Disallow: /login/
+Disallow: /verify/

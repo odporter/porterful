@@ -19,7 +19,7 @@ const ARTISTS_JSON_LD = {
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Music & Merch',
-    url: 'https://porterful.com/store',
+    url: 'https://porterful.com/shop',
   },
 }
 

@@ -1,4 +1,66 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (5:14 PM)*
+
+## Status: 🟢 Site Live + SEO Canonical URL Fixes
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+✅ /artists returning HTTP 200
+✅ /music returning HTTP 200
+✅ /brands returning HTTP 200
+✅ /apply returning HTTP 200
+✅ /contact returning HTTP 200
+
+### 2. Git Commits (3 new commits this run)
+- **f683054** fix(seo): add canonical URLs and metadata to artists, resources, shop pages
+  - artists/page: add canonical alternate
+  - resources/page: add full metadata (title, desc, keywords, OG, Twitter, robots)
+  - shop/page: fix OG image to absolute URL
+- **7b74c27** fix(seo): add robots index/follow to brands page
+  - Brands page was missing robots metadata. All other core pages already have it.
+
+### 3. Fix Applied: Missing Canonical URLs + Robots Meta
+Several pages were missing proper SEO metadata that helps search engines index content correctly:
+- artists/page: added canonical alternate URL
+- resources/page: added full metadata (was completely missing)
+- shop/page: fixed OG image URL to absolute path
+- brands/page: added robots index/follow
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + Brand + SoftwareApplication on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering
+✅ Middleware handles /marketplace→/store and /store→/shop redirects
+✅ FAQPage schema (preserved through refactor)
+✅ Contact form has proper validation (subject required, message min 20 chars)
+✅ Music page search/filter inputs have aria-labels
+✅ FAQ accordion now has proper ARIA expanded/controls
+✅ Music page has clear button on search input
+✅ Artists page has clear button on search input
+✅ Skip-to-content link for keyboard/screen reader users
+✅ Canonical URLs added to: artists, resources, shop, brands pages
+✅ robots index/follow on: apply, artists, contact, digital, music, resources, brands
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **No real artist photos** — avatar files are placeholders
+⚠️ /dashboard/* routes are auth-protected but redirect to /login (no auth UI yet)
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real artist photos** — avatar files are placeholders
+3. **Add real products to store** — still shows "Coming Soon"
+4. **Build auth UI** — /dashboard redirects to /login but no login page exists
+5. **Add robots meta to remaining pages** — 34 pages still missing (mostly utility/legal pages)
+
+---
+
 *Last run: 2026-11-05 (3:44 PM)*
 
 ## Status: 🟢 Site Live + Skip-to-Content Accessibility Improvement

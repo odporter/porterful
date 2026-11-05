@@ -317,7 +317,19 @@ export default function MusicClient() {
                     >
                       {track.title}
                     </p>
-                    <p className="text-xs sm:text-sm text-[var(--pf-text-muted)] truncate">{track.artist}</p>
+                    {(() => {
+                      const artistSlug = ARTISTS.find(a => a.name === track.artist)?.slug
+                      return artistSlug ? (
+                        <Link 
+                          href={`/artist/${artistSlug}`}
+                          className="text-xs sm:text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] truncate transition-colors"
+                        >
+                          {track.artist}
+                        </Link>
+                      ) : (
+                        <p className="text-xs sm:text-sm text-[var(--pf-text-muted)] truncate">{track.artist}</p>
+                      )
+                    })()}
                   </div>
                   
                   {/* Album (hidden on mobile) */}

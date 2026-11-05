@@ -65,24 +65,33 @@ export default function MarketplacePage() {
     return () => clearInterval(interval)
   }, [loaded])
 
-  // Force light theme on this page only
+  // Force light theme on this page only (matches how theme system works — class-based)
   useEffect(() => {
     const html = document.documentElement
-    const originalTheme = html.getAttribute('data-theme') || 'dark'
 
-    html.setAttribute('data-theme', 'light')
-    html.classList.add('light')
+    // Save original theme class
+    const wasDark = html.classList.contains('dark')
+    const wasLight = html.classList.contains('light')
+    const originalTheme = wasDark ? 'dark' : wasLight ? 'light' : 'dark'
+
+    // Apply light theme
     html.classList.remove('dark')
+    html.classList.add('light')
+    html.style.colorScheme = 'light'
+    html.style.background = '#ffffff'
+
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff')
 
     return () => {
-      html.setAttribute('data-theme', originalTheme)
+      // Restore original theme
+      html.classList.remove('light')
       if (originalTheme === 'dark') {
         html.classList.add('dark')
-        html.classList.remove('light')
-      } else {
-        html.classList.add('light')
-        html.classList.remove('dark')
+        html.style.background = '#111111'
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#111111')
       }
+      html.style.colorScheme = originalTheme
     }
   }, [])
 

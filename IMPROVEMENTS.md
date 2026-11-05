@@ -1,13 +1,16 @@
 # Porterful Improvements Log
-*Last run: 2026-11-05 (12:04 PM)*
+*Last run: 2026-11-05 (1:08 PM)*
 
-## Status: 🟢 Site Live + FAQ A11y Improvement
+## Status: 🟢 Site Live + Music Search UX Improvement
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200
 
 ### 2. Git Commits (1 new commit this run)
-- **8f91290** fix(a11y): convert FAQ accordion to button-based with proper ARIA
+- **dd9c671** fix(ux): add clear button to music page search input
+  - X button appears when search has text, clears on click
+  - Improves mobile UX where keyboard dismiss is less obvious
+  - Consistent with shop page search behavior
   - Replaced native `<details>/<summary>` with button + div for full ARIA control
   - Added `aria-expanded` on toggle buttons so screen readers know open/closed state
   - Added `aria-controls` linking each button to its answer region

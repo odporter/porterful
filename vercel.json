@@ -100,7 +100,7 @@
   "redirects": [
     {
       "source": "/marketplace",
-      "destination": "/store",
+      "destination": "/shop",
       "permanent": true
     },
     {

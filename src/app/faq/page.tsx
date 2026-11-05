@@ -1,10 +1,29 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 
+type FAQ = { q: string; a: string };
+type Category = { title: string; faqs: FAQ[] };
+
 export default function FAQPage() {
-  const categories = [
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+  const toggleItem = (categoryIndex: number, faqIndex: number) => {
+    const key = `${categoryIndex}-${faqIndex}`;
+    setOpenItems(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const categories: Category[] = [
     {
       title: 'For Artists',
       faqs: [
@@ -85,26 +104,50 @@ export default function FAQPage() {
         {categories.map((category, i) => (
           <div key={i} className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-[var(--pf-orange)]">{category.title}</h2>
-            <div className="space-y-4">
-              {category.faqs.map((faq, j) => (
-                <details key={j} className="group bg-[var(--pf-surface)] rounded-lg border border-[var(--pf-border)]">
-                  <summary className="cursor-pointer p-4 font-semibold flex justify-between items-center">
-                    {faq.q}
-                    <span className="text-[var(--pf-orange)] group-open:rotate-180 transition-transform">▼</span>
-                  </summary>
-                  <div className="px-4 pb-4 text-[var(--pf-text-secondary)]">
-                    {faq.a}
+            <div className="space-y-3">
+              {category.faqs.map((faq, j) => {
+                const key = `${i}-${j}`;
+                const isOpen = openItems.has(key);
+                return (
+                  <div
+                    key={j}
+                    className="bg-[var(--pf-surface)] rounded-lg border border-[var(--pf-border)] overflow-hidden"
+                  >
+                    <button
+                      onClick={() => toggleItem(i, j)}
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-answer-${i}-${j}`}
+                      className="w-full cursor-pointer p-4 font-semibold flex justify-between items-center text-left gap-3 hover:text-[var(--pf-orange)] transition-colors"
+                    >
+                      <span>{faq.q}</span>
+                      <span
+                        className={`text-[var(--pf-orange)] shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                      >
+                        ▼
+                      </span>
+                    </button>
+                    <div
+                      id={`faq-answer-${i}-${j}`}
+                      role="region"
+                      aria-labelledby={`faq-question-${i}-${j}`}
+                      className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                    >
+                      <div className="px-4 pb-4 text-[var(--pf-text-secondary)]">
+                        {faq.a}
+                      </div>
+                    </div>
                   </div>
-                </details>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
 
         <div className="text-center mt-16 pt-8 border-t border-[var(--pf-border)]">
           <p className="text-[var(--pf-text-secondary)] mb-4">Still have questions?</p>
-          <Link 
-            href="/contact" 
+          <Link
+            href="/contact"
             className="inline-block bg-[var(--pf-orange)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--pf-orange-dark)] transition-colors"
           >
             Contact Us

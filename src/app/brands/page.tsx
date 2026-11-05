@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     images: ['https://porterful.com/og-image.png'],
   },
   alternates: { canonical: 'https://porterful.com/brands' },
+  robots: { index: true, follow: true },
 }
 
 const brands = [

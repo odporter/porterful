@@ -5,7 +5,7 @@ const PUBLIC_PATHS = [
   '/',
   '/music',
   '/artists',
-  '/store',
+  '/shop',
   '/tap',
   '/signal',
   '/tap-in',
@@ -29,10 +29,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Redirect /marketplace and /shop to canonical /store (301 for SEO)
-  if (pathname === '/marketplace' || pathname === '/shop') {
+  // Redirect legacy /marketplace to canonical /shop (301 for SEO)
+  if (pathname === '/marketplace') {
     const url = request.nextUrl.clone()
-    url.pathname = '/store'
+    url.pathname = '/shop'
+    return NextResponse.redirect(url, 301)
+  }
+
+  // Redirect legacy /store to canonical /shop (301 for SEO consolidation)
+  if (pathname === '/store') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/shop'
     return NextResponse.redirect(url, 301)
   }
 

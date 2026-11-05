@@ -31,7 +31,7 @@ export default function CartPage() {
               Looks like you haven't added anything yet.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/shop" className="pf-btn pf-btn-primary">
+              <Link href="/store" className="pf-btn pf-btn-primary">
                 Browse Products
               </Link>
               <Link href="/artists" className="pf-btn pf-btn-secondary">
@@ -181,7 +181,7 @@ export default function CartPage() {
                   Proceed to Checkout
                 </button>
 
-                <Link href="/shop" className="block text-center text-[var(--pf-text-secondary)] hover:text-white text-sm mt-4">
+                <Link href="/store" className="block text-center text-[var(--pf-text-secondary)] hover:text-white text-sm mt-4">
                   Continue Shopping
                 </Link>
               </div>

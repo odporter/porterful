@@ -244,7 +244,7 @@ export default function AboutPage() {
             <Link href="/music" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
               Browse Music
             </Link>
-            <Link href="/shop" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
+            <Link href="/store" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
               Shop Merch
             </Link>
           </div>

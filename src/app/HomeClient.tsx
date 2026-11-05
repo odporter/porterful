@@ -63,7 +63,7 @@ export function HomeClient() {
                     <span>Listen Now</span>
                   </Link>
                   <Link 
-                    href="/shop" 
+                    href="/store" 
                     className="pf-btn pf-btn-secondary text-base sm:text-lg px-6 py-3 flex items-center justify-center gap-2 min-h-[48px]"
                   >
                     <ShoppingCart size={20} />
@@ -396,7 +396,7 @@ export function HomeClient() {
               <p className="text-sm text-[var(--pf-text-secondary)]">Discover artists</p>
             </Link>
             
-            <Link href="/shop" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/store" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
                 <ShoppingCart size={24} className="text-[var(--pf-orange)]" />
               </div>

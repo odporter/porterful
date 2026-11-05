@@ -107,13 +107,22 @@ export default function ContactClient() {
             </div>
 
             <div>
-              <label htmlFor="contact-message" className="block text-sm font-medium mb-2">Message</label>
+              <label htmlFor="contact-message" className="block text-sm font-medium mb-2">Message <span className="text-[var(--pf-text-muted)] font-normal">(min. 20 characters)</span></label>
               <textarea
                 id="contact-message"
                 required
                 rows={5}
+                minLength={20}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                onInvalid={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  if (target.validity.valueMissing) {
+                    target.setCustomValidity('Please enter a message.');
+                  } else if (target.validity.tooShort) {
+                    target.setCustomValidity(`Please provide at least 20 characters (${target.value.length}/20 so far).`);
+                  }
+                }}
                 className="w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] transition-colors resize-none"
                 placeholder="Tell us more..."
               />

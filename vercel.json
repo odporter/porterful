@@ -99,11 +99,6 @@
   ],
   "redirects": [
     {
-      "source": "/store",
-      "destination": "/shop",
-      "permanent": true
-    },
-    {
       "source": "/marketplace",
       "destination": "/shop",
       "permanent": true

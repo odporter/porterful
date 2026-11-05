@@ -30,9 +30,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect legacy /marketplace to canonical /shop (301 for SEO)
-  if (pathname === '/marketplace' || pathname === '/store') {
+  // Note: /store → /shop redirect is handled in vercel.json (Edge-level, before middleware)
+  if (pathname === '/marketplace') {
     const url = request.nextUrl.clone()
-    url.pathname = pathname === '/store' ? '/shop' : '/shop'
+    url.pathname = '/shop'
     return NextResponse.redirect(url, 301)
   }
 

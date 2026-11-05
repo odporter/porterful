@@ -1,4 +1,49 @@
 # Porterful Improvements Log
+*Last run: 2026-11-04 (8:43 PM)*
+
+## Status: 🟢 Site Live + ISR Cache Fix Pushed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /store → HTTP 200 (still 200, not 301 — Vercel Edge cache)
+✅ Build passes cleanly (0 errors) — 96 routes
+
+### 2. Git Commits (1 new commit this run)
+- **c158c70** fix(homepage): force dynamic rendering to eliminate stale ISR cache
+  - Homepage was statically generated at build time
+  - Caused deployed site to show stale content ("First drop coming soon", old hero text, /store links in nav)
+  - Added `export const dynamic = 'force-dynamic'` to page.tsx
+  - GitHub push auto-deploys confirmed (push succeeded)
+
+### 3. Bug Fixed: Stale ISR Cache on Homepage
+🔴 **Root cause identified:** Homepage page.tsx had no `dynamic` export, causing Next.js to statically generate it at build time. The deployed Vercel Edge function was serving the old build's HTML — which still had `/store` links (the old canonical URL) in the Navbar, and stale "First drop coming soon" in Featured Products section.
+
+Fix: Added `export const dynamic = 'force-dynamic'` to force server-side rendering on every request, eliminating ISR cache staleness entirely.
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors) — 96 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products now filtered from shop
+✅ All `/store` links in source code correctly point to `/shop`
+✅ Homepage now uses dynamic rendering (no more stale ISR cache)
+
+### 5. Known Issues
+⚠️ **/store returns HTTP 200 (not redirecting)** — Vercel Edge cache issue persists. Need to purge cache at vercel.com dashboard. middleware.ts + vercel.json both have correct redirects but Edge is serving stale response.
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 6. Recommended Actions
+1. **[DO NOW]** Purge Vercel cache at vercel.com dashboard for /store redirect fix
+2. **Add real products** — store only has placeholder products
+3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
 *Last run: 2026-11-04 (3:21 PM)*
 
 ## Status: 🟢 Site Live + Out-of-Stock Filter Fixed

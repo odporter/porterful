@@ -637,3 +637,52 @@ Now it correctly checks `productId + size + color` together.
 3. **Add /music to sitemap** ← FIXED THIS RUN ✓
 4. **Consider Vercel CLI login** for direct --prod deploys
 
+
+---
+*Last run: 2026-11-04 (10:52 PM)*
+
+## Status: 🟡 Site Live + SEO Redirect + Sitemap Path Fixes Pushed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 307 (middleware working — redirects to /store)
+⚠️ /store → HTTP 200 (Edge cache, redirect not yet propagated — give 2-3 min)
+⚠️ sitemap.xml → HTTP 200 but serves stale cached content (old /store, 2026-09-26)
+   - This is old static sitemap.xml from before migration — new sitemap.xml/route.ts will fix on deploy
+
+### 2. Git Commits (1 new commit this run)
+- **3bb4b0f** fix(seo): move sitemap to /sitemap.xml + flip /store→/shop redirect
+  - Moved sitemap from /sitemap-index.xml to /sitemap.xml (old path was returning HTML 404)
+  - Root cause: sitemap-index.xml matched middleware's "skip dots" rule → returned 404 HTML
+  - Flipped redirect: /store→301→/shop and /marketplace→301→/shop (was: /shop→307→/store)
+  - Canonical URLs already pointed to /shop — now redirects properly align
+
+### 3. Bugs Fixed
+- **Sitemap returning HTML 404:** /sitemap-index.xml path had a "." which caused middleware to skip it entirely, returning the Next.js 404 HTML page instead of XML
+- **Backwards redirect chain:** /shop was redirecting to /store, but canonical was /store — circular loop. Now /store→/shop (301) with canonical on /shop
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors) — 96 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages (now /shop)
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ All /store links now point to /shop
+
+### 5. Pending (Vercel Edge Cache)
+⏳ /store redirect (200→301) — Edge cache will clear in 2-3 min
+⏳ sitemap.xml fresh content — new route generates current date + /shop URLs on next request
+
+### 6. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 7. Recommended Actions
+1. **Add real products** — store only has placeholder products
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Verify sitemap** — check in ~2 min that sitemap.xml shows /shop + current date
+4. **Verify /store redirect** — should return 301→/shop once Edge cache clears

@@ -1,4 +1,53 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (2:12 PM)*
+
+## Status: 🟢 Site Live + Artists Search UX Improvement
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+✅ /music returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **9f74f3d** fix(ux): add clear button to artists page search input
+  - X button appears when search has text, clears on click
+  - Consistent with music page search clear button behavior
+  - Improves mobile UX where keyboard dismiss is less obvious
+
+### 3. Fix Applied: Artists Page Search Clear Button
+The artists page search input lacked a clear button, unlike the music page which got one in the previous run. Added the same pattern:
+- X button appears when search has text
+- Clears on click
+- Consistent UX across music and artists pages
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering
+✅ Middleware handles /store→/shop and /marketplace→/shop redirects
+✅ FAQPage schema (preserved through refactor)
+✅ Contact form has proper validation (subject required, message min 20 chars)
+✅ Music page search/filter inputs have aria-labels
+✅ FAQ accordion now has proper ARIA expanded/controls
+✅ Music page has clear button on search input
+✅ Artists page has clear button on search input (new this run)
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **No real artist photos** — avatar files are placeholders
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real artist photos** — avatar files are placeholders
+3. **Add real products to store** — still shows "Coming Soon"
+
+---
+
 *Last run: 2026-11-05 (1:08 PM)*
 
 ## Status: 🟢 Site Live + Music Search UX Improvement

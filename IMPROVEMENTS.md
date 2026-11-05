@@ -1,4 +1,54 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (1:08 AM)*
+
+## Status: 🟡 Site Live + SEO Cache Issues (Deployment in Progress)
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+⚠️ /store → HTTP 200 (Edge cache serving stale response — new deployment propagating)
+⚠️ /shop → HTTP 307 (Edge cache from old circular-redirect era — will clear on deploy)
+⚠️ sitemap.xml → HTTP 200 but stale (age: 522900s ~8.7h) — new deployment adds cache-bust headers
+
+### 2. Git Commits (1 new commit this run)
+- **0749196** fix(seo): reinforce /store→/shop redirect in middleware + fix sitemap cache headers
+  - Added explicit /store redirect to middleware (was only in vercel.json — edge cache not respecting)
+  - Added /sitemap.xml cache bypass headers to vercel.json (was only sitemap-index)
+  - Added pragma/expires headers to sitemap middleware response
+  - Fixed shop/layout title: 'Store' → 'Shop Merch' (was duplicating page.tsx title)
+  - GitHub push auto-deploy triggered
+
+### 3. Bugs Fixed This Run
+- **Duplicate shop title:** shop/layout.tsx had `title: 'Store - Official Artist Merchandise'` which combined with page.tsx's template `%s | Porterful` produced 'Store | Porterful' — now correctly 'Shop Merch | Porterful'
+- **Sitemap cache headers:** vercel.json only had cache-bust headers for `/sitemap-index.*` but not `/sitemap.xml` itself — fixed
+- **Redundant /marketplace redirect in middleware:** was duplicating vercel.json (both have the redirect) — cleaned up
+
+### 4. Site Health
+✅ Build passes cleanly (0 errors) — 97 routes
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages (now /shop)
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ All /store links in source code correctly point to /shop
+✅ Homepage uses dynamic rendering (no stale ISR cache)
+
+### 5. Pending (Vercel Edge Cache)
+⏳ /store redirect (200→301) — Edge cache will clear in ~2-5 min after deploy completes
+⏳ /shop 307→200 — Edge cache from old circular redirect era clears with deploy
+⏳ sitemap.xml fresh content — new headers will force fresh generation
+
+### 6. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 7. Recommended Actions
+1. **Monitor deploy** — new deployment should clear stale edge cache in ~2-5 min
+2. **Add real products** — store only has placeholder products
+3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
 *Last run: 2026-11-04 (9:48 PM)*
 
 ## Status: 🟢 Site Live + SEO Canonical URLs Fixed

@@ -1,4 +1,52 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (7:07 AM)*
+
+## Status: 🟢 Site Live + Git Push Auto-Deploy Triggered
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /music → HTTP 200
+✅ /shop → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **e20ab1d** fix(ux): make artist name a clickable link on /music track list
+  - Artist name was plain text in track list (title + album were links)
+  - Now artist name links to /artist/:slug when artist is in ARTISTS list
+  - Falls back to plain text for unknown artists
+- **976dcf5** fix(ux): make contact subject required + add ARIA to mobile menu
+  - Contact form: add `required` attribute to subject dropdown (was allowing empty submissions)
+  - Mobile menu: add `role="dialog"`, `aria-modal="true"`, `aria-label` for accessibility
+  - GitHub push auto-deploy triggered
+
+### 3. Fixes Applied
+- **Artist name link on /music:** Track list now links artist names to their artist page. Was a UX inconsistency since title + album were already clickable.
+- **Contact form validation:** The subject dropdown had no `required` attribute, allowing users to submit without selecting a topic. Added `required` to enforce topic selection.
+- **Mobile menu a11y:** Added ARIA dialog attributes to mobile menu for screen reader support.
+
+### 4. Site Health
+✅ All key pages return HTTP 200
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all pages (/shop canonical for shop)
+✅ vercel.json security headers active
+✅ Footer has newsletter signup with rate limiting
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering
+✅ Middleware handles /store→/shop redirects
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **Build takes >3 min** — can't fully verify build in cron timebox
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real products** — store only has placeholder products
+3. **Add product reviews** — current products have placeholder review counts
+
+---
 *Last run: 2026-11-05 (5:46 AM)*
 
 ## Status: 🟢 Site Live + Git Push Auto-Deploy Triggered

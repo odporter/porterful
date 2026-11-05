@@ -58,6 +58,7 @@ export function ArtistsPageClient() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search artists..."
+              aria-label="Search artists"
               className="w-full py-3 pl-12 pr-4 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-[var(--pf-text)] placeholder-[var(--pf-text-muted)] focus:outline-none focus:border-[var(--pf-orange)]"
             />
           </div>
@@ -65,6 +66,7 @@ export function ArtistsPageClient() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort artists by"
               className="appearance-none py-3 pl-4 pr-10 bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl text-[var(--pf-text)] focus:outline-none focus:border-[var(--pf-orange)] cursor-pointer"
             >
               {SORT_OPTIONS.map(opt => (

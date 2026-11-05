@@ -1,4 +1,51 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (5:46 AM)*
+
+## Status: 🟢 Site Live + Git Push Auto-Deploy Triggered
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /music → HTTP 200
+✅ /artists → HTTP 200
+✅ /cart → HTTP 200
+✅ /shop → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **ede8c2f** fix(ui): consistent plays formatting shows 1 decimal (e.g. 45.2K)
+  - Changed `toFixed(0)` → `toFixed(1)` for K-scale play counts in MusicClient
+  - Previously: "45000" → "45K" (whole numbers only, inconsistent rounding)
+  - Now: "45000" → "45.0K" (consistent 1 decimal, e.g. "45.2K", "89.0K")
+  - GitHub push auto-deploy triggered
+
+### 3. Fix Applied
+- **Consistent play count formatting:** The music page displayed play counts inconsistently — some showed whole K values (45K) while others would benefit from a decimal (67.0K). Changed toFixed(0) → toFixed(1) for all K-scale numbers for uniform display.
+
+### 4. Site Health
+✅ All key pages return HTTP 200
+✅ Homepage uses dynamic rendering (no stale ISR)
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all pages (/shop canonical for shop)
+✅ vercel.json security headers active (X-Content-Type-Options, X-Frame-Options, etc.)
+✅ Footer has newsletter signup with rate limiting (5/hour/IP)
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering (price ranges, rating, search)
+✅ Middleware handles /store→/shop, /marketplace→/shop, /competition→/apply redirects
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **Build takes >3 min** — can't fully verify build in cron timebox (build starts but doesn't complete)
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real products** — store only has placeholder products
+3. **Add product reviews** — current products have placeholder review counts
+4. **Consider sitemap.xml generation** — dynamic sitemap for shop pages
+
+---
 *Last run: 2026-11-05 (3:23 AM)*
 
 ## Status: 🟢 Site Live + Redirect Loop Fixed

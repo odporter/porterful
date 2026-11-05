@@ -736,3 +736,35 @@ Now it correctly checks `productId + size + color` together.
 2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
 3. **Verify sitemap** — check in ~2 min that sitemap.xml shows /shop + current date
 4. **Verify /store redirect** — should return 301→/shop once Edge cache clears
+
+## Nov 5, 2026 - SEO & Redirect Fixes
+
+### Issues Found & Fixed
+
+1. **Redirect Loop: /shop → /store → /shop**
+   - Problem: /shop was redirecting to /store, but /store was being matched by middleware and redirecting back to /shop
+   - Root cause: Redirect was in BOTH vercel.json AND middleware, causing a loop
+   - Fix: Moved all /store redirects to vercel.json only (Edge-level, processed before Next.js)
+
+2. **Conflicting Redirects**
+   - /store redirect existed in both vercel.json AND middleware.ts
+   - Fixed by consolidating in vercel.json only
+
+3. **Sitemap Canonical URL Mismatch**
+   - Sitemap listed /shop but actual page is /store
+   - Fixed: Updated sitemap to use /store as canonical URL
+
+4. **Multi-hop Redirect Chain**
+   - /marketplace → /shop → /store (was 2 hops)
+   - Fixed: /marketplace → /store (direct, 1 hop)
+
+### Current Routing State
+- `/store` → 200 (actual shop content)
+- `/shop` → 307 → /store (legacy path, works)
+- `/marketplace` → 307 → /store (legacy path, works)
+- `/competition` → 307 → /apply (legacy path, works)
+
+### Files Changed
+- `vercel.json`: Removed conflicting /store redirect, fixed /marketplace destination
+- `middleware.ts`: Removed /store redirect, fixed /marketplace → /store
+- `src/app/sitemap.xml/route.ts`: Changed /shop to /store in sitemap

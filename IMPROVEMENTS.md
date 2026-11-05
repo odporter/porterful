@@ -1,4 +1,66 @@
 # Porterful Improvements Log
+*Last run: 2026-11-05 (5:44 PM)*
+
+## Status: 🟢 Site Live + Sitemap /music→/digital + Weekly Changefreq
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (2 new commits this run)
+- **0c6c8ca** fix(sitemap): update /music → /digital canonical URL
+  - Sitemap now lists /digital (the live music page) instead of /music
+  - /music redirects to /digital via middleware
+- **76984cb** fix(sitemap): align changefreq for digital + shop to weekly
+  - Both pages are content-rich but rarely change — weekly is more accurate
+  - Signals healthier update patterns to search engines
+
+### 3. Issue: Deployed Site Still Shows Cached /music in Sitemap
+🔴 GitHub push succeeded but live sitemap still returns `/music` instead of `/digital`
+- Vercel ISR cache is very sticky — even force-push + dateModified bump didn't trigger a fresh deploy
+- **Vercel CLI is not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy seems to be the only deploy path currently
+- Sitemap still lists `/music` (redirect target) instead of `/digital` (canonical music page)
+
+### 4. Sitemap SEO Fixes
+🎯 Two improvements to sitemap.xml:
+- Changed `/music` → `/digital` (the actual music page URL)
+- Changed changefreq "daily" → "weekly" for /digital and /shop (content rarely changes)
+
+### 5. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org WebSite + Organization + FAQPage structured data
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Middleware handles /shop and /marketplace → /store redirects
+✅ FAQPage schema (preserved through refactor)
+✅ Contact form has proper validation (subject required, message min 20 chars)
+✅ Music page search/filter inputs have aria-labels
+✅ FAQ accordion now has proper ARIA expanded/controls
+✅ Music page has clear button on search input
+✅ Artists page has clear button on search input
+✅ Skip-to-content link for keyboard/screen reader users
+✅ Canonical URLs added to: artists, resources, shop, brands pages
+✅ robots index/follow on: apply, artists, contact, digital, music, resources, brands
+
+### 6. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push is the only deploy trigger currently
+- Vercel ISR cache appears to persist even after git pushes
+- Run `vercel login` for direct `--prod` deploys (or use Vercel dashboard)
+
+### 7. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` to enable `vercel --prod` for instant deploys
+2. **Force-redeploy via Vercel Dashboard** — dashboard has a "Redeploy" button that bypasses ISR cache
+3. **Add real artist photos** — avatar files are placeholders
+4. **Add real products to store** — still shows "Coming Soon"
+5. **Build auth UI** — /dashboard redirects to /login but no login page exists
+
+---
+
 *Last run: 2026-11-05 (5:14 PM)*
 
 ## Status: 🟢 Site Live + SEO Canonical URL Fixes

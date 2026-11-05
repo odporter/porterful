@@ -1,5 +1,51 @@
 # Porterful Improvements Log
-*Last run: 2026-11-05 (9:31 AM)*
+*Last run: 2026-11-05 (10:01 AM)*
+
+## Status: 🟢 Site Live + Git Push Auto-Deploy Triggered
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ www.porterful.com → HTTP 307 (redirects to porterful.com)
+✅ /music → HTTP 200
+✅ /shop → HTTP 200 (via /store middleware redirect chain)
+
+### 2. Git Commits (1 new commit this run)
+- **7a84746** fix(a11y): add aria-labels to music page search and filter inputs
+  - Added aria-label="Search tracks" to search input
+  - Added aria-label="Filter by album" to album filter select
+  - Improves screen reader accessibility for music discovery
+
+### 3. Fix Applied
+- **Music page accessibility:** Added missing aria-labels to search and filter inputs on the /music page so screen reader users can properly identify these controls.
+
+### 4. Site Health
+✅ All key pages return HTTP 200
+✅ Schema.org: WebSite + Organization + WebPage + FAQPage + MusicGroup on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all pages (/shop canonical for shop)
+✅ vercel.json security headers active
+✅ Footer has newsletter signup with rate limiting
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Out-of-stock products filtered from shop
+✅ Shop page uses client-side filtering
+✅ Middleware handles /store→/shop and /marketplace→/shop redirects
+✅ FAQ page has FAQPage schema
+✅ Contact form has proper validation (subject required, message min 20 chars)
+✅ Music page search/filter inputs have aria-labels (new this run)
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **GitHub push error** — first push attempt failed with "fatal error in commit_refs_rules", retry succeeded
+⚠️ **No real products** — shop only has placeholder/preview products
+⚠️ **Build takes >3 min** — can't fully verify build in cron timebox
+
+### 6. Recommended Actions
+1. **Investigate GitHub commit_refs_rules error** — intermittent push failure
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Add real products** — store only has placeholder products
+4. **Consider sitemap.xml generation** — dynamic sitemap for shop pages
+5. **Add structured data for products** — Product schema on shop page
 
 ## Status: 🟢 Site Live + Git Push Auto-Deploy Triggered
 

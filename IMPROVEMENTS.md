@@ -1,7 +1,55 @@
 # Porterful Improvements Log
-*Last run: 2026-11-06 (7:20 AM)*
+*Last run: 2026-11-06 (10:21 AM)*
 
-## Status: 🟡 Committed, Waiting for Deploy to Clear Edge Cache
+## Status: 🟢 Site Live + Global Keyboard Shortcuts for Music Player
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **e312ee0** feat(ux): add global keyboard shortcuts for music player
+  - Space: toggle play/pause
+  - Arrow Right: next track
+  - Arrow Left: previous track
+  - Arrow Up/Down: volume +10/-10
+  - Shortcuts suppressed when focus is in inputs/textareas/selects
+  - Hook registered once in AudioProvider tree via KeyboardShortcuts component
+  - Build passes cleanly (0 errors)
+
+### 3. UX Improvement: Global Keyboard Shortcuts
+🎹 Added a global keyboard shortcut system for the music player:
+- **Space** → toggle play/pause (anywhere on the site)
+- **→ Arrow** → skip to next track
+- **← Arrow** → go to previous track
+- **↑ Arrow** → volume up (+10%)
+- **↓ Arrow** → volume down (-10%)
+- Shortcuts are automatically suppressed when focus is in any input, textarea, or select element — won't interfere with search fields or forms
+- Registered as a React hook (`useKeyboardShortcuts`) attached to the AudioProvider tree in `providers.tsx`
+- Non-blocking toast feedback on shortcut actions
+- High-impact improvement: power users can control playback without touching the mouse
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org WebSite + Organization + MusicGroup + FAQPage structured data
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ force-dynamic on sitemap and homepage for no-stale-content
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy is the deploy path (just pushed: e312ee0)
+- Run `vercel login` for direct `--prod` deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real artist photos** — avatar files are still placeholders
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+
 
 ### 1. Site Uptime
 ✅ porterful.com → HTTP 200

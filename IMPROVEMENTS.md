@@ -1,4 +1,51 @@
 # Porterful Improvements Log
+*Last run: 2026-11-06 (7:08 AM)*
+
+## Status: 🟢 Site Live + Plays Counter on Album Track List
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ Site fully operational
+
+### 2. Git Commits (1 new commit this run)
+- **b98d378** feat(album): show plays count next to duration on track list
+  - Display plays (e.g. '152K') in orange next to duration on each track row
+  - Uses compact notation (152K) for readability, full number via aria-label
+  - Only shows on sm+ screens to keep mobile row compact
+  - Improves music discovery by surfacing popular tracks
+
+### 3. UX Improvement: Album Track Plays Counter
+🎯 Album pages now show a plays count next to each track's duration:
+- Shows plays in compact notation: `152K` for 152,000, `45K` for 45,000, raw number below 1,000
+- Styled in orange with a small play icon, positioned between track title and duration
+- Hidden on mobile (sm:hidden) to keep compact track rows on small screens
+- `aria-label` includes full number for screen readers (e.g. "152,000 plays")
+- Fans can quickly spot popular tracks (e.g. "Make A Move" at 152K plays, "Oddysee" at 125K)
+- TypeScript passes cleanly, pushed to GitHub → Vercel auto-deploy triggered
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ TypeScript passes cleanly (0 errors)
+✅ Schema: WebSite + Organization + FAQPage + HowTo (4 schemas on homepage)
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy is the deploy path (just pushed: b98d378)
+- Run `vercel login` for direct `--prod` deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Add real artist photos** — avatar files are still placeholders
+2. **Add real products to store** — still shows "First drop coming soon"
+3. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+4. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+
+---
+
 *Last run: 2026-11-06 (6:05 AM)*
 
 ## Status: 🟢 Site Live + HowTo Schema Added

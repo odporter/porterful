@@ -1533,3 +1533,51 @@ Mobile menu drawer had two issues:
 2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
 3. **Consider product reviews** — current products have placeholder review counts
 4. **Add more artists** — artists page only has placeholder content
+
+---
+
+## Status: 🟡 Fixes Committed, Awaiting Auto-Deploy + Manual Prod Deploy
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 200
+✅ /digital → HTTP 307 → /radio (pre-existing, not our redirect)
+✅ /competition → HTTP 307 → /apply
+
+### 2. Git Commits (1 new commit this run)
+- **175a7cf** fix(middleware): consolidate to single src/middleware.ts
+  - Removed duplicate root middleware.ts (2 middleware files existed — one at `/middleware.ts`, one at `/src/middleware.ts`)
+  - Added /music → /digital 301 redirect to src/middleware.ts (was only in root file, which Vercel may not have been using)
+  - Added /competition → /apply 301 redirect to src/middleware.ts  
+  - Updated PUBLIC_PATHS to use /digital instead of /music
+  - Preserves sitemap bypass, auth protection, and all other redirects
+  - Reduces 69 lines of duplicate/conflicting code
+
+### 3. Issue Found: Duplicate Middleware Files
+⚠️ Two middleware.ts files existed — at project root AND in src/:
+  - `/middleware.ts` — had /music→/digital and /competition→/apply redirects
+  - `/src/middleware.ts` — had sitemap bypass + better auth + PUBLIC_PATHS (but missing /music redirect and had /music in PUBLIC_PATHS)
+  - Vercel was likely using only one — this caused /music to return 200 instead of redirecting
+
+### 4. Issue Found: Sitemap Still Lists /store
+🔴 Live sitemap at porterful.com/sitemap.xml still shows `<loc>https://porterful.com/store</loc>` instead of /shop
+  - Sitemap is statically generated (Next.js sitemap.ts) — needs a new build to update
+  - Auto-deploy from git push may not trigger a new build for sitemap
+  - **Needs manual `vercel --prod` deploy** OR update sitemap.ts to use /shop
+
+### 5. Site Health
+✅ TypeScript passes clean (0 errors)
+✅ Git push auto-deploy triggered
+✅ No duplicate middleware files remaining
+✅ All redirects now in single src/middleware.ts
+
+### 6. Recommended Actions
+1. **Login to Vercel CLI** — `vercel login` then `vercel --prod` to force a full rebuild (updates sitemap)
+2. **Update sitemap.ts** — change /store → /shop in the static sitemap to match middleware redirect
+3. **Add real products** — store only has placeholder products
+4. **Build auth UI** — /dashboard redirects to /login but no login page exists
+5. **Fill in Radio + Playlists** — these nav destinations exist but need real content
+
+### 7. Key Files Changed This Run
+- **DELETED:** `middleware.ts` (root — duplicate, 69 lines removed)
+- **MODIFIED:** `src/middleware.ts` (added /music→/digital + /competition→/apply redirects)

@@ -737,7 +737,7 @@ export default function MarketplacePage() {
 
                       {viewMode === 'list' && (
                         <p className="text-sm text-[var(--pf-text-secondary)] mt-2 line-clamp-2">
-                          Premium quality {product.category.toLowerCase()} with custom design. Perfect for everyday use.
+                          {(product as any).description || `Premium quality ${product.category.toLowerCase()} with custom design. Perfect for everyday use.`}
                         </p>
                       )}
 
@@ -816,7 +816,7 @@ function ProductSchema({ products }: { products: any[] }) {
         '@type': 'Product',
         name: product.name,
         image: product.images?.[0],
-        description: `${product.category} - ${product.subcategory || 'Premium quality merchandise'}`,
+        description: (product as any).description || `${product.category} - ${product.subcategory || 'Premium quality merchandise'}`,
         brand: { '@type': 'Brand', name: 'Porterful' },
         offers: {
           '@type': 'Offer',

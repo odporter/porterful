@@ -1,17 +1,47 @@
 // Extended Printful catalog - 100+ products
 // Real product images from Printful
 
-const getProductImage = (category: string, subcategory: string, index: number): string => {
-  // Real product image URLs based on category
-  const images: Record<string, string> = {
-    'Tech': 'https://printful-storage.s3.amazonaws.com/upload/final_product/71/159/mockup_159.png',
-    'Apparel': 'https://printful-storage.s3.amazonaws.com/upload/final_product/71/71/mockup_71.png',
-    'Home & Living': 'https://printful-storage.s3.amazonaws.com/upload/final_product/14/14/mockup_14.png',
-    'Art': 'https://printful-storage.s3.amazonaws.com/upload/final_product/69/69/mockup_69.png',
-    'Accessories': 'https://printful-storage.s3.amazonaws.com/upload/final_product/15/15/mockup_15.png',
-    'Music': 'https://images.unsplash.com/photo-1539185441755-7697f0f1e3ee?w=500',
-  }
-  return images[category] || images['Apparel']
+// Contextual descriptions per subcategory for SEO and UX
+const PRODUCT_DESCRIPTIONS: Record<string, string> = {
+  'Phone Cases': 'Drop-tested protection with a sleek custom design. Slim profile fits your phone perfectly without adding bulk.',
+  'T-Shirts': 'Premium heavyweight cotton with a relaxed fit. Made to last through countless washes while keeping its shape.',
+  'Hoodies': 'Ultra-soft fleece-lined comfort with a spacious kangaroo pocket. Your new favorite layer for any season.',
+  'Sweatshirts': 'Classic crewneck cut with brushed cotton interior. Warm, cozy, and built for everyday wear.',
+  'Long Sleeve': 'Essential layering piece in premium combed cotton. Perfect for transitional weather or casual layering.',
+  'Tank Tops': 'Lightweight and breathable for maximum range of motion. Ideal for workouts or hot summer days.',
+  'Youth': 'Designed for kids who demand comfort and durability. Fun graphics on soft, kid-friendly fabric.',
+  'Mugs': 'Ceramic mugs built for daily use. Whether it\'s your morning coffee or evening tea, these handle the heat.',
+  'Bags': 'Durable canvas totes and drawstring bags that go everywhere. Eco-friendly alternative to plastic.',
+  'Hats': 'Structured caps with an adjustable fit. Block the sun in style with custom embroidery.',
+  'Posters': 'Museum-quality matte finish on thick paper. Transform any room with high-resolution artwork.',
+  'Canvas': 'Gallery-wrapped canvas prints with vibrant, fade-resistant inks. Ready to hang straight out of the box.',
+  'Mouse Pads': 'Smooth micro-textured surface for precise tracking. Non-slip rubber base won\'t budge.',
+  'Stickers': 'Vinyl stickers with a weatherproof glossy finish. Stick them anywhere — laptops, water bottles, notebooks.',
+  'Pillows': 'Soft throw pillows with a hidden zipper closure. Indoor decor that actually feels comfortable.',
+  'Blankets': 'Cozy blankets in Sherpa fleece or woven cotton. Warm enough for cold nights, light enough for all seasons.',
+  'Aprons': 'Heavy-duty apron with an adjustable neck strap and roomy pockets. Built for real cooks.',
+  'Bottles': 'Insulated stainless steel keeps drinks cold for 24 hours or hot for 12. Leak-proof lid for on-the-go.',
+  'Towels': 'Ultra-absorbent quick-dry towels. Perfect for the beach, gym, or everyday use.',
+  'Vinyl': '180g audiophile-grade vinyl pressed on virgin black vinyl. Warm sound, analog soul.',
+  'CDs': 'Compact discs in jewel case or digipak packaging. The format that changed music, still going strong.',
+}
+
+// Per-product descriptions for SEO (overrides subcategory default)
+const PRODUCT_SPECIFIC_DESCRIPTIONS: Record<string, string> = {
+  'tshirt-vintage-black': 'Washed for a lived-in feel, this vintage black tee has that perfectly broken-in look from day one.',
+  'tshirt-premium-tri-blend': 'Made with 50% polyester, 25% cotton, 25% rayon for an impossibly soft hand feel and relaxed drape.',
+  'hoodie-zip-black': 'Full-zip design for easy on-and-off. Split kangaroo pockets and ribbed cuffs for a clean, athletic look.',
+  'mug-magic': 'Watch the color change when you add hot liquid. A fun conversation piece that\'s also dishwasher safe.',
+  'tote-natural': '100% natural unbleached cotton canvas. Strong enough for groceries, stylish enough for the farmers market.',
+  'sticker-pack-50': '50 mixed vinyl stickers featuring original artwork. Perfect for branding, giveaways, or decorating your gear.',
+  'canvas-24x36': 'Statement-piece size that transforms bare walls. Vibrant colors on a gallery-quality stretched frame.',
+  'bottle-17oz': 'Compact and portable — fits in most cup holders and backpack side pockets. Your new daily hydration companion.',
+}
+
+const getProductDescription = (product: any): string => {
+  return PRODUCT_SPECIFIC_DESCRIPTIONS[product.id] 
+    || PRODUCT_DESCRIPTIONS[product.subcategory || ''] 
+    || `Premium quality ${product.subcategory || product.category || 'product'} with custom design. 80% of every sale goes directly to independent artists.`
 }
 
 export const PRINTFUL_CATALOG = {
@@ -215,6 +245,7 @@ export const ALL_PRODUCTS = [
   images: (p as any).image 
     ? [(p as any).image]
     : [`https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500`],
+  description: getProductDescription(p),
   rating: 4.3 + (Math.random() * 0.7),
   reviews: Math.floor(Math.random() * 150) + 20,
   inStock: true,

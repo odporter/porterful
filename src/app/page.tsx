@@ -90,6 +90,41 @@ const jsonLd = {
   ],
 }
 
+// HowTo schema for Google rich results — mirrors the "How it works" 4-step section
+const howToJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to sell music and merch on Porterful',
+  description: 'A step-by-step guide for independent artists to upload music, build products, sell direct, and track results on Porterful.',
+  totalTime: 'PT0S',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Upload Your Music',
+      text: 'Drop your tracks. Set your price. Keep control of your catalog and rights.',
+      image: 'https://porterful.com/og-image.png',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Build Your Products',
+      text: 'Create merch from your music — t-shirts, vinyl, accessories, and digital bundles.',
+      image: 'https://porterful.com/og-image.png',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Sell Direct to Fans',
+      text: 'Your fans buy from you — no middleman, no platform lock-in. Your store, your rules.',
+      image: 'https://porterful.com/og-image.png',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Track Everything',
+      text: 'See what sells, where, and why. Use real data to grow smarter every day.',
+      image: 'https://porterful.com/og-image.png',
+    },
+  ],
+}
+
 // FAQ structured data for Google rich snippets
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -191,6 +226,10 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

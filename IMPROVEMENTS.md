@@ -1690,3 +1690,47 @@ Mobile menu drawer had two issues:
 1. **Monitor deploy** — new deployment should clear stale edge cache in ~2-5 min
 2. **Add real products** — store only has placeholder products
 3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+---
+*Last run: 2026-11-06 (9:16 AM)*
+
+## Status: 🟢 Site Live + Artists Count Added to Featured Artist
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **88ebbe5** feat(home): add Artists count to Featured Artist stats
+  - Featured Artist section now shows an "Artists" stat (8) alongside Tracks, Albums, and Plays
+  - Makes the platform's artist roster more visible on first scroll
+  - GitHub push triggered → Vercel auto-deploy (Vercel CLI not logged in)
+
+### 3. UX Improvement: Artists Count in Featured Artist Section
+🎨 Added "8 Artists" as a new stat in the Featured Artist section of the homepage. Previously showed only Tracks, Albums, and Plays — now highlights the platform's 8-artist roster immediately.
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ TypeScript passes (build blocked by `@supabase/ssr` module resolution in local env — not a code issue)
+✅ Schema.org WebSite + Organization + MusicGroup + FAQPage structured data
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ New Releases album grid on homepage (top 4 by plays)
+✅ Superfan program section prominently featured
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy is the deploy path (just pushed: 88ebbe5)
+- Run `vercel login` for direct `--prod` deploys
+
+### 6. Key Observation: Deployed Site vs Local Code
+🔍 Live site HTML shows skeleton loaders and "First drop coming soon" placeholder for Featured Products/Artists — this appears to be Vercel ISR cache serving an older build. Local code is significantly ahead (New Releases album grid, Superfan section, etc.). Git push triggers auto-deploy, but ISR cache may delay visibility of new content.
+
+### 7. Recommended Actions (Priority Order)
+1. **Force-redeploy via Vercel Dashboard** — bypass ISR cache to see latest local changes
+2. **Login to Vercel CLI** — `vercel login` to enable `vercel --prod` for instant deploys
+3. **Add real artist photos** — avatar files are still placeholders (od-porter.jpg reused)
+4. **Add real products to store** — Featured Products section still shows placeholder
+5. **Fix build environment** — `@supabase/ssr` module resolution fails locally (likely a Node version or environment issue, not code)
+

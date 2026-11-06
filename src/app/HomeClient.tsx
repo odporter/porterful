@@ -214,8 +214,62 @@ export function HomeClient() {
         </div>
       </section>
 
-      {/* Superfan Section */}
+      {/* New Releases */}
       <section className="py-16 md:py-24 bg-[var(--pf-bg)]">
+        <div className="pf-container">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold">New Releases</h2>
+              <p className="text-sm text-[var(--pf-text-secondary)] mt-1">Fresh drops you don&apos;t want to miss</p>
+            </div>
+            <Link href="/digital" className="text-[var(--pf-orange)] hover:underline text-sm font-medium shrink-0 ml-4">
+              Browse All →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {(() => {
+              const albumMap = new Map<string, { album: string; image: string; artist: string; plays: number; trackCount: number }>()
+              TRACKS.forEach(t => {
+                const existing = albumMap.get(t.album)
+                if (existing) {
+                  existing.plays += t.plays || 0
+                  existing.trackCount += 1
+                } else {
+                  albumMap.set(t.album, { album: t.album, image: t.image, artist: t.artist, plays: t.plays || 0, trackCount: 1 })
+                }
+              })
+              return [...albumMap.values()]
+                .sort((a, b) => b.plays - a.plays)
+                .slice(0, 4)
+                .map(a => (
+                  <Link
+                    key={a.album}
+                    href={`/album/${a.album.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="group block"
+                  >
+                    <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-[var(--pf-surface)]">
+                      <Image
+                        src={a.image}
+                        alt={a.album}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <Play size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="white" />
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">{a.album}</h3>
+                    <p className="text-xs text-[var(--pf-text-muted)] truncate">{a.artist} · {a.trackCount} tracks</p>
+                  </Link>
+                ))
+            })()}
+          </div>
+        </div>
+      </section>
+
+      {/* Superfan Section */}
+      <section className="py-16 md:py-24 bg-[var(--pf-bg-secondary)]">
         <div className="pf-container">
           <div className="max-w-4xl mx-auto">
             <div className="bg-gradient-to-br from-[var(--pf-orange)]/10 via-purple-500/5 to-[var(--pf-bg)] rounded-3xl p-8 md:p-12 border border-[var(--pf-border)]">

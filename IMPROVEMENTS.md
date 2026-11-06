@@ -1,13 +1,62 @@
 # Porterful Improvements Log
-*Last run: 2026-11-06 (10:21 AM)*
+*Last run: 2026-11-06 (11:26 AM)*
 
-## Status: 🟢 Site Live + Global Keyboard Shortcuts for Music Player
+## Status: 🟢 Site Live + Sticky Mobile Add-to-Cart Bar
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200
+✅ /land → HTTP 200 (Land Division landing page live)
 
 ### 2. Git Commits (1 new commit this run)
-- **e312ee0** feat(ux): add global keyboard shortcuts for music player
+- **355ce70** feat(ux): add sticky mobile 'Add to Cart' bar on product pages
+  - Fixed mobile UX: users no longer need to scroll up to add to cart
+  - Sticky bottom bar on mobile (md:hidden) with product name, price, and CTA
+  - Shows 'Added!' confirmation state with green styling
+  - Backdrop blur + shadow for visual polish
+  - 20px bottom spacer prevents content from being hidden behind bar
+  - Build passes cleanly (0 errors)
+
+### 3. UX Improvement: Sticky Mobile Add-to-Cart Bar
+📱 Product pages now have a sticky "Add to Cart" bar on mobile:
+- Appears at the bottom of the screen as you scroll down
+- Shows product name + price on the left, CTA button on the right
+- Button shows "Added!" with green confirmation state after tap
+- Uses backdrop-blur + shadow for a polished overlay effect
+- 20px bottom spacer keeps page content fully visible
+- High-impact mobile fix: eliminates frustrating scroll-to-top flow
+- Git push auto-deploy triggered to Vercel
+
+### 4. Sitemap SEO Issue — Stale /store URL Still in Live Sitemap
+🔴 Live sitemap at porterful.com/sitemap.xml still contains `<loc>https://porterful.com/store</loc>` (should be /shop)
+- The route.ts correctly generates /shop with cache-busting query params
+- The stale entry may be from an older static cache or redirect chain
+- A fresh Vercel deploy (via git push) should resolve this
+- Note: sitemap also has many old pages (/trending, /music, /brands, /signal, etc.) that no longer exist as separate routes — these are dead links from the old sitemap
+- Recommend: audit old sitemap entries vs actual routes and prune dead ones
+
+### 5. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo (5 schemas on homepage)
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ force-dynamic on sitemap and homepage for no-stale-content
+✅ Global keyboard shortcuts for music player (Space, arrows, volume)
+
+### 6. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy is the deploy path (just pushed: 355ce70)
+- Run `vercel login` for direct `--prod` deploys
+
+### 7. Recommended Actions (Priority Order)
+1. **Prune dead sitemap URLs** — /trending, /music, /brands, /signal and many others are in sitemap but return 404
+2. **Add real artist photos** — avatar files are still placeholders
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+5. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
   - Space: toggle play/pause
   - Arrow Right: next track
   - Arrow Left: previous track

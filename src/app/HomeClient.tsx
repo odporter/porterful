@@ -377,7 +377,11 @@ export function HomeClient() {
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-[var(--pf-orange)]">{formattedPlays}</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Plays</div>
+                    <div className="text-xs text-[var(--pf-text-muted)]">Total Plays</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[var(--pf-orange)]">8</div>
+                    <div className="text-xs text-[var(--pf-text-muted)]">Artists</div>
                   </div>
                 </div>
                 

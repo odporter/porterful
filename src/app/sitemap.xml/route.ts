@@ -3,62 +3,108 @@ import { NextResponse } from 'next/server'
 // Force dynamic — never ISR cached by Vercel Edge
 export const dynamic = 'force-dynamic'
 
-// Generate sitemap entries
-// Cache-busting strategy: each <loc> URL gets a daily query param (?d=YYYY-MM-DD)
-// Vercel Edge caches by exact URL, so a new date = new cache key = fresh response
-// The query param is stripped from canonical signals by search engines
-function generateSitemap(): Array<{url: string; lastMod: string; changeFreq: string; priority: number}> {
-  const baseUrl = 'https://porterful.com'
-  const today = new Date().toISOString().split('T')[0]
-  // Daily cache-busting suffix — creates unique edge cache key each day
-  const cacheBust = `?d=${today}`
+// Album slug mapping — mirrors album art filenames from data.ts ALBUM_ART
+const ALBUM_SLUGS = [
+  'ambiguous',
+  'from-feast-to-famine',
+  'god-is-good',
+  'one-day',
+  'streets-thought-i-left',
+  'roxannity',
+  'artgasm',
+  'levi',
+]
 
-  return [
-    { url: `${baseUrl}/`, lastMod: today, changeFreq: 'daily', priority: 1 },
-    { url: `${baseUrl}/digital${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/shop${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/artists${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/artist/od-porter${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/tap${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/radio${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/playlists${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/trending${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/superfan${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/brands${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/about${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/contact${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/faq${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/support${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/apply${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/land${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/signup${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/signup/superfan${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/terms${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/privacy${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/refund${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/dmca${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/moral-policy${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/press-kit${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/onboarding${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/challenge${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/resources${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/ecosystem${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/systems${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/cart${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/album/ambiguous${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/from-feast-to-famine${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/god-is-good${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/one-day${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/streets-thought-i-left${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/roxannity${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/artgasm${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/levi${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-  ]
+// All artist slugs
+const ARTIST_SLUGS = [
+  'od-porter',
+  'noble-naturals',
+  'stl-collective',
+  'jordan-may',
+  'sable',
+  'nyx',
+  'marcus-aurora',
+  'zara-cross',
+]
+
+// Generate sitemap entries — clean canonical URLs only (no query params in <loc>)
+function generateSitemap(): Array<{ url: string; lastMod: string; changeFreq: string; priority: number }> {
+  const base = 'https://porterful.com'
+  const today = new Date().toISOString().split('T')[0]
+
+  const entries: Array<{ url: string; lastMod: string; changeFreq: string; priority: number }> = []
+
+  // ── High-priority pages ──────────────────────────────────────────────
+  entries.push(
+    { url: `${base}/`, lastMod: today, changeFreq: 'daily', priority: 1.0 },
+    { url: `${base}/music`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${base}/shop`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${base}/store`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${base}/artists`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
+  )
+
+  // ── Artist detail pages ──────────────────────────────────────────────
+  for (const slug of ARTIST_SLUGS) {
+    entries.push({ url: `${base}/artist/${slug}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 })
+  }
+
+  // ── Album pages ──────────────────────────────────────────────────────
+  for (const slug of ALBUM_SLUGS) {
+    entries.push({ url: `${base}/album/${slug}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 })
+  }
+
+  // ── App / feature pages ──────────────────────────────────────────────
+  entries.push(
+    { url: `${base}/tap`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/radio`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/playlists`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/trending`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/superfan`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/learn`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/brands`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/competition`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+  )
+
+  // ── Dashboard pages (noindex in robots.txt but useful to have in sitemap) ──
+  entries.push(
+    { url: `${base}/dashboard`, lastMod: today, changeFreq: 'weekly', priority: 0.6 },
+    { url: `${base}/dashboard/artist`, lastMod: today, changeFreq: 'weekly', priority: 0.6 },
+    { url: `${base}/dashboard/upload`, lastMod: today, changeFreq: 'weekly', priority: 0.6 },
+    { url: `${base}/cart`, lastMod: today, changeFreq: 'weekly', priority: 0.6 },
+  )
+
+  // ── Marketing / static pages ─────────────────────────────────────────
+  entries.push(
+    { url: `${base}/about`, lastMod: today, changeFreq: 'monthly', priority: 0.7 },
+    { url: `${base}/contact`, lastMod: today, changeFreq: 'monthly', priority: 0.7 },
+    { url: `${base}/faq`, lastMod: today, changeFreq: 'monthly', priority: 0.7 },
+    { url: `${base}/support`, lastMod: today, changeFreq: 'monthly', priority: 0.7 },
+    { url: `${base}/apply`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/signup`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/signup/superfan`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${base}/land`, lastMod: today, changeFreq: 'monthly', priority: 0.6 },
+    { url: `${base}/resources`, lastMod: today, changeFreq: 'monthly', priority: 0.6 },
+    { url: `${base}/ecosystem`, lastMod: today, changeFreq: 'monthly', priority: 0.6 },
+    { url: `${base}/systems`, lastMod: today, changeFreq: 'monthly', priority: 0.6 },
+    { url: `${base}/challenge`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${base}/onboarding`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${base}/press-kit`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
+  )
+
+  // ── Legal pages ──────────────────────────────────────────────────────
+  entries.push(
+    { url: `${base}/terms`, lastMod: today, changeFreq: 'yearly', priority: 0.4 },
+    { url: `${base}/privacy`, lastMod: today, changeFreq: 'yearly', priority: 0.4 },
+    { url: `${base}/refund`, lastMod: today, changeFreq: 'yearly', priority: 0.4 },
+    { url: `${base}/dmca`, lastMod: today, changeFreq: 'yearly', priority: 0.4 },
+    { url: `${base}/moral-policy`, lastMod: today, changeFreq: 'yearly', priority: 0.4 },
+  )
+
+  return entries
 }
 
 export async function GET(): Promise<NextResponse> {
   const sitemap = generateSitemap()
-  // Full ISO 8601 timestamp for @generated (sitemaps.org spec)
   const generated = new Date().toISOString()
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -68,6 +114,7 @@ export async function GET(): Promise<NextResponse> {
   xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
 >
 <!-- Generated: ${generated} -->
+<!-- Porterful — Music, merch, and direct support for independent artists -->
 ${sitemap.map(entry => `  <url>
     <loc>${entry.url}</loc>
     <lastmod>${entry.lastMod}</lastmod>
@@ -79,9 +126,8 @@ ${sitemap.map(entry => `  <url>
   return new NextResponse(xml, {
     status: 200,
     headers: {
-      'Content-Type': 'application/xml',
-      // Aggressive cache-busting: no-cache forces revalidation on every request
-      // Vary: * prevents cached variants from being served
+      'Content-Type': 'application/xml; charset=utf-8',
+      // Prevent Vercel Edge caching so lastmod always reflects today
       'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0',

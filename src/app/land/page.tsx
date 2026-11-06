@@ -2,17 +2,19 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Map, ExternalLink, ChevronRight, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
+import { Map, ExternalLink, ChevronRight, ArrowRight, CheckCircle, Loader2, AlertCircle } from 'lucide-react'
 
 export default function LandPage() {
   const router = useRouter()
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
+    setSubmitError('')
     try {
       const lead = {
         email: form.email,
@@ -29,7 +31,7 @@ export default function LandPage() {
       if (!res.ok) throw new Error('Failed')
       setSubmitted(true)
     } catch {
-      // silently fail
+      setSubmitError('Something went wrong. Please try again.')
     }
     setSubmitting(false)
   }
@@ -68,7 +70,7 @@ export default function LandPage() {
           </div>
 
           {/* Name */}
-          <h2 className="text-2xl font-bold mb-1">National Land Data System™</h2>
+          <h2 className="text-2xl font-bold mb-1">National Land Data SystemTM</h2>
           <p className="text-gray-400 text-sm mb-4">Every parcel. Every opportunity.</p>
 
           {/* Description */}
@@ -78,7 +80,7 @@ export default function LandPage() {
 
           {/* Features */}
           <ul className="grid grid-cols-2 gap-2 mb-6">
-            {['30+ proprietary listings', '5-tier acquisition system', 'Automated deal drops (Mondays)', 'Parcel intelligence scoring', 'Group co-investment deals', '4-tier unlock ($5–$100)'].map(f => (
+            {['30+ proprietary listings', '5-tier acquisition system', 'Automated deal drops (Mondays)', 'Parcel intelligence scoring', 'Group co-investment deals', '4-tier unlock ($5-$100)'].map(f => (
               <li key={f} className="flex items-center gap-2 text-sm text-gray-400">
                 <span className="text-green-400 text-xs">✓</span>
                 {f}
@@ -112,24 +114,92 @@ export default function LandPage() {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-green-900/30 rounded-full mb-4">
                 <CheckCircle className="text-green-400" size={24} />
               </div>
-              <p className="text-green-400 font-bold">You’re on the list.</p>
-              <p className="text-gray-500 text-sm mt-2">We’ll be in touch when opportunities match your criteria.</p>
+              <p className="text-green-400 font-bold">You're on the list.</p>
+              <p className="text-gray-500 text-sm mt-2">We'll be in touch when opportunities match your criteria.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <div className="grid grid-cols-2 gap-4">
-                <input required type="text" placeholder="First Name" className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-800 focus:outline-none text-sm"
-                  value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} />
-                <input required type="text" placeholder="Last Name" className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-800 focus:outline-none text-sm"
-                  value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} />
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="firstName" className="text-xs font-medium text-gray-400 uppercase tracking-wider">First Name</label>
+                  <input
+                    id="firstName"
+                    required
+                    type="text"
+                    autoComplete="given-name"
+                    placeholder="First Name"
+                    className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-500 focus:ring-1 focus:ring-green-500/30 focus:outline-none text-sm"
+                    value={form.firstName}
+                    onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
+                    disabled={submitting}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="lastName" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Last Name</label>
+                  <input
+                    id="lastName"
+                    required
+                    type="text"
+                    autoComplete="family-name"
+                    placeholder="Last Name"
+                    className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-500 focus:ring-1 focus:ring-green-500/30 focus:outline-none text-sm"
+                    value={form.lastName}
+                    onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
+                    disabled={submitting}
+                  />
+                </div>
               </div>
-              <input required type="email" placeholder="Email" className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-800 focus:outline-none text-sm"
-                value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-              <input type="tel" placeholder="Phone (optional)" className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-800 focus:outline-none text-sm"
-                value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-              <textarea placeholder="What kind of land are you looking for? (state, acreage, budget...)" className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-800 focus:outline-none text-sm h-24 resize-none"
-                value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} />
-              <button type="submit" disabled={submitting} className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Email</label>
+                <input
+                  id="email"
+                  required
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-500 focus:ring-1 focus:ring-green-500/30 focus:outline-none text-sm"
+                  value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  disabled={submitting}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="phone" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Phone <span className="text-gray-600 normal-case">(optional)</span></label>
+                <input
+                  id="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-500 focus:ring-1 focus:ring-green-500/30 focus:outline-none text-sm"
+                  value={form.phone}
+                  onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                  disabled={submitting}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="message" className="text-xs font-medium text-gray-400 uppercase tracking-wider">What are you looking for?</label>
+                <textarea
+                  id="message"
+                  placeholder="State, acreage, budget, investment goals..."
+                  className="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:border-green-500 focus:ring-1 focus:ring-green-500/30 focus:outline-none text-sm h-24 resize-none"
+                  value={form.message}
+                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  disabled={submitting}
+                />
+              </div>
+
+              {submitError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm" role="alert">
+                  <AlertCircle size={14} />
+                  {submitError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
                 {submitting ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
                 {submitting ? 'Submitting...' : 'Join the List →'}
               </button>

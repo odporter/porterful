@@ -241,7 +241,7 @@ export default function AboutPage() {
             <Link href="/signup?role=artist" className="pf-btn pf-btn-primary text-lg px-8 py-4">
               Start as Artist
             </Link>
-            <Link href="/music" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
+            <Link href="/digital" className="pf-btn pf-btn-secondary text-lg px-8 py-4">
               Browse Music
             </Link>
             <Link href="/shop" className="pf-btn pf-btn-secondary text-lg px-8 py-4">

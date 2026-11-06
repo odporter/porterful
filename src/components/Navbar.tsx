@@ -242,7 +242,7 @@ export function Navbar() {
                 <PorterfulIcon name="shop" size={18} />
                 <span>Shop</span>
               </Link>
-              <Link href="/music" aria-label="Music" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
+              <Link href="/digital" aria-label="Music" className="flex items-center gap-2 px-4 py-2 rounded-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] transition-colors">
                 <PorterfulIcon name="music" size={18} />
                 <span>Music</span>
               </Link>
@@ -453,7 +453,7 @@ export function Navbar() {
               <PorterfulIcon name="shop" size={20} />
               <span>Shop</span>
             </Link>
-            <Link href="/music" aria-label="Music" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
+            <Link href="/digital" aria-label="Music" className="flex items-center gap-3 px-4 py-4 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:bg-[var(--pf-surface)] rounded-xl transition-colors" onClick={closeMobile}>
               <PorterfulIcon name="music" size={20} />
               <span>Music</span>
             </Link>

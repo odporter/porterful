@@ -191,7 +191,7 @@ export default function ProudToPayPage() {
                 </li>
               </ul>
               <Link 
-                href="/music"
+                href="/digital"
                 className="block w-full py-3 px-6 bg-purple-500 text-white rounded-xl font-medium text-center hover:bg-purple-600 transition-colors"
               >
                 Browse Albums

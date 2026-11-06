@@ -30,7 +30,7 @@ export default function NotFound() {
         <div className="mt-12 pt-8 border-t border-[var(--pf-border)]">
           <p className="text-sm text-[var(--pf-text-muted)] mb-4">Popular pages:</p>
           <div className="flex flex-wrap gap-2 justify-center">
-            <Link href="/music" className="text-sm text-[var(--pf-orange)] hover:underline">Music</Link>
+            <Link href="/digital" className="text-sm text-[var(--pf-orange)] hover:underline">Music</Link>
             <span className="text-[var(--pf-border)]">•</span>
             <Link href="/shop" className="text-sm text-[var(--pf-orange)] hover:underline">Merch</Link>
             <span className="text-[var(--pf-border)]">•</span>

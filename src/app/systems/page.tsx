@@ -351,7 +351,7 @@ export default function SystemsPage() {
           <h3 className="text-2xl font-bold mb-4">Ready to explore?</h3>
           <p className="text-[var(--pf-text-secondary)] mb-8">Dive into the ecosystem. Or start with music.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href="/music"
+            <a href="/digital"
               className="px-6 py-3 bg-[var(--pf-orange)] hover:bg-[var(--pf-orange)]/90 text-black font-medium rounded-full transition-colors">
               Start with Music
             </a>

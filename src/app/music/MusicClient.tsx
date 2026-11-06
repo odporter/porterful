@@ -269,6 +269,16 @@ export default function MusicClient() {
                 ))}
               </select>
             </div>
+            {/* Clear all filters */}
+            {(searchQuery || selectedAlbum !== 'all') && (
+              <button
+                onClick={() => { setSearchQuery(''); setSelectedAlbum('all'); }}
+                aria-label="Clear all filters"
+                className="px-3 py-2 text-sm text-[var(--pf-text-muted)] hover:text-[var(--pf-orange)] transition-colors whitespace-nowrap"
+              >
+                Clear all
+              </button>
+            )}
           </div>
         </div>
 
@@ -276,7 +286,15 @@ export default function MusicClient() {
         <div className="space-y-1">
           {filteredTracks.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-[var(--pf-text-muted)]">No tracks found matching your search.</p>
+              <p className="text-[var(--pf-text-muted)] mb-3">No tracks found matching your search.</p>
+              {(searchQuery || selectedAlbum !== 'all') && (
+                <button
+                  onClick={() => { setSearchQuery(''); setSelectedAlbum('all'); }}
+                  className="text-sm text-[var(--pf-orange)] hover:underline"
+                >
+                  Clear all filters
+                </button>
+              )}
             </div>
           ) : (
             filteredTracks.map(track => {

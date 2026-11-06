@@ -225,7 +225,7 @@ export default function UnlockPage() {
             <details className="bg-[var(--pf-surface)] rounded-lg p-4 border border-[var(--pf-border)]">
               <summary className="font-medium cursor-pointer">What if I only want one song?</summary>
               <p className="mt-2 text-[var(--pf-text-secondary)] text-sm">
-                You can buy individual songs for $1 each on the <Link href="/music" className="text-[var(--pf-orange)] hover:underline">Music page</Link>. Full Access is for listeners who want everything.
+                You can buy individual songs for $1 each on the <Link href="/digital" className="text-[var(--pf-orange)] hover:underline">Music page</Link>. Full Access is for listeners who want everything.
               </p>
             </details>
             <details className="bg-[var(--pf-surface)] rounded-lg p-4 border border-[var(--pf-border)]">

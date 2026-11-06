@@ -119,7 +119,7 @@ export function Footer() {
             <h3 className="font-semibold mb-4 text-[var(--pf-text)]">Platform</h3>
             <ul className="space-y-2">
               <li><Link href="/shop" aria-label="Shop" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Shop</Link></li>
-              <li><Link href="/music" aria-label="Music" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Music</Link></li>
+              <li><Link href="/digital" aria-label="Music" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Music</Link></li>
               <li><Link href="/radio" aria-label="Radio" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Radio</Link></li>
               <li><Link href="/playlists" aria-label="Playlists" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Playlists</Link></li>
               <li><Link href="/challenge" aria-label="10K Challenge" className="text-[var(--pf-orange)] hover:text-[var(--pf-orange)]/80 transition-colors text-sm font-medium">$10K Challenge →</Link></li>

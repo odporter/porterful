@@ -203,10 +203,10 @@ export default function PressKitPage() {
           </div>
         </div>
 
-        {/* Back to Blog */}
+        {/* Back to Resources */}
         <div className="mt-8 text-center">
-          <Link href="/blog" className="text-[var(--pf-orange)] hover:underline">
-            ← Back to Blog
+          <Link href="/resources" className="text-[var(--pf-orange)] hover:underline">
+            ← Back to Resources
           </Link>
         </div>
       </div>

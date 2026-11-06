@@ -206,7 +206,7 @@ export default function RadioClient() {
           <p className="text-[var(--pf-text-secondary)] mb-4">
             Want to own the music? Buy tracks to keep them forever.
           </p>
-          <Link href="/music" className="pf-btn pf-btn-primary inline-flex items-center gap-2">
+          <Link href="/digital" className="pf-btn pf-btn-primary inline-flex items-center gap-2">
             <ShoppingBag size={18} />
             Browse All Music
           </Link>

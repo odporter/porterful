@@ -56,7 +56,7 @@ export function HomeClient() {
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start mb-8">
                   <Link 
-                    href="/music" 
+                    href="/digital" 
                     className="pf-btn pf-btn-primary text-base sm:text-lg px-6 py-3 flex items-center justify-center gap-2 min-h-[48px]"
                   >
                     <Headphones size={20} />
@@ -332,7 +332,7 @@ export function HomeClient() {
                     <Users size={18} className="mr-2" />
                     Follow Artist
                   </Link>
-                  <Link href="/music" className="pf-btn pf-btn-secondary">
+                  <Link href="/digital" className="pf-btn pf-btn-secondary">
                     <Play size={18} className="mr-2" />
                     Play Music
                   </Link>
@@ -380,7 +380,7 @@ export function HomeClient() {
           </h2>
           
           <div className="grid sm:grid-cols-2 md:grid-cols-5 gap-4">
-            <Link href="/music" aria-label="Browse Music - Stream and buy tracks" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/digital" aria-label="Browse Music - Stream and buy tracks" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
                 <Music size={24} className="text-[var(--pf-orange)]" aria-hidden="true" />
               </div>
@@ -436,7 +436,7 @@ export function HomeClient() {
             <Link href="/signup?role=artist" className="px-8 py-4 bg-white text-[var(--pf-orange)] rounded-xl font-bold hover:bg-gray-100 transition-colors">
               Start as Artist
             </Link>
-            <Link href="/music" className="px-8 py-4 bg-white/10 text-white border border-white/30 rounded-xl font-bold hover:bg-white/20 transition-colors">
+            <Link href="/digital" className="px-8 py-4 bg-white/10 text-white border border-white/30 rounded-xl font-bold hover:bg-white/20 transition-colors">
               Browse Music
             </Link>
           </div>

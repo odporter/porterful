@@ -191,7 +191,7 @@ export default function AlbumClient({ albumName, albumImage, albumTracks, totalD
         {/* Back to Music */}
         <div className="mt-8 pt-8 border-t border-[var(--pf-border)]">
           <Link 
-            href="/music"
+            href="/digital"
             className="text-[var(--pf-orange)] hover:underline font-medium"
           >
             ← Back to all music

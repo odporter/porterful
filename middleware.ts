@@ -12,6 +12,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301) // permanent redirect for SEO
   }
   
+  if (pathname === '/music') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/digital'
+    return NextResponse.redirect(url, 301) // permanent redirect for SEO
+  }
+  
   if (pathname === '/competition') {
     const url = request.nextUrl.clone()
     url.pathname = '/apply'

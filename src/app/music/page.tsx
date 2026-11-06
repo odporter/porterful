@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Stream and buy music directly from independent artists. No label, no middleman — 80% of every sale goes to the creator. Browse albums, singles, and EPs.',
   keywords: ['buy music', 'independent artists', 'direct to fan', 'albums', 'EPs', 'singles', 'hip-hop', 'R&B', 'stream music', 'support artists', 'music downloads'],
   alternates: {
-    canonical: 'https://porterful.com/music',
+    canonical: 'https://porterful.com/digital',
   },
   openGraph: {
     title: 'Music | Porterful',

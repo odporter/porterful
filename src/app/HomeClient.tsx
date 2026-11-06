@@ -181,35 +181,35 @@ export function HomeClient() {
           </h2>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <article className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors" aria-label="Upload Your Music feature">
               <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <Music className="text-[var(--pf-orange)]" size={28} />
+                <Music className="text-[var(--pf-orange)]" size={28} aria-hidden="true" />
               </div>
               <h3 className="text-lg font-bold mb-2">Upload Your Music</h3>
               <p className="text-[var(--pf-text-secondary)] text-sm">
                 Upload tracks, set your price. Fans can buy individual songs or tip more to support.
               </p>
-            </div>
+            </article>
             
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <article className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors" aria-label="Sell Your Merch feature">
               <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <Package className="text-[var(--pf-orange)]" size={28} />
+                <Package className="text-[var(--pf-orange)]" size={28} aria-hidden="true" />
               </div>
               <h3 className="text-lg font-bold mb-2">Sell Your Merch</h3>
               <p className="text-[var(--pf-text-secondary)] text-sm">
                 Connect Printful or submit designs. We handle printing and shipping. You keep the profit.
               </p>
-            </div>
+            </article>
             
-            <div className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <article className="bg-[var(--pf-bg)] rounded-2xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors" aria-label="Earn 80% feature">
               <div className="w-14 h-14 rounded-xl bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4">
-                <DollarSign className="text-[var(--pf-orange)]" size={28} />
+                <DollarSign className="text-[var(--pf-orange)]" size={28} aria-hidden="true" />
               </div>
               <h3 className="text-lg font-bold mb-2">Earn 80%</h3>
               <p className="text-[var(--pf-text-secondary)] text-sm">
                 No label taking 90%. You keep 80% of every sale. Platform takes 10%, artists fund gets 10%.
               </p>
-            </div>
+            </article>
           </div>
         </div>
       </section>
@@ -380,41 +380,41 @@ export function HomeClient() {
           </h2>
           
           <div className="grid sm:grid-cols-2 md:grid-cols-5 gap-4">
-            <Link href="/music" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/music" aria-label="Browse Music - Stream and buy tracks" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Music size={24} className="text-[var(--pf-orange)]" />
+                <Music size={24} className="text-[var(--pf-orange)]" aria-hidden="true" />
               </div>
               <h3 className="font-bold mb-1">Music</h3>
               <p className="text-sm text-[var(--pf-text-secondary)]">Stream and buy tracks</p>
             </Link>
             
-            <Link href="/artists" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/artists" aria-label="Discover Artists - Find independent artists" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Users size={24} className="text-[var(--pf-orange)]" />
+                <Users size={24} className="text-[var(--pf-orange)]" aria-hidden="true" />
               </div>
               <h3 className="font-bold mb-1">Artists</h3>
               <p className="text-sm text-[var(--pf-text-secondary)]">Discover artists</p>
             </Link>
             
-            <Link href="/shop" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/shop" aria-label="Shop Store - Browse merch and products" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <ShoppingCart size={24} className="text-[var(--pf-orange)]" />
+                <ShoppingCart size={24} className="text-[var(--pf-orange)]" aria-hidden="true" />
               </div>
               <h3 className="font-bold mb-1">Store</h3>
               <p className="text-sm text-[var(--pf-text-secondary)]">Merch and products</p>
             </Link>
             
-            <Link href="/radio" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/radio" aria-label="Listen to Radio - 24/7 streaming" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Radio size={24} className="text-[var(--pf-orange)]" />
+                <Radio size={24} className="text-[var(--pf-orange)]" aria-hidden="true" />
               </div>
               <h3 className="font-bold mb-1">Radio</h3>
               <p className="text-sm text-[var(--pf-text-secondary)]">24/7 streaming</p>
             </Link>
             
-            <Link href="/playlists" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
+            <Link href="/playlists" aria-label="Browse Playlists - Curated music collections" className="group bg-[var(--pf-bg)] rounded-xl p-6 border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
               <div className="w-12 h-12 rounded-lg bg-[var(--pf-orange)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--pf-orange)]/20 transition-colors">
-                <Disc3 size={24} className="text-[var(--pf-orange)]" />
+                <Disc3 size={24} className="text-[var(--pf-orange)]" aria-hidden="true" />
               </div>
               <h3 className="font-bold mb-1">Playlists</h3>
               <p className="text-sm text-[var(--pf-text-secondary)]">Curated collections</p>

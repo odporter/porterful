@@ -1,5 +1,42 @@
 # Porterful Improvements Log
-*Last run: 2026-11-05 (5:44 PM)*
+*Last run: 2026-11-05 (7:50 PM)*
+
+## Status: 🟢 Site Live + Accessibility Improvements
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ Site fully operational
+
+### 2. Git Commits (1 new commit this run)
+- **4c5990c** fix(a11y): add aria-labels to homepage nav cards and feature cards
+  - 5 Explore Porterful navigation cards now have descriptive aria-labels
+  - Decorative icons marked aria-hidden to avoid screen reader noise
+  - 3 "For Artists" feature cards converted to `<article>` with aria-label
+  - Improves screen reader UX for homepage navigation
+
+### 3. Accessibility Improvements This Run
+- **Explore Porterful nav cards**: Added aria-labels like "Browse Music - Stream and buy tracks" to all 5 cards
+- **Feature card icons**: Added `aria-hidden="true"` to decorative Lucide icons
+- **Feature cards**: Converted from `<div>` to `<article>` with aria-label for proper semantics
+
+### 4. Site Health
+✅ TypeScript passes clean (0 errors)
+✅ No `/store` href links remaining in source
+✅ Git push auto-deploy triggered
+✅ All 5 Explore Porterful nav cards have accessible labels
+✅ Feature section icons properly hidden from screen readers
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+⚠️ **Radio + Playlists pages** — exist but may be placeholder content
+
+### 6. Recommended Actions
+1. **Add real products** — store only has placeholder products
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Fill in Radio + Playlists** — these nav destinations exist but need real content
+
+---
 
 ## Status: 🟢 Site Live + Sitemap /music→/digital + Weekly Changefreq
 

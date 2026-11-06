@@ -19,10 +19,13 @@ export function ArtistsPageClient() {
   const [sortBy, setSortBy] = useState('default')
   const [artists] = useState(ARTISTS)
 
+  // Normalize genre list (split by comma, trim each, lowercase for matching)
+  const genreList = (genre: string) => genre?.split(',').map(g => g.trim().toLowerCase()) ?? []
+
   // Filter and sort artists
   const filteredArtists = artists
     .filter(artist => {
-      const matchesGenre = activeGenre === 'All' || artist.genre?.toLowerCase().includes(activeGenre.toLowerCase())
+      const matchesGenre = activeGenre === 'All' || genreList(artist.genre).some(g => g.includes(activeGenre.toLowerCase()))
       const matchesSearch = !searchQuery ||
         artist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         artist.genre?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -90,7 +93,7 @@ export function ArtistsPageClient() {
         </div>
 
         {/* Genre Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
           {GENRES.map((genre) => (
             <button
               key={genre}
@@ -105,6 +108,19 @@ export function ArtistsPageClient() {
             </button>
           ))}
         </div>
+
+        {/* Results Count */}
+        <p role="status" aria-live="polite" className="text-center text-sm text-[var(--pf-text-muted)] mb-6">
+          Showing {filteredArtists.length} of {artists.length} artists
+          {(activeGenre !== 'All' || searchQuery) && (
+            <button
+              onClick={() => { setActiveGenre('All'); setSearchQuery(''); }}
+              className="ml-2 text-[var(--pf-orange)] hover:underline"
+            >
+              Clear filters
+            </button>
+          )}
+        </p>
 
         {/* Featured Artist */}
         {featuredArtist && (

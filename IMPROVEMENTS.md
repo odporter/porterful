@@ -1,18 +1,27 @@
 # Porterful Improvements Log
-*Last run: 2026-11-06 (7:08 AM)*
+*Last run: 2026-11-06 (7:20 AM)*
 
-## Status: 🟢 Site Live + Plays Counter on Album Track List
+## Status: 🟡 Committed, Waiting for Deploy to Clear Edge Cache
 
 ### 1. Site Uptime
 ✅ porterful.com → HTTP 200
-✅ Site fully operational
+✅ /shop → HTTP 200
+✅ /resources → HTTP 200
+✅ /apply → HTTP 200
 
 ### 2. Git Commits (1 new commit this run)
-- **b98d378** feat(album): show plays count next to duration on track list
-  - Display plays (e.g. '152K') in orange next to duration on each track row
-  - Uses compact notation (152K) for readability, full number via aria-label
-  - Only shows on sm+ screens to keep mobile row compact
-  - Improves music discovery by surfacing popular tracks
+- **950e273** fix(manifest): update shortcuts /music→/digital, /store→/shop
+  - PWA manifest shortcuts were pointing to stale /music and /store URLs
+  - Updated both shortcuts to use /digital and /shop respectively
+  - Git push auto-deploy triggered
+
+### 3. Issue: Sitemap Still Showing /store (Edge Cache)
+🔴 Live sitemap at porterful.com/sitemap.xml still shows `<loc>https://porterful.com/store</loc>` instead of /shop
+- age: 634K seconds (stale since before current vercel.json headers were added)
+- vercel.json has correct no-cache headers for /sitemap.xml (added previously)
+- The cached response predates those header changes — only a fresh deploy fixes it
+- Git push should trigger a new build, which will pick up vercel.json headers
+- After deploy, sitemap should generate with /shop and cache-busting query params
 
 ### 3. UX Improvement: Album Track Plays Counter
 🎯 Album pages now show a plays count next to each track's duration:
@@ -1666,13 +1675,18 @@ Mobile menu drawer had two issues:
 ✅ No duplicate middleware files remaining
 ✅ All redirects now in single src/middleware.ts
 
-### 6. Recommended Actions
-1. **Login to Vercel CLI** — `vercel login` then `vercel --prod` to force a full rebuild (updates sitemap)
-2. **Update sitemap.ts** — change /store → /shop in the static sitemap to match middleware redirect
-3. **Add real products** — store only has placeholder products
-4. **Build auth UI** — /dashboard redirects to /login but no login page exists
-5. **Fill in Radio + Playlists** — these nav destinations exist but need real content
+### 6. Pending (Vercel Edge Cache — auto-clears on deploy)
+⏳ sitemap.xml still shows /store — cached from before vercel.json cache headers were added (age: 634K+ seconds)
+  - vercel.json now has correct no-cache headers for /sitemap.xml
+  - sitemap.xml/route.ts generates /shop with cache-busting query params
+  - Only a new deployment will clear the stale edge cache
+  - Git push auto-deploy should resolve this within ~5 min
 
-### 7. Key Files Changed This Run
-- **DELETED:** `middleware.ts` (root — duplicate, 69 lines removed)
-- **MODIFIED:** `src/middleware.ts` (added /music→/digital + /competition→/apply redirects)
+### 7. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+
+### 8. Recommended Actions
+1. **Monitor deploy** — new deployment should clear stale edge cache in ~2-5 min
+2. **Add real products** — store only has placeholder products
+3. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys

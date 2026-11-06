@@ -11,6 +11,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://porterful.com'),
+  alternates: {
+    canonical: '/',
+  },
   title: {
     default: 'Porterful — Music, Merch, and Direct Support',
     template: '%s | Porterful',

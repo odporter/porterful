@@ -1,4 +1,52 @@
 # Porterful Improvements Log
+*Last run: 2026-11-06 (6:05 AM)*
+
+## Status: 🟢 Site Live + HowTo Schema Added
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ Site fully operational
+
+### 2. Git Commits (1 new commit this run)
+- **3b66dbd** feat(seo): add HowTo schema for Google rich results on homepage
+  - Added HowTo structured data (4 steps: Upload, Build, Sell, Track)
+  - Mirrors the "How it works" section on homepage exactly
+  - TypeScript passes cleanly
+  - Pushed to GitHub → Vercel auto-deploy triggered
+
+### 3. SEO Improvement: HowTo Schema for "How it Works" Section
+🎯 Google HowTo rich results show step-by-step guidance directly in search — perfect for the homepage's "How it works" section:
+- Step 1: Upload Your Music — "Drop your tracks. Set your price. Keep control."
+- Step 2: Build Your Products — "Create merch from your music."
+- Step 3: Sell Direct to Fans — "No middleman. Your store, your rules."
+- Step 4: Track Everything — "See what sells, where, and why."
+- Includes name, description, and image for each step
+- Homepage now has 3 JSON-LD schemas: HowTo + FAQPage + WebSite/Organization
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ TypeScript passes cleanly (0 errors)
+✅ Schema: WebSite + Organization + FAQPage + HowTo (4 schemas on homepage)
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Middleware handles /music→/digital, /store→/shop, /marketplace→/shop redirects
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy is the deploy path (just pushed: 3b66dbd)
+- Run `vercel login` for direct `--prod` deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for instant `--prod` deploys
+2. **Add real artist photos** — avatar files are still placeholders
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+
+---
+
 *Last run: 2026-11-06 (2:45 AM)*
 
 ## Status: 🟢 Site Live + SEO Redirect Fix (/marketplace & /store → /shop)

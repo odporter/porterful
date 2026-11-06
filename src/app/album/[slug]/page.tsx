@@ -34,13 +34,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const albumTracks = TRACKS.filter(t => t.album === album.name)
   const totalPlays = albumTracks.reduce((sum, t) => sum + (t.plays || 0), 0)
   
+  const canonicalUrl = `https://porterful.com/album/${slug}`
+
   return {
     title: `${album.name} by O D Porter`,
     description: `Stream and buy tracks from ${album.name} album. ${albumTracks.length} tracks. Total plays: ${totalPlays.toLocaleString()}.`,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `${album.name} | Porterful`,
       description: `${albumTracks.length} tracks • ${totalPlays.toLocaleString()} total plays`,
+      url: canonicalUrl,
       images: [{ url: album.image, width: 500, height: 500, alt: album.name }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${album.name} | Porterful`,
+      description: `${albumTracks.length} tracks • ${totalPlays.toLocaleString()} total plays`,
+      images: [album.image],
     },
   }
 }

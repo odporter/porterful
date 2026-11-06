@@ -159,10 +159,18 @@ export default function AlbumClient({ albumName, albumImage, albumTracks, totalD
                   </p>
                 </div>
                 
-                {/* Duration */}
-                <span className="text-sm text-[var(--pf-text-muted)]">
-                  {track.duration}
-                </span>
+                {/* Plays + Duration */}
+                <div className="flex items-center gap-3 text-sm text-[var(--pf-text-muted)]">
+                  {track.plays ? (
+                    <span className="hidden sm:flex items-center gap-1 text-[var(--pf-orange)]/70" aria-label={`${track.plays.toLocaleString()} plays`}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                      {track.plays >= 1000 ? `${(track.plays / 1000).toFixed(0)}K` : track.plays}
+                    </span>
+                  ) : null}
+                  <span>{track.duration}</span>
+                </div>
                 
                 {/* Price */}
                 <button

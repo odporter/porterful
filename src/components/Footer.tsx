@@ -118,13 +118,13 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4 text-[var(--pf-text)]">Platform</h3>
             <ul className="space-y-2">
-              <li><Link href="/shop" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Shop</Link></li>
-              <li><Link href="/music" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Music</Link></li>
-              <li><Link href="/radio" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Radio</Link></li>
-              <li><Link href="/playlists" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Playlists</Link></li>
-              <li><Link href="/challenge" className="text-[var(--pf-orange)] hover:text-[var(--pf-orange)]/80 transition-colors text-sm font-medium">$10K Challenge →</Link></li>
-              <li><Link href="/signup/superfan" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">⭐ Superfan Program</Link></li>
-              <li><Link href="/support" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Support Artists</Link></li>
+              <li><Link href="/shop" aria-label="Shop" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Shop</Link></li>
+              <li><Link href="/music" aria-label="Music" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Music</Link></li>
+              <li><Link href="/radio" aria-label="Radio" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Radio</Link></li>
+              <li><Link href="/playlists" aria-label="Playlists" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Playlists</Link></li>
+              <li><Link href="/challenge" aria-label="10K Challenge" className="text-[var(--pf-orange)] hover:text-[var(--pf-orange)]/80 transition-colors text-sm font-medium">$10K Challenge →</Link></li>
+              <li><Link href="/signup/superfan" aria-label="Superfan Program" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">⭐ Superfan Program</Link></li>
+              <li><Link href="/support" aria-label="Support Artists" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Support Artists</Link></li>
             </ul>
           </div>
 
@@ -132,10 +132,10 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4 text-[var(--pf-text)]">Sell</h3>
             <ul className="space-y-2">
-              <li><Link href="/dashboard/upload" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Upload Music</Link></li>
-              <li><Link href="/dashboard/add-product" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Add Merch</Link></li>
-              <li><Link href="/signup?role=artist" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Become an Artist</Link></li>
-              <li><Link href="/dashboard/artist" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Artist Dashboard</Link></li>
+              <li><Link href="/dashboard/upload" aria-label="Upload Music" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Upload Music</Link></li>
+              <li><Link href="/dashboard/add-product" aria-label="Add Merch" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Add Merch</Link></li>
+              <li><Link href="/signup?role=artist" aria-label="Become an Artist" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Become an Artist</Link></li>
+              <li><Link href="/dashboard/artist" aria-label="Artist Dashboard" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Artist Dashboard</Link></li>
             </ul>
           </div>
 
@@ -143,13 +143,13 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4 text-[var(--pf-text)]">Company</h3>
             <ul className="space-y-2">
-              <li><Link href="/about" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">About</Link></li>
-              <li><Link href="/faq" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">FAQ</Link></li>
-              <li><Link href="/contact" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Contact</Link></li>
-              <li><Link href="/resources" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Resources</Link></li>
-              <li><Link href="/ecosystem" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Ecosystem</Link></li>
-              <li><Link href="/terms" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Terms</Link></li>
-              <li><Link href="/privacy" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Privacy</Link></li>
+              <li><Link href="/about" aria-label="About" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">About</Link></li>
+              <li><Link href="/faq" aria-label="FAQ" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">FAQ</Link></li>
+              <li><Link href="/contact" aria-label="Contact" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Contact</Link></li>
+              <li><Link href="/resources" aria-label="Resources" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Resources</Link></li>
+              <li><Link href="/ecosystem" aria-label="Ecosystem" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Ecosystem</Link></li>
+              <li><Link href="/terms" aria-label="Terms" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Terms</Link></li>
+              <li><Link href="/privacy" aria-label="Privacy" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors text-sm">Privacy</Link></li>
             </ul>
           </div>
 

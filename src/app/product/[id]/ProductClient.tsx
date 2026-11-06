@@ -378,6 +378,42 @@ export default function ProductClient({ productId }: { productId: string }) {
           </div>
         </div>
       </div>
+
+      {/* Sticky Mobile "Add to Cart" Bar — visible on scroll past the main CTA */}
+      {(product as any).inStock && (
+        <div
+          aria-hidden="false"
+          className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--pf-surface)]/95 backdrop-blur-md border-t border-[var(--pf-border)] px-4 py-3 flex items-center gap-3 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[var(--pf-text)] truncate">{product.name}</p>
+            <p className="text-sm font-bold text-[var(--pf-orange)]">${sellingPrice.toFixed(2)}</p>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            disabled={added}
+            className={`shrink-0 flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-base transition-all active:scale-95 ${
+              added
+                ? 'bg-green-600 text-white shadow-lg shadow-green-500/30'
+                : 'bg-[var(--pf-orange)] text-white shadow-lg shadow-orange-500/30 hover:bg-[var(--pf-orange-dark)]'
+            }`}
+          >
+            {added ? (
+              <>
+                <Check size={18} />
+                Added!
+              </>
+            ) : (
+              <>
+                <ShoppingCart size={18} />
+                Add to Cart
+              </>
+            )}
+          </button>
+        </div>
+      )}
+      {/* Spacer for sticky bar on mobile so content isn't hidden behind it */}
+      <div className="h-20 md:hidden" aria-hidden="true" />
     </div>
   );
 }

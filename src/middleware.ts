@@ -3,7 +3,7 @@ import { createMiddlewareSupabaseClient } from '@/lib/supabase-auth'
 
 const PUBLIC_PATHS = [
   '/',
-  '/music',
+  '/digital',
   '/artists',
   '/shop',
   '/tap',
@@ -29,14 +29,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Redirect legacy /store and /marketplace to canonical /shop (301 for SEO)
+  // === Legacy URL redirects (301 for SEO) — BEFORE public path check ===
   if (pathname === '/store' || pathname === '/marketplace') {
     const url = request.nextUrl.clone()
     url.pathname = '/shop'
     return NextResponse.redirect(url, 301)
   }
 
-  // Force dynamic sitemap with no-store to bypass Vercel Edge ISR cache
+  if (pathname === '/music') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/digital'
+    return NextResponse.redirect(url, 301)
+  }
+
+  if (pathname === '/competition') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/apply'
+    return NextResponse.redirect(url, 301)
+  }
+
+  // === Force dynamic sitemap to bypass Vercel Edge ISR cache ===
   if (pathname === '/sitemap.xml') {
     const response = NextResponse.next({ request: { headers: request.headers } })
     response.headers.set('cache-control', 'no-store, must-revalidate, max-age=0')
@@ -52,7 +64,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protect dashboard and all sub-routes under (app)
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/api/auth/signup') || pathname.startsWith('/checkout') || pathname.startsWith('/artist') || pathname.startsWith('/superfan') || pathname.startsWith('/settings')) {
+  if (
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/api/auth/signup') ||
+    pathname.startsWith('/checkout') ||
+    pathname.startsWith('/artist') ||
+    pathname.startsWith('/superfan') ||
+    pathname.startsWith('/settings')
+  ) {
     // Use a single response object so that Supabase SSR can write refreshed
     // session cookies back to the browser. Passing a throwaway NextResponse.next()
     // causes the refreshed tokens to be silently discarded.

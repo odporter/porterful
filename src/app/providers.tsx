@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/Toast'
 import { WalletProvider } from '@/lib/wallet-context'
 import { AudioProvider } from '@/lib/audio-context'
 import { PayoutProvider } from '@/lib/payout-context'
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
 
 // --- Auth Session type (mirrors Supabase) ---
 interface SessionUser {
@@ -118,6 +119,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <CartProvider>
           <ToastProvider>
             <AudioProvider>
+              <KeyboardShortcuts />
               <PayoutProvider>
                 {children}
               </PayoutProvider>

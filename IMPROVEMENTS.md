@@ -1,5 +1,67 @@
 # Porterful Improvements Log
-*Last run: 2026-11-05 (7:50 PM)*
+*Last run: 2026-11-06 (12:36 AM)*
+
+## Status: 🟢 Site Live + Dead Link Fixes (/music → /digital)
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ Site fully operational
+
+### 2. Git Commits (1 new commit this run)
+- **2641842** fix(links): update /music → /digital across all pages
+  - 14 files changed, 38 insertions, 20 deletions
+  - Fixed 14 hardcoded `/music` links across the codebase
+  - Also fixed dead `/blog` link in press-kit → `/resources`
+
+### 3. Fixes Applied: Dead Link Elimination
+The music page URL was changed from `/music` → `/digital` (via middleware 301), but many internal links were still hardcoded to `/music`. This meant:
+- Every internal link triggered a 301 redirect (performance + UX penalty)
+- The `/blog` link in press-kit was completely broken (no blog exists)
+
+Fixed all hardcoded `/music` hrefs across:
+- HomeClient (4 links: nav card, artist hero, hero CTA, features CTA)
+- About page, Support page, Unlock page
+- Radio page, Systems page, Album page
+- Not-found page
+- Navbar, GlobalPlayer, Footer, TrackLockedToast
+
+Middleware 301 redirect preserved for external links/bookmarks.
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ TypeScript passes clean (0 errors)
+✅ No `/music` hrefs remaining in source (verified via grep)
+✅ No `/blog` dead links remaining in source
+✅ Schema.org: WebSite + Organization + MusicGroup on homepage
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Skip-to-content link for keyboard/screen reader users
+✅ FAQ accordion has proper ARIA expanded/controls
+✅ Contact form has proper validation
+✅ Music/digital page has clear button on search input
+✅ Artists page has clear button on search input
+✅ Canonical URLs on: artists, resources, shop, brands, contact, digital
+✅ robots index/follow on: apply, artists, contact, digital, music, resources, brands
+✅ Accessibility: aria-labels on nav cards, feature cards use `<article>`
+✅ Middleware handles: /store→/shop, /marketplace→/shop, /music→/digital
+
+### 5. Known Issues
+⚠️ **Vercel CLI not logged in** — `vercel --prod` fails, relying on git push auto-deploy
+⚠️ **No real products** — store only has placeholder/preview products
+⚠️ **No real artist photos** — avatar files are placeholders
+⚠️ /dashboard/* routes are auth-protected but redirect to /login (no auth UI yet)
+⚠️ **Radio + Playlists pages** — exist but may be placeholder content
+
+### 6. Recommended Actions
+1. **Add real products** — store only has placeholder products
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Fill in Radio + Playlists** — these nav destinations exist but need real content
+4. **Build auth UI** — /dashboard redirects to /login but no login page exists
+5. **Add real artist photos** — avatar files are placeholders
+
+---
 
 ## Status: 🟢 Site Live + Accessibility Improvements
 

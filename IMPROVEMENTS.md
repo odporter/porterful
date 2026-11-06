@@ -1839,15 +1839,24 @@ Mobile menu drawer had two issues:
 ### 1. Site Uptime
 ✅ porterful.com → HTTP 200
 
-### 2. Git Commits (1 new commit this run)
-- **f8bcced** feat(shop): add contextual product descriptions for SEO and UX
+### 2. Git Commits (2 new commits this run)
+- **88ebbe5** feat(homepage): add Artists count to Featured Artist stats section
+- **7062b9e** fix(sitemap): remove query params from \<loc\>, add missing pages, fix lastmod dates
   - Added PRODUCT_DESCRIPTIONS map with subcategory-level descriptions (Phone Cases, T-Shirts, Hoodies, Mugs, etc.)
   - Added PRODUCT_SPECIFIC_DESCRIPTIONS for unique per-product copy (8 specific products)
   - Updated ShopClient.tsx list view to show real descriptions instead of hardcoded "Premium quality..."
   - Updated ProductSchema JSON-LD to use real descriptions in Google Shopping structured data
   - All 100+ products now have contextual copy visible in list view and product schema
 
-### 3. UX Improvement: Real Product Descriptions
+### 3. Sitemap Fix Deployed
+🔧 Sitemap was generating URLs with `?d=YYYY-MM-DD` query params in `<loc>` — violates sitemap.org spec and can pollute canonical signals
+✅ Removed all query params from `<loc>` — sitemap now uses clean canonical URLs only
+✅ Added all missing pages: /music, /store, /learn, /competition, /dashboard, /dashboard/artist, /dashboard/upload, /cart
+✅ Added all 8 artist detail pages and 8 album pages (dynamically listed)
+✅ lastmod now dynamically reflects today's date instead of hardcoded 2026-09-26
+✅ Legal pages (terms, privacy, refund, dmca, moral-policy) set to `yearly` changefreq
+
+### 4. UX Improvement: Real Product Descriptions
 🎨 Products no longer show generic placeholder text. Every product now has:
   - Subcategory-level descriptions (e.g., "Drop-tested protection with a sleek custom design..." for phone cases)
   - Specific descriptions for standout products (vintage tees, magic mugs, sticker packs, etc.)
@@ -1868,4 +1877,4 @@ Mobile menu drawer had two issues:
 4. **Add OG video metadata** — homepage and /digital could use og:video for rich previews
 5. **Cart persistence** — consider adding a "Save Cart" email capture for abandoned carts
 ---
-*Last run: 2026-11-06 (12:28 PM)*
+*Last run: 2026-11-06 (12:52 PM)*

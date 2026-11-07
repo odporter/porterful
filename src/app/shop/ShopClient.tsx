@@ -231,12 +231,14 @@ export default function MarketplacePage() {
     setActiveMinRating(prev => prev === minRating ? null : minRating)
   }
 
-  // Clear all filters
+  // Clear all filters (search, category, sort, price ranges, rating)
   const clearFilters = () => {
     setActivePriceRanges([])
     setActiveMinRating(null)
     setSearch('')
+    setDebouncedSearch('')
     setSelectedCategory('all')
+    setSortBy('popular')
   }
 
   const hasActiveFilters = activePriceRanges.length > 0 || activeMinRating !== null
@@ -307,6 +309,7 @@ export default function MarketplacePage() {
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') {
                     setSearch('')
+                    setDebouncedSearch('')
                     setShowFilters(false)
                   }
                 }}

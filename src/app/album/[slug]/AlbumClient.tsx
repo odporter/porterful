@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useAudio } from '@/lib/audio-context';
 import { useCart } from '@/lib/cart-context';
 import { useToast } from '@/components/Toast';
+import { ARTISTS } from '@/lib/artists';
 import type { Track } from '@/lib/audio-context';
 
 interface AlbumClientProps {
@@ -21,6 +22,9 @@ export default function AlbumClient({ albumName, albumArtist, albumImage, albumT
   const { addItem } = useCart();
   const { showToast } = useToast();
   const [buyingAlbum, setBuyingAlbum] = useState(false);
+
+  // Look up the artist's slug dynamically from ARTISTS data
+  const artistSlug = ARTISTS.find(a => a.name === albumArtist || a.id === albumArtist)?.slug || 'od-porter';
 
   const handlePlayAll = () => {
     setQueue(albumTracks);
@@ -75,8 +79,8 @@ export default function AlbumClient({ albumName, albumArtist, albumImage, albumT
             <div className="flex-1">
               <p className="text-sm font-medium text-[var(--pf-orange)] uppercase tracking-wider mb-2">Album</p>
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{albumName}</h1>
-              <Link 
-                href="/artist/od-porter"
+              <Link
+                href={`/artist/${artistSlug}`}
                 className="inline-flex items-center gap-2 text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] transition-colors mb-4"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-sm font-semibold">

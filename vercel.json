@@ -23,122 +23,80 @@
     {
       "source": "/sitemap-index.xml",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
-        },
-        {
-          "key": "Pragma",
-          "value": "no-cache"
-        },
-        {
-          "key": "Expires",
-          "value": "0"
-        },
-        {
-          "key": "x-vercel-set-bypass-cache",
-          "value": "true"
-        },
-        {
-          "key": "x-vercel-cache",
-          "value": "BYPASS"
-        }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
       ]
     },
     {
       "source": "/sitemap-index.*",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
-        },
-        {
-          "key": "Pragma",
-          "value": "no-cache"
-        },
-        {
-          "key": "Expires",
-          "value": "0"
-        },
-        {
-          "key": "x-vercel-set-bypass-cache",
-          "value": "true"
-        },
-        {
-          "key": "x-vercel-cache",
-          "value": "BYPASS"
-        }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
       ]
     },
     {
       "source": "/sitemap.xml",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
-        },
-        {
-          "key": "Pragma",
-          "value": "no-cache"
-        },
-        {
-          "key": "Expires",
-          "value": "0"
-        },
-        {
-          "key": "x-vercel-set-bypass-cache",
-          "value": "true"
-        },
-        {
-          "key": "x-vercel-cache",
-          "value": "BYPASS"
-        }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
+      ]
+    },
+    {
+      "source": "/sitemap",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
+      ]
+    },
+    {
+      "source": "/(.*)-sitemap.xml",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
+      ]
+    },
+    {
+      "source": "/shop",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
       ]
     },
     {
       "source": "/marketplace",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
-        },
-        {
-          "key": "x-vercel-set-bypass-cache",
-          "value": "true"
-        },
-        {
-          "key": "x-vercel-cache",
-          "value": "BYPASS"
-        }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate" },
+        { "key": "x-vercel-set-bypass-cache", "value": "true" },
+        { "key": "x-vercel-cache", "value": "BYPASS" }
       ]
     }
   ],
   "redirects": [
-    {
-      "source": "/store",
-      "destination": "/shop",
-      "permanent": true
-    },
-    {
-      "source": "/marketplace",
-      "destination": "/shop",
-      "permanent": true
-    },
-    {
-      "source": "/competition",
-      "destination": "/apply",
-      "permanent": true
-    }
+    { "source": "/store", "destination": "/shop", "permanent": true },
+    { "source": "/marketplace", "destination": "/shop", "permanent": true },
+    { "source": "/competition", "destination": "/apply", "permanent": true }
   ],
   "rewrites": [
-    {
-      "source": "/signup",
-      "destination": "/signup/signup"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
+    { "source": "/signup", "destination": "/signup/signup" },
+    { "source": "/api/(.*)", "destination": "/api/$1" }
   ],
   "functions": {
     "src/app/(app)/media/[...path]/route.ts": {

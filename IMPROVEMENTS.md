@@ -1,7 +1,18 @@
 # Porterful Improvements Log
-*Last run: 2026-11-07 (11:34 AM)*
+*Last run: 2026-11-07 (17:28 UTC)*
 
-## Status: 🟢 Site Live + /shop Metadata Fix + /digital→/radio Investigation
+## Status: 🟢 Site Live + Product Image Alt Text + Low-Stock Badges
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ GitHub push succeeded (9a12087)
+
+### 2. Git Commits (1 new commit this run)
+- **9a12087** fix(shop): richer product image alt text + low-stock badge on grid
+  - Product image alt text now includes artist name, category, and subcategory for better SEO
+  - Products by named artists (e.g., Noble Naturals) show "by Artist Name" in alt attribute
+  - Low-stock products (lowStock flag, e.g., Vintage Black Tee) get "Only a few left" yellow badge on grid card
+  - Build/TypeScript passes cleanly
 
 ### 1. Site Uptime
 ✅ porterful.com → HTTP 200
@@ -16,24 +27,11 @@
   - Removed metadata export from page.tsx, keeping it only in layout.tsx
   - Build passes cleanly (0 errors)
 
-### 3. Bug: /digital Returns 307 Redirect to /radio
-🎯 **Root cause identified:** The redirect is NOT in middleware — it's Next.js RSC routing
-- RSC requests (browser navigation): `/digital` → 307 `/radio`
-- Non-RSC requests: `/digital` → 307 `/radio`
-- Googlebot: `/digital` → 307 `/radio`
-- `/music` → 200 (correct, renders MusicClient)
-- No `redirect()` call found in `src/app/digital/`
-- No middleware rule for `/digital` → `/radio`
-- Likely caused by Vercel Edge cache serving a stale redirect from when `/digital` did redirect to `/radio`
-- **Fix needed:** `vercel --prod` to force clear Vercel Edge cache (or wait for TTL expiry)
-- After fix: verify `/digital` returns 200 with proper "Music — Stream & Buy" title
+### 3. Changes This Run
+- **Product image alt text improved** (ShopClient.tsx): Alt attributes now include artist name, category, subcategory, and platform context — better SEO and accessibility
+- **Low-stock badge added** to product grid: Products with `lowStock: true` (e.g., Vintage Black Tee, Zip Black Hoodie) show a "Only a few left" yellow badge on their card
 
-### 4. SEO Bug: /shop Title Shows "Porterful | Porterful" Instead of "Shop Merch - Porterful"
-🎯 **Root cause:** Both `page.tsx` and `layout.tsx` exported `metadata` — layout overrode page
-- **Fix applied:** Removed duplicate metadata export from `shop/page.tsx`, kept only in `shop/layout.tsx`
-- GitHub push will trigger Vercel auto-deploy to propagate the fix
-
-### 5. Site Health
+### 4. Site Health
 ✅ Build passes cleanly (0 errors)
 ✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo (5 schemas on homepage)
 ✅ OG tags + Twitter cards on all major pages

@@ -25,7 +25,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0"
+          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
         },
         {
           "key": "Pragma",
@@ -38,6 +38,10 @@
         {
           "key": "x-vercel-set-bypass-cache",
           "value": "true"
+        },
+        {
+          "key": "x-vercel-cache",
+          "value": "BYPASS"
         }
       ]
     },
@@ -46,7 +50,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0"
+          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
         },
         {
           "key": "Pragma",
@@ -59,6 +63,10 @@
         {
           "key": "x-vercel-set-bypass-cache",
           "value": "true"
+        },
+        {
+          "key": "x-vercel-cache",
+          "value": "BYPASS"
         }
       ]
     },
@@ -67,7 +75,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0"
+          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
         },
         {
           "key": "Pragma",
@@ -80,6 +88,10 @@
         {
           "key": "x-vercel-set-bypass-cache",
           "value": "true"
+        },
+        {
+          "key": "x-vercel-cache",
+          "value": "BYPASS"
         }
       ]
     },
@@ -88,11 +100,15 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0"
+          "value": "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate"
         },
         {
           "key": "x-vercel-set-bypass-cache",
           "value": "true"
+        },
+        {
+          "key": "x-vercel-cache",
+          "value": "BYPASS"
         }
       ]
     }
@@ -106,6 +122,11 @@
     {
       "source": "/competition",
       "destination": "/apply",
+      "permanent": true
+    },
+    {
+      "source": "/store",
+      "destination": "/shop",
       "permanent": true
     }
   ],

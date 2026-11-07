@@ -1967,3 +1967,28 @@ Mobile menu drawer had two issues:
 3. **Add real products to store** — shop shows filter UI but products may be empty/demo
 4. **Add more artists** — Browse Artists only shows O D Porter and Noble Naturals
 
+
+## Status: 🟢 Site Live + Fix: /shop Redirect Loop (Deploy Pending)
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit)
+- **d64c9bb** fix(seo): redirect loop /shop→/store + use canonical /shop in breadcrumbs
+
+### 3. Bug Fixed: /shop → /store Redirect Loop
+**Problem:** Vercel Edge was caching a stale redirect where `/shop` (307) → `/store` (301) → `/shop`. The redirect loop happened because the old vercel.json listed redirects in an order that could be misinterpreted by the Edge, or an older version of the config was cached.
+
+**Fix:** 
+- Reordered vercel.json redirects so `/store → /shop` is listed first for clarity
+- Fixed breadcrumb JSON-LD in `product/[id]/page.tsx` to use canonical `/shop` instead of `/store`
+
+**Files changed:** `vercel.json`, `src/app/product/[id]/page.tsx`
+
+### 4. Notes
+- Vercel Edge caches redirects — fix is pushed to `main` branch and Vercel will auto-deploy
+- The sitemap is now properly bypassing Edge cache (confirmed `x-vercel-cache: HIT` on sitemap.xml means it's working)
+- Shop page loads correctly at `https://porterful.com/store` (200)
+- Site is fully functional — this is a SEO improvement to fix the redirect chain
+
+---

@@ -286,8 +286,9 @@ export default function CheckoutPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">First Name</label>
+                      <label htmlFor="checkout-first-name" className="block text-sm text-[var(--pf-text-muted)] mb-1">First Name</label>
                       <input 
+                        id="checkout-first-name"
                         type="text" 
                         autoComplete="given-name"
                         className={`w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] ${
@@ -303,8 +304,9 @@ export default function CheckoutPage() {
                       {shippingErrors.name && <p className="text-red-400 text-xs mt-1">{shippingErrors.name}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Last Name</label>
+                      <label htmlFor="checkout-last-name" className="block text-sm text-[var(--pf-text-muted)] mb-1">Last Name</label>
                       <input 
+                        id="checkout-last-name"
                         type="text" 
                         autoComplete="family-name"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none" 
@@ -315,8 +317,9 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Email</label>
+                    <label htmlFor="checkout-email" className="block text-sm text-[var(--pf-text-muted)] mb-1">Email</label>
                     <input 
+                      id="checkout-email"
                       type="email" 
                       autoComplete="email"
                       className={`w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] ${
@@ -332,8 +335,9 @@ export default function CheckoutPage() {
                     {shippingErrors.email && <p className="text-red-400 text-xs mt-1">{shippingErrors.email}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Address</label>
+                    <label htmlFor="checkout-address" className="block text-sm text-[var(--pf-text-muted)] mb-1">Address</label>
                     <input 
+                      id="checkout-address"
                       type="text" 
                       autoComplete="street-address"
                       className={`w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] ${
@@ -350,8 +354,9 @@ export default function CheckoutPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">City</label>
+                      <label htmlFor="checkout-city" className="block text-sm text-[var(--pf-text-muted)] mb-1">City</label>
                       <input 
+                        id="checkout-city"
                         type="text" 
                         autoComplete="address-level2"
                         className={`w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] ${
@@ -366,8 +371,9 @@ export default function CheckoutPage() {
                       {shippingErrors.city && <p className="text-red-400 text-xs mt-1">{shippingErrors.city}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">State</label>
+                      <label htmlFor="checkout-state" className="block text-sm text-[var(--pf-text-muted)] mb-1">State</label>
                       <input 
+                        id="checkout-state"
                         type="text" 
                         autoComplete="address-level1"
                         className={`w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--pf-orange)] ${
@@ -384,8 +390,9 @@ export default function CheckoutPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">ZIP Code</label>
+                      <label htmlFor="checkout-zip" className="block text-sm text-[var(--pf-text-muted)] mb-1">ZIP Code</label>
                       <input 
+                        id="checkout-zip"
                         type="text" 
                         autoComplete="postal-code"
                         inputMode="numeric"
@@ -401,8 +408,9 @@ export default function CheckoutPage() {
                       {shippingErrors.zip && <p className="text-red-400 text-xs mt-1">{shippingErrors.zip}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Country</label>
+                      <label htmlFor="checkout-country" className="block text-sm text-[var(--pf-text-muted)] mb-1">Country</label>
                       <select 
+                        id="checkout-country"
                         className="w-full bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg px-4 py-3 focus:border-[var(--pf-orange)] focus:outline-none"
                         value={shipping.country}
                         onChange={(e) => setShipping(s => ({ ...s, country: e.target.value }))}
@@ -464,9 +472,10 @@ export default function CheckoutPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Card Number</label>
+                    <label htmlFor="checkout-card-number" className="block text-sm text-[var(--pf-text-muted)] mb-1">Card Number</label>
                     <div className="relative">
                       <input 
+                        id="checkout-card-number"
                         type="text" 
                         inputMode="numeric"
                         autoComplete="cc-number"
@@ -492,8 +501,9 @@ export default function CheckoutPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">Expiry</label>
+                      <label htmlFor="checkout-expiry" className="block text-sm text-[var(--pf-text-muted)] mb-1">Expiry</label>
                       <input 
+                        id="checkout-expiry"
                         type="text" 
                         inputMode="numeric"
                         autoComplete="cc-exp"
@@ -515,8 +525,9 @@ export default function CheckoutPage() {
                       {errors.expiry && <p className="text-red-400 text-xs mt-1">{errors.expiry}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm text-[var(--pf-text-muted)] mb-1">CVC</label>
+                      <label htmlFor="checkout-cvc" className="block text-sm text-[var(--pf-text-muted)] mb-1">CVC</label>
                       <input 
+                        id="checkout-cvc"
                         type="text" 
                         inputMode="numeric"
                         autoComplete="cc-csc"

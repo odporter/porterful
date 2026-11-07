@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { useAudio } from '@/lib/audio-context'
 import { TRACKS, ALBUMS } from '@/lib/data'
+import { ARTISTS } from '@/lib/artists'
 import Link from 'next/link'
 import { ArtistLink } from '@/components/ArtistLink'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, MapPin, Music2 } from 'lucide-react'
 
 // Loading skeleton component
 function TrackSkeleton() {
@@ -522,15 +523,45 @@ export default function DigitalClient() {
               <div className="mb-8">
                 <h2 className="text-lg font-bold mb-4 text-[var(--pf-text)]">Artists</h2>
                 <Carousel>
-                  {artists.map(artist => (
-                    <Link key={artist} href={`/artist/${artist.toLowerCase().replace(/\s+/g, '-')}`} className="flex-shrink-0 w-40">
-                      <div className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-colors">
-                        <div className="aspect-square bg-gradient-to-br from-[var(--pf-orange)]/30 to-purple-600/30 flex items-center justify-center">
-                          <span className="text-4xl font-bold text-white/80">{artist.charAt(0)}</span>
+                  {ARTISTS.map(artist => (
+                    <Link key={artist.id} href={`/artist/${artist.id}`} className="flex-shrink-0 w-48">
+                      <div className="bg-[var(--pf-surface)] rounded-xl overflow-hidden border border-[var(--pf-border)] hover:border-[var(--pf-orange)] transition-all hover:shadow-lg hover:shadow-orange-500/10 group">
+                        {/* Artist Avatar */}
+                        <div className={`aspect-square bg-gradient-to-br ${artist.coverGradient} relative overflow-hidden`}>
+                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {artist.image && artist.image !== '/artist-images/od-porter.jpg' ? (
+                              <Image
+                                src={artist.image}
+                                alt={artist.name}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            ) : (
+                              <span className="text-5xl font-bold text-white/90">{artist.name.charAt(0)}</span>
+                            )}
+                          </div>
+                          {/* Verified badge */}
+                          {artist.verified && (
+                            <div className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </div>
+                          )}
                         </div>
+                        {/* Artist Info */}
                         <div className="p-3">
-                          <p className="font-medium text-[var(--pf-text)] truncate">{artist}</p>
-                          <p className="text-xs text-[var(--pf-text-secondary)]">{TRACKS.filter(t => t.artist === artist).length} tracks</p>
+                          <p className="font-semibold text-[var(--pf-text)] truncate group-hover:text-[var(--pf-orange)] transition-colors">{artist.name}</p>
+                          <p className="text-xs text-[var(--pf-text-secondary)] flex items-center gap-1 mt-0.5">
+                            <MapPin size={10} />
+                            {artist.location}
+                          </p>
+                          <p className="text-xs text-[var(--pf-text-muted)] mt-1 flex items-center gap-1">
+                            <Music2 size={10} />
+                            {artist.trackCount ?? TRACKS.filter(t => t.artist === artist.name).length} tracks
+                          </p>
                         </div>
                       </div>
                     </Link>

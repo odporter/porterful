@@ -16,6 +16,7 @@ export interface ArtistData {
   supporters: number | null
   earnings: number | null
   products: number
+  isFeatured?: boolean
   trackCount?: number
   social?: {
     instagram?: string
@@ -42,6 +43,7 @@ export const ARTISTS: ArtistData[] = [
     supporters: null,
     earnings: null,
     products: 12,
+    isFeatured: true,
     trackCount: TRACKS.filter(t => t.artist === 'O D Porter').length,
     social: {
       instagram: 'odporter',

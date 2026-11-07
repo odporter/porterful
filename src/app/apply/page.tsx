@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { Upload, Headphones, ShoppingCart, TrendingUp, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Apply as Artist',
+  title: 'Apply as Artist — Join Porterful',
   description: 'Join Porterful as an artist. Upload your music, sell merch, and keep 80% of every sale. No label, no middleman — direct from you to your fans.',
   openGraph: {
-    title: 'Apply as Artist',
-    description: 'Join Porterful as an artist. Keep 80% of every sale. No label, no middleman.',
+    title: 'Apply as Artist — Join Porterful',
+    description: 'Upload your music. Sell merch. Keep 80% of every sale. Direct to your fans, no middleman. Apply free as a founding beta artist.',
     url: 'https://porterful.com/apply',
     siteName: 'Porterful',
     locale: 'en_US',
@@ -16,18 +16,62 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Apply as Artist',
-    description: 'Join Porterful as an artist. Keep 80% of every sale. No label, no middleman.',
+    title: 'Apply as Artist — Join Porterful',
+    description: 'Upload your music. Sell merch. Keep 80% of every sale. No label, no middleman.',
     images: ['https://porterful.com/og-image.png'],
   },
   alternates: { canonical: 'https://porterful.com/apply' },
   robots: { index: true, follow: true },
 }
 
+const faqData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How much does it cost to join Porterful?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Free to join as a founding beta artist. No upfront fees.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does the 80% revenue share work?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'You keep 80% of every sale. Porterful takes 20% to keep the platform running.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What music formats do you support?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'MP3, WAV, FLAC, and AIFF. High-quality audio recommended.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I sell physical merch too?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes! Create t-shirts, vinyl records, posters, and more directly from your artist dashboard.',
+      },
+    },
+  ],
+}
+
 export default function ApplyPage() {
   return (
-    <div className="min-h-screen bg-[var(--pf-bg)] pt-24 pb-16">
-      <div className="max-w-4xl mx-auto px-6">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
+      />
+      <div className="min-h-screen bg-[var(--pf-bg)] pt-24 pb-16">
+        <div className="max-w-4xl mx-auto px-6">
         {/* Hero */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pf-orange)]/10 border border-[var(--pf-orange)]/30 rounded-full text-[var(--pf-orange)] text-sm font-medium mb-6">
@@ -119,6 +163,5 @@ export default function ApplyPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
-}

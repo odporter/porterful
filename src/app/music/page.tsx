@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Music | Porterful',
     description: 'Stream and buy music from independent artists. Support creators directly.',
-    url: 'https://porterful.com/music',
+    url: 'https://porterful.com/digital',
     siteName: 'Porterful',
     type: 'website',
     images: [

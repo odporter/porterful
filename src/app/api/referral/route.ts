@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server'
 import { REFERRAL_COOKIE, REFERRAL_COOKIE_MAX_AGE, getStoreUrl, normalizeReferralHandle } from '@/lib/referral'
 

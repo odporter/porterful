@@ -21,9 +21,9 @@ function generateSitemap(): Array<{ url: string; lastMod: string; changeFreq: st
   // ── High-priority pages ──────────────────────────────────────────────
   entries.push(
     { url: `${base}/`, lastMod: today, changeFreq: 'daily', priority: 1.0 },
-    { url: `${base}/music`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${base}/digital`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
     { url: `${base}/shop`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    // NOTE: /store is excluded — it permanently redirects to /shop (avoids duplicate canonical)
+    // NOTE: /store and /music are excluded — they permanently redirect (avoids duplicate canonical)
     { url: `${base}/artists`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
   )
 
@@ -46,7 +46,7 @@ function generateSitemap(): Array<{ url: string; lastMod: string; changeFreq: st
     { url: `${base}/superfan`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
     { url: `${base}/learn`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
     { url: `${base}/brands`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${base}/competition`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
+    // NOTE: /competition is excluded — it permanently redirects to /apply (avoids duplicate canonical)
   )
 
   // ── Dashboard pages (noindex in robots.txt but useful to have in sitemap) ──

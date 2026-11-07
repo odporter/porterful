@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // Zendrop API integration for dropshipping
 import { NextRequest, NextResponse } from 'next/server'
 

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server'
 import { allowTapRequest, insertTapEvent, getTapRequestIp, type TapEventType } from '@/lib/tap-server'
 import { cleanTapValue, normalizeTapSlug } from '@/lib/tap'

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { TRACKS, ALBUMS } from '@/lib/data';
 import { ALL_PRODUCTS as PRODUCTS } from '@/lib/products';

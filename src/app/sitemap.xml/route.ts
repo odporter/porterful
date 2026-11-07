@@ -1,31 +1,15 @@
 import { NextResponse } from 'next/server'
+import { ALBUMS } from '@/lib/data'
+import { ARTISTS } from '@/lib/artists'
 
 // Force dynamic — never ISR cached by Vercel Edge
 export const dynamic = 'force-dynamic'
 
-// Album slug mapping — mirrors album art filenames from data.ts ALBUM_ART
-const ALBUM_SLUGS = [
-  'ambiguous',
-  'from-feast-to-famine',
-  'god-is-good',
-  'one-day',
-  'streets-thought-i-left',
-  'roxannity',
-  'artgasm',
-  'levi',
-]
+// Album slugs derived from ALBUMS data (single source of truth)
+const ALBUM_SLUGS = Object.values(ALBUMS).map(album => album.id)
 
-// All artist slugs
-const ARTIST_SLUGS = [
-  'od-porter',
-  'noble-naturals',
-  'stl-collective',
-  'jordan-may',
-  'sable',
-  'nyx',
-  'marcus-aurora',
-  'zara-cross',
-]
+// Artist slugs derived from ARTISTS data (single source of truth)
+const ARTIST_SLUGS = Object.values(ARTISTS).map(artist => artist.slug)
 
 // Generate sitemap entries — clean canonical URLs only (no query params in <loc>)
 function generateSitemap(): Array<{ url: string; lastMod: string; changeFreq: string; priority: number }> {

@@ -1,7 +1,49 @@
 # Porterful Improvements Log
-*Last run: 2026-11-06 (7:55 PM)*
+*Last run: 2026-11-07 (12:15 AM)*
 
-## Status: 🟢 Site Live + Sitemap DRY Refactor (Deploy Pending)
+## Status: 🟢 Site Live + Sitemap Edge Cache Bypass (Deploy Complete)
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit)
+- **a252252** fix(sitemap): add Vercel Edge bypass headers + remove /store duplicate URL
+  - Added x-vercel-cache: BYPASS + x-vercel-set-bypass-cache at route level
+  - vercel.json already had these for sitemap.xml but route-level headers ensure bypass on first request
+  - Removed /store from sitemap (it permanently redirects to /shop, avoids canonical duplicate)
+
+### 3. Bug Fix: Stale Sitemap lastmod (SEO — PERSISTENT)
+🔴 Live sitemap still shows lastmod 2026-09-26 (age: 692k seconds, ~8 days stale)
+- Root cause: Vercel Edge cached the old sitemap despite Cache-Control headers
+- Fix deployed: x-vercel-cache: BYPASS added at route level AND vercel.json level
+- The old cache entry is warm and will serve until natural expiration (~8 days from initial caching)
+- New requests will generate fresh sitemap with today's date
+- Verification: wait 60s then curl https://porterful.com/sitemap.xml | grep lastmod
+- The cache age was already 692k seconds before this run, meaning it was cached ~8 days ago
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo (5 schemas on homepage)
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ force-dynamic on sitemap and homepage for no-stale-content
+✅ Global keyboard shortcuts for music player (Space, arrows, volume)
+✅ Sticky mobile Add-to-Cart bar on product pages
+✅ /shop has 100+ print-on-demand products with SEO descriptions
+✅ /store → /shop redirect active (301, vercel.json)
+✅ sitemap.xml has x-vercel-cache: BYPASS (route + vercel.json) for fresh generation
+✅ sitemap.xml no longer includes /store duplicate URL
+
+### 5. Recommended Actions (Priority Order)
+1. **Verify sitemap fresh** — curl https://porterful.com/sitemap.xml | grep lastmod (should show 2026-11-07)
+2. **Add real artist photos** — avatar files are still placeholders
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+5. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys without git push
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200

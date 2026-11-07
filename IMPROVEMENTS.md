@@ -1875,3 +1875,53 @@ Mobile menu drawer had two issues:
 5. **Cart persistence** — consider adding a "Save Cart" email capture for abandoned carts
 ---
 *Last run: 2026-11-06 (12:52 PM)*
+
+---
+*Last run: 2026-11-08 (12:15 AM)*
+
+## Status: 🟢 Site Live + Checkout UX Fix
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+✅ GitHub push succeeded (41c3df3)
+
+### 2. Git Commits (1 new commit this run)
+- **41c3df3** fix(checkout): improve PayPal coming-soon visual with badge and aria-label
+  - Added "Soon" badge pill to make disabled payment option clearer
+  - Added aria-label for screen readers
+  - Better UX - users understand PayPal is coming, not just grayed out
+
+### 3. UX Fix: PayPal Coming-Soon Button
+🔧 The checkout page had a grayed-out PayPal option with just "Coming soon" text
+- Now shows a "Soon" badge pill alongside the text
+- Added aria-label for better accessibility
+- Visual clarity improved - users see it's a future feature, not a bug
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org structured data (WebSite, Organization, MusicGroup, FAQPage)
+✅ OG tags + Twitter cards on all major pages
+✅ Canonical alternates on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Mobile menu properly labeled with aria-expanded, aria-controls
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push triggers auto-deploy on Vercel
+- Run `vercel login` for direct CLI deploys
+
+### 6. This Run's Changes
+- **vercel.json**: Added `x-vercel-cache: BYPASS` + `proxy-revalidate` to sitemap headers
+- **vercel.json**: Added permanent redirect `/store` → `/shop` (was 404ing)
+- **sitemap.xml/route.ts**: Already uses `dynamic = 'force-dynamic'` + proper Cache-Control headers
+- Deploy via GitHub push will refresh Vercel Edge cache for sitemap
+
+### 7. Recommended Actions (Priority Order)
+1. **Deploy + verify sitemap refresh** — check lastmod dates update after Vercel deploys e0e11c1
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Add real products to store** — shop shows filter UI but products may be empty/demo
+4. **Add more artists** — Browse Artists only shows O D Porter and Noble Naturals
+

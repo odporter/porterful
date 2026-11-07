@@ -1,44 +1,42 @@
 # Porterful Improvements Log
-*Last run: 2026-11-07 (5:48 AM)*
+*Last run: 2026-11-07 (8:05 AM)*
 
-## Status: 🟢 Site Live + Rich Artist Cards on /digital Artists Tab
+## Status: 🟢 Site Live + SEO: Sitemap Cache + /shop Headers Fix
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200
 
 ### 2. Git Commits (1 new commit this run)
-- **58ad800** feat(digital): rich artist cards on /digital Artists tab with verified badges and location
-  - Artist tab on /digital now uses full ARTISTS data instead of just track artist names
-  - Each card shows: gradient avatar background with artist's coverGradient, name, location with MapPin icon, track count, verified badge (blue checkmark) for verified artists
-  - Cards link to `/artist/${artist.id}` instead of `/artist/${artist.toLowerCase().replace(/\s+/g, '-')}` — matching the actual route
-  - Hover effect: orange border glow + shadow + text color shift
-  - Previously showed plain placeholder initials (e.g. "O" in orange gradient) for all artists
+- **65e435b** fix(seo): dedupe /shop headers, add sitemap index/glob cache-bust rules
+  - Removed duplicate /shop header entry in vercel.json (was listed twice)
+  - Added /sitemap header rule (covers /sitemap and sitemap-index variations)
+  - Added /(.*)-sitemap.xml header rule for all sitemap index files
+  - /sitemap-index.* was already covered by existing glob pattern
+  - vercel.json cleanup: condensed header arrays, removed redundant properties
+  - GitHub push triggered Vercel auto-deploy to clear stale Edge cache
 
-### 3. UX Improvement: Rich Artist Cards on /digital
-🎨 The Artists tab on /digital was showing placeholder cards with just the artist's first initial — a major missed opportunity since rich artist data exists in ARTISTS. Now:
-- Gradient backgrounds match each artist's `coverGradient` (orange→purple for O D Porter, emerald→teal for Noble Naturals, blue→indigo for STL Collective, etc.)
-- Verified artists (O D Porter) get a blue checkmark badge
-- Location shown under the name (e.g. "St. Louis, MO", "New Orleans, LA")
-- Track count uses artist.trackCount or falls back to TRACKS filter
-- Hover effects: border turns orange, subtle shadow, name turns orange
-- Links point to the correct artist ID route (`/artist/od-porter` not `/artist/o-d-porter`)
+### 3. SEO Fix: Sitemap + /shop Cache Headers
+🎨 Sitemap was serving stale lastmod dates (2026-09-26) despite route-level cache headers because Vercel Edge cached the pre-built static response. Same issue affected /shop which was being served from stale Edge cache.
+
+**Fixes applied:**
+- `/sitemap` header rule: covers /sitemap, /sitemap.xml, /sitemap-index.xml and any /(.*)-sitemap.xml files
+- `/shop` header: single deduped entry with full BYPASS cache headers  
+- vercel.json: removed duplicate /shop entry, added sitemap glob patterns, condensed arrays
 
 ### 4. Site Health
 ✅ HTTP 200 across all key pages
-✅ TypeScript + Build passes cleanly (0 errors)
+✅ Build passes cleanly (0 errors)
 ✅ Schema.org WebSite + Organization + MusicGroup + FAQPage structured data
 ✅ OG tags + Twitter cards on all major pages
 ✅ vercel.json security headers active
 ✅ Navbar has aria-labels on all interactive elements
 ✅ Cart has free shipping progress bar (threshold: $50)
-✅ Artist roster: 8 artists with distinct gradient themes
 ✅ Middleware handles /store, /marketplace → /shop and /music → /digital redirects
-✅ Sitemap uses cache-busting query params for fresh crawls
 ✅ force-dynamic on sitemap and homepage for no-stale-content
 
 ### 5. Vercel CLI Status
 🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
-- GitHub push → Vercel auto-deploy (just pushed: 58ad800)
+- GitHub push → Vercel auto-deploy (just pushed: 65e435b)
 - Run `vercel login` for direct `--prod` deploys
 
 ### 6. Recommended Actions (Priority Order)

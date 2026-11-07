@@ -37,15 +37,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const product = ALL_PRODUCTS.find(p => p.id === id)
-  // API computes: salePrice = basePrice * 1.3; compareAtPrice = salePrice * 1.3
-  const basePrice = product?.basePrice || 5
-  const sellingPrice = Math.round(basePrice * 1.3 * 100) / 100
-  const compareAtPrice = Math.round(sellingPrice * 1.3 * 100) / 100
-  
-  // Return 404 if product doesn't exist
+
+  // Return 404 before any computation that accesses product properties
   if (!product) {
     notFound()
   }
+
+  // API computes: salePrice = basePrice * 1.3; compareAtPrice = salePrice * 1.3
+  const basePrice = product.basePrice || 5
+  const sellingPrice = Math.round(basePrice * 1.3 * 100) / 100
 
   // Combined JSON-LD: Product + Breadcrumb in a single @graph array
   // (avoids multiple <script type="application/ld+json"> tags which can cause SEO parsing issues)

@@ -23,7 +23,7 @@ function generateSitemap(): Array<{ url: string; lastMod: string; changeFreq: st
     { url: `${base}/`, lastMod: today, changeFreq: 'daily', priority: 1.0 },
     { url: `${base}/music`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
     { url: `${base}/shop`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${base}/store`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
+    // NOTE: /store is excluded — it permanently redirects to /shop (avoids duplicate canonical)
     { url: `${base}/artists`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
   )
 
@@ -112,11 +112,14 @@ ${sitemap.map(entry => `  <url>
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
       // Prevent Vercel Edge caching so lastmod always reflects today
+      // x-vercel-cache headers must be set at the route level (not just vercel.json) to bypass Edge cache
       'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0',
       'Vary': '*',
       'X-Robots-Tag': 'index, follow',
+      'x-vercel-cache': 'BYPASS',
+      'x-vercel-set-bypass-cache': 'true',
     },
   })
 }

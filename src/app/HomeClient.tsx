@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Play, Headphones, Music, Star, Users, DollarSign, Upload, ShoppingCart, Package, Radio, Disc3, ArrowUp } from 'lucide-react';
 import { useSupabase } from '@/app/providers';
-import { TRACKS } from '@/lib/data';
+import { TRACKS, ALBUMS } from '@/lib/data';
 import { ARTISTS } from '@/lib/artists';
 import { ArtistSearch } from '@/components/ArtistSearch';
 
@@ -234,6 +234,7 @@ export function HomeClient() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {(() => {
+              // Build album map with plays from TRACKS for accurate play counts
               const albumMap = new Map<string, { album: string; image: string; artist: string; plays: number; trackCount: number }>()
               TRACKS.forEach(t => {
                 const existing = albumMap.get(t.album)
@@ -244,13 +245,22 @@ export function HomeClient() {
                   albumMap.set(t.album, { album: t.album, image: t.image, artist: t.artist, plays: t.plays || 0, trackCount: 1 })
                 }
               })
-              return [...albumMap.values()]
-                .sort((a, b) => b.plays - a.plays)
-                .slice(0, 4)
-                .map(a => (
+              // Sort by year descending (newest first), then by plays descending within same year
+              const albums = [...albumMap.values()].sort((a, b) => {
+                const yearA = ALBUMS[a.album.toLowerCase().replace(/\s+/g, '-')]?.year ?? 0
+                const yearB = ALBUMS[b.album.toLowerCase().replace(/\s+/g, '-')]?.year ?? 0
+                if (yearB !== yearA) return yearB - yearA
+                return b.plays - a.plays
+              })
+              return albums.slice(0, 4).map(a => {
+                const albumKey = a.album.toLowerCase().replace(/\s+/g, '-')
+                const albumData = ALBUMS[albumKey]
+                const year = albumData?.year ?? ''
+                const formattedPlays = a.plays >= 1000000 ? `${(a.plays / 1000000).toFixed(1)}M` : a.plays >= 1000 ? `${(a.plays / 1000).toFixed(0)}K` : a.plays
+                return (
                   <Link
                     key={a.album}
-                    href={`/album/${a.album.toLowerCase().replace(/\s+/g, '-')}`}
+                    href={`/album/${albumKey}`}
                     className="group block"
                   >
                     <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-[var(--pf-surface)]">
@@ -261,6 +271,17 @@ export function HomeClient() {
                         sizes="(max-width: 768px) 50vw, 25vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                      {/* Play count badge */}
+                      <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
+                        {formattedPlays} plays
+                      </div>
+                      {/* Year badge */}
+                      {year && (
+                        <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-[var(--pf-orange)] text-black text-xs font-bold">
+                          {year}
+                        </div>
+                      )}
+                      {/* Hover play overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                         <Play size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="white" />
                       </div>
@@ -268,7 +289,8 @@ export function HomeClient() {
                     <h3 className="font-semibold text-sm truncate group-hover:text-[var(--pf-orange)] transition-colors">{a.album}</h3>
                     <p className="text-xs text-[var(--pf-text-muted)] truncate">{a.artist} · {a.trackCount} tracks</p>
                   </Link>
-                ))
+                )
+              })
             })()}
           </div>
         </div>

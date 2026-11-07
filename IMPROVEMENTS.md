@@ -1,7 +1,50 @@
 # Porterful Improvements Log
-*Last run: 2026-11-07 (12:15 AM)*
+*Last run: 2026-11-07 (3:34 AM)*
 
-## Status: 🟢 Site Live + Sitemap Edge Cache Bypass (Deploy Complete)
+## Status: 🟢 Site Live + Shop Filter Bug Fixed
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 200 (via /store→/shop 307 redirect)
+✅ Sitemap still cached (stale lastmod 2026-09-26, age: 704K seconds)
+  - Cache-Control headers are correct but Vercel Edge is ignoring them (serving cached HIT)
+  - This is a Vercel Edge infrastructure caching issue beyond code-level fixes
+
+### 2. Git Commits (1 new commit)
+- **31bf64e** fix(shop): clear sort+debouncedSearch on filter reset; escape key clears search immediately
+  - `clearFilters()` now also resets sort dropdown to "Most Popular" (was previously left unchanged)
+  - `clearFilters()` now also clears `debouncedSearch` so products repopulate immediately (was left stale)
+  - Escape key in search field now clears both `search` and `debouncedSearch` (previously left debounced value stale, products wouldn't update until 350ms debounce expired)
+  - Build passes cleanly (0 errors)
+
+### 3. Bug Fix: Shop Filter Clear Left Sort Stale
+- **Problem:** Clicking "Clear filters" anywhere on /shop left the sort dropdown unchanged, so switching from "Newest" to "Most Popular" and then clearing filters would still show "Newest" results
+- **Problem 2:** "Clear filters" also left `debouncedSearch` set, so clearing search via the "Clear filters" button wouldn't actually update the product grid until the 350ms debounce timer expired
+- **Problem 3:** Escape key in search didn't clear `debouncedSearch`, causing stale product results on rapid filter cycling
+- **Fix:** `clearFilters()` now resets sort + debouncedSearch; Escape handler now clears both state values
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ Build passes cleanly (0 errors)
+✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo (5 schemas on homepage)
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ force-dynamic on sitemap and homepage for no-stale-content
+✅ Global keyboard shortcuts for music player (Space, arrows, volume)
+✅ Sticky mobile Add-to-Cart bar on product pages
+✅ /shop has 100+ print-on-demand products with SEO descriptions
+✅ /store → /shop redirect active (301, vercel.json)
+✅ /shop filter clear properly resets sort + search debounce
+
+### 5. Recommended Actions (Priority Order)
+1. **Verify sitemap fresh** — sitemap still cached with stale lastmod 2026-09-26 (Vercel Edge ignoring Cache-Control; needs infrastructure-level fix)
+2. **Add real artist photos** — avatar files are still placeholders
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+5. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys without git push
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200

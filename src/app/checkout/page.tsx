@@ -452,12 +452,13 @@ export default function CheckoutPage() {
                     <Check className="text-[var(--pf-orange)]" size={20} />
                   </div>
                   
-                  <div className="bg-[var(--pf-bg)] rounded-lg p-4 flex items-center gap-4 opacity-50">
+                  <div className="bg-[var(--pf-bg)] rounded-lg p-4 flex items-center gap-4 opacity-50" aria-label="PayPal - coming soon">
                     <Zap className="text-[var(--pf-text-muted)]" size={24} />
                     <div className="flex-1">
                       <p className="font-medium text-[var(--pf-text-muted)]">Pay with PayPal</p>
                       <p className="text-sm text-[var(--pf-text-muted)]">Coming soon</p>
                     </div>
+                    <span className="text-xs bg-[var(--pf-border)] text-[var(--pf-text-muted)] px-2 py-1 rounded-full">Soon</span>
                   </div>
                 </div>
 

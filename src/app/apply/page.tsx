@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Fragment } from 'react'
 import { Upload, Headphones, ShoppingCart, TrendingUp, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -65,7 +66,7 @@ const faqData = {
 
 export default function ApplyPage() {
   return (
-    <>
+    <Fragment>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
@@ -163,5 +164,5 @@ export default function ApplyPage() {
           </div>
         </div>
       </div>
-    </>
+    </Fragment>
   )

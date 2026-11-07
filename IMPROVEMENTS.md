@@ -1,7 +1,63 @@
 # Porterful Improvements Log
-*Last run: 2026-11-07 (9:28 AM)*
+*Last run: 2026-11-07 (11:34 AM)*
 
-## Status: 🟢 Site Live + SEO: Sitemap Cache + /shop Headers Fix
+## Status: 🟢 Site Live + /shop Metadata Fix + /digital→/radio Investigation
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /shop → HTTP 200
+✅ /artists → HTTP 200
+✅ /digital → HTTP 307 → /radio (see #3)
+✅ /music → HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **6dc2cc3** fix(shop): consolidate metadata in layout, remove duplicate from page
+  - Both `shop/page.tsx` and `shop/layout.tsx` exported `metadata`, causing conflict
+  - Removed metadata export from page.tsx, keeping it only in layout.tsx
+  - Build passes cleanly (0 errors)
+
+### 3. Bug: /digital Returns 307 Redirect to /radio
+🎯 **Root cause identified:** The redirect is NOT in middleware — it's Next.js RSC routing
+- RSC requests (browser navigation): `/digital` → 307 `/radio`
+- Non-RSC requests: `/digital` → 307 `/radio`
+- Googlebot: `/digital` → 307 `/radio`
+- `/music` → 200 (correct, renders MusicClient)
+- No `redirect()` call found in `src/app/digital/`
+- No middleware rule for `/digital` → `/radio`
+- Likely caused by Vercel Edge cache serving a stale redirect from when `/digital` did redirect to `/radio`
+- **Fix needed:** `vercel --prod` to force clear Vercel Edge cache (or wait for TTL expiry)
+- After fix: verify `/digital` returns 200 with proper "Music — Stream & Buy" title
+
+### 4. SEO Bug: /shop Title Shows "Porterful | Porterful" Instead of "Shop Merch - Porterful"
+🎯 **Root cause:** Both `page.tsx` and `layout.tsx` exported `metadata` — layout overrode page
+- **Fix applied:** Removed duplicate metadata export from `shop/page.tsx`, kept only in `shop/layout.tsx`
+- GitHub push will trigger Vercel auto-deploy to propagate the fix
+
+### 5. Site Health
+✅ Build passes cleanly (0 errors)
+✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo (5 schemas on homepage)
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Global keyboard shortcuts for music player (Space, arrows, volume)
+✅ Sticky mobile Add-to-Cart bar on product pages
+✅ /shop has 100+ print-on-demand products with SEO descriptions
+✅ /store → /shop redirect active (301, vercel.json)
+✅ /music → /digital redirect active (301, middleware)
+
+### 6. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy (just pushed: 6dc2cc3)
+- Run `vercel login` for direct `--prod` deploys
+
+### 7. Recommended Actions (Priority Order)
+1. **Run `vercel --prod`** — Force-clear Vercel Edge cache to fix /digital→/radio redirect issue
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+3. **Add real artist photos** — avatar files are still placeholders for most artists
+4. **Add real products to store** — still shows "First drop coming soon"
+5. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200

@@ -8,6 +8,7 @@ import { Star, Heart, Share2, ShoppingCart, Check, ShoppingBag } from 'lucide-re
 import { useCart } from '@/lib/cart-context';
 import { useToast } from '@/components/Toast';
 import { ALL_PRODUCTS } from '@/lib/products';
+import { ArtistLink } from '@/components/ArtistLink';
 import Script from 'next/script';
 
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -173,12 +174,12 @@ export default function ProductClient({ productId }: { productId: string }) {
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">{product.name}</h1>
               {productArtist !== 'Porterful' && (
-                <Link 
-                  href={`/artist/${productArtist.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="text-lg text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)]"
+                <ArtistLink 
+                  artist={productArtist} 
+                  className="text-lg text-[var(--pf-text-secondary)]"
                 >
                   by {productArtist}
-                </Link>
+                </ArtistLink>
               )}
             </div>
 

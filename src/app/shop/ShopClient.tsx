@@ -299,7 +299,7 @@ export default function MarketplacePage() {
             {/* Search */}
             <div className="flex-1 relative">
               <input
-                type="text"
+                type="search"
                 placeholder="Search products..."
                 aria-label="Search products"
                 value={search}

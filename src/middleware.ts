@@ -30,7 +30,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // === Legacy URL redirects (301 for SEO) — BEFORE public path check ===
-  if (pathname === '/store' || pathname === '/marketplace') {
+  if (pathname === '/store') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/shop'
+    return NextResponse.redirect(url, 301)
+  }
+
+  if (pathname === '/marketplace') {
     const url = request.nextUrl.clone()
     url.pathname = '/shop'
     return NextResponse.redirect(url, 301)

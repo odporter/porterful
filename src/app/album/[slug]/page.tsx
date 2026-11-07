@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const canonicalUrl = `https://porterful.com/album/${slug}`
 
   return {
-    title: `${album.name} by O D Porter`,
+    title: `${album.name} by ${album.artist}`,
     description: `Stream and buy tracks from ${album.name} album. ${albumTracks.length} tracks. Total plays: ${totalPlays.toLocaleString()}.`,
     alternates: {
       canonical: canonicalUrl,
@@ -75,6 +75,7 @@ export default async function AlbumPage({ params }: PageProps) {
     <div className="min-h-screen pt-20 pb-24">
       <AlbumClient
         albumName={album.name}
+        albumArtist={album.artist}
         albumImage={album.image}
         albumTracks={albumTracks}
         totalDuration={formatDuration(totalSeconds)}

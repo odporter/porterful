@@ -10,12 +10,13 @@ import type { Track } from '@/lib/audio-context';
 
 interface AlbumClientProps {
   albumName: string;
+  albumArtist: string;
   albumImage: string;
   albumTracks: Track[];
   totalDuration: string;
 }
 
-export default function AlbumClient({ albumName, albumImage, albumTracks, totalDuration }: AlbumClientProps) {
+export default function AlbumClient({ albumName, albumArtist, albumImage, albumTracks, totalDuration }: AlbumClientProps) {
   const { playTrack, currentTrack, isPlaying, setQueue } = useAudio();
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -81,7 +82,7 @@ export default function AlbumClient({ albumName, albumImage, albumTracks, totalD
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--pf-orange)] to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
                   O
                 </div>
-                <span className="font-medium">O D Porter</span>
+                <span className="font-medium">{albumArtist}</span>
               </Link>
               
               <div className="flex flex-wrap gap-4 text-sm text-[var(--pf-text-secondary)] mb-6">

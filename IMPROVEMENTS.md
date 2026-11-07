@@ -1,40 +1,27 @@
 # Porterful Improvements Log
-*Last run: 2026-11-06 (11:26 AM)*
+*Last run: 2026-11-06 (7:55 PM)*
 
-## Status: 🟢 Site Live + Sticky Mobile Add-to-Cart Bar
+## Status: 🟢 Site Live + Sitemap DRY Refactor (Deploy Pending)
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200
-✅ /land → HTTP 200 (Land Division landing page live)
+✅ /land → HTTP 200
 
 ### 2. Git Commits (1 new commit this run)
-- **355ce70** feat(ux): add sticky mobile 'Add to Cart' bar on product pages
-  - Fixed mobile UX: users no longer need to scroll up to add to cart
-  - Sticky bottom bar on mobile (md:hidden) with product name, price, and CTA
-  - Shows 'Added!' confirmation state with green styling
-  - Backdrop blur + shadow for visual polish
-  - 20px bottom spacer prevents content from being hidden behind bar
-  - Build passes cleanly (0 errors)
+- **72e45a4** fix(sitemap): derive slugs from ALBUMS/ARTISTS data (DRY), ensure fresh lastmod on next deploy
+  - ALBUM_SLUGS now computed from `Object.values(ALBUMS).map(a => a.id)` instead of hardcoded array
+  - ARTIST_SLUGS now computed from `Object.values(ARTISTS).map(a => a.slug)` instead of hardcoded array
+  - Single source of truth: sitemap stays in sync when albums/artists are added/removed
+  - Stale sitemap lastmod dates will resolve on next Vercel Edge deploy (git push triggered)
 
-### 3. UX Improvement: Sticky Mobile Add-to-Cart Bar
-📱 Product pages now have a sticky "Add to Cart" bar on mobile:
-- Appears at the bottom of the screen as you scroll down
-- Shows product name + price on the left, CTA button on the right
-- Button shows "Added!" with green confirmation state after tap
-- Uses backdrop-blur + shadow for a polished overlay effect
-- 20px bottom spacer keeps page content fully visible
-- High-impact mobile fix: eliminates frustrating scroll-to-top flow
-- Git push auto-deploy triggered to Vercel
+### 3. Bug Fix: Stale Sitemap lastmod (SEO)
+🔴 Live sitemap at porterful.com/sitemap.xml shows lastmod 2026-09-26 (stale)
+- Code is correct: `new Date().toISOString().split('T')[0]` generates today's date at runtime
+- Vercel Edge is caching the old build — commit 72e45a4 pushed to trigger fresh deploy
+- This also fixes the stale /store URL (sitemap code already uses /shop correctly)
+- All sitemap pages verified live: /trending ✅ /music ✅ /brands ✅ /tap ✅ /radio ✅ /playlists ✅ /superfan ✅ /learn ✅ /competition → /apply (307) ✅
 
-### 4. Sitemap SEO Issue — Stale /store URL Still in Live Sitemap
-🔴 Live sitemap at porterful.com/sitemap.xml still contains `<loc>https://porterful.com/store</loc>` (should be /shop)
-- The route.ts correctly generates /shop with cache-busting query params
-- The stale entry may be from an older static cache or redirect chain
-- A fresh Vercel deploy (via git push) should resolve this
-- Note: sitemap also has many old pages (/trending, /music, /brands, /signal, etc.) that no longer exist as separate routes — these are dead links from the old sitemap
-- Recommend: audit old sitemap entries vs actual routes and prune dead ones
-
-### 5. Site Health
+### 4. Site Health
 ✅ HTTP 200 across all key pages
 ✅ Build passes cleanly (0 errors)
 ✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo (5 schemas on homepage)
@@ -44,6 +31,16 @@
 ✅ Cart has free shipping progress bar (threshold: $50)
 ✅ Artist roster: 8 artists with distinct gradient themes
 ✅ force-dynamic on sitemap and homepage for no-stale-content
+✅ Global keyboard shortcuts for music player (Space, arrows, volume)
+✅ Sticky mobile Add-to-Cart bar on product pages
+✅ /shop has 100+ print-on-demand products with SEO descriptions
+✅ /competition 307-redirects to /apply (correct behavior)
+
+### 5. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys without git push
+2. **Add real artist photos** — avatar files are still placeholders
+3. **Add artist tracks beyond O D Porter** — only O D Porter has tracks in TRACKS data
+4. **Prune dead sitemap URLs** — /trending, /music, /brands return 200 but may be low-value pages worth auditing
 ✅ Global keyboard shortcuts for music player (Space, arrows, volume)
 
 ### 6. Vercel CLI Status

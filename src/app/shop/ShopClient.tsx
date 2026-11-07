@@ -654,11 +654,11 @@ export default function MarketplacePage() {
                     <div className={`${viewMode === 'list' ? 'w-32 h-32 shrink-0' : 'aspect-square'} relative bg-[var(--pf-bg)]`}>
                       <Image
                         src={product.images[0]}
-                        alt={product.name}
+                        alt={`${product.name}${((product as any).artist && (product as any).artist !== 'Porterful') ? ` by ${(product as any).artist}` : ''} — ${product.category}${product.subcategory ? ` ${product.subcategory}` : ''} on Porterful. Shop direct, support independent artists.`}
                         fill
                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         className="object-cover group-hover:scale-105 transition-transform"
-                        priority={idx < 8} // Prioritize above-the-fold images for LCP
+                        priority={idx < 8}
                         onError={(e) => { (e.target as HTMLImageElement).src = '/product-placeholder.svg' }}
                       />
                       {product.category && (
@@ -669,6 +669,11 @@ export default function MarketplacePage() {
                       {product.colors && product.colors.length > 1 && (
                         <div className="absolute top-2 right-2 bg-[var(--pf-surface)]/90 backdrop-blur-sm text-[var(--pf-text)] text-xs px-2 py-0.5 rounded-full">
                           {product.colors.length} colors
+                        </div>
+                      )}
+                      {(product as any).lowStock && product.inStock && (
+                        <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full shadow">
+                          Only a few left
                         </div>
                       )}
                       {!product.inStock && (

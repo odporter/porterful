@@ -292,8 +292,43 @@ export default function MarketplacePage() {
       : products.filter(p => p.category.toLowerCase() === (CATEGORY_MAP[cat.id] || cat.id).toLowerCase()).length
   }))
 
+  // Build breadcrumb items from current filters
+  const breadcrumbItems = [
+    { name: 'Home', href: '/' },
+    { name: 'Shop', href: '/shop' },
+  ]
+  if (selectedCategory !== 'all') {
+    const catLabel = CATEGORIES.find(c => c.id === selectedCategory)?.name.replace(/^[🔥\s]+/, '') || selectedCategory
+    breadcrumbItems.push({ name: catLabel, href: `/shop?category=${selectedCategory}` })
+  }
+  if (search) {
+    breadcrumbItems.push({ name: `"${search}"`, href: '#' })
+  }
+
   return (
     <div className="min-h-screen bg-[var(--pf-bg-secondary)] pt-20">
+      {/* Breadcrumb */}
+      <div className="bg-[var(--pf-surface)] border-b border-[var(--pf-border)]">
+        <div className="pf-container py-2.5">
+          <nav aria-label="Breadcrumb">
+            <ol className="flex items-center gap-2 text-sm text-[var(--pf-text-secondary)]">
+              {breadcrumbItems.map((item, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  {i > 0 && <span className="opacity-40">/</span>}
+                  {i < breadcrumbItems.length - 1 ? (
+                    <Link href={item.href} className="hover:text-[var(--pf-orange)] transition-colors">
+                      {item.name}
+                    </Link>
+                  ) : (
+                    <span className="text-[var(--pf-text)] font-medium" aria-current={search ? 'page' : undefined}>{item.name}</span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-[var(--pf-surface)] border-b border-[var(--pf-border)] sticky top-16 z-40">
         <div className="pf-container">

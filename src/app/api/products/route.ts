@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
       price: salePrice, // legacy field for compatibility
       salePrice,
       artistCut,
+      images: Array.isArray(p.images) ? p.images : (((p as any).image) ? [(p as any).image] : []), // normalize: ensure images[] array
     }
   })
   

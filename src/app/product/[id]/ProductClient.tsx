@@ -9,7 +9,6 @@ import { useCart } from '@/lib/cart-context';
 import { useToast } from '@/components/Toast';
 import { ALL_PRODUCTS } from '@/lib/products';
 import { ArtistLink } from '@/components/ArtistLink';
-import Script from 'next/script';
 
 const FREE_SHIPPING_THRESHOLD = 50;
 
@@ -98,57 +97,7 @@ export default function ProductClient({ productId }: { productId: string }) {
         </nav>
 
         {/* Breadcrumb Schema for Google Rich Results */}
-        <Script
-          id="breadcrumb-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'BreadcrumbList',
-              itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://porterful.com' },
-                { '@type': 'ListItem', position: 2, name: 'Store', item: 'https://porterful.com/shop' },
-                { '@type': 'ListItem', position: 3, name: product.name, item: `https://porterful.com/product/${product.id}` },
-              ],
-            }),
-          }}
-        />
-
-        {/* Product Schema for Google Rich Results */}
-        <Script
-          id="product-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Product',
-              name: product.name,
-              description: productDescription,
-              image: [productImage],
-              offers: {
-                '@type': 'Offer',
-                url: `https://porterful.com/product/${product.id}`,
-                priceCurrency: 'USD',
-                price: sellingPrice.toFixed(2),
-                priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                availability: (product as any).inStock
-                  ? 'https://schema.org/InStock'
-                  : 'https://schema.org/OutOfStock',
-                seller: {
-                  '@type': 'Organization',
-                  name: 'Porterful',
-                },
-              },
-              ...((product as any).rating && {
-                aggregateRating: {
-                  '@type': 'AggregateRating',
-                  ratingValue: (product as any).rating,
-                  reviewCount: (product as any).reviews,
-                },
-              }),
-            }),
-          }}
-        />
+        {/* Product + Breadcrumb JSON-LD is rendered by page.tsx to avoid duplicates */}
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           {/* Product Image */}

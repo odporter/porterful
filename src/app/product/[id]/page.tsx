@@ -42,23 +42,26 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const sellingPrice = Math.round(basePrice * 1.3 * 100) / 100
   const compareAtPrice = Math.round(sellingPrice * 1.3 * 100) / 100
   
-  // JSON-LD structured data for SEO
-  const jsonLd = product ? {
+  // Return 404 if product doesn't exist
+  if (!product) {
+    notFound()
+  }
+
+  // Combined JSON-LD: Product + Breadcrumb in a single @graph array
+  // (avoids multiple <script type="application/ld+json"> tags which can cause SEO parsing issues)
+  const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     description: (product as any).description || `${product.name} - Premium quality ${product.subcategory?.toLowerCase() || 'merchandise'}. 80% of proceeds go to independent artists.`,
     image: (product as any).images?.[0] || (product as any).image,
-    brand: {
-      '@type': 'Brand',
-      name: 'Porterful',
-    },
+    brand: { '@type': 'Brand', name: 'Porterful' },
     offers: {
       '@type': 'Offer',
       price: sellingPrice.toFixed(2),
       priceCurrency: 'USD',
-      availability: product.inStock 
-        ? 'https://schema.org/InStock' 
+      availability: product.inStock
+        ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
     },
     aggregateRating: product.rating ? {
@@ -66,38 +69,29 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       ratingValue: product.rating,
       reviewCount: product.reviews,
     } : undefined,
-  } : null
+  }
 
-  // Breadcrumb structured data for SEO (links to canonical URLs)
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://porterful.com' },
       { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://porterful.com/shop' },
-      { '@type': 'ListItem', position: 3, name: product?.name || 'Product', item: `https://porterful.com/product/${id}` },
+      { '@type': 'ListItem', position: 3, name: product.name, item: `https://porterful.com/product/${id}` },
     ],
   }
-  
-  // Return 404 if product doesn't exist
-  if (!product) {
-    notFound()
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [productJsonLd, breadcrumbJsonLd],
   }
 
   return (
     <>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
-      {breadcrumbJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-        />
-      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ProductClient productId={id} />
     </>
   )

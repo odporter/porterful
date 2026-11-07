@@ -68,14 +68,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     } : undefined,
   } : null
 
-  // Breadcrumb structured data for SEO
-  // Note: /store redirects to /shop (canonical) via middleware
+  // Breadcrumb structured data for SEO (links to canonical URLs)
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://porterful.com' },
-      { '@type': 'ListItem', position: 2, name: 'Store', item: 'https://porterful.com/shop' },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://porterful.com/shop' },
       { '@type': 'ListItem', position: 3, name: product?.name || 'Product', item: `https://porterful.com/product/${id}` },
     ],
   }

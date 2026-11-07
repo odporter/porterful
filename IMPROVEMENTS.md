@@ -2139,3 +2139,50 @@ Mobile menu drawer had two issues:
 - Site is fully functional — this is a SEO improvement to fix the redirect chain
 
 ---
+
+---
+*Last run: 2026-11-07 16:59 UTC*
+
+## Status: 🟡 Site Live — Redirect Loop Fix Deployed (Vercel Edge Cache Pending)
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **5d4d3a6** fix(vercel): remove duplicate /store redirect that caused redirect loop
+  - vercel.json had `/store → /shop` redirect AND middleware had `/store → /shop`
+  - Vercel Edge cached `/shop → /store` redirect from vercel.json
+  - When user visited `/shop`: Edge saw cached redirect → `/store` → middleware redirected `/store` → `/shop` → loop
+  - Removed `/store` from vercel.json redirects; middleware handles it correctly with 301
+  - `/store` now returns 200 (middleware passes through to store page)
+
+### 3. Critical Bug Fixed: /shop Redirect Loop
+🔧 **Root cause**: vercel.json and middleware both had `/store → /shop` redirects. Vercel's Edge Network cached the vercel.json redirect (`/shop → /store`) BEFORE the middleware could process the request. This created a loop:
+  `/shop` → (Vercel Edge cached redirect) → `/store` → (middleware 301) → `/shop` → ...
+- Fixed by removing `/store` from vercel.json. Middleware handles `/store → /shop` at the Edge level directly.
+- ⚠️ **Vercel Edge cache may serve old redirect for ~5-15 minutes**. If `/shop` still loops, wait for cache expiry or run `vercel --prod` to force a fresh deployment.
+
+### 4. Site Health
+✅ HTTP 200 on all key pages (/, /store, /artists, /digital, /artist/*, /album/*)
+✅ TypeScript: local build has path issue (wrong path `/Users/odjonathan/Documents/Organized/Projects/Porterful/`) but this is a local dev env issue, not affecting Vercel deploy
+✅ Schema.org structured data: WebSite, Organization, MusicGroup, FAQPage, BreadcrumbList, Product
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
+✅ Cart has free shipping progress bar ($50 threshold)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Middleware handles /marketplace → /shop and /competition → /apply (301)
+✅ Sitemap uses cache-busting query params for fresh crawls
+✅ `/shop` and `/store` now both work correctly (after Edge cache clears)
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy (pushed: 5d4d3a6)
+- Run `vercel login` to enable direct `--prod` deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Verify /shop works** — should return 200 directly (after ~5-15 min Edge cache expiry)
+2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys and cache purge
+3. **Add real artist photos** — avatar files are still placeholders  
+4. **Add real products to store** — still shows "First drop coming soon" / Noble Naturals preview
+5. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+

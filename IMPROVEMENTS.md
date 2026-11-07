@@ -1,4 +1,54 @@
 # Porterful Improvements Log
+*Last run: 2026-11-07 (5:48 AM)*
+
+## Status: 🟢 Site Live + Rich Artist Cards on /digital Artists Tab
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200
+
+### 2. Git Commits (1 new commit this run)
+- **58ad800** feat(digital): rich artist cards on /digital Artists tab with verified badges and location
+  - Artist tab on /digital now uses full ARTISTS data instead of just track artist names
+  - Each card shows: gradient avatar background with artist's coverGradient, name, location with MapPin icon, track count, verified badge (blue checkmark) for verified artists
+  - Cards link to `/artist/${artist.id}` instead of `/artist/${artist.toLowerCase().replace(/\s+/g, '-')}` — matching the actual route
+  - Hover effect: orange border glow + shadow + text color shift
+  - Previously showed plain placeholder initials (e.g. "O" in orange gradient) for all artists
+
+### 3. UX Improvement: Rich Artist Cards on /digital
+🎨 The Artists tab on /digital was showing placeholder cards with just the artist's first initial — a major missed opportunity since rich artist data exists in ARTISTS. Now:
+- Gradient backgrounds match each artist's `coverGradient` (orange→purple for O D Porter, emerald→teal for Noble Naturals, blue→indigo for STL Collective, etc.)
+- Verified artists (O D Porter) get a blue checkmark badge
+- Location shown under the name (e.g. "St. Louis, MO", "New Orleans, LA")
+- Track count uses artist.trackCount or falls back to TRACKS filter
+- Hover effects: border turns orange, subtle shadow, name turns orange
+- Links point to the correct artist ID route (`/artist/od-porter` not `/artist/o-d-porter`)
+
+### 4. Site Health
+✅ HTTP 200 across all key pages
+✅ TypeScript + Build passes cleanly (0 errors)
+✅ Schema.org WebSite + Organization + MusicGroup + FAQPage structured data
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Middleware handles /store, /marketplace → /shop and /music → /digital redirects
+✅ Sitemap uses cache-busting query params for fresh crawls
+✅ force-dynamic on sitemap and homepage for no-stale-content
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy (just pushed: 58ad800)
+- Run `vercel login` for direct `--prod` deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys
+2. **Add real artist photos** — avatar files are still placeholders for most artists
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+
+---
+
 *Last run: 2026-11-07 (3:34 AM)*
 
 ## Status: 🟢 Site Live + Shop Filter Bug Fixed

@@ -11,11 +11,12 @@ import { ArtistSearch } from '@/components/ArtistSearch';
 
 export function HomeClient() {
   const { user } = useSupabase();
-  const featuredTracks = TRACKS.slice(0, 6);
   const totalPlays = TRACKS.reduce((sum, track) => sum + (track.plays || 0), 0);
   const formattedPlays = totalPlays >= 1000000 ? `${(totalPlays / 1000000).toFixed(1)}M+` : `${(totalPlays / 1000).toFixed(0)}K+`;
   // Dynamic featured artist — first artist marked isFeatured, fallback to first artist in list
   const featuredArtist = ARTISTS.find(a => a.isFeatured) || ARTISTS[0];
+  // Get featured artist's own tracks for Latest Releases
+  const featuredArtistTracks = TRACKS.filter(t => t.artist === featuredArtist.name).slice(0, 5);
   const artistTrackCount = TRACKS.filter(t => t.artist === featuredArtist.name).length;
   const artistAlbumCount = new Set(TRACKS.filter(t => t.artist === featuredArtist.name).map(t => t.album)).size;
   const artistPlays = TRACKS.filter(t => t.artist === featuredArtist.name).reduce((sum, t) => sum + (t.plays || 0), 0);
@@ -433,7 +434,7 @@ export function HomeClient() {
               <div className="p-6 md:p-10 bg-[var(--pf-surface)]">
                 <h4 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-4">LATEST RELEASES</h4>
                 <div className="space-y-3">
-                  {featuredTracks.slice(0, 5).map(track => (
+                  {featuredArtistTracks.map(track => (
                     // Derive album slug from album name (e.g. "Ambiguous" → "ambiguous")
                     <Link 
                       key={track.id}

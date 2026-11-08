@@ -319,17 +319,23 @@ export function HomeClient() {
               
               <div className="grid md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-[var(--pf-bg)]/50 rounded-xl p-6 text-center">
-                  <div className="text-3xl mb-3">🎁</div>
+                  <div className="w-12 h-12 rounded-full bg-[var(--pf-orange)]/10 flex items-center justify-center mx-auto mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--pf-orange)]" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect width="22" height="12" x="1" y="5" rx="2"></rect><line x1="12" x2="12" y1="1" y2="5"></line><line x1="12" x2="12" y1="19" y2="23"></line></svg>
+                  </div>
                   <h3 className="font-bold mb-2">Earn Rewards</h3>
                   <p className="text-sm text-[var(--pf-text-secondary)]">Get 3% of every sale made through your unique Superfan link</p>
                 </div>
                 <div className="bg-[var(--pf-bg)]/50 rounded-xl p-6 text-center">
-                  <div className="text-3xl mb-3">👑</div>
+                  <div className="w-12 h-12 rounded-full bg-[var(--pf-orange)]/10 flex items-center justify-center mx-auto mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--pf-orange)]" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                  </div>
                   <h3 className="font-bold mb-2">Exclusive Access</h3>
                   <p className="text-sm text-[var(--pf-text-secondary)]">Unlock special badges, early drops, and behind-the-scenes content</p>
                 </div>
                 <div className="bg-[var(--pf-bg)]/50 rounded-xl p-6 text-center">
-                  <div className="text-3xl mb-3">💫</div>
+                  <div className="w-12 h-12 rounded-full bg-[var(--pf-orange)]/10 flex items-center justify-center mx-auto mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--pf-orange)]" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+                  </div>
                   <h3 className="font-bold mb-2">Support Artists</h3>
                   <p className="text-sm text-[var(--pf-text-secondary)]">Your success directly funds the artists you love</p>
                 </div>

@@ -326,14 +326,8 @@ export default function DigitalClient() {
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<'artists' | 'albums' | 'songs'>('artists')
   const [songsDisplayed, setSongsDisplayed] = useState(50)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [sortBy, setSortBy] = useState<'default' | 'price-low' | 'price-high' | 'title' | 'artist'>('default')
-
-  // Simulate initial load
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800)
-    return () => clearTimeout(timer)
-  }, [])
 
   const filteredTracks = search 
     ? TRACKS.filter(t => 

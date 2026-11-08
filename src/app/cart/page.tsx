@@ -3,19 +3,40 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, Share2, Copy, Check } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
+import { useState } from 'react';
 
 export default function CartPage() {
   const router = useRouter();
   const { items, removeItem, updateQuantity, clearCart, subtotal, artistCut } = useCart();
   const total = subtotal + (subtotal >= 50 ? 0 : 5);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+  const [copied, setCopied] = useState(false);
 
   const handleCheckout = () => {
     // Store cart in localStorage for checkout page
     localStorage.setItem('porterful-checkout-items', JSON.stringify(items));
     router.push('/checkout');
+  };
+
+  const handleShareCart = async () => {
+    const cartData = items.map(i => ({ id: i.productId, q: i.quantity, s: i.size, c: i.color }));
+    const encoded = btoa(encodeURIComponent(JSON.stringify(cartData)));
+    const shareUrl = `${window.location.origin}/cart?shared=${encoded}`;
+    const text = `Check out my Porterful cart — ${itemCount} items, $${subtotal.toFixed(2)} going straight to independent artists!`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'My Porterful Cart', text, url: shareUrl });
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   };
 
   return (
@@ -177,6 +198,14 @@ export default function CartPage() {
                   className="w-full pf-btn pf-btn-primary whitespace-nowrap"
                 >
                   Proceed to Checkout
+                </button>
+
+                <button
+                  onClick={handleShareCart}
+                  className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pf-bg)] border border-[var(--pf-border)] rounded-lg hover:border-[var(--pf-orange)] transition-colors text-sm font-medium"
+                >
+                  {copied ? <Check size={16} className="text-green-400" /> : <Share2 size={16} />}
+                  <span>{copied ? 'Link copied!' : 'Share your cart'}</span>
                 </button>
 
                 <Link href="/shop" className="block text-center text-[var(--pf-text-secondary)] hover:text-white text-sm mt-4">

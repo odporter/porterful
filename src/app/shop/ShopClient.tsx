@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { ArrowUp, ShoppingCart, Check } from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
 import { useToast } from '@/components/Toast'
-import Script from 'next/script'
 
 // Custom Porterful Icons
 const Icon = {
@@ -836,7 +835,7 @@ function ProductSchema({ products }: { products: any[] }) {
   }
 
   return (
-    <Script
+    <script
       id="product-schema"
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}

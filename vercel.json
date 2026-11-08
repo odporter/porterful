@@ -90,7 +90,6 @@
     }
   ],
   "redirects": [
-    { "source": "/radio", "destination": "/digital", "permanent": false },
     { "source": "/competition", "destination": "/apply", "permanent": true }
   ],
   "rewrites": [

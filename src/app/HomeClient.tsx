@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Play, Headphones, Music, Star, Users, DollarSign, Upload, ShoppingCart, Package, Radio, Disc3, ArrowUp } from 'lucide-react';
 import { useSupabase } from '@/app/providers';
 import { TRACKS } from '@/lib/data';
+import { ARTISTS } from '@/lib/artists';
 import { ArtistSearch } from '@/components/ArtistSearch';
 
 export function HomeClient() {
@@ -13,6 +14,11 @@ export function HomeClient() {
   const featuredTracks = TRACKS.slice(0, 6);
   const totalPlays = TRACKS.reduce((sum, track) => sum + (track.plays || 0), 0);
   const formattedPlays = totalPlays >= 1000000 ? `${(totalPlays / 1000000).toFixed(1)}M+` : `${(totalPlays / 1000).toFixed(0)}K+`;
+  // Dynamic featured artist — first artist marked isFeatured, fallback to first artist in list
+  const featuredArtist = ARTISTS.find(a => a.isFeatured) || ARTISTS[0];
+  const artistTrackCount = TRACKS.filter(t => t.artist === featuredArtist.name).length;
+  const artistAlbumCount = new Set(TRACKS.filter(t => t.artist === featuredArtist.name).map(t => t.album)).size;
+  const artistGenres = featuredArtist.genre.split(',').map(g => g.trim()).slice(0, 3);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
@@ -272,7 +278,7 @@ export function HomeClient() {
               <Link href="/artists" className="text-[var(--pf-orange)] hover:underline text-sm font-medium">
                 All Artists →
               </Link>
-              <Link href="/artist/od-porter" className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] text-sm font-medium">
+              <Link href={`/artist/${featuredArtist.slug}`} className="text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] text-sm font-medium">
                 View Profile →
               </Link>
             </div>
@@ -285,8 +291,8 @@ export function HomeClient() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[var(--pf-orange)] to-purple-500 shrink-0">
                     <Image
-                      src="/artist-images/od-porter.jpg"
-                      alt="O D Porter"
+                      src={featuredArtist.image}
+                      alt={featuredArtist.name}
                       fill
                       sizes="64px"
                       className="object-cover"
@@ -294,31 +300,30 @@ export function HomeClient() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold">O D Porter</h3>
-                      <span className="text-blue-400">✓</span>
+                      <h3 className="text-xl font-bold">{featuredArtist.name}</h3>
+                      {featuredArtist.verified && <span className="text-blue-400">✓</span>}
                     </div>
-                    <p className="text-sm text-[var(--pf-text-secondary)]">St. Louis, MO</p>
+                    <p className="text-sm text-[var(--pf-text-secondary)]">{featuredArtist.location}</p>
                   </div>
                 </div>
                 
                 <p className="text-[var(--pf-text-secondary)] mb-4">
-                  Independent artist and founder. Born in Miami, raised in NOLA & STL. 
-                  Building a platform where artists own everything.
+                  {featuredArtist.shortBio}
                 </p>
                 
                 <div className="flex flex-wrap gap-2 mb-6">
-                  <span className="text-xs px-2 py-1 rounded-full bg-[var(--pf-orange)]/10 text-[var(--pf-orange)] border border-[var(--pf-orange)]/20">Hip-Hop</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">R&B</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">St. Louis</span>
+                  {artistGenres.map(genre => (
+                    <span key={genre} className="text-xs px-2 py-1 rounded-full bg-[var(--pf-orange)]/10 text-[var(--pf-orange)] border border-[var(--pf-orange)]/20">{genre}</span>
+                  ))}
                 </div>
                 
                 <div className="flex gap-4 mb-6">
                   <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{TRACKS.length}</div>
+                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{artistTrackCount}</div>
                     <div className="text-xs text-[var(--pf-text-muted)]">Tracks</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{new Set(TRACKS.map(t => t.album)).size}</div>
+                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{artistAlbumCount}</div>
                     <div className="text-xs text-[var(--pf-text-muted)]">Albums</div>
                   </div>
                   <div>
@@ -328,7 +333,7 @@ export function HomeClient() {
                 </div>
                 
                 <div className="flex flex-wrap gap-3">
-                  <Link href="/artist/od-porter" className="pf-btn pf-btn-primary">
+                  <Link href={`/artist/${featuredArtist.slug}`} className="pf-btn pf-btn-primary">
                     <Users size={18} className="mr-2" />
                     Follow Artist
                   </Link>
@@ -343,7 +348,7 @@ export function HomeClient() {
               <div className="p-6 md:p-10 bg-[var(--pf-surface)]">
                 <h4 className="text-sm font-semibold text-[var(--pf-text-muted)] mb-4">LATEST RELEASES</h4>
                 <div className="space-y-3">
-                  {featuredTracks.slice(0, 5).map(track => (
+                  {TRACKS.filter(t => t.artist === featuredArtist.name).slice(0, 5).map(track => (
                     // Derive album slug from album name (e.g. "Ambiguous" → "ambiguous")
                     <Link 
                       key={track.id}

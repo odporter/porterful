@@ -10,6 +10,7 @@ export interface ArtistData {
   bio: string
   shortBio: string
   verified: boolean
+  isFeatured?: boolean
   image: string
   coverGradient: string
   followers: number
@@ -36,6 +37,7 @@ export const ARTISTS: ArtistData[] = [
     bio: `Independent artist and founder of Porterful. Born in Miami, raised between New Orleans and St. Louis — most known from the STL.`,
     shortBio: 'Independent artist and founder of Porterful. Born in Miami, raised in New Orleans & St. Louis.',
     verified: true,
+    isFeatured: true,
     image: '/artist-images/od-porter.jpg',
     coverGradient: 'from-[var(--pf-orange)] to-purple-600',
     followers: 2847,

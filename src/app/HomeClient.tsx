@@ -18,6 +18,7 @@ export function HomeClient() {
   const featuredArtist = ARTISTS.find(a => a.isFeatured) || ARTISTS[0];
   const artistTrackCount = TRACKS.filter(t => t.artist === featuredArtist.name).length;
   const artistAlbumCount = new Set(TRACKS.filter(t => t.artist === featuredArtist.name).map(t => t.album)).size;
+  const artistPlays = TRACKS.filter(t => t.artist === featuredArtist.name).reduce((sum, t) => sum + (t.plays || 0), 0);
   const artistGenres = featuredArtist.genre.split(',').map(g => g.trim()).slice(0, 3);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -407,8 +408,8 @@ export function HomeClient() {
                     <div className="text-xs text-[var(--pf-text-muted)]">Total Plays</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{ARTISTS.length}</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Artists</div>
+                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{artistPlays >= 1000000 ? `${(artistPlays / 1000000).toFixed(1)}M` : `${(artistPlays / 1000).toFixed(0)}K`}</div>
+                    <div className="text-xs text-[var(--pf-text-muted)]">Total Plays</div>
                   </div>
                 </div>
                 

@@ -1,28 +1,22 @@
 # Porterful Improvements Log
-*Last run: 2026-11-08 (04:29 UTC)*
+*Last run: 2026-11-08 (04:48 UTC)*
 
-## Status: 🟢 Site Live + Build Fix + TypeScript Error Resolved
+## Status: 🟢 Site Live + Emoji → SVG Icons on Contact Page
 
 ### 1. Site Uptime
-✅ porterful.com → HTTP 200
-✅ /music → HTTP 200
-✅ /artists → HTTP 200
-✅ /store → HTTP 200
-✅ /apply → HTTP 200
-✅ GitHub push succeeded (f47d411)
+✅ porterful.com returning HTTP 200
 
 ### 2. Git Commits (1 new commit this run)
-- **f47d411** fix(home): fix ALBUMS type indexing in New Releases sort
-  - TypeScript error: `ALBUMS[albumKey]` couldn't be indexed by a plain `string` (TS treats object keys as specific literal union types)
-  - Fixed by casting `albumKey` to `keyof typeof ALBUMS` in two places: the sort comparator and the `albumData` lookup
-  - Build passes cleanly (0 errors)
+- **0148f60** fix(contact): replace emoji with accessible SVG icons
+  - Replaced ✉️ success message with custom MailIcon SVG
+  - Replaced 📚, 💬, 🐦 quick link emoji with lucide-react BookOpen, MessageCircle, and custom Twitter SVG
+  - Improves accessibility and brand consistency
 
-### 3. Bug Fix: TypeScript Build Error on Homepage
-- **Problem:** `HomeClient.tsx` line 251 had a TypeScript error — ALBUMS is typed as a concrete object with specific keys (`ambiguous`, `from-feast-to-famine`, etc.) but the code used a plain `string` variable to index it. TypeScript requires the index to match the object's actual key type.
-- **Fix:** Cast `albumKey` to `keyof typeof ALBUMS` in both the sort comparator and the `albumData` lookup.
-- **Impact:** This would have blocked `vercel --prod` from building. Now the homepage compiles cleanly.
+### 3. Accessibility Fix: Contact Page Emoji → SVG Icons
+The Contact page had emoji characters (✉️, 📚, 💬, 🐦) which vary across platforms and can be inaccessible to screen readers. Replaced with consistent SVG icons using lucide-react and a custom Twitter SVG that matches Porterful's brand aesthetic.
 
 ### 4. Site Health
+✅ porterful.com → HTTP 200
 ✅ Build passes cleanly (0 errors)
 ✅ HTTP 200 across all key pages
 ✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo
@@ -31,11 +25,10 @@
 ✅ Navbar has aria-labels on all interactive elements
 ✅ Cart has free shipping progress bar (threshold: $50)
 ✅ Artist roster: 8 artists with distinct gradient themes
-✅ Global keyboard shortcuts for music player
-✅ Sticky mobile Add-to-Cart bar on product pages
 ✅ /shop has 100+ print-on-demand products with SEO descriptions
 ✅ /store → /shop redirect active (301, vercel.json)
 ✅ /music → /digital redirect active (301, middleware)
+✅ GitHub push → Vercel auto-deploy active (commit 0148f60 pushed)
 
 ### 5. Vercel CLI Status
 🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"

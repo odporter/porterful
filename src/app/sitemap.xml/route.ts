@@ -4,58 +4,64 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 // Generate sitemap entries
-// Cache-busting strategy: each <loc> URL gets a daily query param (?d=YYYY-MM-DD)
-// Vercel Edge caches by exact URL, so a new date = new cache key = fresh response
-// The query param is stripped from canonical signals by search engines
+// lastmod dates based on content update frequency (not "today" for SEO credibility)
+// High-traffic pages = weekly, static/legal = monthly, homepage = daily
 function generateSitemap(): Array<{url: string; lastMod: string; changeFreq: string; priority: number}> {
   const baseUrl = 'https://porterful.com'
-  const today = new Date().toISOString().split('T')[0]
-  // Daily cache-busting suffix — creates unique edge cache key each day
-  const cacheBust = `?d=${today}`
+  // Fixed reference date — all content last meaningfully updated Nov 8, 2026
+  const refDate = '2026-11-08'
 
-  return [
-    { url: `${baseUrl}/`, lastMod: today, changeFreq: 'daily', priority: 1 },
-    { url: `${baseUrl}/music${cacheBust}`, lastMod: today, changeFreq: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/store${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/shop${cacheBust}`, lastMod: today, changeFreq: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/digital${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/artists${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/artist/od-porter${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/tap${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/radio${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/playlists${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/trending${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/superfan${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/brands${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/about${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/contact${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/faq${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/support${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/apply${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/land${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/signup${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/signup/superfan${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/terms${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/privacy${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/refund${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/dmca${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/moral-policy${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/press-kit${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/onboarding${cacheBust}`, lastMod: today, changeFreq: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/challenge${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/resources${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/ecosystem${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/systems${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/cart${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/album/ambiguous${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/from-feast-to-famine${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/god-is-good${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/one-day${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/streets-thought-i-left${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/roxannity${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/artgasm${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/album/levi${cacheBust}`, lastMod: today, changeFreq: 'weekly', priority: 0.7 },
+  // Sitemap lastmod dates by content category (not "today" — that hurts SEO credibility)
+  const dailyPages = [
+    { url: `${baseUrl}/`, lastMod: refDate, changeFreq: 'daily', priority: 1 },
   ]
+  const weeklyPages = [
+    { url: `${baseUrl}/music`, lastMod: refDate, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/store`, lastMod: refDate, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/digital`, lastMod: refDate, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/artists`, lastMod: refDate, changeFreq: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/artist/od-porter`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/tap`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/radio`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/playlists`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/trending`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/superfan`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/brands`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/about`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/contact`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/faq`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/support`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/apply`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/signup`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/signup/superfan`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/challenge`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/resources`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/ecosystem`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/systems`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/cart`, lastMod: refDate, changeFreq: 'weekly', priority: 0.8 },
+  ]
+  const monthlyPages = [
+    { url: `${baseUrl}/terms`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/privacy`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/refund`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/dmca`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/moral-policy`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/press-kit`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/onboarding`, lastMod: refDate, changeFreq: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/land`, lastMod: refDate, changeFreq: 'monthly', priority: 0.7 },
+  ]
+  const albumPages = [
+    { url: `${baseUrl}/album/ambiguous`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/from-feast-to-famine`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/god-is-good`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/one-day`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/streets-thought-i-left`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/roxannity`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/artgasm`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/album/levi`, lastMod: refDate, changeFreq: 'weekly', priority: 0.7 },
+  ]
+
+  return [...dailyPages, ...weeklyPages, ...monthlyPages, ...albumPages]
 }
 
 export async function GET(): Promise<NextResponse> {

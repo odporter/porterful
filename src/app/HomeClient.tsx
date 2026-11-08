@@ -248,13 +248,15 @@ export function HomeClient() {
               })
               // Sort by year descending (newest first), then by plays descending within same year
               const albums = [...albumMap.values()].sort((a, b) => {
-                const yearA = ALBUMS[a.album.toLowerCase().replace(/\s+/g, '-')]?.year ?? 0
-                const yearB = ALBUMS[b.album.toLowerCase().replace(/\s+/g, '-')]?.year ?? 0
+                const albumKeyA = a.album.toLowerCase().replace(/\s+/g, '-') as keyof typeof ALBUMS
+                const albumKeyB = b.album.toLowerCase().replace(/\s+/g, '-') as keyof typeof ALBUMS
+                const yearA = ALBUMS[albumKeyA]?.year ?? 0
+                const yearB = ALBUMS[albumKeyB]?.year ?? 0
                 if (yearB !== yearA) return yearB - yearA
                 return b.plays - a.plays
               })
               return albums.slice(0, 4).map(a => {
-                const albumKey = a.album.toLowerCase().replace(/\s+/g, '-')
+                const albumKey = a.album.toLowerCase().replace(/\s+/g, '-') as keyof typeof ALBUMS
                 const albumData = ALBUMS[albumKey]
                 const year = albumData?.year ?? ''
                 const formattedPlays = a.plays >= 1000000 ? `${(a.plays / 1000000).toFixed(1)}M` : a.plays >= 1000 ? `${(a.plays / 1000).toFixed(0)}K` : a.plays

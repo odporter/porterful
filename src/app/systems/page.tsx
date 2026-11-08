@@ -218,20 +218,22 @@ export default function SystemsPage() {
 
                   {/* CTA */}
                   {system.url === '#' ? (
-                    <button
-                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-colors border ${system.borderColor} hover:${system.accentColor}`}>
+                    <a
+                      href="/contact"
+                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-colors border ${system.borderColor} text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:border-[var(--pf-orange)]`}
+                    >
                       {system.cta}
                       <ChevronRight size={16} />
-                    </button>
+                    </a>
                   ) : (
                     <a
                       href={system.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-colors ${
+                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-colors border ${
                         system.id === 'nlds'
-                          ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30'
-                          : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text)] border border-[var(--pf-border)]'
+                          ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30'
+                          : 'bg-[var(--pf-surface)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-orange)] hover:border-[var(--pf-orange)] border-[var(--pf-border)]'
                       }`}>
                       {system.cta}
                       <ExternalLink size={16} />

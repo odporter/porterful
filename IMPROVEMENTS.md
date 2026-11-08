@@ -2237,3 +2237,9 @@ vercel --prod
 3. **Add real artist photos** — avatar files are still placeholders
 4. **Add real products to store** — only 3 demo products (all out of stock)
 5. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+
+
+### 2025-02-05
+- **Shared cart links** — cart page now decodes `?shared=` URL param and loads shared items (was encode-only before). Also fixed `addItem` quantity default in cart-context.
+- **Cart quantity fix** — `addItem` in cart-context now respects passed `quantity` prop (was always defaulting to 1).
+- **Suspense boundary** — cart page wrapped with Suspense for `useSearchParams` compatibility.

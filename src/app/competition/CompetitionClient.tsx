@@ -266,7 +266,7 @@ export default function CompetitionPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                 <Link href="/signup?role=artist" className="px-8 py-4 bg-[var(--pf-orange)] text-white rounded-xl font-bold text-lg hover:bg-[var(--pf-orange)]/90 transition-colors inline-flex items-center justify-center gap-2">
                   <Star size={20} />
-                  Claim Founding Artist Status
+                  {isLive ? 'Claim Founding Artist Status' : 'Get Notified'}
                 </Link>
                 <Link href="/signup/superfan" className="px-8 py-4 bg-[var(--pf-surface)] border border-[var(--pf-border)] text-white rounded-xl font-bold text-lg hover:bg-[var(--pf-surface-hover)] transition-colors inline-flex items-center justify-center gap-2">
                   <Users size={20} />

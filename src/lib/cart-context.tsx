@@ -54,7 +54,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isLoaded]);
 
-  const addItem = (item: Omit<CartItem, 'quantity'>) => {
+  const addItem = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setItems(prev => {
       // Find existing item with same productId AND same options (size/color)
       // If options are being newly selected, treat as separate cart entry

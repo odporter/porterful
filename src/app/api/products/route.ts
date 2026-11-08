@@ -46,8 +46,9 @@ export async function GET(request: NextRequest) {
   products = products.map(p => {
     const salePrice = Math.round((p.basePrice || 5) * 1.3 * 100) / 100
     const artistCut = Math.round(salePrice * 0.80 * 100) / 100
+    const { artistCut: _ignored, ...rest } = p as any // strip any stale DB value
     return {
-      ...p,
+      ...rest,
       price: salePrice, // legacy field for compatibility
       salePrice,
       artistCut,

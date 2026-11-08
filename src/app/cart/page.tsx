@@ -2,17 +2,71 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Minus, Plus, Trash2, ShoppingBag, Share2, Copy, Check } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 
-export default function CartPage() {
+function CartPageInner() {
   const router = useRouter();
-  const { items, removeItem, updateQuantity, clearCart, subtotal, artistCut } = useCart();
+  const searchParams = useSearchParams();
+  const { items, addItem, removeItem, updateQuantity, clearCart, subtotal, artistCut } = useCart();
   const total = subtotal + (subtotal >= 50 ? 0 : 5);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
   const [copied, setCopied] = useState(false);
+  const [sharedLoaded, setSharedLoaded] = useState(false);
+
+  // Load shared cart from URL params on mount
+  useEffect(() => {
+    const shared = searchParams.get('shared');
+    if (!shared) return;
+
+    try {
+      const decoded = JSON.parse(decodeURIComponent(atob(shared)));
+      if (!Array.isArray(decoded) || decoded.length === 0) return;
+
+      // Only apply if cart is empty (avoid merging conflicts)
+      if (items.length === 0) {
+        decoded.forEach((entry: { id: string; q?: number; s?: string; c?: string }) => {
+          // Fetch product details and add to cart
+          fetch(`/api/products/${entry.id}`)
+            .then(res => res.json())
+            .then(product => {
+              if (product && product.name) {
+                addItem({
+                  productId: product.id,
+                  price: product.salePrice || product.price || 9.99,
+                  name: product.name,
+                  artist: product.artist || 'Porterful',
+                  image: product.images?.[0] || '/product-placeholder.svg',
+                  artistCut: (product.salePrice || product.price || 9.99) * 0.80,
+                  quantity: entry.q || 1,
+                  size: entry.s,
+                  color: entry.c,
+                });
+              }
+            })
+            .catch(() => {
+              // Fallback: add minimal cart entry
+              addItem({
+                productId: entry.id,
+                price: 9.99,
+                name: 'Shared Item',
+                artist: 'Porterful',
+                image: '/product-placeholder.svg',
+                artistCut: 9.99 * 0.80,
+                quantity: entry.q || 1,
+                size: entry.s,
+                color: entry.c,
+              });
+            });
+        });
+        setSharedLoaded(true);
+      }
+    } catch (e) {
+      console.error('Failed to parse shared cart:', e);
+    }
+  }, []); // Run once on mount
 
   const handleCheckout = () => {
     // Store cart in localStorage for checkout page
@@ -235,5 +289,13 @@ export default function CartPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen pt-24"><div className="pf-container max-w-4xl pb-28"><div className="h-8 w-48 bg-[var(--pf-surface)] rounded animate-pulse mb-8" /><div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-32 bg-[var(--pf-surface)] rounded-xl animate-pulse" />)}</div></div></div>}>
+      <CartPageInner />
+    </Suspense>
   );
 }

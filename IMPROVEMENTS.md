@@ -1,10 +1,27 @@
 # Porterful Improvements Log
-*Last run: 2026-11-08 (04:48 UTC)*
+*Last run: 2026-11-08 (20:23 UTC)*
 
-## Status: 🟢 Site Live + Emoji → SVG Icons on Contact Page
+## Status: 🟢 Site Live + Clean Build Verified
 
 ### 1. Site Uptime
-✅ porterful.com returning HTTP 200
+✅ porterful.com returning HTTP 200 (all key pages)
+✅ /apply FAQPage structured data confirmed in HTML source
+
+### 2. Build
+✅ Clean production build (65 static pages, zero errors)
+✅ ENOENT trace bug resolved by removing .next/ and rebuilding
+
+### 3. Git
+- Up to date with origin/main — nothing to commit
+- Vercel CLI not authenticated — run `npx vercel login` to enable deployments
+
+### 4. Previous Improvements (from Nov 8 04:48 UTC)
+- **Shared cart links** — cart page now decodes `?shared=` URL param and loads shared items (was encode-only before). Also fixed `addItem` quantity default in cart-context.
+- **Cart quantity fix** — `addItem` in cart-context now respects passed `quantity` prop (was always defaulting to 1).
+- **Suspense boundary** — cart page wrapped with Suspense for `useSearchParams` compatibility.
+
+### 5. Blockers
+- **Vercel deployment** — `vercel --prod` fails with "No existing credentials found." Need to run `npx vercel login` and authenticate with the Porterful Vercel team.
 
 ### 2. Git Commits (1 new commit this run)
 - **0148f60** fix(contact): replace emoji with accessible SVG icons

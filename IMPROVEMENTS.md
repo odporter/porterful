@@ -1,4 +1,37 @@
 # Porterful Improvements Log
+*Last run: 2026-11-09 (00:52 UTC)*
+
+## Status: 🟢 Site Live + Clean Build Verified
+
+### 1. Site Uptime
+✅ porterful.com returning HTTP 200 (all key pages)
+✅ /shop, /store, /cart, /checkout pages all healthy
+✅ OG meta tags present on /shop and /store pages
+
+### 2. Build
+✅ Clean production build (65 static pages, zero errors)
+
+### 3. Git
+- Pushed 1 new commit: `c49da33` — Add fallback placeholder images
+- Vercel deployment still needs authentication
+
+### 4. Improvements This Run
+- **Placeholder images** — Created 3 SVG placeholder files referenced by `onError` handlers across the app:
+  - `public/product-placeholder.svg` — used by ProductClient and ShopClient when product images fail to load
+  - `public/placeholder-album.svg` — used by DigitalClient for missing album art
+  - `public/album-art/default.jpg` — used by GlobalPlayer, GlobalPlayer 2, RadioClient, and artist pages for missing track/cover art
+  - These prevent broken image icons and provide a consistent visual fallback
+
+### 5. Blockers
+- **Vercel deployment** — `vercel --prod` fails with "No existing credentials found." Run `npx vercel login` to authenticate.
+
+### 6. Audit Notes
+- Newsletter API (`/api/newsletter/route.ts`) has in-memory rate limiting — works for single-instance, consider Redis for scale
+- Multiple `TODO` comments in codebase (auth, email, Stripe checkout, dropship orders) — not blockers for launch
+- `next/script` with `dangerouslySetInnerHTML` for JSON-LD is used in client components — works but could be moved to server component wrappers for cleaner SSR
+
+---
+
 *Last run: 2026-11-08 (20:23 UTC)*
 
 ## Status: 🟢 Site Live + Clean Build Verified

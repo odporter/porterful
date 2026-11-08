@@ -1,5 +1,58 @@
 # Porterful Improvements Log
+*Last run: 2026-11-08 (04:29 UTC)*
+
+## Status: 🟢 Site Live + Build Fix + TypeScript Error Resolved
+
+### 1. Site Uptime
+✅ porterful.com → HTTP 200
+✅ /music → HTTP 200
+✅ /artists → HTTP 200
+✅ /store → HTTP 200
+✅ /apply → HTTP 200
+✅ GitHub push succeeded (f47d411)
+
+### 2. Git Commits (1 new commit this run)
+- **f47d411** fix(home): fix ALBUMS type indexing in New Releases sort
+  - TypeScript error: `ALBUMS[albumKey]` couldn't be indexed by a plain `string` (TS treats object keys as specific literal union types)
+  - Fixed by casting `albumKey` to `keyof typeof ALBUMS` in two places: the sort comparator and the `albumData` lookup
+  - Build passes cleanly (0 errors)
+
+### 3. Bug Fix: TypeScript Build Error on Homepage
+- **Problem:** `HomeClient.tsx` line 251 had a TypeScript error — ALBUMS is typed as a concrete object with specific keys (`ambiguous`, `from-feast-to-famine`, etc.) but the code used a plain `string` variable to index it. TypeScript requires the index to match the object's actual key type.
+- **Fix:** Cast `albumKey` to `keyof typeof ALBUMS` in both the sort comparator and the `albumData` lookup.
+- **Impact:** This would have blocked `vercel --prod` from building. Now the homepage compiles cleanly.
+
+### 4. Site Health
+✅ Build passes cleanly (0 errors)
+✅ HTTP 200 across all key pages
+✅ Schema.org: WebSite + Organization + MusicGroup + FAQPage + HowTo
+✅ OG tags + Twitter cards on all major pages
+✅ vercel.json security headers active
+✅ Navbar has aria-labels on all interactive elements
+✅ Cart has free shipping progress bar (threshold: $50)
+✅ Artist roster: 8 artists with distinct gradient themes
+✅ Global keyboard shortcuts for music player
+✅ Sticky mobile Add-to-Cart bar on product pages
+✅ /shop has 100+ print-on-demand products with SEO descriptions
+✅ /store → /shop redirect active (301, vercel.json)
+✅ /music → /digital redirect active (301, middleware)
+
+### 5. Vercel CLI Status
+🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
+- GitHub push → Vercel auto-deploy triggered (f47d411)
+- Run `vercel login` for direct `--prod` deploys
+
+### 6. Recommended Actions (Priority Order)
+1. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys without git push
+2. **Add real artist photos** — avatar files are still placeholders for most artists
+3. **Add real products to store** — still shows "First drop coming soon"
+4. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
+
+---
+
 *Last run: 2026-11-07 (17:28 UTC)*
+
+## Status: 🟢 Site Live + Product Image Alt Text + Low-Stock Badges
 
 ## Status: 🟢 Site Live + Product Image Alt Text + Low-Stock Badges
 

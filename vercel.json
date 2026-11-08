@@ -91,7 +91,6 @@
   ],
   "redirects": [
     { "source": "/radio", "destination": "/digital", "permanent": false },
-    { "source": "/marketplace", "destination": "/shop", "permanent": true },
     { "source": "/competition", "destination": "/apply", "permanent": true }
   ],
   "rewrites": [

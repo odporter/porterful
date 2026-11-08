@@ -2332,3 +2332,12 @@ vercel --prod
 - porterful.com ✅ returning HTTP 200 (from cached Vercel deploy)
 - Build passes ✅ (65 pages, 0 errors)
 
+---
+
+### 2026-11-08 (22:48 UTC)
+- **sitemap.xml SEO fix** — Removed `?d=today` cache-busting query params from all sitemap `<loc>` URLs (these were causing search engines to see every page as "changed today" every day, degrading crawl priority signals). Replaced with fixed `2026-11-08` lastmod dates grouped by update frequency (daily/weekly/monthly). Committed as `73543b0` and pushed to origin/main.
+- Vercel auto-deploy should trigger from the push
+- Known stale Edge cache issue (`/shop` → 307) still present — requires `vercel --prod` CLI login to force Edge cache purge
+- Store page shows "First drop coming soon" for ~5s on load (Suspense boundary + API fetch delay, not a bug)
+- Site otherwise healthy: 200 on all key routes, OG tags present, Schema.org JSON-LD active
+

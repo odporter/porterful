@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Upload, Headphones, ShoppingCart, TrendingUp, Users } from 'lucide-react'
+import { ApplyFAQ } from './ApplyFAQ'
 
 export const metadata: Metadata = {
   title: 'Apply as Artist — Join Porterful',
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const faqData = {
+const faqStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
@@ -33,7 +34,7 @@ const faqData = {
       name: 'How much does it cost to join Porterful?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Free to join as a founding beta artist. No upfront fees.',
+        text: 'Free to join as a founding beta artist. No upfront fees, no monthly subscriptions.',
       },
     },
     {
@@ -41,7 +42,7 @@ const faqData = {
       name: 'How does the 80% revenue share work?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'You keep 80% of every sale. Porterful takes 20% to keep the platform running.',
+        text: 'You keep 80% of every sale. Porterful takes 20% — broken down as 15% payment processing and 5% platform operations. No hidden fees.',
       },
     },
     {
@@ -49,7 +50,7 @@ const faqData = {
       name: 'What music formats do you support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MP3, WAV, FLAC, and AIFF. High-quality audio recommended.',
+        text: 'MP3, WAV, FLAC, and AIFF. High-quality audio (320kbps+) is recommended for the best listener experience.',
       },
     },
     {
@@ -57,7 +58,23 @@ const faqData = {
       name: 'Can I sell physical merch too?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes! Create t-shirts, vinyl records, posters, and more directly from your artist dashboard.',
+        text: 'Yes! Create t-shirts, vinyl records, posters, and more from your artist dashboard. Physical products are print-on-demand and ship directly to fans worldwide.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'When do I get paid?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Payments are processed via Stripe. Withdraw anytime with a $10 minimum. Payments typically arrive in 2-3 business days.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do I keep control of my music?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '100%. You own your music, your catalog, and your fan relationships. No contracts, no commitments, no label interference.',
       },
     },
   ],
@@ -70,7 +87,7 @@ export default function ApplyPage() {
       <script
         id="apply-faq-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
       />
       <div className="min-h-screen bg-[var(--pf-bg)] pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-6">
@@ -142,28 +159,8 @@ export default function ApplyPage() {
             </div>
           </div>
 
-          {/* FAQ */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
-            <div className="space-y-4">
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-6">
-                <h3 className="font-semibold text-white mb-2">How much does it cost?</h3>
-                <p className="text-sm text-[var(--pf-text-secondary)]">Free to join as a founding beta artist. No upfront fees.</p>
-              </div>
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-6">
-                <h3 className="font-semibold text-white mb-2">How does the 80% revenue share work?</h3>
-                <p className="text-sm text-[var(--pf-text-secondary)]">You keep 80% of every sale. Porterful takes 20% to keep the platform running.</p>
-              </div>
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-6">
-                <h3 className="font-semibold text-white mb-2">What music formats do you support?</h3>
-                <p className="text-sm text-[var(--pf-text-secondary)]">MP3, WAV, FLAC, and AIFF. High-quality audio recommended.</p>
-              </div>
-              <div className="bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-xl p-6">
-                <h3 className="font-semibold text-white mb-2">Can I sell physical merch too?</h3>
-                <p className="text-sm text-[var(--pf-text-secondary)]">Yes! Create t-shirts, vinyl records, posters, and more directly from your artist dashboard.</p>
-              </div>
-            </div>
-          </div>
+          {/* Interactive FAQ Accordion */}
+          <ApplyFAQ />
         </div>
       </div>
     </>

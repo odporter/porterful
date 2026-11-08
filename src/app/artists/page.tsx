@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ArtistsPageClient } from './ArtistsPageClient'
+import Script from 'next/script'
 
 const ARTISTS_JSON_LD = {
   '@context': 'https://schema.org',
@@ -18,7 +19,7 @@ const ARTISTS_JSON_LD = {
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Music & Merch',
-    url: 'https://porterful.com/shop',
+    url: 'https://porterful.com/store',
   },
 }
 
@@ -64,7 +65,6 @@ const FAQ_JSON_LD = {
 export const metadata: Metadata = {
   title: 'Discover Artists',
   description: 'Browse and support independent artists on Porterful. Every purchase helps them keep creating.',
-  alternates: { canonical: 'https://porterful.com/artists' },
   openGraph: {
     title: 'Discover Artists | Porterful',
     description: 'Browse and support independent artists. Every purchase helps them keep creating.',
@@ -86,12 +86,12 @@ export const metadata: Metadata = {
 export default function ArtistsPage() {
   return (
     <>
-      <script
+      <Script
         id="artists-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ARTISTS_JSON_LD) }}
       />
-      <script
+      <Script
         id="faq-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}

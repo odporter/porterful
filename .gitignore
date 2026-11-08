@@ -1,0 +1,4 @@
+.env.local.example
+node_modules/
+.next/
+.git/.eslintrc.json

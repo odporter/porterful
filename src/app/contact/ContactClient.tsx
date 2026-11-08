@@ -3,6 +3,21 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
+import { BookOpen, MessageCircle, Send } from 'lucide-react'
+
+// Custom SVG icons for brand consistency
+const MailIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto text-[var(--pf-orange)]">
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+)
+
+const TwitterIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="mx-auto">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+)
 
 export default function ContactClient() {
   const [submitted, setSubmitted] = useState(false)
@@ -49,7 +64,7 @@ export default function ContactClient() {
 
         {submitted ? (
           <div className="bg-[var(--pf-surface)] rounded-2xl p-8 text-center border border-[var(--pf-orange)]/30">
-            <div className="text-6xl mb-4">✉️</div>
+            <div className="mb-4"><MailIcon /></div>
             <h2 className="text-2xl font-bold mb-2">Message Sent!</h2>
             <p className="text-[var(--pf-text-secondary)] mb-6">
               We'll get back to you within 24-48 hours.
@@ -160,14 +175,18 @@ export default function ContactClient() {
         {/* Quick Links */}
         <div className="mt-16 grid md:grid-cols-3 gap-6">
           <div className="bg-[var(--pf-surface)] rounded-xl p-6 text-center border border-[var(--pf-border)]">
-            <div className="text-3xl mb-2">📚</div>
+            <div className="flex justify-center mb-3 text-[var(--pf-orange)]">
+              <BookOpen size={32} />
+            </div>
             <h3 className="font-semibold mb-1">Help Center</h3>
             <Link href="/faq" className="text-[var(--pf-text-muted)] text-sm hover:text-[var(--pf-orange)]">
               FAQs and guides
             </Link>
           </div>
           <div className="bg-[var(--pf-surface)] rounded-xl p-6 text-center border border-[var(--pf-border)]">
-            <div className="text-3xl mb-2">💬</div>
+            <div className="flex justify-center mb-3 text-[var(--pf-orange)]">
+              <MessageCircle size={32} />
+            </div>
             <h3 className="font-semibold mb-1">Community</h3>
             <a
               href="https://discord.gg/porterful"
@@ -179,7 +198,9 @@ export default function ContactClient() {
             </a>
           </div>
           <div className="bg-[var(--pf-surface)] rounded-xl p-6 text-center border border-[var(--pf-border)]">
-            <div className="text-3xl mb-2">🐦</div>
+            <div className="flex justify-center mb-3">
+              <TwitterIcon />
+            </div>
             <h3 className="font-semibold mb-1">Twitter</h3>
             <a
               href="https://twitter.com/porterful"

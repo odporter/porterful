@@ -404,12 +404,8 @@ export function HomeClient() {
                     <div className="text-xs text-[var(--pf-text-muted)]">Albums</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[var(--pf-orange)]">{formattedPlays}</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Total Plays</div>
-                  </div>
-                  <div>
                     <div className="text-2xl font-bold text-[var(--pf-orange)]">{artistPlays >= 1000000 ? `${(artistPlays / 1000000).toFixed(1)}M` : `${(artistPlays / 1000).toFixed(0)}K`}</div>
-                    <div className="text-xs text-[var(--pf-text-muted)]">Total Plays</div>
+                    <div className="text-xs text-[var(--pf-text-muted)]">Plays</div>
                   </div>
                 </div>
                 

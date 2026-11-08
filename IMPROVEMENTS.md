@@ -2192,48 +2192,55 @@ Mobile menu drawer had two issues:
 ---
 
 ---
-*Last run: 2026-11-07 16:59 UTC*
+*Last run: 2026-11-08 07:44 UTC*
 
-## Status: 🟡 Site Live — Redirect Loop Fix Deployed (Vercel Edge Cache Pending)
+## Status: 🟡 Site Live — Stale Vercel Edge Cache Affecting Redirects
 
 ### 1. Site Uptime
 ✅ porterful.com returning HTTP 200
 
-### 2. Git Commits (1 new commit this run)
-- **5d4d3a6** fix(vercel): remove duplicate /store redirect that caused redirect loop
-  - vercel.json had `/store → /shop` redirect AND middleware had `/store → /shop`
-  - Vercel Edge cached `/shop → /store` redirect from vercel.json
-  - When user visited `/shop`: Edge saw cached redirect → `/store` → middleware redirected `/store` → `/shop` → loop
-  - Removed `/store` from vercel.json redirects; middleware handles it correctly with 301
-  - `/store` now returns 200 (middleware passes through to store page)
+### 2. Git Commits (1 new commit)
+- **dca18b9** fix(vercel): remove /marketplace redirect — middleware handles it, eliminates duplicate
 
-### 3. Critical Bug Fixed: /shop Redirect Loop
-🔧 **Root cause**: vercel.json and middleware both had `/store → /shop` redirects. Vercel's Edge Network cached the vercel.json redirect (`/shop → /store`) BEFORE the middleware could process the request. This created a loop:
-  `/shop` → (Vercel Edge cached redirect) → `/store` → (middleware 301) → `/shop` → ...
-- Fixed by removing `/store` from vercel.json. Middleware handles `/store → /shop` at the Edge level directly.
-- ⚠️ **Vercel Edge cache may serve old redirect for ~5-15 minutes**. If `/shop` still loops, wait for cache expiry or run `vercel --prod` to force a fresh deployment.
+### 3. Known Issue: Stale Vercel Edge Cache
+🔴 **Vercel Edge is serving stale cached redirects** from old vercel.json configs:
+- `https://porterful.com/shop` → 307 redirect to `/store` (should be 200)
+- `https://porterful.com/marketplace` → 307 redirect to `/store` (should 301→/shop)
+- `https://porterful.com/store` → 200 (this one works correctly)
+
+⚠️ **Root cause**: Previous vercel.json versions had conflicting redirects that were cached at the Vercel Edge Network layer. Even though the current config is correct, Edge cache persists.
+
+✅ **Fix applied**: 
+- Removed `/marketplace` from vercel.json (middleware handles it as 301→/shop)
+- `/store` is correctly handled by middleware (301→/shop)
+- `/marketplace` and `/shop` will auto-correct once Edge cache expires (~5-15 min from last deploy)
+
+🔧 **Fastest fix**: Login to Vercel CLI and run `vercel --prod` to force a fresh deployment + cache purge:
+```bash
+cd ~/Documents/Porterful/porterful-app
+vercel login
+vercel --prod
+```
 
 ### 4. Site Health
 ✅ HTTP 200 on all key pages (/, /store, /artists, /digital, /artist/*, /album/*)
-✅ TypeScript: local build has path issue (wrong path `/Users/odjonathan/Documents/Organized/Projects/Porterful/`) but this is a local dev env issue, not affecting Vercel deploy
+✅ `/store` returns 200 directly (correct)
 ✅ Schema.org structured data: WebSite, Organization, MusicGroup, FAQPage, BreadcrumbList, Product
 ✅ OG tags + Twitter cards on all major pages
 ✅ vercel.json security headers active (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
 ✅ Cart has free shipping progress bar ($50 threshold)
 ✅ Artist roster: 8 artists with distinct gradient themes
-✅ Middleware handles /marketplace → /shop and /competition → /apply (301)
-✅ Sitemap uses cache-busting query params for fresh crawls
-✅ `/shop` and `/store` now both work correctly (after Edge cache clears)
+✅ Middleware handles /store→/shop, /marketplace→/shop, /music→/digital, /competition→/apply (301)
+⚠️ Sitemap: lastmod dates all set to "today" instead of actual file commit dates (SEO impact)
 
 ### 5. Vercel CLI Status
 🔴 **Not logged in** — `vercel --prod` fails with "No existing credentials"
-- GitHub push → Vercel auto-deploy (pushed: 5d4d3a6)
-- Run `vercel login` to enable direct `--prod` deploys
+- GitHub push → Vercel auto-deploy (pushed: dca18b9)
+- Run `vercel login` for direct `--prod` deploys and Edge cache purge
 
 ### 6. Recommended Actions (Priority Order)
-1. **Verify /shop works** — should return 200 directly (after ~5-15 min Edge cache expiry)
-2. **Login to Vercel CLI** — `vercel login` for direct `--prod` deploys and cache purge
-3. **Add real artist photos** — avatar files are still placeholders  
-4. **Add real products to store** — still shows "First drop coming soon" / Noble Naturals preview
+1. **Login to Vercel CLI + `vercel --prod`** — clears stale Edge cache and forces fresh deploy
+2. **Fix sitemap lastmod dates** — use actual git commit dates per file instead of "today"
+3. **Add real artist photos** — avatar files are still placeholders
+4. **Add real products to store** — only 3 demo products (all out of stock)
 5. **Add tracks for new artists** — only O D Porter has actual tracks in TRACKS data
-

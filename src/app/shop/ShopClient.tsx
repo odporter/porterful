@@ -305,6 +305,8 @@ export default function MarketplacePage() {
                     setShowFilters(false)
                   }
                 }}
+                aria-label="Search products"
+                autoComplete="off"
                 className="w-full px-4 py-2.5 pl-10 pr-10 rounded-lg border border-[var(--pf-border)] bg-[var(--pf-bg)] text-[var(--pf-text)] focus:border-[var(--pf-orange)] focus:outline-none"
               />
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)]">

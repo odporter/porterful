@@ -69,6 +69,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Preconnect to external image CDNs for faster LCP */}
+        <link rel="preconnect" href="https://printful-storage.s3.amazonaws.com" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://printful-storage.s3.amazonaws.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body className="antialiased">
         <Providers>
           {children}

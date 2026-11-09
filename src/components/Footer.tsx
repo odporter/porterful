@@ -213,6 +213,7 @@ export function Footer() {
                 placeholder="your@email.com"
                 disabled={status === 'loading'}
                 aria-label="Email address"
+                autoComplete="email"
                 aria-invalid={status === 'error'}
                 aria-describedby="newsletter-status"
                 className={`flex-1 px-4 py-2 rounded-lg border bg-[var(--pf-bg)] text-[var(--pf-text)] text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 disabled:opacity-50 transition-colors ${

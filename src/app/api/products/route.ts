@@ -31,13 +31,14 @@ export async function GET(request: NextRequest) {
     products = products.filter(p => p.subcategory?.toLowerCase() === subcategory.toLowerCase())
   }
   
-  // Search
+  // Search - includes artist name for discovery
   if (search) {
     const searchLower = search.toLowerCase()
     products = products.filter(p => 
       p.name.toLowerCase().includes(searchLower) ||
       p.category.toLowerCase().includes(searchLower) ||
-      p.subcategory?.toLowerCase().includes(searchLower)
+      p.subcategory?.toLowerCase().includes(searchLower) ||
+      (p as any).artist?.toLowerCase().includes(searchLower)
     )
   }
   

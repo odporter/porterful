@@ -3,12 +3,51 @@
 import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 import { Play, Search, Disc, Users, Filter } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useAudio } from '@/lib/audio-context';
 import { useToast } from '@/components/Toast';
 import { TRACKS } from '@/lib/data';
 import { ARTISTS } from '@/lib/artists';
+
+// JSON-LD schemas for SEO
+const MUSIC_PAGE_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicPlaylist',
+  name: 'Porterful Music — Independent Artist Tracks & Albums',
+  description: 'Stream and buy music from independent artists. 80% of proceeds go directly to creators.',
+  url: 'https://porterful.com/music',
+  numberOfTracks: TRACKS.length,
+  track: TRACKS.slice(0, 20).map((track, index) => ({
+    '@type': 'MusicRecording',
+    name: track.title,
+    byArtist: { '@type': 'MusicGroup', name: track.artist },
+    inAlbum: track.album,
+    duration: track.duration,
+    url: `https://porterful.com/album/${track.album.toLowerCase().replace(/\s+/g, '-')}`,
+    offers: {
+      '@type': 'Offer',
+      price: track.price.toFixed(2),
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+  })),
+};
+
+const MUSIC_GROUP_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicGroup',
+  name: 'Porterful Artists',
+  description: 'Independent artists on Porterful — music, merch, and direct support.',
+  url: 'https://porterful.com/artists',
+  sameAs: ['https://twitter.com/porterful', 'https://instagram.com/porterful'],
+  member: ARTISTS.slice(0, 10).map(artist => ({
+    '@type': 'Person',
+    name: artist.name,
+    genre: artist.genre,
+  })),
+};
 
 export default function MusicClient() {
   const { addItem } = useCart();
@@ -85,6 +124,21 @@ export default function MusicClient() {
 
   return (
     <div className="min-h-screen bg-[var(--pf-bg)]">
+      {/* JSON-LD Structured Data for SEO */}
+      <Script
+        id="music-playlist-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(MUSIC_PAGE_JSON_LD),
+        }}
+      />
+      <Script
+        id="music-group-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(MUSIC_GROUP_JSON_LD),
+        }}
+      />
       {/* Featured Album Hero */}
       <section className="bg-[var(--pf-bg)] border-b border-[var(--pf-border)]">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 pt-6 sm:pt-10 pb-5 sm:pb-8">

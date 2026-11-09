@@ -16,9 +16,11 @@ export default function MusicClient() {
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAlbum, setSelectedAlbum] = useState('all');
+  const [selectedArtist, setSelectedArtist] = useState('all');
 
-  // Get unique albums
+  // Get unique albums and artists
   const albums = Array.from(new Set(TRACKS.map(t => t.album)));
+  const artists = Array.from(new Set(TRACKS.map(t => t.artist)));
 
   // Filter tracks
   const filteredTracks = TRACKS.filter(track => {
@@ -27,7 +29,8 @@ export default function MusicClient() {
       track.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
       track.album.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesAlbum = selectedAlbum === 'all' || track.album === selectedAlbum;
-    return matchesSearch && matchesAlbum;
+    const matchesArtist = selectedArtist === 'all' || track.artist === selectedArtist;
+    return matchesSearch && matchesAlbum && matchesArtist;
   });
 
   // Featured album (album with most total plays)
@@ -241,6 +244,20 @@ export default function MusicClient() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 pr-8 py-2 w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 focus:ring-1 focus:ring-[var(--pf-orange)]/20 transition-all placeholder:text-[var(--pf-text-muted)]"
               />
+            </div>
+            {/* Artist Filter */}
+            <div className="relative w-full sm:w-40">
+              <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pf-text-muted)] pointer-events-none" />
+              <select
+                value={selectedArtist}
+                onChange={(e) => setSelectedArtist(e.target.value)}
+                className="pl-8 pr-3 py-2 w-full bg-[var(--pf-surface)] border border-[var(--pf-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--pf-orange)]/50 appearance-none cursor-pointer"
+              >
+                <option value="all">All artists</option>
+                {artists.map(artist => (
+                  <option key={artist} value={artist}>{artist}</option>
+                ))}
+              </select>
             </div>
             {/* Album Filter */}
             <div className="relative w-full sm:w-44">

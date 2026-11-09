@@ -14,9 +14,21 @@ export interface CartItem {
   artistCut: number;
 }
 
+interface AddItemInput {
+  productId: string;
+  quantity?: number; // defaults to 1
+  size?: string;
+  color?: string;
+  price: number;
+  name: string;
+  artist: string;
+  image: string;
+  artistCut: number;
+}
+
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
+  addItem: (item: AddItemInput) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -54,7 +66,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isLoaded]);
 
-  const addItem = (item: Omit<CartItem, 'quantity'>) => {
+  const addItem = (item: AddItemInput) => {
+    const qty = item.quantity ?? 1;
     setItems(prev => {
       // Find existing item with same productId AND same options (size/color)
       // If options are being newly selected, treat as separate cart entry
@@ -66,11 +79,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existing) {
         return prev.map(i => 
           i.productId === item.productId && i.size === item.size && i.color === item.color
-            ? { ...i, quantity: i.quantity + 1 }
+            ? { ...i, quantity: i.quantity + qty }
             : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: qty }];
     });
   };
 

@@ -71,9 +71,6 @@ export function ArtistSearch() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Calculate total results for keyboard navigation
-  const totalResults = (results?.artists?.length || 0) + (results?.tracks?.length || 0) + (results?.products?.length || 0);
-
   // Close on click outside
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

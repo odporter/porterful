@@ -63,6 +63,7 @@ export default function ProductClient({ productId }: { productId: string }) {
 
     addItem({
       productId: product.id,
+      quantity: quantity,
       price: sellingPrice,
       name: product.name,
       artist: productArtist,

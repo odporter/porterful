@@ -17,10 +17,9 @@ export function ArtistsPageClient() {
   const [activeGenre, setActiveGenre] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('default')
-  const [artists] = useState(ARTISTS)
 
-  // Filter and sort artists
-  const filteredArtists = artists
+  // Filter and sort artists - use ARTISTS directly (static import, no useState needed)
+  const filteredArtists = ARTISTS
     .filter(artist => {
       const matchesGenre = activeGenre === 'All' || artist.genre?.toLowerCase().includes(activeGenre.toLowerCase())
       const matchesSearch = !searchQuery ||
@@ -34,7 +33,7 @@ export function ArtistsPageClient() {
       return 0
     })
 
-  const featuredArtist = artists[0]
+  const featuredArtist = ARTISTS[0]
 
   return (
     <div className="min-h-screen pt-24 pb-12">

@@ -5,6 +5,28 @@ import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/app/providers';
 import { VerificationForm } from '@/components/VerificationBadge';
 
+// Accessible SVG badge icons matching Porterful's brand
+const BadgeIcon = {
+  Veteran: () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  ),
+  BlackOwned: () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  ),
+  MinorityOwned: () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  ),
+};
+
 export default function VerifyPage() {
   const { user, supabase } = useSupabase();
   const router = useRouter();
@@ -32,7 +54,9 @@ export default function VerifyPage() {
           
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-[var(--pf-surface)] rounded-lg">
-              <span className="text-3xl mb-2 block">🎖️</span>
+              <span className="inline-block mb-2 text-[var(--pf-orange)]">
+                <BadgeIcon.Veteran />
+              </span>
               <h3 className="font-medium">Veteran Badge</h3>
               <p className="text-sm text-[var(--pf-text-secondary)] mt-1">
                 Show your service. 1% of your sales go to veteran causes.
@@ -40,7 +64,9 @@ export default function VerifyPage() {
             </div>
             
             <div className="text-center p-4 bg-[var(--pf-surface)] rounded-lg">
-              <span className="text-3xl mb-2 block">✊</span>
+              <span className="inline-block mb-2 text-[var(--pf-orange)]">
+                <BadgeIcon.BlackOwned />
+              </span>
               <h3 className="font-medium">Black-Owned Badge</h3>
               <p className="text-sm text-[var(--pf-text-secondary)] mt-1">
                 Stand out to customers who want to support Black-owned businesses.
@@ -48,7 +74,9 @@ export default function VerifyPage() {
             </div>
             
             <div className="text-center p-4 bg-[var(--pf-surface)] rounded-lg">
-              <span className="text-3xl mb-2 block">🌍</span>
+              <span className="inline-block mb-2 text-[var(--pf-orange)]">
+                <BadgeIcon.MinorityOwned />
+              </span>
               <h3 className="font-medium">Minority-Owned Badge</h3>
               <p className="text-sm text-[var(--pf-text-secondary)] mt-1">
                 Connect with customers who prioritize diversity.
@@ -60,7 +88,9 @@ export default function VerifyPage() {
         {/* Veteran Support Info */}
         <div className="pf-card p-6 mb-8 bg-blue-600/5 border border-blue-600/20">
           <div className="flex items-start gap-4">
-            <span className="text-4xl">🎖️</span>
+            <span className="text-[var(--pf-orange)] mt-1">
+              <BadgeIcon.Veteran />
+            </span>
             <div>
               <h3 className="font-semibold text-lg">Veteran Support Program</h3>
               <p className="text-[var(--pf-text-secondary)] mt-1 mb-3">
